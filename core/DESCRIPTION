@@ -1,0 +1,21 @@
+Package: Omix
+Type: Package
+Title: Shared Utilities for OMIX Analysis Modules
+Version: 0.1.0
+Authors@R: c(
+    person("Margaret", "Cam", email = "maggie.cam@nih.gov", role = c("aut", "cre")),
+    person("Aleksandra", "Michalowski", email = "aleksandra.michalowski@nih.gov", role = c("aut")),
+    person("Dante", "Smith", email = "dante.smith@nih.gov", role = "aut"),
+    person("Tyler", "Malys", email = "tyler.malys@nih.gov", role = "aut"))
+Description: Reusable R utilities for OMIX bioinformatics analysis modules.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.2
+Depends: R (>= 4.1.0)
+Imports: 
+    colorspace,
+    ggsci,
+    RColorBrewer
+Suggests: 
+    testthat (>= 3.0.0)

@@ -1,0 +1,8 @@
+name: omix-l2p-multi
+display_name: OMIX-L2P-Multi
+version: 0.0.0
+module_type: pathway
+status: planned
+owner: OMIX Team
+description: Multi-comparison L2P pathway analysis.
+data_policy: No data are committed until implementation begins.

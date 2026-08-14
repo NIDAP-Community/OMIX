@@ -1,0 +1,8 @@
+name: omix-l2p-single
+display_name: OMIX-L2P-Single
+version: 0.0.0
+module_type: pathway
+status: planned
+owner: OMIX Team
+description: Single-comparison L2P pathway analysis.
+data_policy: No data are committed until implementation begins.
