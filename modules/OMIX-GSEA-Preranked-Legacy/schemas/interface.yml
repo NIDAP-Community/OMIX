@@ -1,0 +1,28 @@
+interface_version: 1
+entrypoint: scripts/run_gsea.R
+inputs:
+  deg_table:
+    required: true
+    formats: [csv, tsv, rds]
+    description: Differential-expression table with one gene identifier column and one or more ranking-score columns.
+  pathways_database:
+    required: true
+    formats: [csv, tsv, rds]
+    description: Gene-set membership database.
+parameters:
+  gene_names_column:
+    type: string
+    default: Gene
+  gene_scores_suffix:
+    type: string
+    default: _tstat
+  species:
+    type: string
+    default: Human
+outputs:
+  gsea_results:
+    path: gsea_results.csv
+    format: csv
+  gsea_pvalue_tables:
+    path: gsea_pvalue_tables.png
+    format: png

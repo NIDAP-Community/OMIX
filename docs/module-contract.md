@@ -16,6 +16,13 @@ modules/<module-name>/
 `-- CHANGELOG.md           Module release history
 ```
 
+The monorepo is platform-neutral. Modules must not contain Code Ocean App
+Panel metadata, Code Ocean environment Dockerfiles, or `/data` and `/results`
+mount assumptions. Platform-specific repositories or build outputs own those
+adapters. A module's `scripts/` entry point accepts explicit input and output
+paths so that Code Ocean, Galaxy, containers, and HPC schedulers can invoke
+the same scientific implementation.
+
 Shared utilities belong in `core/` only after two or more modules need the same
 stable behavior. A module should otherwise own its implementation and declare
 its own dependencies and data policy in `module.yml`.

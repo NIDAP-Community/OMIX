@@ -99,6 +99,8 @@
 #' @param Image_Width Numeric. image width in pixels Default: \code{2500}.
 #' @param Image_Height Numeric. Image height in pixels Default: \code{2500}.
 #' @param Image_Resolution Numeric. Image resolution (dpi) Default: \code{300}.
+#' @param Output_Directory Character. Directory for generated figures. Defaults
+#' to the current working directory.
 #' @param Display_Warnings
 #' Numeric. Set to 0 if you want warnings to appear in the Logs output tab;
 #' default is set to -1 which mutes the warnings Default: \code{-1}.
@@ -140,6 +142,7 @@ GSEA_Preranked <- function(
   Image_Width = 2500,
   Image_Height = 2500,
   Image_Resolution = 300,
+  Output_Directory = getwd(),
   Display_Warnings = -1
 ) {
   # This function calculates pre-ranked GSEA for multiple contrasts
@@ -1085,8 +1088,18 @@ GSEA_Preranked <- function(
 
   ## visualization
   
-  # Define output graphics file path
-  graphicsFile <- file.path("/results", "gsea_pvalue_tables.png")
+  if (
+    !is.character(Output_Directory) ||
+      length(Output_Directory) != 1L ||
+      is.na(Output_Directory) ||
+      !nzchar(Output_Directory)
+  ) {
+    stop("ERROR: `Output_Directory` must be one non-empty path")
+  }
+  dir.create(Output_Directory, showWarnings = FALSE, recursive = TRUE)
+
+  # Define output graphics file path without assuming a platform-specific mount.
+  graphicsFile <- file.path(Output_Directory, "gsea_pvalue_tables.png")
 
   png(
     filename = graphicsFile,
@@ -1220,5 +1233,4 @@ GSEA_Preranked <- function(
 
   return(gsea)
 }
-
 

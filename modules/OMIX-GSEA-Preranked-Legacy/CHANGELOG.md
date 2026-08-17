@@ -7,6 +7,14 @@ Version numbers correspond to Code Ocean capsule release versions (integers: v1,
 
 ## [Unreleased]
 
+### Changed
+- Moved the reusable GSEA implementation to `R/GSEA_Preranked.R` and added
+  the platform-neutral `scripts/run_gsea.R` entry point (2026-08-17).
+- Replaced the hard-coded `/results` figure path with an explicit output
+  directory, allowing the same implementation to run outside Code Ocean.
+- Removed Code Ocean capsule files from the canonical OMIX module; capsule
+  repositories are deployment adapters generated from this source.
+
 ### Added
 - OMIX Suite Documentation Guide file included in results output (2026-01-08)
   - Explains CHANGELOG and two-README structure

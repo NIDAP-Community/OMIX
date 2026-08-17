@@ -4,7 +4,7 @@ Gene Set Enrichment Analysis (GSEA) for pre-ranked gene lists using the fgsea pa
 
 ## Overview
 
-**Version**: v5.0 | **Part of the OMIX analysis suite**
+**Version**: v5.1.0 | **Part of the OMIX analysis suite**
 
 Gene Set Enrichment Analysis (GSEA) determines whether predefined gene sets show statistically significant, concordant differences between two biological states. This tool uses **pre-ranked gene lists** from differential expression analysis to evaluate pathway enrichment using the fast fgsea algorithm.
 
@@ -61,7 +61,24 @@ Differential expression results with:
 **Column naming pattern:** `{comparison}_{suffix}`  
 Example: `TreatmentA_tstat`, `TreatmentB_tstat`, `Control_tstat`
 
-**Demo dataset included**: Mouse RNA-seq data runs automatically if no file is uploaded.
+The module intentionally does not include demo data. Supply explicit input paths
+when running locally, in a container, or from another platform.
+
+## Run from the command line
+
+The module entry point is platform-neutral:
+
+```bash
+Rscript scripts/run_gsea.R \
+  --deg_table /path/to/DEG_Analysis.csv \
+  --pathways_database /path/to/pathways.rds \
+  --output_dir results
+```
+
+The same command-line contract is the intended integration point for a Galaxy
+tool wrapper, an HPC job script, or a container entry point. Platform adapters
+may choose inputs differently, but must call this interface with explicit
+paths.
 
 ## Supported Species
 
@@ -136,7 +153,7 @@ For questions or issues:
 - **NIDAP Team**: NCICCBRNIDAP@mail.nih.gov
 - **CCBR**: CCR Collaborative Bioinformatics Resource
 
-For detailed step-by-step instructions on using the App Panel, see `/code/README.md`.
+See `schemas/interface.yml` for the machine-readable input and output contract.
 
 ---
 

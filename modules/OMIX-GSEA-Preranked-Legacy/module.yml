@@ -1,9 +1,10 @@
 name: omix-gsea-preranked-legacy
 display_name: OMIX-GSEA-Preranked-Legacy
-version: 5.0.0
+version: 5.1.0
 module_type: pathway
 status: active
 owner: OMIX Team
 description: Legacy preranked gene set enrichment analysis using fgsea.
-data_policy: No data are committed. Code Ocean dataset attachments are declared in .codeocean/datasets.json.
-starter_environment: r-pathway
+data_policy: No data are committed. Callers supply input paths through the module CLI or a platform adapter.
+runtime_profile: r-pathway
+entrypoint: scripts/run_gsea.R

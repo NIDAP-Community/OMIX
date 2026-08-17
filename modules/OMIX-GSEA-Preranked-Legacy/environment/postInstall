@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-# Install fgsea from Bioconductor
-Rscript -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager"); BiocManager::install("fgsea", update = FALSE, ask = FALSE)'
-
-# Install l2p and l2psupp from CCBR GitHub (ortholog mapping packages)
-Rscript -e 'install.packages("https://github.com/CCBR/l2p/raw/master/l2p_0.0-14.tar.gz", repos=NULL)'
-Rscript -e 'install.packages("https://github.com/CCBR/l2p/raw/master/l2psupp_0.0-14.tar.gz", repos=NULL)'
