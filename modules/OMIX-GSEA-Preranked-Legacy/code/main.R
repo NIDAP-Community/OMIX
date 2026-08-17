@@ -57,8 +57,9 @@ while (i <= length(args)) {
 
 opt <- parse_args(parser, args = filtered_args)
 
-# Uploaded file takes priority. Otherwise, locate DEG_Analysis.csv passed
-# from the upstream workflow capsule anywhere under this capsule's /data.
+# Uploaded file takes priority. Otherwise, locate a CSV whose name matches
+# the DEG regex passed from the upstream workflow capsule anywhere under
+# this capsule's /data.
 find_upstream_deg <- function() {
   files <- list.files(
     "/data",
@@ -67,10 +68,21 @@ find_upstream_deg <- function() {
     all.files = FALSE
   )
 
-  matches <- files[tolower(basename(files)) == "deg_analysis.csv"]
+  file_names <- basename(files)
+  matches <- files[
+    grepl("DEG", file_names) &
+      grepl("\\.csv$", file_names, ignore.case = TRUE)
+  ]
 
-  if (length(matches) > 0) {
-    return(matches[1])
+  if (length(matches) == 1L) {
+    return(matches)
+  }
+
+  if (length(matches) > 1L) {
+    stop(
+      "ERROR: Multiple upstream DEG CSV files were found:\\n",
+      paste(matches, collapse = "\\n")
+    )
   }
 
   NULL
@@ -88,7 +100,7 @@ if (is.null(opt$deg_table) || opt$deg_table == "") {
     message("No DEG file uploaded. Using example data asset.")
   } else {
     stop(
-      "ERROR: No DEG_Analysis.csv was received from the upstream capsule.\n",
+      "ERROR: No CSV file matching the DEG regex was received from the upstream capsule.\n",
       "Visible files under /data:\n",
       paste(
         list.files("/data", recursive = TRUE, full.names = TRUE),
