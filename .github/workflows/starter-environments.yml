@@ -48,6 +48,42 @@ jobs:
             --tag omix-r-pathway:ci \
             starter-environments/r-pathway
 
+      - name: Capture resolved pathway package inventory
+        run: |
+          mkdir -p build-artifacts
+          docker run --rm \
+            --volume "${{ github.workspace }}/build-artifacts:/out" \
+            --entrypoint Rscript \
+            omix-r-pathway:ci \
+            -e '
+              installed <- as.data.frame(installed.packages(lib.loc = .libPaths()))
+              write.csv(
+                installed[, c("Package", "Version", "Built", "LibPath")],
+                "/out/installed-packages.csv",
+                row.names = FALSE
+              )
+              writeLines(capture.output(sessionInfo()), "/out/sessionInfo.txt")
+              writeLines(as.character(BiocManager::version()), "/out/bioconductor-version.txt")
+              project <- tempfile("renv-project-")
+              dir.create(project)
+              renv::snapshot(
+                project = project,
+                library = .libPaths(),
+                lockfile = "/out/renv.lock",
+                type = "all",
+                prompt = FALSE
+              )
+            '
+
+      - name: Upload pathway package inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pathway-package-inventory
+          path: build-artifacts
+          if-no-files-found: error
+          retention-days: 90
+
       - name: Log in to GHCR
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish }}
         uses: docker/login-action@v3
