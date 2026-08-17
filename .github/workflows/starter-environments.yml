@@ -38,13 +38,15 @@ jobs:
           load: true
           tags: omix-r-base:ci
 
+      # `docker/build-push-action` runs with an isolated BuildKit context, so
+      # it cannot resolve the locally loaded `omix-r-base:ci` tag. The runner
+      # Docker daemon can resolve that tag directly after the preceding build.
       - name: Build r-pathway
-        uses: docker/build-push-action@v6
-        with:
-          context: starter-environments/r-pathway
-          build-args: BASE_IMAGE=omix-r-base:ci
-          load: true
-          tags: omix-r-pathway:ci
+        run: |
+          docker build \
+            --build-arg BASE_IMAGE=omix-r-base:ci \
+            --tag omix-r-pathway:ci \
+            starter-environments/r-pathway
 
       - name: Log in to GHCR
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish }}
