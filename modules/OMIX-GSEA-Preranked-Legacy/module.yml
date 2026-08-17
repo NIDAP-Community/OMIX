@@ -6,3 +6,4 @@ status: active
 owner: OMIX Team
 description: Legacy preranked gene set enrichment analysis using fgsea.
 data_policy: No data are committed. Code Ocean dataset attachments are declared in .codeocean/datasets.json.
+starter_environment: r-pathway

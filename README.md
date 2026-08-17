@@ -48,6 +48,14 @@ The synchronization tooling is under construction.
 Each planned module currently contains only its skeleton contract. Read
 [docs/module-contract.md](docs/module-contract.md) before adding implementation.
 
+## Starter environments
+
+Shared runtime definitions live in [`starter-environments/`](starter-environments/).
+They are built once for a scientific domain and then used by module-specific
+container overlays. This keeps pathway modules independent of MOSuite while
+allowing the same pinned OCI image to run in Code Ocean, Docker, and HPC.
+See [docs/starter-environments.md](docs/starter-environments.md).
+
 ## Checks
 
 Run the repository layout check from the repository root:
