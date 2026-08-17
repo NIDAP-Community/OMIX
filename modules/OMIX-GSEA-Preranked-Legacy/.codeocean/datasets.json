@@ -1,0 +1,13 @@
+{
+	"version": 1,
+	"attached_datasets": [
+		{
+			"id": "28035d52-03e6-4761-8f50-72d48af496d1",
+			"mount": "deg_table"
+		},
+		{
+			"id": "eb51e72e-bcb9-400d-bf94-fc8cad85c7f1",
+			"mount": "msigdb"
+		}
+	]
+}

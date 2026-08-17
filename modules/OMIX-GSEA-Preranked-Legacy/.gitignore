@@ -1,0 +1,4 @@
+# Exclude data, results, and scratch directories (best practice for reproducibility)
+/data/
+/results/
+/scratch/

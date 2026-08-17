@@ -1,0 +1,23 @@
+metadata_version: 1
+name: OMIX GSEA Preranked Legacy
+description: Gene Set Enrichment Analysis (GSEA) for ranked gene lists using fgsea.
+  Performs pre-ranked GSEA with MSigDB collections (Hallmark, REACTOME, etc.) on differential
+  expression results. Supports multiple species via ortholog mapping. Generates enrichment
+  statistics, NES scores, p-values with FDR correction, and leading-edge gene annotations.
+  Includes demo dataset (Mouse RNA-seq) for easy testing - runs automatically if no
+  input file is provided. Part of the OMIX analysis suite.
+tags:
+- OMIX
+- pathway-analysis
+- enrichment
+- gene-sets
+- bioinformatics
+- R
+- Bulk RNA-seq
+- Differential expression
+- MSigDB
+- GSEA
+- fgsea
+authors:
+- name: Aleksandra Michalowski
+- name: Maggie Cam
