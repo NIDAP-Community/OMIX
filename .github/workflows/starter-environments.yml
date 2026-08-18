@@ -71,6 +71,9 @@ jobs:
                 library = .libPaths(),
                 lockfile = "/out/renv.lock",
                 type = "all",
+                # These are installed separately from the immutable CCBR/l2p
+                # tarball URLs declared in the Dockerfile, not a package repo.
+                exclude = c("l2p", "l2psupp"),
                 prompt = FALSE
               )
             '
