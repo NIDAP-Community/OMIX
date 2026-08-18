@@ -41,6 +41,25 @@ for (module_dir in module_dirs) {
       call. = FALSE
     )
   }
+
+  forbidden_platform_paths <- c(
+    ".codeocean",
+    "metadata",
+    "environment",
+    "code"
+  )
+  present_platform_paths <- forbidden_platform_paths[
+    file.exists(file.path(module_dir, forbidden_platform_paths))
+  ]
+  if (length(present_platform_paths) > 0L) {
+    stop(
+      "Module contract failed for ", basename(module_dir),
+      ": Code Ocean adapter paths belong in the individual repository, not ",
+      "the canonical module: ",
+      paste(present_platform_paths, collapse = ", "),
+      call. = FALSE
+    )
+  }
 }
 
 message("OMIX monorepo layout check passed.")

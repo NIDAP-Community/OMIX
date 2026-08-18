@@ -50,8 +50,10 @@ contains the Code Ocean-specific `code/`, metadata, and environment files.
 | [OMIX-L2P-Single](modules/OMIX-L2P-Single) | [OMIX-L2P-Single](https://github.com/NIDAP-Community/OMIX-L2P-Single) | Single-comparison L2P | Active |
 | [OMIX-L2P-Multi](modules/OMIX-L2P-Multi) | [OMIX-L2P-Multi](https://github.com/NIDAP-Community/OMIX-L2P-Multi) | Multi-comparison L2P | Active |
 
-Read [docs/module-contract.md](docs/module-contract.md) before adding or
-releasing module implementation.
+Read the [developer guide](docs/developer-guide.md) and
+[module contract](docs/module-contract.md) before adding or releasing module
+implementation. The compact instructions for GitHub Copilot are in
+[.github/copilot-instructions.md](.github/copilot-instructions.md).
 
 ## Starter environments
 
