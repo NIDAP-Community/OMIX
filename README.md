@@ -39,12 +39,16 @@ documentation, and release history.
 Each module will be synchronized with its corresponding individual repository.
 The synchronization tooling is under construction.
 
-| Module | Purpose | Status |
-| --- | --- | --- |
-| [OMIX-GSEA-Preranked-Legacy](modules/OMIX-GSEA-Preranked-Legacy) | Legacy preranked GSEA | Active |
-| [OMIX-Volcano-Plot](modules/OMIX-Volcano-Plot) | Differential-expression volcano plot | Active |
-| [OMIX-L2P-Single](modules/OMIX-L2P-Single) | Single-comparison L2P | Active |
-| [OMIX-L2P-Multi](modules/OMIX-L2P-Multi) | Multi-comparison L2P | Active |
+The **Module** link below is the canonical, platform-neutral implementation.
+The **Code Ocean adapter** link is the repository deployed as a capsule; it
+contains the Code Ocean-specific `code/`, metadata, and environment files.
+
+| Module | Code Ocean adapter | Purpose | Status |
+| --- | --- | --- | --- |
+| [OMIX-GSEA-Preranked-Legacy](modules/OMIX-GSEA-Preranked-Legacy) | [OMIX-GSEA-Preranked-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy) | Legacy preranked GSEA | Active |
+| [OMIX-Volcano-Plot](modules/OMIX-Volcano-Plot) | [OMIX-Volcano-Plot](https://github.com/NIDAP-Community/OMIX-Volcano-Plot) | Differential-expression volcano plot | Active |
+| [OMIX-L2P-Single](modules/OMIX-L2P-Single) | [OMIX-L2P-Single](https://github.com/NIDAP-Community/OMIX-L2P-Single) | Single-comparison L2P | Active |
+| [OMIX-L2P-Multi](modules/OMIX-L2P-Multi) | [OMIX-L2P-Multi](https://github.com/NIDAP-Community/OMIX-L2P-Multi) | Multi-comparison L2P | Active |
 
 Read [docs/module-contract.md](docs/module-contract.md) before adding or
 releasing module implementation.
