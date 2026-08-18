@@ -1,0 +1,31 @@
+interface_version: 1
+entrypoint: scripts/run_l2p_multi.R
+inputs:
+  deg_table:
+    required: true
+    formats: [csv, tsv, txt, rds]
+    description: Wide differential-expression table containing one or more comparison-specific statistics.
+parameters:
+  comparisons:
+    required: true
+    type: string
+    description: Comma-separated comparison identifiers used to infer matching DEG columns when explicit columns are not supplied.
+  species:
+    type: string
+    default: Human
+  collections_to_include:
+    type: string
+    default: H
+  output_dir:
+    type: path
+    default: results
+outputs:
+  l2p_multi_results:
+    path: l2p_multi_results.csv
+    format: csv
+  l2p_multi_provenance:
+    path: l2p_multi_results_provenance.csv
+    format: csv
+  l2p_multi_plot:
+    path: l2p_multi_plot.png
+    format: png

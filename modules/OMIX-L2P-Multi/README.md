@@ -1,7 +1,22 @@
-# OMIX-L2P-Multi
+# OMIX L2P Multi
 
-Status: planned.
+Platform-neutral L2P over-representation analysis for comparing multiple DEG
+contrasts. The module accepts explicit input and output paths so it can be
+called from an HPC job, container, Galaxy wrapper, or a platform adapter.
 
-This skeleton reserves the module name and its independent development
-boundary. Add implementation, tests, schemas, and runnable code here as the
-module design is defined.
+## Run from the command line
+
+```bash
+Rscript scripts/run_l2p_multi.R \
+  --deg_table /path/to/DEG_Analysis.csv \
+  --comparisons TreatmentA-Control,TreatmentB-Control \
+  --output_dir results
+```
+
+For conventional wide DEG tables, the module derives columns such as
+`TreatmentA-Control_tstat`, `TreatmentA-Control_pval`, and
+`TreatmentA-Control_FC`. Supply explicit comma-separated column lists when
+your table uses different names.
+
+The reusable implementation is in `R/analysis_functions.R`; see
+`schemas/interface.yml` for the machine-readable contract.

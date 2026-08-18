@@ -1,0 +1,31 @@
+interface_version: 1
+entrypoint: scripts/run_l2p_single.R
+inputs:
+  deg_table:
+    required: true
+    formats: [csv, tsv, txt, rds]
+    description: Differential-expression table containing one comparison or a wide table with comparison-prefixed columns.
+parameters:
+  comparison:
+    required: true
+    type: string
+    description: Comparison identifier used to infer matching DEG columns when explicit columns are not supplied.
+  species:
+    type: string
+    default: Human
+  collections_to_include:
+    type: string
+    default: GO,REACTOME,KEGG
+  output_dir:
+    type: path
+    default: results
+outputs:
+  l2p_results:
+    path: l2p_results.csv
+    format: csv
+  l2p_provenance:
+    path: l2p_results_provenance.csv
+    format: csv
+  l2p_plots:
+    path: l2p_plots.png
+    format: png

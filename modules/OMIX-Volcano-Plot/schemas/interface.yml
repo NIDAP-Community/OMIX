@@ -1,0 +1,30 @@
+interface_version: 1
+entrypoint: scripts/run_volcano_plot.R
+inputs:
+  deg_table:
+    required: true
+    formats: [csv, tsv, txt, rds]
+    description: Differential-expression table containing a feature identifier, significance values, and log2 fold-change values.
+parameters:
+  pvalue_type:
+    type: string
+    default: nominal
+    allowed: [nominal, adjusted]
+  p_value_threshold:
+    type: number
+    default: 0.05
+  log2_fold_change_threshold:
+    type: number
+    default: 1.0
+  output_dir:
+    type: path
+    default: results
+outputs:
+  volcano_plots:
+    path: volcano_plot.png
+    format: png
+    description: One plot per selected comparison; multiple comparisons receive a suffix.
+  volcano_plot_data:
+    path: volcano_plot_data.csv
+    format: csv
+    description: Input DEG table augmented with signed negative-log10 significance ranks.

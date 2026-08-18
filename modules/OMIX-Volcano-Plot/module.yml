@@ -1,0 +1,10 @@
+name: omix-volcano-plot
+display_name: OMIX Volcano Plot
+version: 1.0.0
+module_type: visualization
+status: active
+owner: OMIX Team
+description: Platform-neutral generation of publication-ready volcano plots from differential-expression tables.
+data_policy: No data are committed. Callers supply an explicit DEG-table path through the CLI or a platform adapter.
+runtime_profile: r-visualization
+entrypoint: scripts/run_volcano_plot.R
