@@ -200,7 +200,10 @@ volcano_plot_enhanced <- function(
   }
 
   infer_feature_column <- function(df) {
-    preferred <- c("Gene", "Feature_ID", "FeatureID", "gene", "gene_id")
+    preferred <- c(
+      "GeneName", "Gene Symbols", "Gene", "Feature_ID", "FeatureID",
+      "gene_name", "gene_symbol", "GeneSymbol", "gene", "gene_id"
+    )
     hit <- preferred[preferred %in% colnames(df)][1]
     if (!is.na(hit)) {
       return(hit)

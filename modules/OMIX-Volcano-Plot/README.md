@@ -13,7 +13,9 @@ Rscript scripts/run_volcano_plot.R \
 ```
 
 The feature identifier, significance, and log2-fold-change columns are inferred
-when their names follow common DEG conventions. They can be set explicitly with
+when their names follow common DEG conventions. Feature detection prefers
+`GeneName`, then `Gene Symbols`, followed by common generic identifier names.
+They can be set explicitly with
 `--column_with_feature_id`, `--significance_column`, and
 `--log2_fold_change_column`. For multiple comparisons, provide matching
 comma-separated significance and fold-change column lists.
