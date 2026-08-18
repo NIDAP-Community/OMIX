@@ -15,12 +15,16 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # This lockfile was captured from the validated CI build. Restore the exact
-# CRAN and Bioconductor package set into the image's site library.
+# CRAN and Bioconductor package set into a dedicated runtime library. Source
+# restoration preserves dependency order; the binary restore path can test a
+# package before its binary dependency is available.
 WORKDIR /opt/omix/r-pathway
 COPY renv.lock renv.lock
-RUN R -q -e "renv::restore( \
+ENV R_LIBS_USER=/opt/omix/r-pathway/library
+RUN mkdir -p "$R_LIBS_USER" \
+    && R -q -e "options(pkgType = 'source'); renv::restore( \
   lockfile = '/opt/omix/r-pathway/renv.lock', \
-  library = .Library, \
+  library = Sys.getenv('R_LIBS_USER'), \
   prompt = FALSE \
 )"
 
