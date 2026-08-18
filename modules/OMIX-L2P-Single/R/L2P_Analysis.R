@@ -948,7 +948,9 @@ l2p_single <- function(
         ) +
         coord_flip()
     }
-    print(gplot)
+    if (interactive()) {
+      print(gplot)
+    }
     return(gplot)
   }
 
@@ -1073,7 +1075,9 @@ l2p_single <- function(
           title.position = "top"
         )
       )
-    print(gplot)
+    if (interactive()) {
+      print(gplot)
+    }
     return(gplot)
   }
 
@@ -1085,15 +1089,19 @@ l2p_single <- function(
     # Combine the wrapped segments with newlines
     wrapped_message <- paste(unlist(wrapped_segments), collapse = "\n")
 
-    grid.newpage()
-    grid.rect(gp = gpar(fill = color, col = NA))
-    grid.text(
-      wrapped_message,
-      x = 0.5,
-      y = 0.5,
-      gp = gpar(fontface = "italic", cex = 3, col = "black"),
-      just = "center"
-    )
+    if (interactive()) {
+      grid.newpage()
+      grid.rect(gp = gpar(fill = color, col = NA))
+      grid.text(
+        wrapped_message,
+        x = 0.5,
+        y = 0.5,
+        gp = gpar(fontface = "italic", cex = 3, col = "black"),
+        just = "center"
+      )
+    } else {
+      message(wrapped_message)
+    }
   }
 
   ## --------------- ##

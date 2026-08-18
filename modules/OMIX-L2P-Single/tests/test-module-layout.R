@@ -12,10 +12,13 @@ invisible(parse(file = function_file))
 invisible(parse(file = cli_file))
 
 cli_text <- paste(readLines(cli_file, warn = FALSE), collapse = "\n")
+function_text <- paste(readLines(function_file, warn = FALSE), collapse = "\n")
 stopifnot(grepl("--deg_table", cli_text, fixed = TRUE))
 stopifnot(grepl("--comparison", cli_text, fixed = TRUE))
 stopifnot(grepl("--output_dir", cli_text, fixed = TRUE))
 stopifnot(!grepl('"/data/', cli_text, fixed = TRUE))
 stopifnot(!grepl('"/results"', cli_text, fixed = TRUE))
+stopifnot(grepl("if (interactive())", function_text, fixed = TRUE))
+stopifnot(grepl("message(wrapped_message)", function_text, fixed = TRUE))
 
 message("OMIX-L2P-Single module layout checks passed")
