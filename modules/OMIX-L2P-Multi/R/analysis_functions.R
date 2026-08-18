@@ -487,6 +487,8 @@ l2p_multi <- function(
 
     if (!nzchar(provided)) {
       common_gene_columns <- c(
+        "GeneName",
+        "Gene Symbols",
         "Gene",
         "gene",
         "GeneSymbol",

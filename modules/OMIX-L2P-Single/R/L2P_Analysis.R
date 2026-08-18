@@ -424,6 +424,8 @@ l2p_single <- function(
 
     if (!nzchar(provided)) {
       common_gene_columns <- c(
+        "GeneName",
+        "Gene Symbols",
         "Gene",
         "gene",
         "GeneSymbol",
