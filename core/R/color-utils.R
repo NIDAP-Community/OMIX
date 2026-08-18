@@ -31,7 +31,8 @@ get_hex_color <- function(rcolor) {
 #'
 #' @param hex A hex color string.
 #'
-#' @return A single R color name.
+#' @return The closest base R color name. This is a human-friendly
+#'   approximation; the input hex value remains the exact color.
 #' @export
 get_closest_color <- function(hex) {
   target_rgb <- grDevices::col2rgb(hex)
@@ -50,7 +51,8 @@ get_closest_color <- function(hex) {
 #'
 #' @param col Character vector of hex colors.
 #'
-#' @return A named character vector of hex colors.
+#' @return A named character vector of hex colors. Each name is the closest
+#'   base R color name; each value is the exact hex color.
 #' @export
 colorvect <- function(col) {
   named_colors <- setNames(col, sapply(col, get_closest_color))

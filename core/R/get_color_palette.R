@@ -11,7 +11,9 @@
 #' @param seed Random seed for reproducibility.
 #' @param print Whether to display the plot.
 #'
-#' @return A vector of color hex codes.
+#' @return A named vector of color hex codes. Names are the closest base R
+#'   color names, which provide a convenient R-friendly label; the hex values
+#'   remain the exact colors used.
 #' @export
 #'
 #' @examples
@@ -20,7 +22,7 @@
 #' }
 
 get_color_palette <- function(num_col = 10, 
-                            sel_pal = "Dark2", 
+                            sel_pal = "Default",
                             use_custom_pal = FALSE, 
                             custom_pal = c(), 
                             split_pal_plot = TRUE, 

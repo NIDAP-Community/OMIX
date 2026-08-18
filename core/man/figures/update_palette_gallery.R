@@ -1,6 +1,12 @@
-source("R/Utilities/color-utils.R")
+core_dir <- if (file.exists(file.path("core", "R", "color-utils.R"))) {
+  "core"
+} else {
+  "."
+}
+source(file.path(core_dir, "R", "color-utils.R"))
 
-dir.create("man/figures", recursive = TRUE, showWarnings = FALSE)
+figures_dir <- file.path(core_dir, "man", "figures")
+dir.create(figures_dir, recursive = TRUE, showWarnings = FALSE)
 
 palette_groups <- list(
   "default" = c("Default", "Okabeito"),
@@ -14,39 +20,70 @@ group_titles <- c(
   "ggsci" = "Omix ggsci palettes"
 )
 
+max_colors_per_row <- 12
+
 make_palette_caption <- function(palette_name) {
   palette_colors <- unname(pick_palette(palette_name))
   palette_count <- length(palette_colors)
 
-  if (palette_count <= 12) {
+  if (palette_count <= max_colors_per_row) {
     sprintf("%s (%d colors; all colors shown)", palette_name, palette_count)
   } else {
-    sprintf("%s (%d colors; first 12 shown)", palette_name, palette_count)
+    sprintf(
+      "%s (%d colors; all colors shown in %d rows)",
+      palette_name,
+      palette_count,
+      ceiling(palette_count / max_colors_per_row)
+    )
   }
 }
 
 for (group_name in names(palette_groups)) {
   palette_names <- palette_groups[[group_name]]
-  output_file <- file.path("man", "figures", paste0("palette-gallery-", group_name, ".png"))
+  output_file <- file.path(figures_dir, paste0("palette-gallery-", group_name, ".png"))
 
   grDevices::png(
     filename = output_file,
     width = 1200,
-    height = max(220, 170 * length(palette_names)),
+    height = max(220, sum(vapply(
+      palette_names,
+      function(name) 170 * ceiling(length(pick_palette(name)) / max_colors_per_row),
+      numeric(1)
+    ))),
     res = 140
   )
 
-  graphics::par(mfrow = c(length(palette_names), 1), mar = c(1, 1, 3, 1), oma = c(0, 0, 2, 0))
+  panel_heights <- vapply(
+    palette_names,
+    function(name) ceiling(length(pick_palette(name)) / max_colors_per_row),
+    numeric(1)
+  )
+  graphics::layout(matrix(seq_along(palette_names), ncol = 1), heights = panel_heights)
+  graphics::par(mar = c(1, 1, 3, 1), oma = c(0, 0, 2, 0))
 
   for (palette_name in palette_names) {
     palette_colors <- unname(pick_palette(palette_name))
-    displayed_colors <- palette_colors[seq_len(min(12, length(palette_colors)))]
+    palette_count <- length(palette_colors)
+    palette_rows <- ceiling(palette_count / max_colors_per_row)
 
     graphics::plot.new()
-    graphics::plot.window(xlim = c(0, length(displayed_colors)), ylim = c(0, 1))
+    graphics::plot.window(
+      xlim = c(0, min(max_colors_per_row, palette_count)),
+      ylim = c(0, palette_rows)
+    )
 
-    for (color_index in seq_along(displayed_colors)) {
-      graphics::rect(color_index - 1, 0, color_index, 1, col = displayed_colors[color_index], border = NA)
+    for (color_index in seq_along(palette_colors)) {
+      color_row <- ceiling(color_index / max_colors_per_row)
+      color_column <- (color_index - 1) %% max_colors_per_row
+      y_bottom <- palette_rows - color_row
+      graphics::rect(
+        color_column,
+        y_bottom,
+        color_column + 1,
+        y_bottom + 1,
+        col = palette_colors[color_index],
+        border = NA
+      )
     }
 
     graphics::box(col = "grey80")
