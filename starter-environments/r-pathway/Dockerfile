@@ -27,9 +27,20 @@ ENV RENV_CONFIG_PPM_ENABLED=FALSE \
     RENV_CONFIG_INSTALL_JOBS=1 \
     R_LIBS_USER=/opt/omix/r-pathway/library
 RUN mkdir -p "$R_LIBS_USER" \
-    && R -q -e "options(pkgType = 'source'); renv::restore( \
+    && R -q -e "options(pkgType = 'source'); \
+repos <- c( \
+  CRAN = 'https://cran.r-project.org', \
+  BioCsoft = 'https://bioconductor.org/packages/${BIOCONDUCTOR_VERSION}/bioc', \
+  BioCann = 'https://bioconductor.org/packages/${BIOCONDUCTOR_VERSION}/data/annotation', \
+  BioCexp = 'https://bioconductor.org/packages/${BIOCONDUCTOR_VERSION}/data/experiment', \
+  BioCworkflows = 'https://bioconductor.org/packages/${BIOCONDUCTOR_VERSION}/workflows', \
+  BioCbooks = 'https://bioconductor.org/packages/${BIOCONDUCTOR_VERSION}/books' \
+); \
+options(repos = repos); \
+renv::restore( \
   lockfile = '/opt/omix/r-pathway/renv.lock', \
   library = Sys.getenv('R_LIBS_USER'), \
+  repos = repos, \
   prompt = FALSE \
 )"
 
