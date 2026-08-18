@@ -14,10 +14,18 @@ RUN apt-get update \
         zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN R -q -e "BiocManager::install(version = '${BIOCONDUCTOR_VERSION}', ask = FALSE, update = FALSE); \
-  install.packages(c('data.table', 'dplyr', 'ggplot2', 'optparse', 'plyr', 'scales', 'stringr', 'tidyr'), repos = 'https://cloud.r-project.org'); \
-  BiocManager::install(c('fgsea', 'GSVA'), ask = FALSE, update = FALSE)"
+# This lockfile was captured from the validated CI build. Restore the exact
+# CRAN and Bioconductor package set into the image's site library.
+WORKDIR /opt/omix/r-pathway
+COPY renv.lock renv.lock
+RUN R -q -e "renv::restore( \
+  lockfile = '/opt/omix/r-pathway/renv.lock', \
+  library = .Library, \
+  prompt = FALSE \
+)"
 
+# l2p and l2psupp are not hosted in a package repository. Their immutable
+# CCBR/l2p commit is the source record for these two packages.
 RUN curl --fail --location --retry 3 \
       --output /tmp/l2p_0.0-14.tar.gz \
       https://raw.githubusercontent.com/CCBR/l2p/${L2P_REF}/l2p_0.0-14.tar.gz \
