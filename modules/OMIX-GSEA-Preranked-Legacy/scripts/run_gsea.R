@@ -18,11 +18,11 @@ option_list <- list(
   make_option("--deg_table", type = "character", help = "Path to the DEG table (CSV, TSV, or RDS)"),
   make_option("--pathways_database", type = "character", help = "Path to the pathways database (CSV, TSV, or RDS)"),
   make_option("--output_dir", type = "character", default = "results", help = "Directory for result files [default: %default]"),
-  make_option("--gene_names_column", type = "character", default = "Gene", help = "Gene name column [default: %default]"),
+  make_option("--gene_names_column", type = "character", default = NULL, help = "Gene name column; auto-detects GeneName, then Gene when omitted"),
   make_option("--species", type = "character", default = "Human", help = "Species in the DEG table [default: %default]"),
   make_option("--gene_scores_suffix", type = "character", default = "_tstat", help = "Suffix for ranking-score columns [default: %default]"),
   make_option("--pathways_species", type = "character", default = "Human", help = "Species in the pathways database [default: %default]"),
-  make_option("--collections", type = "character", default = "H: hallmark gene sets,CP:REACTOME: Reactome gene sets", help = "Comma-separated collections [default: %default]"),
+  make_option("--collections", type = "character", default = "H: hallmark gene sets,C2:CP:REACTOME: Reactome gene sets", help = "Comma-separated collections [default: %default]"),
   make_option("--min_geneset_size", type = "integer", default = 15L, help = "Minimum geneset size [default: %default]"),
   make_option("--max_geneset_size", type = "integer", default = 500L, help = "Maximum geneset size [default: %default]"),
   make_option("--n_permutations", type = "integer", default = 5000L, help = "Number of permutations [default: %default]"),
@@ -54,6 +54,49 @@ if (!file.exists(opt$deg_table)) {
 if (!file.exists(opt$pathways_database)) {
   stop("ERROR: Pathways database was not found: ", opt$pathways_database)
 }
+
+resolve_gene_names_column <- function(path, requested) {
+  if (!is.null(requested) && nzchar(requested) && tolower(requested) != "auto") {
+    return(requested)
+  }
+
+  extension <- tolower(tools::file_ext(path))
+  available_columns <- if (extension == "rds") {
+    object <- readRDS(path)
+    if (is.data.frame(object)) {
+      names(object)
+    } else if (is.list(object)) {
+      data_frames <- Filter(is.data.frame, object)
+      if (length(data_frames) == 0L) {
+        stop("ERROR: DEG RDS does not contain a data frame: ", path)
+      }
+      names(data_frames[[1L]])
+    } else {
+      stop("ERROR: DEG RDS does not contain a data frame: ", path)
+    }
+  } else if (extension == "csv") {
+    names(read.csv(path, nrows = 0L, check.names = FALSE))
+  } else if (extension %in% c("tsv", "txt")) {
+    names(read.delim(path, nrows = 0L, check.names = FALSE))
+  } else {
+    stop("ERROR: Unsupported DEG table format: ", path)
+  }
+
+  candidates <- c("GeneName", "Gene", "gene_name", "GeneSymbol", "gene_symbol")
+  detected <- candidates[candidates %in% available_columns]
+  if (length(detected) == 0L) {
+    stop(
+      "ERROR: Could not auto-detect the gene-name column. ",
+      "Specify --gene_names_column. Available columns: ",
+      paste(available_columns, collapse = ", ")
+    )
+  }
+
+  message("Auto-detected gene-name column: ", detected[[1L]])
+  detected[[1L]]
+}
+
+opt$gene_names_column <- resolve_gene_names_column(opt$deg_table, opt$gene_names_column)
 
 collections <- trimws(strsplit(opt$collections, ",", fixed = TRUE)[[1]])
 collapse_redundancy <- tolower(opt$collapse_redundancy) == "true"

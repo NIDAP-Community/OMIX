@@ -23,6 +23,14 @@ they are installed from the immutable `L2P_REF` commit in
 [`Dockerfile`](Dockerfile). This preserves their source provenance without
 using a mutable `master` branch.
 
+`gridExtra` 2.3.1 is included for GSEA plot assembly. Its CRAN source archive
+used for the release has SHA-256
+`de42e501ac2c6a70bd0ffc18d7703e9b0e6b878c610df09756183c3e52445c82`.
+
+`patchwork` 1.3.2 is included for GSEA plot composition. Its CRAN source
+archive used for the release has SHA-256
+`0ec469acfd69d1a4f1a6317c861e6bf000f768c2d5047e3aed6713df9afe27eb`.
+
 ## Local and HPC paths
 
 All consumers should mount their input and output folders at the same paths:

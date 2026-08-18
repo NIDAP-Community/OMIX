@@ -12,7 +12,7 @@ inputs:
 parameters:
   gene_names_column:
     type: string
-    default: Gene
+    description: Optional gene-name column. When omitted, auto-detects GeneName, then Gene.
   gene_scores_suffix:
     type: string
     default: _tstat

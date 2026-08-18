@@ -10,6 +10,11 @@ Version numbers correspond to Code Ocean capsule release versions (integers: v1,
 ### Changed
 - Moved the reusable GSEA implementation to `R/GSEA_Preranked.R` and added
   the platform-neutral `scripts/run_gsea.R` entry point (2026-08-17).
+- Auto-detect the gene-name column (`GeneName`, then `Gene`) when it is not
+  supplied, and use the current `C2:CP:REACTOME` MSigDB collection identifier.
+- Preserve the original gene-name column while mapping ortholog results back
+  to the input species, so auto-detected columns such as `GeneName` complete
+  successfully for cross-species analyses.
 - Replaced the hard-coded `/results` figure path with an explicit output
   directory, allowing the same implementation to run outside Code Ocean.
 - Removed Code Ocean capsule files from the canonical OMIX module; capsule

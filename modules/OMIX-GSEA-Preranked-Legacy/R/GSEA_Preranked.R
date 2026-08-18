@@ -1014,6 +1014,11 @@ GSEA_Preranked <- function(
     exist_ortholog <- exist_ortholog %>%
       filter(row_number() == 1) %>%
       ungroup()
+    # Keep the join map keyed as `Gene`, but retain a presentation map whose
+    # source-gene column has the user-selected name.  `species.genes()` uses
+    # the latter when it translates ortholog labels back for the output.
+    species_gene_map <- exist_ortholog %>%
+      dplyr::rename(!!Gene_Names_Column := Gene)
     cat(sprintf(
       paste0(
         "%g genes were mapped between %s and %s and will be used in the ",
@@ -1202,10 +1207,11 @@ GSEA_Preranked <- function(
 
   ## return dataset
   if (need_ortholog) {
-    gsea$leadingEdge_orthologs <- species.genes()$leadingEdge_orthologs
-    gsea$leadingEdge <- species.genes()$leadingEdge
-    gsea$inPathway_orthologs <- species.genes()$inPathway_orthologs
-    gsea$inPathway <- species.genes()$inPathway
+    species_gene_results <- species.genes(map = species_gene_map)
+    gsea$leadingEdge_orthologs <- species_gene_results$leadingEdge_orthologs
+    gsea$leadingEdge <- species_gene_results$leadingEdge
+    gsea$inPathway_orthologs <- species_gene_results$inPathway_orthologs
+    gsea$inPathway <- species_gene_results$inPathway
   }
 
   # Convert sort_output_by to symbols and apply arrange
@@ -1233,4 +1239,3 @@ GSEA_Preranked <- function(
 
   return(gsea)
 }
-
