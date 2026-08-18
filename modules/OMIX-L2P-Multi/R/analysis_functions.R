@@ -1387,9 +1387,13 @@ l2p_multi <- function(
   updated_genes_num <- sum(updated_genes_idx)
   print(paste("Number of updated genes:", updated_genes_num))
   cat("Original:Updated\n")
-  print(sapply(seq_along(updated_genes), function(i) {
+  updated_gene_pairs <- vapply(seq_along(updated_genes), function(i) {
     paste0(names(updated_genes)[i], ":", updated_genes[i])
-  }))
+  }, character(1))
+  print(utils::head(updated_gene_pairs, 10L))
+  if (length(updated_gene_pairs) > 10L) {
+    cat(sprintf("... (%d more updated genes)\n", length(updated_gene_pairs) - 10L))
+  }
 
   # Error messaging for zero significant pathway results:
   names(l2presults) <- groups
@@ -1982,7 +1986,9 @@ l2p_multi <- function(
     g <- g + facet_wrap(~categ, nrow = 1)
   }
 
-  print(g)
+  if (interactive()) {
+    print(g)
+  }
 
   if (!is.null(export_plot_file) && nzchar(export_plot_file)) {
     ggplot2::ggsave(
