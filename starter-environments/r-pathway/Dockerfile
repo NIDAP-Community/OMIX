@@ -20,7 +20,12 @@ RUN apt-get update \
 # package before its binary dependency is available.
 WORKDIR /opt/omix/r-pathway
 COPY renv.lock renv.lock
-ENV R_LIBS_USER=/opt/omix/r-pathway/library
+# Do not transform the dated CRAN source snapshot into a PPM binary endpoint.
+# Source packages are installed sequentially so each package's dependencies are
+# loadable during renv's post-install verification.
+ENV RENV_CONFIG_PPM_ENABLED=FALSE \
+    RENV_CONFIG_INSTALL_JOBS=1 \
+    R_LIBS_USER=/opt/omix/r-pathway/library
 RUN mkdir -p "$R_LIBS_USER" \
     && R -q -e "options(pkgType = 'source'); renv::restore( \
   lockfile = '/opt/omix/r-pathway/renv.lock', \

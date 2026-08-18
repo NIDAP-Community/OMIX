@@ -12,7 +12,8 @@ assets at runtime under `/data`.
 `renv.lock` records the complete CRAN and Bioconductor package set captured
 from the validated CI image: R 4.4.3 and Bioconductor 3.20. The Dockerfile
 uses `renv::restore()` to install those exact package versions into its
-dedicated runtime library.
+dedicated runtime library from source archives, in dependency order. This
+avoids binary restore-order differences across package-manager endpoints.
 
 `l2p` and `l2psupp` version 0.0-14 are intentionally not in `renv.lock`:
 they are installed from the immutable `L2P_REF` commit in
