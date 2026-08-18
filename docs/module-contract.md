@@ -23,6 +23,45 @@ adapters. A module's `scripts/` entry point accepts explicit input and output
 paths so that Code Ocean, Galaxy, containers, and HPC schedulers can invoke
 the same scientific implementation.
 
+## Code Ocean deployment adapters
+
+An individual Code Ocean repository is a **deployment adapter**, not a
+directory-for-directory mirror of its module in this monorepo. The two
+repositories intentionally divide ownership as follows:
+
+| Responsibility | Canonical OMIX module | Code Ocean repository |
+| --- | --- | --- |
+| Scientific R implementation | `R/` | Exported copy under `code/functions/` |
+| Platform-neutral command-line interface | `scripts/` | Not copied directly |
+| Input/output contract and tests | `schemas/`, `tests/` | References the released module contract |
+| Code Ocean App Panel and metadata | Never | `.codeocean/`, `metadata/` |
+| Code Ocean runtime adapter | Never | `code/main.R`, `code/run` |
+| Code Ocean paths and workflow discovery | Never | `/data` discovery and `/results` handling in `code/main.R` |
+| Capsule environment | Never | `environment/` |
+
+`code/main.R` is therefore expected to differ from a module's `scripts/`
+entry point. The former translates Code Ocean inputs, parameters, and output
+locations into a call to the scientific implementation; the latter accepts
+explicit, platform-neutral paths for local, Docker, Galaxy, and HPC use.
+
+### Development and release flow
+
+1. For a scientific or reusable-interface change, edit the canonical OMIX
+   module first; update its tests, schema, and changelog as appropriate.
+2. Run the module and repository checks, then export the released R
+   implementation to the corresponding Code Ocean repository's
+   `code/functions/` directory.
+3. For a change discovered in Code Ocean, test it in the capsule first. If it
+   changes scientific behavior or the reusable interface, backport it to the
+   canonical module, validate it there, and then export the release back to
+   the adapter.
+4. Keep Code Ocean-only behavior—App Panel fields, `/data` discovery,
+   `/results` handling, and the capsule environment—only in the individual
+   repository.
+
+Each Code Ocean repository contains `OMIX_MODULE_SOURCE.md`, which identifies
+its canonical module and links developers to this contract.
+
 Shared utilities belong in `core/` only after two or more modules need the same
 stable behavior. A module should otherwise own its implementation and declare
 its own dependencies and data policy in `module.yml`.

@@ -41,12 +41,13 @@ The synchronization tooling is under construction.
 
 | Module | Purpose | Status |
 | --- | --- | --- |
-| [OMIX-GSEA-Preranked-Legacy](modules/OMIX-GSEA-Preranked-Legacy) | Legacy preranked GSEA | Planned |
-| [OMIX-L2P-Single](modules/OMIX-L2P-Single) | Single-comparison L2P | Planned |
-| [OMIX-L2P-Multi](modules/OMIX-L2P-Multi) | Multi-comparison L2P | Planned |
+| [OMIX-GSEA-Preranked-Legacy](modules/OMIX-GSEA-Preranked-Legacy) | Legacy preranked GSEA | Active |
+| [OMIX-Volcano-Plot](modules/OMIX-Volcano-Plot) | Differential-expression volcano plot | Active |
+| [OMIX-L2P-Single](modules/OMIX-L2P-Single) | Single-comparison L2P | Active |
+| [OMIX-L2P-Multi](modules/OMIX-L2P-Multi) | Multi-comparison L2P | Active |
 
-Each planned module currently contains only its skeleton contract. Read
-[docs/module-contract.md](docs/module-contract.md) before adding implementation.
+Read [docs/module-contract.md](docs/module-contract.md) before adding or
+releasing module implementation.
 
 ## Starter environments
 
