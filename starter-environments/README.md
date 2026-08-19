@@ -29,8 +29,16 @@ code change.
 
 ## Release rule
 
-Use the image digest recorded after a successful build for reproducible module
-releases. Do not use the mutable `latest` tag in a released module manifest.
+Each starter environment has a `VERSION` file. A manual publication uses that
+version tag and the Git commit tag; it does not publish a mutable `latest` tag.
+After publication, CI records the resolved digest in the workflow summary.
+Use that digest in a reproducible module or Code Ocean release record.
+
+Before the first publication from OMIX, ensure that the corresponding GHCR
+package is associated with the `NIDAP-Community/OMIX` repository or grants its
+GitHub Actions workflow write access. A package previously associated with
+another repository, such as `OMIX_Test`, does not automatically accept writes
+from OMIX.
 
 No research or reference data belongs in a starter image. Attach or mount
 versioned data assets at runtime under `/data` instead.

@@ -3,6 +3,7 @@ FROM ${BASE_IMAGE}
 
 LABEL org.opencontainers.image.title="OMIX r-base starter"
 LABEL org.opencontainers.image.description="Base R runtime for OMIX modules"
+LABEL org.opencontainers.image.source="https://github.com/NIDAP-Community/OMIX"
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \

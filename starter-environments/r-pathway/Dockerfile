@@ -1,4 +1,6 @@
-ARG BASE_IMAGE=ghcr.io/nidap-community/omix-r-base:latest
+# `r4.4.3-v1` is an immutable OMIX release tag. CI overrides this argument with
+# its local validation image; release records also retain the resolved digest.
+ARG BASE_IMAGE=ghcr.io/nidap-community/omix-r-base:r4.4.3-v1
 FROM ${BASE_IMAGE}
 
 ARG BIOCONDUCTOR_VERSION=3.20
@@ -6,6 +8,7 @@ ARG L2P_REF=ab389bc978441f1893414da7a07e803bea971205
 
 LABEL org.opencontainers.image.title="OMIX r-pathway starter"
 LABEL org.opencontainers.image.description="Pathway and gene-set analysis runtime for OMIX modules"
+LABEL org.opencontainers.image.source="https://github.com/NIDAP-Community/OMIX"
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \

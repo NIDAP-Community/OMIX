@@ -65,8 +65,9 @@ Do not add `.codeocean/`, `metadata/`, `environment/`, or a Code Ocean
 ## Environments and reproducibility
 
 - Shared domain environments live in `starter-environments/` and are published
-  as versioned OCI images. Prefer an immutable commit tag for a tested release;
-  reserve `latest` for convenience.
+  as versioned OCI images. Use the version tag plus the resolved image digest
+  from the publication workflow for every tested release; never use `latest`
+  for a capsule, Docker, or HPC release.
 - Module-specific overlays or Code Ocean-only setup remain in the adapter.
 - Pin package versions in the environment lockfile. Record package provenance
   for packages installed from tarballs or other nonstandard sources.

@@ -29,6 +29,21 @@ set captured from its validated image. The base image, R version,
 Bioconductor release, lockfile, and non-CRAN package commits must remain
 pinned for a reproducible rebuild.
 
+## Publishing a shared image
+
+1. Make the intended Dockerfile and lockfile changes, then bump that
+   environment's `VERSION` file. If the base image changes, update the
+   versioned `BASE_IMAGE` reference in each dependent environment.
+2. Merge the validated change to `main`, confirm the GHCR package is associated
+   with `NIDAP-Community/OMIX` (or grants OMIX Actions access), then manually
+   dispatch **Starter Environments** with **Publish** enabled.
+3. Record the version-tagged image digest from the workflow summary alongside
+   the consuming module commit and input-data provenance. Register that exact
+   image in Code Ocean and use its digest for Docker or HPC releases.
+
+The workflow publishes an explicit version tag and the source commit tag. It
+does not publish or overwrite `latest`.
+
 ## Platform adapters
 
 - **Code Ocean:** an administrator registers the published image as a Starter

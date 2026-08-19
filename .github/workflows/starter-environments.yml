@@ -98,11 +98,29 @@ jobs:
       - name: Publish starter images
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish }}
         run: |
+          base_version="$(tr -d '[:space:]' < starter-environments/r-base/VERSION)"
+          pathway_version="$(tr -d '[:space:]' < starter-environments/r-pathway/VERSION)"
           docker tag omix-r-base:ci ghcr.io/nidap-community/omix-r-base:${{ github.sha }}
-          docker tag omix-r-base:ci ghcr.io/nidap-community/omix-r-base:latest
+          docker tag omix-r-base:ci ghcr.io/nidap-community/omix-r-base:"$base_version"
           docker tag omix-r-pathway:ci ghcr.io/nidap-community/omix-r-pathway:${{ github.sha }}
-          docker tag omix-r-pathway:ci ghcr.io/nidap-community/omix-r-pathway:latest
+          docker tag omix-r-pathway:ci ghcr.io/nidap-community/omix-r-pathway:"$pathway_version"
           docker push ghcr.io/nidap-community/omix-r-base:${{ github.sha }}
-          docker push ghcr.io/nidap-community/omix-r-base:latest
+          docker push ghcr.io/nidap-community/omix-r-base:"$base_version"
           docker push ghcr.io/nidap-community/omix-r-pathway:${{ github.sha }}
-          docker push ghcr.io/nidap-community/omix-r-pathway:latest
+          docker push ghcr.io/nidap-community/omix-r-pathway:"$pathway_version"
+
+      - name: Record published image digests
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish }}
+        run: |
+          base_version="$(tr -d '[:space:]' < starter-environments/r-base/VERSION)"
+          pathway_version="$(tr -d '[:space:]' < starter-environments/r-pathway/VERSION)"
+          base_ref="ghcr.io/nidap-community/omix-r-base:$base_version"
+          pathway_ref="ghcr.io/nidap-community/omix-r-pathway:$pathway_version"
+          base_digest="$(docker buildx imagetools inspect "$base_ref" --format '{{.Manifest.Digest}}')"
+          pathway_digest="$(docker buildx imagetools inspect "$pathway_ref" --format '{{.Manifest.Digest}}')"
+          {
+            echo '## Published OMIX starter environments'
+            echo
+            echo "- \`$base_ref@$base_digest\`"
+            echo "- \`$pathway_ref@$pathway_digest\`"
+          } >> "$GITHUB_STEP_SUMMARY"

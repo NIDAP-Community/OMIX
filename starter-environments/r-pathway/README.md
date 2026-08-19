@@ -45,3 +45,7 @@ After publication, use the immutable image digest for a release. For example:
 ```bash
 apptainer pull gsea-pathway.sif docker://ghcr.io/nidap-community/omix-r-pathway@sha256:<digest>
 ```
+
+The current release tag is recorded in `VERSION`. The Dockerfile builds from
+the corresponding versioned `omix-r-base` release tag; the GitHub Actions
+release summary records the exact resolved digests.
