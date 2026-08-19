@@ -44,6 +44,16 @@ pinned for a reproducible rebuild.
 The workflow publishes an explicit version tag and the source commit tag. It
 does not publish or overwrite `latest`.
 
+### Adopting an existing image
+
+When a validated image already exists in GHCR under a legacy repository
+association, first reconnect that package to `NIDAP-Community/OMIX` and grant
+OMIX Actions write access. Then manually dispatch **Starter Environments**
+with **Adopt existing** enabled and the existing source tag (normally
+`latest`). This registry-only job copies the existing manifest to the version
+tags recorded in `VERSION`; it does not run a Docker build or reinstall any
+packages.
+
 ## Platform adapters
 
 - **Code Ocean:** an administrator registers the published image as a Starter

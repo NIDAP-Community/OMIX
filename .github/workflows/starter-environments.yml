@@ -18,9 +18,20 @@ on:
         required: true
         default: false
         type: boolean
+      adopt_existing:
+        description: Retag existing GHCR manifests without rebuilding them
+        required: true
+        default: false
+        type: boolean
+      existing_source_tag:
+        description: Existing tag to adopt when retagging (normally latest)
+        required: true
+        default: latest
+        type: string
 
 jobs:
   build:
+    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.adopt_existing }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -120,6 +131,55 @@ jobs:
           pathway_digest="$(docker buildx imagetools inspect "$pathway_ref" --format '{{.Manifest.Digest}}')"
           {
             echo '## Published OMIX starter environments'
+            echo
+            echo "- \`$base_ref@$base_digest\`"
+            echo "- \`$pathway_ref@$pathway_digest\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  adopt-existing:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.adopt_existing }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Retag existing starter images without rebuilding
+        run: |
+          source_tag="${{ inputs.existing_source_tag }}"
+          base_version="$(tr -d '[:space:]' < starter-environments/r-base/VERSION)"
+          pathway_version="$(tr -d '[:space:]' < starter-environments/r-pathway/VERSION)"
+          base_source="ghcr.io/nidap-community/omix-r-base:$source_tag"
+          pathway_source="ghcr.io/nidap-community/omix-r-pathway:$source_tag"
+          base_target="ghcr.io/nidap-community/omix-r-base:$base_version"
+          pathway_target="ghcr.io/nidap-community/omix-r-pathway:$pathway_version"
+
+          docker buildx imagetools inspect "$base_source"
+          docker buildx imagetools inspect "$pathway_source"
+          docker buildx imagetools create --prefer-index=false --tag "$base_target" "$base_source"
+          docker buildx imagetools create --prefer-index=false --tag "$pathway_target" "$pathway_source"
+
+      - name: Record adopted image digests
+        run: |
+          base_version="$(tr -d '[:space:]' < starter-environments/r-base/VERSION)"
+          pathway_version="$(tr -d '[:space:]' < starter-environments/r-pathway/VERSION)"
+          base_ref="ghcr.io/nidap-community/omix-r-base:$base_version"
+          pathway_ref="ghcr.io/nidap-community/omix-r-pathway:$pathway_version"
+          base_digest="$(docker buildx imagetools inspect "$base_ref" --format '{{.Manifest.Digest}}')"
+          pathway_digest="$(docker buildx imagetools inspect "$pathway_ref" --format '{{.Manifest.Digest}}')"
+          {
+            echo '## Adopted existing OMIX starter environments'
             echo
             echo "- \`$base_ref@$base_digest\`"
             echo "- \`$pathway_ref@$pathway_digest\`"
