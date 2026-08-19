@@ -62,6 +62,20 @@ explicit, platform-neutral paths for local, Docker, Galaxy, and HPC use.
 Each Code Ocean repository contains `OMIX_MODULE_SOURCE.md`, which identifies
 its canonical module and links developers to this contract.
 
+### Adapter registry and bidirectional links
+
+Each canonical module records its supported deployment adapters in the
+`deployment_adapters` list in `module.yml`. Every entry names the platform and
+links to the adapter repository. The module README must also link to each
+supported adapter so people can find the deployable implementation.
+
+In the other direction, every adapter README and `OMIX_MODULE_SOURCE.md` must
+link to its canonical module and to this contract. When an adapter is added,
+moved, renamed, or retired, update all four references—the module metadata,
+module README, adapter README, and `OMIX_MODULE_SOURCE.md`—and verify the link
+targets before release. This keeps the monorepo the scientific source of truth
+without hiding the platform-specific deployment path.
+
 Shared utilities belong in `core/` only after two or more modules need the same
 stable behavior. A module should otherwise own its implementation and declare
 its own dependencies and data policy in `module.yml`.

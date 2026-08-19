@@ -4,6 +4,8 @@ Platform-neutral L2P over-representation analysis for comparing multiple DEG
 contrasts. The module accepts explicit input and output paths so it can be
 called from an HPC job, container, Galaxy wrapper, or a platform adapter.
 
+**Code Ocean deployment adapter:** [OMIX-L2P-Multi](https://github.com/NIDAP-Community/OMIX-L2P-Multi)
+
 ## Run from the command line
 
 ```bash

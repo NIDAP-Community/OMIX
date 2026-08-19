@@ -8,3 +8,6 @@ description: Legacy preranked gene set enrichment analysis using fgsea.
 data_policy: No data are committed. Callers supply input paths through the module CLI or a platform adapter.
 runtime_profile: r-pathway
 entrypoint: scripts/run_gsea.R
+deployment_adapters:
+  - platform: code-ocean
+    repository: https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy

@@ -8,3 +8,6 @@ description: Platform-neutral multi-comparison L2P over-representation pathway a
 data_policy: No data are committed. Callers supply an explicit DEG-table path through the CLI or a platform adapter.
 runtime_profile: r-pathway
 entrypoint: scripts/run_l2p_multi.R
+deployment_adapters:
+  - platform: code-ocean
+    repository: https://github.com/NIDAP-Community/OMIX-L2P-Multi

@@ -38,11 +38,14 @@ Do not add `.codeocean/`, `metadata/`, `environment/`, or a Code Ocean
      environment, not in an unrelated module.
 2. For canonical changes, update the implementation, schema, tests, README,
    and changelog as applicable.
-3. Run module checks and the repository layout check.
-4. Export only the released scientific function files to the adapter's
+3. When an adapter is added, moved, renamed, or retired, update the module's
+   `deployment_adapters` metadata and README link, plus the adapter README and
+   `OMIX_MODULE_SOURCE.md` link back to the canonical module.
+4. Run module checks and the repository layout check.
+5. Export only the released scientific function files to the adapter's
    `code/functions/` directory. Keep the adapter's `code/main.R` as its small
    Code Ocean translation layer.
-5. Test the adapter in Code Ocean when its workflow or runtime is affected.
+6. Test the adapter in Code Ocean when its workflow or runtime is affected.
    Backport any scientific fix discovered there to the canonical module before
    releasing it again.
 
@@ -79,11 +82,14 @@ Before requesting review or a release:
 2. Run the changed module's own tests and a representative command-line run.
 3. Confirm that the canonical function and exported adapter function are
    intentionally identical when the scientific implementation is shared.
-4. Confirm that no generated outputs, debug data, tokens, or platform files
+4. Confirm bidirectional adapter references: `module.yml` and the module README
+   point to every supported adapter; the adapter README and
+   `OMIX_MODULE_SOURCE.md` point to the canonical module.
+5. Confirm that no generated outputs, debug data, tokens, or platform files
    were staged in the monorepo.
-5. Update user documentation and the module changelog for externally visible
+6. Update user documentation and the module changelog for externally visible
    behavior changes.
-6. For a Code Ocean release, sync the adapter, rebuild/select the intended
+7. For a Code Ocean release, sync the adapter, rebuild/select the intended
    environment, and run a capsule validation before publishing a release.
 
 ## How to use this guide

@@ -4,6 +4,8 @@ Platform-neutral volcano-plot generation for differential-expression tables.
 The module accepts an explicit input path and output directory, so it can be
 called from an HPC job, container, Galaxy wrapper, or a platform adapter.
 
+**Code Ocean deployment adapter:** [OMIX-Volcano-Plot](https://github.com/NIDAP-Community/OMIX-Volcano-Plot)
+
 ## Run from the command line
 
 ```bash

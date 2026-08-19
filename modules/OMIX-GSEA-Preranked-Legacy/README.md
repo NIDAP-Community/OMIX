@@ -2,6 +2,8 @@
 
 Gene Set Enrichment Analysis (GSEA) for pre-ranked gene lists using the fgsea package. Part of the OMIX analysis suite.
 
+**Code Ocean deployment adapter:** [OMIX-GSEA-Preranked-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy)
+
 ## Overview
 
 **Version**: v5.1.0 | **Part of the OMIX analysis suite**

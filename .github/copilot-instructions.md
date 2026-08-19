@@ -14,6 +14,9 @@ OMIX architecture or module code.
   separate adapter repository.
 - Treat an adapter as a deployment layer, not a directory mirror. Export only
   the released scientific function files to `code/functions/`.
+- Record each supported adapter in the canonical module's
+  `deployment_adapters` metadata and README. Keep the adapter README and
+  `OMIX_MODULE_SOURCE.md` linked back to that canonical module.
 - Place shared, reusable container definitions in `starter-environments/`.
   Pin dependencies and preserve nonstandard package provenance.
 

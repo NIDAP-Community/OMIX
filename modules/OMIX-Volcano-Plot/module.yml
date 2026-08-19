@@ -8,3 +8,6 @@ description: Platform-neutral generation of publication-ready volcano plots from
 data_policy: No data are committed. Callers supply an explicit DEG-table path through the CLI or a platform adapter.
 runtime_profile: r-visualization
 entrypoint: scripts/run_volcano_plot.R
+deployment_adapters:
+  - platform: code-ocean
+    repository: https://github.com/NIDAP-Community/OMIX-Volcano-Plot
