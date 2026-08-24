@@ -1,0 +1,63 @@
+interface_version: 1
+entrypoint: scripts/run_gsea_filters.R
+inputs:
+  gsea_results:
+    required: true
+    formats: [csv, tsv, rds]
+    description: GSEA result table containing contrasts, pathway annotations, p-values, enrichment scores, and pathway membership columns.
+parameters:
+  p_value_filter:
+    type: string
+    default: adjusted p-value
+    allowed: [adjusted p-value, raw p-value]
+  p_value_threshold:
+    type: number
+    default: 0.05
+  enrichment_score_filter:
+    type: string
+    default: NES (Normalized Enrichment Score)
+    allowed: [NES (Normalized Enrichment Score), ES (Enrichment Score)]
+  enrichment_score_threshold:
+    type: number
+    default: 0
+  enrichment_score_sign:
+    type: string
+    default: +/-
+    allowed: [+/- , +, -]
+  size_filter:
+    type: string
+    default: Pathway size
+    allowed: [Pathway size, Leading Edge (LE) size]
+  size_cutoff:
+    type: integer
+    default: 0
+  top_rank_filter:
+    type: string
+    default: all
+  collections_to_include:
+    type: string
+    description: Optional comma-separated collection names.
+  pathways_to_include:
+    type: string
+    description: Optional comma-separated pathway names.
+  gene_filter_universe:
+    type: string
+    default: Leading Edge (LE)
+    allowed: [Leading Edge (LE), Pathway]
+  genes_to_include:
+    type: string
+    description: Optional comma-separated gene symbols.
+  contrast_filter:
+    type: string
+    default: none
+    allowed: [none, keep, remove]
+  contrasts:
+    type: string
+    description: Optional comma-separated contrast names used with keep or remove mode.
+outputs:
+  filtered_gsea_results:
+    path: filtered_gsea_results.csv
+    format: csv
+  filtered_gsea_results_rds:
+    path: filtered_gsea_results.rds
+    format: rds

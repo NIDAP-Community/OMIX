@@ -1,0 +1,13 @@
+name: omix-gsea-filters-legacy
+display_name: OMIX-GSEA-Filters-Legacy
+version: 1.0.0
+module_type: pathway
+status: active
+owner: OMIX Team
+description: Filter, subset, and export GSEA result tables using statistical, annotation, gene, and contrast criteria.
+data_policy: No data are committed. Callers supply an explicit GSEA results-table path through the portable CLI or a platform adapter.
+runtime_profile: r-visualization
+entrypoint: scripts/run_gsea_filters.R
+deployment_adapters:
+  - platform: code-ocean
+    repository: https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy
