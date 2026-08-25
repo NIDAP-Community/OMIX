@@ -9,14 +9,13 @@ The initial statistical foundation is deliberately small:
 
 - `limma` and `edgeR` for linear-model and voom-based bulk differential
   expression;
-- `DESeq2` for count-model differential expression where a module selects that
-  method;
-- `sva` for surrogate-variable and ComBat batch-adjustment workflows; and
 - `optparse` for command-line adapters.
 
-Pathway packages (`fgsea`, `GSVA`, `l2p`), plotting/reporting packages, module
-code, and research data do not belong here. They remain in specialized images
-or module-level adapters.
+DESeq2, `sva`, pathway packages (`fgsea`, `GSVA`, `l2p`), plotting/reporting
+packages, module code, and research data do not belong here. Method-specific
+stacks remain in specialised images or module-level adapters, preventing one
+module's large dependency graph from becoming a prerequisite for every
+statistical workflow.
 
 ## Bootstrap-release gate
 

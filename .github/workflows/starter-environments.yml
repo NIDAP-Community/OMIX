@@ -69,7 +69,7 @@ jobs:
       - name: Verify statistical runtime
         run: |
           docker run --rm --entrypoint Rscript omix-r-statistics:ci -e '
-            packages <- c("limma", "edgeR", "DESeq2", "sva", "optparse")
+            packages <- c("limma", "edgeR", "optparse")
             versions <- vapply(packages, function(package) {
               suppressPackageStartupMessages(library(package, character.only = TRUE))
               as.character(packageVersion(package))

@@ -21,16 +21,18 @@ remotes::install_version(
   upgrade = "never"
 )
 
-# Bioconductor 3.20 is tied to R 4.4. These are the shared statistical
-# foundations; module-specific scientific packages stay with their module.
+# Bioconductor 3.20 is tied to R 4.4. Keep this shared runtime limited to the
+# limma-voom statistical foundation. DESeq2, sva, and other method-specific
+# stacks belong in a future specialised image; otherwise they impose a large
+# genome-annotation dependency chain on every statistics module.
 BiocManager::install(
-  c("limma", "edgeR", "DESeq2", "sva"),
+  c("limma", "edgeR"),
   version = bioconductor_version,
   ask = FALSE,
   update = FALSE
 )
 
-required_packages <- c("optparse", "limma", "edgeR", "DESeq2", "sva")
+required_packages <- c("optparse", "limma", "edgeR")
 missing <- required_packages[!vapply(required_packages, requireNamespace, logical(1), quietly = TRUE)]
 if (length(missing) > 0L) {
   stop("Required packages failed to install: ", paste(missing, collapse = ", "))
