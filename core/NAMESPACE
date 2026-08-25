@@ -7,4 +7,4 @@ export(get_colors)
 export(get_hex_color)
 export(get_random_colors)
 export(plot_palette)
-
+export(new_omix_standard_input)

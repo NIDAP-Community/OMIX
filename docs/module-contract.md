@@ -79,3 +79,13 @@ without hiding the platform-specific deployment path.
 Shared utilities belong in `core/` only after two or more modules need the same
 stable behavior. A module should otherwise own its implementation and declare
 its own dependencies and data policy in `module.yml`.
+
+## Optional ecosystem bridges
+
+External data-object integrations are neither scientific modules nor Core
+dependencies. `core/` defines portable input contracts; an optional bridge
+package under `bridges/<ecosystem>/` may depend on Core and an external package
+to convert its objects into those contracts. A bridge must document its source
+object assumptions, preserve conversion provenance, and test its supported
+ecosystem version. It must not introduce Code Ocean runtime paths or UI into
+the monorepo's portable code.

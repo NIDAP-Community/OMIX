@@ -54,6 +54,7 @@ installation above.
 | `get_closest_color()` | Find the nearest named R color for a hex value. |
 | `colorvect()` | Name a hex color vector with its closest R color names. |
 | `plot_palette()` | Draw a supplied palette directly. |
+| `new_omix_standard_input()` | Validate and align portable counts-plus-metadata input for OMIX modules. |
 
 ## Get a palette
 
@@ -191,6 +192,25 @@ Themed Color Palettes for ggplot2*](https://nanx.me/ggsci/).
 ![RColorBrewer palettes](man/figures/palette-gallery-brewer.png)
 
 ![ggsci palettes](man/figures/palette-gallery-ggsci.png)
+
+## Portable input contract
+
+Modules should accept explicit, portable count and metadata tables. Core can
+validate and align that input without installing an external data ecosystem:
+
+```r
+input <- Omix::new_omix_standard_input(
+  counts = counts,
+  metadata = metadata,
+  feature_id_column = "GeneName",
+  sample_id_column = "Sample",
+  sample_columns = c("A1", "B1")
+)
+```
+
+The resulting `omix_standard_input` stores aligned `counts` and `metadata`,
+the selected sample columns, and optional provenance. Ecosystem-specific
+conversion lives in optional bridge packages under `bridges/`.
 
 ## Test core
 

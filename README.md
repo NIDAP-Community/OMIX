@@ -6,6 +6,8 @@ package with independent analysis modules.
 ```text
 OMIX/
 |-- core/                              Shared R package: Omix
+|-- bridges/                           Optional ecosystem-specific R packages
+|   `-- mosuite/                       OmixMOSuite MOO-to-table bridge
 |-- modules/                           Independent analysis modules
 |   |-- OMIX-GSEA-Preranked-Legacy/
 |   |-- OMIX-L2P-Single/
@@ -29,6 +31,19 @@ library(Omix)
 
 See [core/README.md](core/README.md) for the full utility guide and local
 contributor setup.
+
+## Optional bridge packages
+
+`bridges/` contains separately installable packages that convert a supported
+external data object into a portable Core contract. They are not dependencies
+of `Omix` or ordinary table-based modules.
+
+| Package | Ecosystem | Purpose |
+| --- | --- | --- |
+| [OmixMOSuite](bridges/mosuite) | MOSuite | Convert an MOO into `omix_standard_input` counts and metadata tables. |
+
+See [bridges/README.md](bridges/README.md) for the extension contract and
+installation guidance.
 
 ## Module catalog
 

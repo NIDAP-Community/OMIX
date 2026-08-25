@@ -49,6 +49,19 @@ Do not add `.codeocean/`, `metadata/`, `environment/`, or a Code Ocean
    Backport any scientific fix discovered there to the canonical module before
    releasing it again.
 
+## Optional ecosystem bridges
+
+`core/` owns portable contracts such as counts-plus-metadata validation. It
+does not import external data-object ecosystems. Optional bridge packages live
+under `bridges/<ecosystem>/`; each is an independent R package that depends on
+Core and its ecosystem, then converts the object to the portable contract.
+
+Use a bridge when several modules benefit from a stable, documented conversion.
+Do not put object extraction, Code Ocean paths, or a scientific policy such as
+single-cell pseudobulk aggregation into Core without an explicit contract and
+tests. A bridge is platform-neutral; its Code Ocean installation and UI remain
+the responsibility of the separate deployment adapter.
+
 ## Inputs, outputs, and test data
 
 - Portable module scripts accept explicit paths. They must not assume Code

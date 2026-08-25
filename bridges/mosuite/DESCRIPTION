@@ -1,0 +1,22 @@
+Package: OmixMOSuite
+Type: Package
+Title: MOSuite Data Bridge for OMIX
+Version: 0.1.0
+Authors@R: c(
+    person("Margaret", "Cam", email = "maggie.cam@nih.gov", role = c("aut", "cre")))
+Description: Converts MOSuite multiOmicDataSet objects into the portable
+    counts-plus-metadata input contract used by OMIX modules.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: false
+RoxygenNote: 7.3.2
+Depends: R (>= 4.3.0)
+Imports:
+    MOSuite,
+    Omix,
+    S7
+Remotes:
+    CCBR/MOSuite@5c80b4493d546d9298131e745cc7812f51a2a297
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

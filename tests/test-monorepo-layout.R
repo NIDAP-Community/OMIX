@@ -10,6 +10,7 @@ required_root_paths <- c(
   "core/NAMESPACE",
   "core/R",
   "modules",
+  "bridges/README.md",
   "docs/module-contract.md"
 )
 
@@ -57,6 +58,21 @@ for (module_dir in module_dirs) {
       ": Code Ocean adapter paths belong in the individual repository, not ",
       "the canonical module: ",
       paste(present_platform_paths, collapse = ", "),
+      call. = FALSE
+    )
+  }
+}
+
+bridge_dirs <- list.dirs(file.path(repo_root, "bridges"), recursive = FALSE)
+required_bridge_paths <- c("DESCRIPTION", "NAMESPACE", "R", "tests", "README.md")
+for (bridge_dir in bridge_dirs) {
+  missing_bridge_paths <- required_bridge_paths[
+    !file.exists(file.path(bridge_dir, required_bridge_paths))
+  ]
+  if (length(missing_bridge_paths) > 0L) {
+    stop(
+      "Bridge contract failed for ", basename(bridge_dir), ": ",
+      paste(missing_bridge_paths, collapse = ", "),
       call. = FALSE
     )
   }
