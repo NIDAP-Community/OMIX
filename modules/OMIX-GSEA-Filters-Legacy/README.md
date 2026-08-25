@@ -3,7 +3,7 @@
 Filter and subset GSEA result tables by statistical significance, enrichment
 score, pathway size, collection, pathway, gene membership, and contrast.
 
-**Code Ocean deployment adapter:** [OMIX-GSEA-Filters-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy)
+**Deployment repository:** [OMIX-GSEA-Filters-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy)
 
 ## Input
 
@@ -36,7 +36,7 @@ The portable CLI writes `filtered_gsea_results.csv` and
 - **Selection:** retain top-ranked pathways, selected collections or pathways,
   pathways containing selected genes, or selected contrasts.
 
-The Code Ocean adapter adds an interactive HTML table and a filtering-summary
+The deployment adapter adds an interactive HTML table and a filtering-summary
 image, but its App Panel and `/data`/`/results` behavior are deliberately not
 part of this platform-neutral module.
 

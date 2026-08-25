@@ -10,6 +10,7 @@ OMIX/
 |   `-- mosuite/                       OmixMOSuite MOO-to-table bridge
 |-- modules/                           Independent analysis modules
 |   |-- OMIX-GSEA-Preranked-Legacy/
+|   |-- OMIX-DEG-Analysis/
 |   |-- OMIX-L2P-Single/
 |   `-- OMIX-L2P-Multi/
 |-- docs/                              Repository and module conventions
@@ -51,15 +52,13 @@ Each directory under `modules/` is independent from the other modules and
 from the `Omix` package API. It owns its own source, tests, schemas,
 documentation, and release history.
 
-Each module will be synchronized with its corresponding individual repository.
-The synchronization tooling is under construction.
-
 The **Module** link below is the canonical, platform-neutral implementation.
-The **Code Ocean adapter** link is the repository deployed as a capsule; it
-contains the Code Ocean-specific `code/`, metadata, and environment files.
+The optional **Deployment repository** link is a separately maintained
+interface and runtime layer; it is not required to run the module locally.
 
-| Module | Code Ocean adapter | Purpose | Status |
+| Module | Deployment repository | Purpose | Status |
 | --- | --- | --- | --- |
+| [OMIX-DEG-Analysis](modules/OMIX-DEG-Analysis) | [OMIX-DEG-Analysis](https://github.com/NIDAP-Community/OMIX-DEG-Analysis) | Raw-count differential expression | Review |
 | [OMIX-GSEA-Preranked-Legacy](modules/OMIX-GSEA-Preranked-Legacy) | [OMIX-GSEA-Preranked-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy) | Legacy preranked GSEA | Active |
 | [OMIX-Volcano-Plot](modules/OMIX-Volcano-Plot) | [OMIX-Volcano-Plot](https://github.com/NIDAP-Community/OMIX-Volcano-Plot) | Differential-expression volcano plot | Active |
 | [OMIX-L2P-Single](modules/OMIX-L2P-Single) | [OMIX-L2P-Single](https://github.com/NIDAP-Community/OMIX-L2P-Single) | Single-comparison L2P | Active |
@@ -75,7 +74,7 @@ implementation. The compact instructions for GitHub Copilot are in
 Shared runtime definitions live in [`starter-environments/`](starter-environments/).
 They are built once for a scientific domain and then used by module-specific
 container overlays. This keeps pathway modules independent of MOSuite while
-allowing the same pinned OCI image to run in Code Ocean, Docker, and HPC.
+allowing the same pinned OCI image to run locally, in Docker, and on HPC.
 See [docs/starter-environments.md](docs/starter-environments.md).
 
 ## Checks

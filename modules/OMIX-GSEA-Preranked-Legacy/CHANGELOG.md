@@ -3,7 +3,7 @@
 All notable changes to OMIX GSEA will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
-Version numbers correspond to Code Ocean capsule release versions (integers: v1, v2, v3, etc.).
+Version numbers correspond to adapter release versions (integers: v1, v2, v3, etc.).
 
 ## [Unreleased]
 
@@ -16,8 +16,8 @@ Version numbers correspond to Code Ocean capsule release versions (integers: v1,
   to the input species, so auto-detected columns such as `GeneName` complete
   successfully for cross-species analyses.
 - Replaced the hard-coded `/results` figure path with an explicit output
-  directory, allowing the same implementation to run outside Code Ocean.
-- Removed Code Ocean capsule files from the canonical OMIX module; capsule
+  directory, allowing the same implementation to run outside a deployment platform.
+- Removed platform-specific capsule files from the canonical OMIX module; capsule
   repositories are deployment adapters generated from this source.
 
 ### Added

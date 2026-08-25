@@ -55,7 +55,7 @@ for (module_dir in module_dirs) {
   if (length(present_platform_paths) > 0L) {
     stop(
       "Module contract failed for ", basename(module_dir),
-      ": Code Ocean adapter paths belong in the individual repository, not ",
+      ": deployment-adapter paths belong in the individual repository, not ",
       "the canonical module: ",
       paste(present_platform_paths, collapse = ", "),
       call. = FALSE

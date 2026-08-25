@@ -1,0 +1,53 @@
+interface_version: 1
+entrypoint: scripts/run_deg_analysis.R
+inputs:
+  table:
+    required_when: input_type=table
+    counts:
+      formats: [csv, tsv, txt, rds]
+      description: Raw integer-like feature-by-sample count table with one feature-ID column.
+    metadata:
+      formats: [csv, tsv, txt, rds]
+      description: Sample-level metadata table with a unique sample-ID column.
+  moo:
+    required_when: input_type=moo
+    formats: [rds]
+    description: MOSuite multiOmicDataSet, converted by OmixMOSuite using the raw count layer and embedded sample metadata.
+parameters:
+  input_type:
+    type: string
+    default: table
+    allowed: [table, moo]
+  gene_names_column:
+    type: string
+    default: GeneName
+  sample_names_column:
+    type: string
+    default: Sample
+  contrast_variable_columns:
+    type: string
+    default: Group
+  contrasts:
+    type: string
+    default: B-A
+  covariate_columns:
+    type: string
+  batch_effect_columns:
+    type: string
+    default: Batch
+  donor_variable_column:
+    type: string
+  filter_low_expression:
+    type: boolean
+    default: true
+  normalization_method:
+    type: string
+    default: TMM
+    allowed: [TMM, TMMwsp, RLE, upperquartile]
+outputs:
+  deg_analysis:
+    path: DEG_Analysis.csv
+    format: csv
+  run_summary:
+    path: DEG_Analysis_run_summary.txt
+    format: text

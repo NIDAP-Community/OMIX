@@ -2,7 +2,7 @@
 
 `OmixMOSuite` is an optional interoperability package that converts MOSuite
 `multiOmicDataSet` (MOO) objects into the portable OMIX standard input. It is
-not a Code Ocean adapter and can be used in R, Docker, or HPC environments.
+platform-neutral and can be used in R, Docker, or HPC environments.
 
 ## Install
 

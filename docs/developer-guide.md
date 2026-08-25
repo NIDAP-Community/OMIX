@@ -2,38 +2,37 @@
 
 This guide is the practical companion to the [module contract](module-contract.md).
 Read both before adding a module, changing an existing module, or preparing a
-Code Ocean capsule release.
+release.
 
 ## One scientific source, platform-specific adapters
 
 The OMIX monorepo is the canonical, platform-neutral home for reusable
 scientific behavior. A module must run with explicit input and output paths so
-the same implementation can be called from Docker, HPC, Galaxy, or a Code
-Ocean capsule.
+the same implementation can be called from local R, Docker, HPC, or Galaxy.
 
-Individual capsule repositories are deployment adapters. They make the
-canonical behavior usable in Code Ocean, but they are not a second source of
+Individual deployment repositories are adapters. They make canonical behavior
+usable on a particular platform, but they are not a second source of
 scientific truth and are not directory-for-directory copies of modules.
 
-| Owns | Canonical OMIX module | Code Ocean adapter repository |
+| Owns | Canonical OMIX module | Deployment adapter repository |
 | --- | --- | --- |
 | Scientific R functions | `R/` | Exported copy in `code/functions/` |
 | Portable CLI | `scripts/` | No |
 | Schemas and direct tests | `schemas/`, `tests/` | Link to the canonical contract |
-| App Panel, capsule metadata, runtime paths | No | `.codeocean/`, `metadata/`, `code/main.R`, `code/run` |
-| Capsule setup | No | `environment/` |
+| UI, metadata, runtime paths | No | Platform-owned configuration and entry point |
+| Runtime setup | No | Platform-owned environment files |
 | Shared reusable image definitions | `starter-environments/` | References a published image |
 
-Do not add `.codeocean/`, `metadata/`, `environment/`, or a Code Ocean
-`code/` runtime directory to a module under `modules/`.
+Do not add platform UI, metadata, environment, or runtime directories to a
+module under `modules/`.
 
 ## Starting a change
 
 1. Classify it before editing.
    - A scientific algorithm, reusable parameter, schema, or portable I/O
      change starts in the canonical module.
-   - An App Panel label, capsule input discovery rule, `/data` or `/results`
-     behavior, or capsule-only setup belongs in the adapter.
+   - A platform UI label, mounted-input discovery rule, platform output
+     behavior, or platform-only setup belongs in the adapter.
    - A dependency needed by multiple modules belongs in a shared starter
      environment, not in an unrelated module.
 2. For canonical changes, update the implementation, schema, tests, README,
@@ -43,9 +42,9 @@ Do not add `.codeocean/`, `metadata/`, `environment/`, or a Code Ocean
    `OMIX_MODULE_SOURCE.md` link back to the canonical module.
 4. Run module checks and the repository layout check.
 5. Export only the released scientific function files to the adapter's
-   `code/functions/` directory. Keep the adapter's `code/main.R` as its small
-   Code Ocean translation layer.
-6. Test the adapter in Code Ocean when its workflow or runtime is affected.
+   scientific-function directory. Keep the adapter entry point as a small
+   platform translation layer.
+6. Test the adapter on its target platform when its workflow or runtime is affected.
    Backport any scientific fix discovered there to the canonical module before
    releasing it again.
 
@@ -57,23 +56,22 @@ under `bridges/<ecosystem>/`; each is an independent R package that depends on
 Core and its ecosystem, then converts the object to the portable contract.
 
 Use a bridge when several modules benefit from a stable, documented conversion.
-Do not put object extraction, Code Ocean paths, or a scientific policy such as
+Do not put object extraction, platform paths, or a scientific policy such as
 single-cell pseudobulk aggregation into Core without an explicit contract and
-tests. A bridge is platform-neutral; its Code Ocean installation and UI remain
+tests. A bridge is platform-neutral; its platform installation and UI remain
 the responsibility of the separate deployment adapter.
 
 ## Inputs, outputs, and test data
 
-- Portable module scripts accept explicit paths. They must not assume Code
-  Ocean mounts such as `/data` or `/results`.
-- The adapter may discover workflow inputs below `/data` and write to
-  `/results`; document those rules in the adapter.
+- Portable module scripts accept explicit paths. They must not assume mounted
+  input or output locations.
+- The adapter may discover platform inputs and write platform outputs;
+  document those rules in the adapter.
 - Keep real data, generated results, credentials, and large package inventory
   artifacts out of Git. Use an ignored `data/debug/` fixture only for local
   reproducibility checks.
-- A useful local adapter test recreates the downstream Code Ocean mount shape:
-  mount a fixture at `/data`, mount a disposable output directory at
-  `/results`, and run the adapter's `code/run`.
+- A useful local adapter test recreates the target platform's input and output
+  layout with disposable fixture and result directories.
 
 ## Environments and reproducibility
 
@@ -81,7 +79,7 @@ the responsibility of the separate deployment adapter.
   as versioned OCI images. Use the version tag plus the resolved image digest
   from the publication workflow for every tested release; never use `latest`
   for a capsule, Docker, or HPC release.
-- Module-specific overlays or Code Ocean-only setup remain in the adapter.
+- Module-specific overlays or platform-only setup remain in the adapter.
 - Pin package versions in the environment lockfile. Record package provenance
   for packages installed from tarballs or other nonstandard sources.
 - Rebuild and publish an image only after its lockfile and Dockerfile changes
@@ -103,8 +101,8 @@ Before requesting review or a release:
    were staged in the monorepo.
 6. Update user documentation and the module changelog for externally visible
    behavior changes.
-7. For a Code Ocean release, sync the adapter, rebuild/select the intended
-   environment, and run a capsule validation before publishing a release.
+7. For a platform release, synchronize the adapter, select the intended
+   environment, and run a platform validation before publishing a release.
 
 ## How to use this guide
 

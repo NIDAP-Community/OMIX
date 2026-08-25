@@ -9,10 +9,8 @@ r-base -> r-pathway -> OMIX-GSEA-Preranked-Legacy
        -> r-statistics -> OMIX-DEG-Analysis
 ```
 
-The image family is intended for three execution targets:
+The image family is intended for local and shared execution targets:
 
-- Code Ocean, after an administrator registers the published image as a
-  Starter Environment;
 - local Docker development; and
 - HPC execution through Apptainer/Singularity.
 
@@ -34,7 +32,7 @@ code change.
 Each starter environment has a `VERSION` file. A manual publication uses that
 version tag and the Git commit tag; it does not publish a mutable `latest` tag.
 After publication, CI records the resolved digest in the workflow summary.
-Use that digest in a reproducible module or Code Ocean release record.
+Use that digest in a reproducible module release record.
 
 Before the first publication from OMIX, ensure that the corresponding GHCR
 package is associated with the `NIDAP-Community/OMIX` repository or grants its

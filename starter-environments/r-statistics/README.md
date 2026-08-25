@@ -12,7 +12,7 @@ The initial statistical foundation is deliberately small:
 - `DESeq2` for count-model differential expression where a module selects that
   method;
 - `sva` for surrogate-variable and ComBat batch-adjustment workflows; and
-- `optparse` for Code Ocean-compatible command-line adapters.
+- `optparse` for command-line adapters.
 
 Pathway packages (`fgsea`, `GSVA`, `l2p`), plotting/reporting packages, module
 code, and research data do not belong here. They remain in specialized images
@@ -20,11 +20,11 @@ or module-level adapters.
 
 ## Bootstrap-release gate
 
-`VERSION` is intentionally `v0`. It must not be published or registered as a
-Code Ocean Starter Environment. The first CI build uploads an exact package
+`VERSION` is intentionally `v0`. It must not be published or registered for
+production use. The first CI build uploads an exact package
 inventory and an `renv.lock` artifact. Review and commit that lockfile, replace
 the bootstrap installer with `renv::restore()`, then set `VERSION` to a new
 publishable `v1` tag. This makes the first released image reproducible without
 using a mutable package-manager endpoint.
 
-After publication, record the immutable GHCR digest with each capsule release.
+After publication, record the immutable GHCR digest with each module release.

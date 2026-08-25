@@ -1,0 +1,13 @@
+name: omix-deg-analysis
+display_name: OMIX-DEG-Analysis
+version: 0.1.0
+module_type: differential-expression
+status: review
+owner: OMIX Team
+description: Raw-count differential-expression analysis with design-aware filtering, edgeR TMM normalization, limma-voom modelling, and optional repeated-measures blocking.
+data_policy: No data are committed. Callers supply explicit count and metadata paths, or an explicit MOSuite MOO RDS through the optional bridge.
+runtime_profile: r-statistics
+entrypoint: scripts/run_deg_analysis.R
+deployment_adapters:
+  - platform: code-ocean
+    repository: https://github.com/NIDAP-Community/OMIX-DEG-Analysis

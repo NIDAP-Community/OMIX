@@ -38,8 +38,8 @@ pinned for a reproducible rebuild.
    with `NIDAP-Community/OMIX` (or grants OMIX Actions access), then manually
    dispatch **Starter Environments** with **Publish** enabled.
 3. Record the version-tagged image digest from the workflow summary alongside
-   the consuming module commit and input-data provenance. Register that exact
-   image in Code Ocean and use its digest for Docker or HPC releases.
+   the consuming module commit and input-data provenance. Use that exact image
+   digest for local containers and HPC releases.
 
 The workflow publishes an explicit version tag and the source commit tag. It
 does not publish or overwrite `latest`.
@@ -54,10 +54,8 @@ with **Adopt existing** enabled and the existing source tag (normally
 tags recorded in `VERSION`; it does not run a Docker build or reinstall any
 packages.
 
-## Platform adapters
+## Execution targets
 
-- **Code Ocean:** an administrator registers the published image as a Starter
-  Environment. The capsule retains only module-specific setup.
-- **Docker:** bind-mount inputs at `/data` and outputs at `/results`.
+- **Docker:** bind-mount explicit input and output directories.
 - **HPC:** pull the same image digest with Apptainer/Singularity and bind the
-  same two paths.
+  required input and output directories.
