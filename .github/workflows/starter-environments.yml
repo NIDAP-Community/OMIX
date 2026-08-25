@@ -59,6 +59,61 @@ jobs:
             --tag omix-r-pathway:ci \
             starter-environments/r-pathway
 
+      - name: Build r-statistics bootstrap image
+        run: |
+          docker build \
+            --build-arg BASE_IMAGE=omix-r-base:ci \
+            --tag omix-r-statistics:ci \
+            starter-environments/r-statistics
+
+      - name: Verify statistical runtime
+        run: |
+          docker run --rm --entrypoint Rscript omix-r-statistics:ci -e '
+            packages <- c("limma", "edgeR", "DESeq2", "sva", "optparse")
+            versions <- vapply(packages, function(package) {
+              suppressPackageStartupMessages(library(package, character.only = TRUE))
+              as.character(packageVersion(package))
+            }, character(1))
+            writeLines(paste(sprintf("%s %s", packages, versions), collapse = "\\n"))
+          '
+
+      - name: Capture statistics package inventory
+        run: |
+          mkdir -p build-artifacts/statistics
+          docker run --rm \
+            --volume "${{ github.workspace }}/build-artifacts/statistics:/out" \
+            --entrypoint Rscript \
+            omix-r-statistics:ci \
+            -e '
+              installed <- as.data.frame(installed.packages(lib.loc = .libPaths()))
+              write.csv(
+                installed[, c("Package", "Version", "Built", "LibPath")],
+                "/out/installed-packages.csv",
+                row.names = FALSE
+              )
+              writeLines(capture.output(sessionInfo()), "/out/sessionInfo.txt")
+              writeLines(as.character(BiocManager::version()), "/out/bioconductor-version.txt")
+              project <- tempfile("renv-project-")
+              dir.create(project)
+              renv::snapshot(
+                project = project,
+                library = .libPaths(),
+                lockfile = "/out/renv.lock",
+                type = "all",
+                prompt = FALSE,
+                force = TRUE
+              )
+            '
+
+      - name: Upload statistics package inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: statistics-package-inventory
+          path: build-artifacts/statistics
+          if-no-files-found: error
+          retention-days: 90
+
       - name: Capture resolved pathway package inventory
         run: |
           mkdir -p build-artifacts
@@ -111,6 +166,7 @@ jobs:
         run: |
           base_version="$(tr -d '[:space:]' < starter-environments/r-base/VERSION)"
           pathway_version="$(tr -d '[:space:]' < starter-environments/r-pathway/VERSION)"
+          statistics_version="$(tr -d '[:space:]' < starter-environments/r-statistics/VERSION)"
           docker tag omix-r-base:ci ghcr.io/nidap-community/omix-r-base:${{ github.sha }}
           docker tag omix-r-base:ci ghcr.io/nidap-community/omix-r-base:"$base_version"
           docker tag omix-r-pathway:ci ghcr.io/nidap-community/omix-r-pathway:${{ github.sha }}
@@ -119,14 +175,24 @@ jobs:
           docker push ghcr.io/nidap-community/omix-r-base:"$base_version"
           docker push ghcr.io/nidap-community/omix-r-pathway:${{ github.sha }}
           docker push ghcr.io/nidap-community/omix-r-pathway:"$pathway_version"
+          if [[ "$statistics_version" == *-v0 ]]; then
+            echo "r-statistics is still a bootstrap definition; skipping publication until its CI-captured renv.lock is committed and VERSION is v1 or later."
+          else
+            docker tag omix-r-statistics:ci ghcr.io/nidap-community/omix-r-statistics:${{ github.sha }}
+            docker tag omix-r-statistics:ci ghcr.io/nidap-community/omix-r-statistics:"$statistics_version"
+            docker push ghcr.io/nidap-community/omix-r-statistics:${{ github.sha }}
+            docker push ghcr.io/nidap-community/omix-r-statistics:"$statistics_version"
+          fi
 
       - name: Record published image digests
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish }}
         run: |
           base_version="$(tr -d '[:space:]' < starter-environments/r-base/VERSION)"
           pathway_version="$(tr -d '[:space:]' < starter-environments/r-pathway/VERSION)"
+          statistics_version="$(tr -d '[:space:]' < starter-environments/r-statistics/VERSION)"
           base_ref="ghcr.io/nidap-community/omix-r-base:$base_version"
           pathway_ref="ghcr.io/nidap-community/omix-r-pathway:$pathway_version"
+          statistics_ref="ghcr.io/nidap-community/omix-r-statistics:$statistics_version"
           base_digest="$(docker buildx imagetools inspect "$base_ref" --format '{{.Manifest.Digest}}')"
           pathway_digest="$(docker buildx imagetools inspect "$pathway_ref" --format '{{.Manifest.Digest}}')"
           {
@@ -134,6 +200,10 @@ jobs:
             echo
             echo "- \`$base_ref@$base_digest\`"
             echo "- \`$pathway_ref@$pathway_digest\`"
+            if [[ "$statistics_version" != *-v0 ]]; then
+              statistics_digest="$(docker buildx imagetools inspect "$statistics_ref" --format '{{.Manifest.Digest}}')"
+              echo "- \`$statistics_ref@$statistics_digest\`"
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
 
   adopt-existing:
@@ -160,22 +230,32 @@ jobs:
           source_tag="${{ inputs.existing_source_tag }}"
           base_version="$(tr -d '[:space:]' < starter-environments/r-base/VERSION)"
           pathway_version="$(tr -d '[:space:]' < starter-environments/r-pathway/VERSION)"
+          statistics_version="$(tr -d '[:space:]' < starter-environments/r-statistics/VERSION)"
           base_source="ghcr.io/nidap-community/omix-r-base:$source_tag"
           pathway_source="ghcr.io/nidap-community/omix-r-pathway:$source_tag"
+          statistics_source="ghcr.io/nidap-community/omix-r-statistics:$source_tag"
           base_target="ghcr.io/nidap-community/omix-r-base:$base_version"
           pathway_target="ghcr.io/nidap-community/omix-r-pathway:$pathway_version"
+          statistics_target="ghcr.io/nidap-community/omix-r-statistics:$statistics_version"
 
           docker buildx imagetools inspect "$base_source"
           docker buildx imagetools inspect "$pathway_source"
           docker buildx imagetools create --prefer-index=false --tag "$base_target" "$base_source"
           docker buildx imagetools create --prefer-index=false --tag "$pathway_target" "$pathway_source"
+          if docker buildx imagetools inspect "$statistics_source"; then
+            docker buildx imagetools create --prefer-index=false --tag "$statistics_target" "$statistics_source"
+          else
+            echo "No existing r-statistics image at $statistics_source; skipping adoption."
+          fi
 
       - name: Record adopted image digests
         run: |
           base_version="$(tr -d '[:space:]' < starter-environments/r-base/VERSION)"
           pathway_version="$(tr -d '[:space:]' < starter-environments/r-pathway/VERSION)"
+          statistics_version="$(tr -d '[:space:]' < starter-environments/r-statistics/VERSION)"
           base_ref="ghcr.io/nidap-community/omix-r-base:$base_version"
           pathway_ref="ghcr.io/nidap-community/omix-r-pathway:$pathway_version"
+          statistics_ref="ghcr.io/nidap-community/omix-r-statistics:$statistics_version"
           base_digest="$(docker buildx imagetools inspect "$base_ref" --format '{{.Manifest.Digest}}')"
           pathway_digest="$(docker buildx imagetools inspect "$pathway_ref" --format '{{.Manifest.Digest}}')"
           {
@@ -183,4 +263,7 @@ jobs:
             echo
             echo "- \`$base_ref@$base_digest\`"
             echo "- \`$pathway_ref@$pathway_digest\`"
+            if statistics_digest="$(docker buildx imagetools inspect "$statistics_ref" --format '{{.Manifest.Digest}}' 2>/dev/null)"; then
+              echo "- \`$statistics_ref@$statistics_digest\`"
+            fi
           } >> "$GITHUB_STEP_SUMMARY"

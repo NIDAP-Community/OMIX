@@ -6,6 +6,7 @@ module-specific code or user data.
 
 ```text
 r-base -> r-pathway -> OMIX-GSEA-Preranked-Legacy
+       -> r-statistics -> OMIX-DEG-Analysis
 ```
 
 The image family is intended for three execution targets:
@@ -21,6 +22,7 @@ The image family is intended for three execution targets:
 | --- | --- | --- |
 | `r-base` | Pinned R and common build/runtime libraries | all R environments |
 | `r-pathway` | Pathway and gene-set analysis libraries | GSEA, GSVA, L2P |
+| `r-statistics` | Bulk statistical-analysis libraries | DEG and future statistical modules |
 
 Images are built by the `Starter Environments` GitHub workflow. Normal pushes
 and pull requests only build and validate images. Publishing to GHCR is a
