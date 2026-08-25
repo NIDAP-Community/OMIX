@@ -59,6 +59,7 @@ option_list <- list(
   make_option("--return_batch_corrected_values", type = "character", default = "true"),
   make_option("--remove_donor_effect_for_downstream", type = "character", default = "true"),
   make_option("--normalization_method", type = "character", default = "TMM"),
+  make_option("--write_normalization_diagnostics", type = "character", default = "true"),
   make_option("--summarization_method", type = "character", default = "sum"),
   make_option("--output_dir", type = "character", default = "results")
 )
@@ -103,6 +104,7 @@ if (length(selected_samples) == 0L) {
   selected_samples <- intersect(as.character(metadata[[opt$sample_names_column]]), names(counts))
 }
 if (length(selected_samples) == 0L) stop("No selected metadata sample IDs occur in the count table.")
+dir.create(opt$output_dir, recursive = TRUE, showWarnings = FALSE)
 
 results <- omix_deg_analysis(
   Dataset = counts,
@@ -117,18 +119,23 @@ results <- omix_deg_analysis(
   batch_effect_columns = split_csv(opt$batch_effect_columns),
   filter_low_expression = as_logical(opt$filter_low_expression, "filter_low_expression"),
   normalization_method = opt$normalization_method,
+  normalization_diagnostics = as_logical(opt$write_normalization_diagnostics, "write_normalization_diagnostics"),
+  diagnostics_output_dir = opt$output_dir,
   return_batch_corrected_values = as_logical(opt$return_batch_corrected_values, "return_batch_corrected_values"),
   remove_donor_effect_for_downstream = as_logical(opt$remove_donor_effect_for_downstream, "remove_donor_effect_for_downstream"),
   summarization_method = opt$summarization_method
 )
 
-dir.create(opt$output_dir, recursive = TRUE, showWarnings = FALSE)
 utils::write.csv(results, file.path(opt$output_dir, "DEG_Analysis.csv"), row.names = FALSE, na = "")
 run_summary <- attr(results, "omix_deg_run")
 writeLines(c(
   "OMIX DEG Analysis run summary",
   input_summary,
   paste("model type:", run_summary$model_type),
+  paste("normalization profile:", opt$normalization_method),
+  paste("library-size normalization:", run_summary$library_size_normalization),
+  paste("voom-scale normalization:", run_summary$voom_scale_normalization),
+  paste("normalization diagnostics:", if (length(run_summary$normalization_diagnostic_files) == 0L) "not written" else paste(basename(run_summary$normalization_diagnostic_files), collapse = ", ")),
   paste("genes before filtering:", run_summary$genes_before_filtering),
   paste("genes modelled:", run_summary$genes_modelled),
   paste("expression output:", run_summary$expression_output),

@@ -30,7 +30,17 @@
 #'   to the DE model and removed from the downstream expression values.
 #' @param filter_low_expression Apply `edgeR::filterByExpr()` using the
 #'   biological group design. Default: `TRUE`.
-#' @param normalization_method edgeR normalisation method. Default: `"TMM"`.
+#' @param normalization_method Combined normalization profile. `"TMM"` is the
+#'   default. Other supported profiles are `"TMM + Quantile"`, `"Quantile"`,
+#'   `"TMM + Scale"`, `"TMM + Cyclic Loess"`, `"TMMwsp"`, `"RLE"`, and
+#'   `"Upper Quartile"`.
+#' @param normalization_diagnostics Write before-and-after normalization
+#'   diagnostics when `diagnostics_output_dir` is supplied. The diagnostics
+#'   include boxplots and density plots of filtered log-CPM values before
+#'   library-size normalization and after voom processing. Default: `FALSE`.
+#' @param diagnostics_output_dir Existing or new directory for normalization
+#'   diagnostic PNG files. Has no effect unless `normalization_diagnostics` is
+#'   `TRUE`.
 #' @param return_expression_matrix Append downstream expression values to the
 #'   right of the returned DEG table. Default: `TRUE`.
 #' @param return_batch_corrected_values Remove requested technical batches, and
@@ -59,6 +69,8 @@ omix_deg_analysis <- function(
   batch_effect_columns = NULL,
   filter_low_expression = TRUE,
   normalization_method = "TMM",
+  normalization_diagnostics = FALSE,
+  diagnostics_output_dir = NULL,
   return_expression_matrix = TRUE,
   return_batch_corrected_values = TRUE,
   remove_donor_effect_for_downstream = !is.null(donor_variable_column),
@@ -92,6 +104,13 @@ omix_deg_analysis <- function(
   if (!summarization_method %in% c("sum", "mean", "max")) {
     stop("summarization_method must be one of: sum, mean, max.")
   }
+  if (!is.logical(normalization_diagnostics) || length(normalization_diagnostics) != 1L || is.na(normalization_diagnostics)) {
+    stop("normalization_diagnostics must be TRUE or FALSE.")
+  }
+  if (!is.null(diagnostics_output_dir) && (length(diagnostics_output_dir) != 1L || is.na(diagnostics_output_dir))) {
+    stop("diagnostics_output_dir must be one path or NULL.")
+  }
+  normalization_profile <- .omix_deg_normalization_profile(normalization_method)
 
   required_dataset_columns <- c(gene_names_column, samples_to_include)
   missing_dataset_columns <- setdiff(required_dataset_columns, colnames(Dataset))
@@ -265,11 +284,21 @@ omix_deg_analysis <- function(
     }
     dge <- dge[keep, , keep.lib.sizes = FALSE]
   }
-  dge <- edgeR::calcNormFactors(dge, method = normalization_method)
+  pre_normalization_log_cpm <- edgeR::cpm(
+    dge,
+    log = TRUE,
+    prior.count = 0.5,
+    normalized.lib.sizes = FALSE
+  )
+  dge <- edgeR::calcNormFactors(dge, method = normalization_profile[["library_size"]])
 
   if (length(donor_variable_column) == 1L) {
     donor <- factor(sample_metadata[[donor_variable_column]])
-    voom_first_pass <- limma::voom(dge, design, normalize.method = "none")
+    voom_first_pass <- limma::voom(
+      dge,
+      design,
+      normalize.method = normalization_profile[["voom_scale"]]
+    )
     correlation_fit <- limma::duplicateCorrelation(
       voom_first_pass,
       design,
@@ -278,7 +307,7 @@ omix_deg_analysis <- function(
     voom_expression <- limma::voom(
       dge,
       design,
-      normalize.method = "none",
+      normalize.method = normalization_profile[["voom_scale"]],
       block = donor,
       correlation = correlation_fit$consensus.correlation
     )
@@ -295,10 +324,24 @@ omix_deg_analysis <- function(
     )
     model_type <- "repeated_measures"
   } else {
-    voom_expression <- limma::voom(dge, design, normalize.method = "none")
+    voom_expression <- limma::voom(
+      dge,
+      design,
+      normalize.method = normalization_profile[["voom_scale"]]
+    )
     fit <- limma::lmFit(voom_expression, design)
     correlation_fit <- NULL
     model_type <- "linear"
+  }
+
+  diagnostic_files <- character()
+  if (isTRUE(normalization_diagnostics) && !is.null(diagnostics_output_dir)) {
+    diagnostic_files <- .omix_deg_write_normalization_diagnostics(
+      pre_normalization_log_cpm = pre_normalization_log_cpm,
+      post_normalization_log_cpm = voom_expression$E,
+      output_dir = diagnostics_output_dir,
+      profile_label = normalization_profile[["label"]]
+    )
   }
 
   contrast_matrix <- limma::makeContrasts(contrasts = contrast_labels, levels = design)
@@ -382,7 +425,9 @@ omix_deg_analysis <- function(
 
   attr(results, "omix_deg_run") <- list(
     model_type = model_type,
-    normalization_method = normalization_method,
+    normalization_method = normalization_profile[["label"]],
+    library_size_normalization = normalization_profile[["library_size"]],
+    voom_scale_normalization = normalization_profile[["voom_scale"]],
     genes_before_filtering = genes_before_filtering,
     genes_modelled = nrow(voom_expression$E),
     expression_output = if (identical(expression_for_downstream, voom_expression$E)) {
@@ -395,7 +440,91 @@ omix_deg_analysis <- function(
       adjustment_columns
     )),
     modeled_covariates = model_covariates,
-    consensus_correlation = if (is.null(correlation_fit)) NULL else correlation_fit$consensus.correlation
+    consensus_correlation = if (is.null(correlation_fit)) NULL else correlation_fit$consensus.correlation,
+    normalization_diagnostic_files = unname(diagnostic_files)
   )
   results
+}
+
+.omix_deg_write_normalization_diagnostics <- function(
+  pre_normalization_log_cpm,
+  post_normalization_log_cpm,
+  output_dir,
+  profile_label
+) {
+  dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+  sample_names <- colnames(post_normalization_log_cpm)
+  colors <- grDevices::hcl.colors(length(sample_names), palette = "Dark 3")
+  y_limits <- range(c(pre_normalization_log_cpm, post_normalization_log_cpm), finite = TRUE)
+  x_limits <- y_limits
+
+  write_png <- function(path, draw) {
+    grDevices::png(path, width = 2400, height = 1200, res = 180)
+    on.exit(grDevices::dev.off(), add = TRUE)
+    draw()
+  }
+
+  boxplot_path <- file.path(output_dir, "normalization_boxplots.png")
+  write_png(boxplot_path, function() {
+    graphics::par(mfrow = c(1L, 2L), mar = c(8, 4, 4, 1) + 0.1)
+    graphics::boxplot(
+      pre_normalization_log_cpm,
+      col = colors,
+      las = 2,
+      ylim = y_limits,
+      main = "Before normalization",
+      ylab = "log2-CPM"
+    )
+    graphics::boxplot(
+      post_normalization_log_cpm,
+      col = colors,
+      las = 2,
+      ylim = y_limits,
+      main = paste("After", profile_label),
+      ylab = "log2-CPM"
+    )
+  })
+
+  density_path <- file.path(output_dir, "normalization_densities.png")
+  write_png(density_path, function() {
+    graphics::par(mfrow = c(1L, 2L), mar = c(4, 4, 4, 1) + 0.1)
+    limma::plotDensities(
+      pre_normalization_log_cpm,
+      col = colors,
+      xlim = x_limits,
+      main = "Before normalization",
+      xlab = "log2-CPM"
+    )
+    limma::plotDensities(
+      post_normalization_log_cpm,
+      col = colors,
+      xlim = x_limits,
+      main = paste("After", profile_label),
+      xlab = "log2-CPM"
+    )
+  })
+  c(boxplots = boxplot_path, densities = density_path)
+}
+
+.omix_deg_normalization_profile <- function(value) {
+  profiles <- list(
+    "TMM" = c(label = "TMM", library_size = "TMM", voom_scale = "none"),
+    "TMM + Quantile" = c(label = "TMM + Quantile", library_size = "TMM", voom_scale = "quantile"),
+    "Quantile" = c(label = "Quantile", library_size = "none", voom_scale = "quantile"),
+    "TMM + Scale" = c(label = "TMM + Scale", library_size = "TMM", voom_scale = "scale"),
+    "TMM + Cyclic Loess" = c(label = "TMM + Cyclic Loess", library_size = "TMM", voom_scale = "cyclicloess"),
+    "TMMwsp" = c(label = "TMMwsp", library_size = "TMMwsp", voom_scale = "none"),
+    "RLE" = c(label = "RLE", library_size = "RLE", voom_scale = "none"),
+    "Upper Quartile" = c(label = "Upper Quartile", library_size = "upperquartile", voom_scale = "none")
+  )
+  aliases <- c(upperquartile = "Upper Quartile")
+  value <- trimws(as.character(value))
+  if (length(value) != 1L || is.na(value)) {
+    stop("normalization_method must be one normalization profile.")
+  }
+  if (value %in% names(aliases)) value <- aliases[[value]]
+  if (!value %in% names(profiles)) {
+    stop("normalization_method must be one of: ", paste(names(profiles), collapse = ", "), ".")
+  }
+  profiles[[value]]
 }

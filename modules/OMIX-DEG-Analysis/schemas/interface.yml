@@ -43,7 +43,11 @@ parameters:
   normalization_method:
     type: string
     default: TMM
-    allowed: [TMM, TMMwsp, RLE, upperquartile]
+    allowed: [TMM, TMM + Quantile, Quantile, TMM + Scale, TMM + Cyclic Loess, TMMwsp, RLE, Upper Quartile]
+  write_normalization_diagnostics:
+    type: boolean
+    default: true
+    description: Write before-and-after boxplot and density diagnostics for filtered log-CPM values.
 outputs:
   deg_analysis:
     path: DEG_Analysis.csv
@@ -51,3 +55,9 @@ outputs:
   run_summary:
     path: DEG_Analysis_run_summary.txt
     format: text
+  normalization_boxplots:
+    path: normalization_boxplots.png
+    format: png
+  normalization_densities:
+    path: normalization_densities.png
+    format: png

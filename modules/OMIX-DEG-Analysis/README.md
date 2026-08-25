@@ -55,6 +55,50 @@ metadata, validates their sample alignment, and passes the portable table
 contract to the DEG function. Do not use a prefiltered MOO layer as input to
 the count model; it applies its own design-aware filtering.
 
+## Summary of normalization best practices
+
+| Dataset type | Recommended workflow | Reason |
+| --- | --- | --- |
+| **Typical dataset** (standard knockouts, treatments, diverse human tissues) | **Normalization Method: `TMM`** (default) [1, 2] | Preserves the observed biological range while correcting RNA-composition bias. |
+| **High technical noise** (for example, varying platforms or batch-heavy historical data) | **Normalization Method: `TMM + Quantile`** | Forces log-CPM distributions to align and can reduce severe, non-linear technical variation, at the risk of attenuating subtle or global biology. [2] |
+
+`TMM + Scale` equalizes sample medians, while `TMM + Cyclic Loess` is a
+slower, pairwise alternative that can be more robust when differential
+expression is unbalanced. `Quantile` omits TMM and applies voom-scale quantile
+normalization alone; use it only when that deliberate choice fits the study.
+
+### Choosing a profile
+
+- Start with **`TMM`** for a new bulk RNA-seq analysis.
+- Try **`TMM + Scale`** when QC shows a modest, sample-wide median shift after
+  TMM and there is good reason to regard it as technical.
+- Use **`TMM + Quantile`** only when QC shows a severe technical mismatch of
+  whole distributions. It is intentionally stronger and can obscure genuine
+  global shifts.
+- Use **`TMM + Cyclic Loess`** as a sensitivity analysis for nonlinear,
+  sample-specific distribution differences, particularly with unbalanced
+  differential expression.
+- Use **`Quantile`**, **`TMMwsp`**, **`RLE`**, or **`Upper Quartile`** for a
+  deliberate legacy/reproducibility comparison or a documented special case;
+  they are not routine first choices.
+
+Normalization does not replace modelling known technical batch variables.
+
+### Normalization diagnostics
+
+The portable CLI writes `normalization_boxplots.png` and
+`normalization_densities.png` by default. Each file compares filtered log-CPM
+values before normalization with the final voom values used for modelling.
+Disable this output with `--write_normalization_diagnostics false`. When
+calling `omix_deg_analysis()` directly, set
+`normalization_diagnostics = TRUE` and supply `diagnostics_output_dir` to write
+the same files.
+
+### References
+
+1. Robinson MD, Oshlack A. A scaling normalization method for differential expression analysis of RNA-seq data. *Genome Biology*. 2010;11:R25. [doi:10.1186/gb-2010-11-3-r25](https://doi.org/10.1186/gb-2010-11-3-r25)
+2. [limma documentation: `voom` and `normalizeBetweenArrays`](https://bioconductor.org/packages/devel/bioc/manuals/limma/man/limma.pdf)
+
 ## Design notes
 
 - Use `--donor_variable_column` only for genuine repeated measurements from

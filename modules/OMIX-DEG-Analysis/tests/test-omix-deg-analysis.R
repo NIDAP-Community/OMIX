@@ -32,13 +32,33 @@ unpaired <- omix_deg_analysis(
   gene_names_column = "Gene",
   contrast_variable_columns = "Condition",
   contrasts = "B-A",
-  batch_effect_columns = "Batch"
+  batch_effect_columns = "Batch",
+  normalization_method = "TMM + Quantile"
 )
 
 stopifnot(all(c("Gene", "B-A_logFC", "B-A_pval", "B-A_adjpval") %in% colnames(unpaired)))
 stopifnot(identical(tail(colnames(unpaired), 6L), fixture$metadata$Sample))
 stopifnot(identical(attr(unpaired, "omix_deg_run")$model_type, "linear"))
 stopifnot(identical(attr(unpaired, "omix_deg_run")$expression_output, "batch_adjusted_voom"))
+stopifnot(identical(attr(unpaired, "omix_deg_run")$normalization_method, "TMM + Quantile"))
+stopifnot(identical(attr(unpaired, "omix_deg_run")$voom_scale_normalization, "quantile"))
+
+diagnostic_directory <- tempfile("omix-deg-normalization-diagnostics-")
+diagnostic_run <- omix_deg_analysis(
+  Dataset = fixture$dataset,
+  Metadata_Table = fixture$metadata,
+  sample_names_column = "Sample",
+  samples_to_include = fixture$metadata$Sample,
+  gene_names_column = "Gene",
+  contrast_variable_columns = "Condition",
+  contrasts = "B-A",
+  normalization_diagnostics = TRUE,
+  diagnostics_output_dir = diagnostic_directory
+)
+diagnostic_files <- attr(diagnostic_run, "omix_deg_run")$normalization_diagnostic_files
+stopifnot(identical(basename(diagnostic_files), c("normalization_boxplots.png", "normalization_densities.png")))
+stopifnot(all(file.exists(diagnostic_files)))
+unlink(diagnostic_directory, recursive = TRUE)
 
 paired_metadata <- data.frame(
   Sample = c("D1_A", "D1_B", "D2_A", "D2_B", "D3_A", "D3_B"),
