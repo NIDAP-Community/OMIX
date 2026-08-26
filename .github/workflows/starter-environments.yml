@@ -59,7 +59,7 @@ jobs:
             --tag omix-r-pathway:ci \
             starter-environments/r-pathway
 
-      - name: Build r-statistics bootstrap image
+      - name: Build r-statistics
         run: |
           docker build \
             --build-arg BASE_IMAGE=omix-r-base:ci \
