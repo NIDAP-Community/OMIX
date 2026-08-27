@@ -12,7 +12,9 @@ module.
 | Bridge | External ecosystem | Output |
 | --- | --- | --- |
 | `mosuite` / `OmixMOSuite` | MOSuite MOO | `omix_standard_input` |
+| `seurat` / `OmixSeurat` | Seurat object via SeuratObject | donor-by-condition pseudobulk `omix_standard_input` |
 
-Future bridges—for example, a Seurat pseudobulk bridge—belong here only after
-their conversion and scientific policy have been explicitly specified and
-tested.
+Bridges may define an explicit conversion policy when it is documented and
+tested. `OmixSeurat`, for example, aggregates raw counts for one selected cell
+type by donor and condition; it does not expose individual cells as DEG
+replicates.

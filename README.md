@@ -7,7 +7,8 @@ package with independent analysis modules.
 OMIX/
 |-- core/                              Shared R package: Omix
 |-- bridges/                           Optional ecosystem-specific R packages
-|   `-- mosuite/                       OmixMOSuite MOO-to-table bridge
+|   |-- mosuite/                       OmixMOSuite MOO-to-table bridge
+|   `-- seurat/                        OmixSeurat pseudobulk bridge
 |-- modules/                           Independent analysis modules
 |   |-- OMIX-GSEA-Preranked-Legacy/
 |   |-- OMIX-DEG-Analysis/
@@ -42,6 +43,7 @@ of `Omix` or ordinary table-based modules.
 | Package | Ecosystem | Purpose |
 | --- | --- | --- |
 | [OmixMOSuite](bridges/mosuite) | MOSuite | Convert an MOO into `omix_standard_input` counts and metadata tables. |
+| [OmixSeurat](bridges/seurat) | SeuratObject | Aggregate one selected cell type into donor-by-condition raw-count pseudobulk tables. |
 
 See [bridges/README.md](bridges/README.md) for the extension contract and
 installation guidance.

@@ -1,0 +1,24 @@
+Package: OmixSeurat
+Type: Package
+Title: Seurat Pseudobulk Data Bridge for OMIX
+Version: 0.1.0
+Authors@R: c(
+    person("Margaret", "Cam", email = "maggie.cam@nih.gov", role = c("aut", "cre")))
+Author: Margaret Cam [aut, cre]
+Maintainer: Margaret Cam <maggie.cam@nih.gov>
+Description: Extracts raw counts and aligned cell metadata from Seurat objects,
+    then creates donor-by-condition pseudobulk profiles as the portable
+    counts-plus-metadata input contract used by OMIX modules.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: false
+RoxygenNote: 7.3.2
+Depends: R (>= 4.3.0)
+Imports:
+    Matrix,
+    methods,
+    Omix,
+    SeuratObject
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
