@@ -56,7 +56,11 @@ diagnostic_run <- omix_deg_analysis(
   diagnostics_output_dir = diagnostic_directory
 )
 diagnostic_files <- attr(diagnostic_run, "omix_deg_run")$normalization_diagnostic_files
-stopifnot(identical(basename(diagnostic_files), c("normalization_boxplots.png", "normalization_densities.png")))
+stopifnot(identical(basename(diagnostic_files), c(
+  "normalization_boxplots.png",
+  "normalization_densities.png",
+  "voom_mean_variance.png"
+)))
 stopifnot(all(file.exists(diagnostic_files)))
 unlink(diagnostic_directory, recursive = TRUE)
 
@@ -97,5 +101,23 @@ duplicate_error <- tryCatch(
   error = conditionMessage
 )
 stopifnot(is.character(duplicate_error), grepl("Technical replicates detected", duplicate_error, fixed = TRUE))
+
+under_replicated_metadata <- fixture$metadata[fixture$metadata$Sample %in% c("A1", "B1", "B2"), , drop = FALSE]
+under_replicated_error <- tryCatch(
+  omix_deg_analysis(
+    Dataset = fixture$dataset[, c("Gene", under_replicated_metadata$Sample), drop = FALSE],
+    Metadata_Table = under_replicated_metadata,
+    sample_names_column = "Sample",
+    samples_to_include = under_replicated_metadata$Sample,
+    gene_names_column = "Gene",
+    contrast_variable_columns = "Condition",
+    contrasts = "B-A"
+  ),
+  error = conditionMessage
+)
+stopifnot(
+  is.character(under_replicated_error),
+  grepl("Each comparison group must contain at least two biological samples", under_replicated_error, fixed = TRUE)
+)
 
 message("OMIX DEG raw-count model tests passed")

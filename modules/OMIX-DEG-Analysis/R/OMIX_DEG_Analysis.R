@@ -37,7 +37,8 @@
 #' @param normalization_diagnostics Write before-and-after normalization
 #'   diagnostics when `diagnostics_output_dir` is supplied. The diagnostics
 #'   include boxplots and density plots of filtered log-CPM values before
-#'   library-size normalization and after voom processing. Default: `FALSE`.
+#'   library-size normalization and after voom processing, plus the voom
+#'   mean-variance trend used to estimate precision weights. Default: `FALSE`.
 #' @param diagnostics_output_dir Existing or new directory for normalization
 #'   diagnostic PNG files. Has no effect unless `normalization_diagnostics` is
 #'   `TRUE`.
@@ -185,6 +186,24 @@ omix_deg_analysis <- function(
   raw_counts <- raw_counts[, rownames(sample_metadata), drop = FALSE]
   raw_groups <- raw_groups[include]
 
+  samples_per_group <- table(raw_groups)
+  under_replicated_groups <- names(samples_per_group)[samples_per_group < 2L]
+  if (length(under_replicated_groups) > 0L) {
+    group_summary <- paste0(
+      under_replicated_groups,
+      " (n=",
+      unname(samples_per_group[under_replicated_groups]),
+      ")"
+    )
+    stop(
+      "Each comparison group must contain at least two biological samples. ",
+      "Under-replicated group(s): ",
+      paste(group_summary, collapse = ", "),
+      ". For single-cell input, aggregate raw counts by donor and condition ",
+      "before running OMIX-DEG-Analysis."
+    )
+  }
+
   group_levels_raw <- unique(contrast_terms)
   group_levels <- make.names(group_levels_raw, unique = FALSE)
   if (anyDuplicated(group_levels)) {
@@ -291,6 +310,7 @@ omix_deg_analysis <- function(
     normalized.lib.sizes = FALSE
   )
   dge <- edgeR::calcNormFactors(dge, method = normalization_profile[["library_size"]])
+  write_diagnostics <- isTRUE(normalization_diagnostics) && !is.null(diagnostics_output_dir)
 
   if (length(donor_variable_column) == 1L) {
     donor <- factor(sample_metadata[[donor_variable_column]])
@@ -309,7 +329,8 @@ omix_deg_analysis <- function(
       design,
       normalize.method = normalization_profile[["voom_scale"]],
       block = donor,
-      correlation = correlation_fit$consensus.correlation
+      correlation = correlation_fit$consensus.correlation,
+      save.plot = write_diagnostics
     )
     correlation_fit <- limma::duplicateCorrelation(
       voom_expression,
@@ -327,7 +348,8 @@ omix_deg_analysis <- function(
     voom_expression <- limma::voom(
       dge,
       design,
-      normalize.method = normalization_profile[["voom_scale"]]
+      normalize.method = normalization_profile[["voom_scale"]],
+      save.plot = write_diagnostics
     )
     fit <- limma::lmFit(voom_expression, design)
     correlation_fit <- NULL
@@ -335,10 +357,12 @@ omix_deg_analysis <- function(
   }
 
   diagnostic_files <- character()
-  if (isTRUE(normalization_diagnostics) && !is.null(diagnostics_output_dir)) {
+  if (write_diagnostics) {
     diagnostic_files <- .omix_deg_write_normalization_diagnostics(
       pre_normalization_log_cpm = pre_normalization_log_cpm,
       post_normalization_log_cpm = voom_expression$E,
+      voom_xy = voom_expression$voom.xy,
+      voom_line = voom_expression$voom.line,
       output_dir = diagnostics_output_dir,
       profile_label = normalization_profile[["label"]]
     )
@@ -449,6 +473,8 @@ omix_deg_analysis <- function(
 .omix_deg_write_normalization_diagnostics <- function(
   pre_normalization_log_cpm,
   post_normalization_log_cpm,
+  voom_xy,
+  voom_line,
   output_dir,
   profile_label
 ) {
@@ -503,7 +529,23 @@ omix_deg_analysis <- function(
       xlab = "log2-CPM"
     )
   })
-  c(boxplots = boxplot_path, densities = density_path)
+
+  mean_variance_path <- file.path(output_dir, "voom_mean_variance.png")
+  write_png(mean_variance_path, function() {
+    graphics::plot(
+      voom_xy$x,
+      voom_xy$y,
+      pch = 16,
+      cex = 0.35,
+      col = grDevices::adjustcolor("black", alpha.f = 0.2),
+      xlab = voom_xy$xlab,
+      ylab = voom_xy$ylab,
+      main = paste("voom mean-variance trend:", profile_label)
+    )
+    graphics::lines(voom_line$x, voom_line$y, col = "red", lwd = 2)
+  })
+
+  c(boxplots = boxplot_path, densities = density_path, mean_variance = mean_variance_path)
 }
 
 .omix_deg_normalization_profile <- function(value) {

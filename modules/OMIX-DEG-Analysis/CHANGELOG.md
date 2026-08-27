@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.3 - 2026-08-27
+
+- Restored the saved voom mean-variance trend diagnostic alongside the
+  normalization boxplot and density diagnostics.
+
+## 0.1.2 - 2026-08-26
+
+- Reject under-replicated comparison groups before fitting limma-voom, with a
+  clear message that cells are not biological DEG replicates.
+- Added a reproducible, ignored Kang IFN-beta PBMC pseudobulk fixture generator
+  for local paired-design integration checks.
+- Documented the optional `OmixSeurat` bridge for SeuratObject-based raw-count
+  pseudobulk conversion.
+
 ## 0.1.1 - 2026-08-25
 
 - Added combined edgeR-plus-voom normalization profiles, including TMM,

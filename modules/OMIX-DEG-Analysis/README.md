@@ -34,6 +34,24 @@ The count table contains one feature-ID column followed by sample columns. The
 metadata sample-ID values must match those sample columns exactly. The output
 directory receives `DEG_Analysis.csv` and `DEG_Analysis_run_summary.txt`.
 
+### Local paired-pseudobulk fixture
+
+For a reproducible local integration test, generate the Kang et al. IFN-beta
+PBMC CD14+ monocyte fixture. It contains eight donors observed in both `ctrl`
+and `stim` conditions, producing 16 donor-by-condition profiles. The data are
+created under ignored `data/debug/` and are never part of a release.
+
+```r
+BiocManager::install("muscData")
+```
+
+```bash
+Rscript modules/OMIX-DEG-Analysis/scripts/create_kang_pseudobulk_fixture.R
+```
+
+Run the resulting files with `--contrast_variable_columns Group`,
+`--contrasts stim-ctrl`, and `--donor_variable_column Donor`.
+
 ## Optional MOSuite MOO input
 
 MOO input is an optional interoperability path, not a requirement for this
@@ -54,6 +72,15 @@ The bridge extracts the MOO's **raw** count layer and embedded sample
 metadata, validates their sample alignment, and passes the portable table
 contract to the DEG function. Do not use a prefiltered MOO layer as input to
 the count model; it applies its own design-aware filtering.
+
+## Optional Seurat pseudobulk input
+
+For a Seurat object, use the optional
+[OmixSeurat bridge](../../bridges/seurat/README.md) to select a cell type and
+sum raw `RNA` `counts` by donor and condition. It returns the same portable
+count-table-plus-metadata contract used above. The bridge depends on
+`SeuratObject`, not the full Seurat package, and does not treat cells as
+independent DEG replicates.
 
 ## Summary of normalization best practices
 
@@ -86,13 +113,15 @@ Normalization does not replace modelling known technical batch variables.
 
 ### Normalization diagnostics
 
-The portable CLI writes `normalization_boxplots.png` and
-`normalization_densities.png` by default. Each file compares filtered log-CPM
-values before normalization with the final voom values used for modelling.
-Disable this output with `--write_normalization_diagnostics false`. When
-calling `omix_deg_analysis()` directly, set
-`normalization_diagnostics = TRUE` and supply `diagnostics_output_dir` to write
-the same files.
+The portable CLI writes `normalization_boxplots.png`,
+`normalization_densities.png`, and `voom_mean_variance.png` by default. The
+first two compare filtered log-CPM values before normalization with the final
+voom values used for modelling. The mean-variance plot shows the voom trend
+used to estimate precision weights and is useful for checking low-count
+filtering and model preparation. Disable these outputs with
+`--write_normalization_diagnostics false`. When calling `omix_deg_analysis()`
+directly, set `normalization_diagnostics = TRUE` and supply
+`diagnostics_output_dir` to write the same files.
 
 ### References
 
@@ -103,6 +132,9 @@ the same files.
 
 - Use `--donor_variable_column` only for genuine repeated measurements from
   the same biological donor or participant.
+- Every comparison group must contain at least two biological samples. For
+  single-cell input, aggregate raw counts by donor and condition first; cells
+  are not independent replicates.
 - Technical replicates within the same donor-by-group combination are rejected
   rather than selected silently.
 - Batch adjustment is included in the fitted model. The optional expression
