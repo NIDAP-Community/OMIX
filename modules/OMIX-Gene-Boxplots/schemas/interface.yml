@@ -39,6 +39,16 @@ parameters:
     type: string
     default: anova
     allowed: [anova, t-test, kruskal]
+  minimum_samples_per_category:
+    type: integer
+    default: 3
+    description: Minimum samples per displayed group, preserving the original template default.
+  title:
+    type: string
+    default: auto
+  y_axis_label:
+    type: string
+    default: auto
   output_dir:
     type: path
     default: results

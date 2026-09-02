@@ -2,7 +2,9 @@
 
 Create one publication-ready gene-expression boxplot per requested gene. The
 module is platform-neutral: it reads ordinary expression and metadata tables
-from paths you provide and writes ordinary PNG and CSV files.
+from paths you provide and writes ordinary PNG and CSV files. Its scientific
+and visual implementation is the preserved CCBR `Boxplot_with_Stats.R` code,
+not a simplified replacement.
 
 **Deployment repository:** [OMIX-Gene-Boxplots](https://github.com/NIDAP-Community/OMIX-Gene-Boxplots)
 
@@ -22,6 +24,32 @@ on the plotted values and is not a substitute for the original DEG model.
 
 Each displayed comparison is drawn as a horizontal bar spanning its two
 corresponding groups, labelled with the selected nominal or adjusted p-value.
+
+## Preserved implementation and OMIX boundary
+
+[`R/Boxplot_with_Stats.R`](R/Boxplot_with_Stats.R) contains the original
+implementation, including its public `gene_boxplot_with_stats()` and
+`gene_boxplot_with_deg_results()` functions, category-order handling,
+duplicate-gene behavior, covariate-aware tests, compact-letter annotations,
+beeswarm option, palette controls, and layout controls. It is the compatibility
+reference and should not be refactored without regression tests against it.
+
+`omix_gene_boxplots()` is deliberately a thin wrapper. It maps ordinary input
+tables and standardized output paths to the preserved functions; it does not
+recalculate their logic. Its only intentional OMIX default difference is that
+**nominal** p-values are selected by default for precomputed DEG annotations
+(`pvalue_to_plot = "raw"` in the preserved function). Choose `adjusted` when
+you want the original DEG-wrapper default instead.
+
+## Plot appearance
+
+The default visual style is the established CCBR template: groups are assigned
+**Deep Red**, **Vivid Blue**, **Green**, **Purple**, and subsequent original
+custom colors in display order; boxes are lightly filled; individual
+observations are small filled circles; and a right-side legend is shown.
+Comparison bars and italic p-value labels are black. Leave `colors` empty to
+retain these defaults, or provide comma-separated original color names in group
+order. The preserved functions expose the complete original appearance API.
 
 ## Required tables
 
@@ -69,5 +97,8 @@ Rscript scripts/run_gene_boxplots.R \
 - `gene_boxplot_expression_long.csv` — exact sample-level values displayed.
 - `gene_boxplot_run_summary.csv` — the selected analysis settings and data
   scope.
+
+The first two artifacts use the same original plotting and statistics code;
+the long table and run summary are additive OMIX workflow records.
 
 See `schemas/interface.yml` for the machine-readable interface contract.
