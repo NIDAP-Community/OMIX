@@ -32,6 +32,12 @@ result <- omix_gene_boxplots(
 stopifnot(length(result$plots) == 2L)
 stopifnot(nrow(result$statistics) == 2L)
 stopifnot(all(result$statistics$source == "precomputed_deg"))
+gene_a_geometries <- vapply(
+  result$plots[["GeneA"]]$layers,
+  function(layer) class(layer$geom)[[1L]],
+  character(1)
+)
+stopifnot(sum(gene_a_geometries == "GeomSegment") == 1L)
 stopifnot(file.exists(file.path(out_dir, "gene_boxplots", "GeneA.png")))
 stopifnot(file.exists(file.path(out_dir, "gene_boxplot_statistics.csv")))
 

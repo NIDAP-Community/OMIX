@@ -332,28 +332,61 @@ omix_make_gene_boxplot <- function(
     one_gene_stats$selected_p <- one_gene_stats[[value_column]]
     one_gene_stats <- one_gene_stats[is.finite(one_gene_stats$selected_p), , drop = FALSE]
     if (nrow(one_gene_stats)) {
-      annotation_label <- paste(
-        paste0(
-          one_gene_stats$group1, " vs ", one_gene_stats$group2, ": ",
-          vapply(one_gene_stats$selected_p, omix_format_pvalue, character(1),
-            label = if (identical(pvalue_type, "adjusted")) "adj. p" else "p"
-          )
-        ),
-        collapse = "\n"
-      )
+      one_gene_stats$x1 <- match(one_gene_stats$group1, levels_present)
+      one_gene_stats$x2 <- match(one_gene_stats$group2, levels_present)
+      one_gene_stats <- one_gene_stats[
+        is.finite(one_gene_stats$x1) & is.finite(one_gene_stats$x2),
+        ,
+        drop = FALSE
+      ]
+      one_gene_stats <- one_gene_stats[
+        order(abs(one_gene_stats$x2 - one_gene_stats$x1), one_gene_stats$x1, one_gene_stats$x2),
+        ,
+        drop = FALSE
+      ]
+    }
+    if (nrow(one_gene_stats)) {
       y_range <- range(one_gene$value, na.rm = TRUE)
-      y_padding <- diff(y_range) * 0.12
-      if (!is.finite(y_padding) || y_padding == 0) {
-        y_padding <- max(abs(y_range), 1) * 0.12
+      value_span <- diff(y_range)
+      if (!is.finite(value_span) || value_span == 0) {
+        value_span <- max(abs(y_range), 1)
       }
-      plot <- plot + ggplot2::annotate(
-        "text",
-        x = (length(levels_present) + 1) / 2,
-        y = max(y_range) + y_padding,
-        label = annotation_label,
-        size = 3.2,
-        lineheight = 0.95
-      ) + ggplot2::coord_cartesian(clip = "off")
+      whisker_tops <- vapply(levels_present, function(category) {
+        values <- one_gene$value[one_gene$category == category]
+        q3 <- stats::quantile(values, 0.75, na.rm = TRUE)
+        iqr <- stats::IQR(values, na.rm = TRUE)
+        min(q3 + 1.5 * iqr, max(values, na.rm = TRUE))
+      }, numeric(1))
+      base_y <- max(whisker_tops, na.rm = TRUE) + value_span * 0.10
+      line_spacing <- value_span * 0.12
+      label_gap <- value_span * 0.035
+      p_label <- if (identical(pvalue_type, "adjusted")) "adj. p" else "p"
+      for (index in seq_len(nrow(one_gene_stats))) {
+        comparison <- one_gene_stats[index, , drop = FALSE]
+        line_y <- base_y + (index - 1L) * line_spacing
+        plot <- plot +
+          ggplot2::annotate(
+            "segment",
+            x = comparison$x1,
+            xend = comparison$x2,
+            y = line_y,
+            yend = line_y,
+            linewidth = 0.65,
+            color = "grey20"
+          ) +
+          ggplot2::annotate(
+            "text",
+            x = mean(c(comparison$x1, comparison$x2)),
+            y = line_y + label_gap,
+            label = omix_format_pvalue(comparison$selected_p, label = p_label),
+            size = 3.2,
+            vjust = 0,
+            color = "grey20"
+          )
+      }
+      plot <- plot +
+        ggplot2::coord_cartesian(clip = "off") +
+        ggplot2::theme(plot.margin = grid::unit(c(18, 6, 6, 6), "pt"))
     }
   }
   plot

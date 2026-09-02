@@ -20,6 +20,9 @@ terms, donor blocking, and contrast. `within_plot` is available for simple
 exploratory comparisons, but it deliberately performs a new independent test
 on the plotted values and is not a substitute for the original DEG model.
 
+Each displayed comparison is drawn as a horizontal bar spanning its two
+corresponding groups, labelled with the selected nominal or adjusted p-value.
+
 ## Required tables
 
 `expression_table` must contain a gene identifier column (default `GeneName`)
