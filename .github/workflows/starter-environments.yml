@@ -59,6 +59,13 @@ jobs:
             --tag omix-r-pathway:ci \
             starter-environments/r-pathway
 
+      - name: Build r-visualization
+        run: |
+          docker build \
+            --build-arg BASE_IMAGE=omix-r-base:ci \
+            --tag omix-r-visualization:ci \
+            starter-environments/r-visualization
+
       - name: Build r-statistics
         run: |
           docker build \
@@ -70,6 +77,21 @@ jobs:
         run: |
           docker run --rm --entrypoint Rscript omix-r-statistics:ci -e '
             packages <- c("limma", "edgeR", "optparse")
+            versions <- vapply(packages, function(package) {
+              suppressPackageStartupMessages(library(package, character.only = TRUE))
+              as.character(packageVersion(package))
+            }, character(1))
+            writeLines(paste(sprintf("%s %s", packages, versions), collapse = "\\n"))
+          '
+
+      - name: Verify visualization runtime
+        run: |
+          docker run --rm --entrypoint Rscript omix-r-visualization:ci -e '
+            packages <- c(
+              "ggplot2", "dplyr", "tidyr", "ggbeeswarm", "broom",
+              "multcomp", "multcompView", "RColorBrewer", "plotly",
+              "patchwork", "pheatmap", "optparse"
+            )
             versions <- vapply(packages, function(package) {
               suppressPackageStartupMessages(library(package, character.only = TRUE))
               as.character(packageVersion(package))
@@ -115,6 +137,45 @@ jobs:
         with:
           name: statistics-package-inventory
           path: build-artifacts/statistics
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Capture visualization package inventory
+        run: |
+          mkdir -p build-artifacts/visualization
+          docker run --rm \
+            --volume "${{ github.workspace }}/build-artifacts/visualization:/out" \
+            --entrypoint Rscript \
+            omix-r-visualization:ci \
+            -e '
+              installed <- as.data.frame(installed.packages(lib.loc = .libPaths()))
+              write.csv(
+                installed[, c("Package", "Version", "Built", "LibPath")],
+                "/out/installed-packages.csv",
+                row.names = FALSE
+              )
+              writeLines(capture.output(sessionInfo()), "/out/sessionInfo.txt")
+              project <- tempfile("renv-project-")
+              dir.create(project)
+              renv::snapshot(
+                project = project,
+                library = .libPaths(),
+                lockfile = "/out/renv.lock",
+                type = "all",
+                # `littler` is supplied by the r-base image and is not restored
+                # into the dedicated visualization R library.
+                exclude = "littler",
+                prompt = FALSE,
+                force = TRUE
+              )
+            '
+
+      - name: Upload visualization package inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visualization-package-inventory
+          path: build-artifacts/visualization
           if-no-files-found: error
           retention-days: 90
 
@@ -170,6 +231,7 @@ jobs:
         run: |
           base_version="$(tr -d '[:space:]' < starter-environments/r-base/VERSION)"
           pathway_version="$(tr -d '[:space:]' < starter-environments/r-pathway/VERSION)"
+          visualization_version="$(tr -d '[:space:]' < starter-environments/r-visualization/VERSION)"
           statistics_version="$(tr -d '[:space:]' < starter-environments/r-statistics/VERSION)"
           docker tag omix-r-base:ci ghcr.io/nidap-community/omix-r-base:${{ github.sha }}
           docker tag omix-r-base:ci ghcr.io/nidap-community/omix-r-base:"$base_version"
@@ -179,6 +241,14 @@ jobs:
           docker push ghcr.io/nidap-community/omix-r-base:"$base_version"
           docker push ghcr.io/nidap-community/omix-r-pathway:${{ github.sha }}
           docker push ghcr.io/nidap-community/omix-r-pathway:"$pathway_version"
+          if [[ "$visualization_version" == *-v0 ]]; then
+            echo "r-visualization is still a bootstrap definition; skipping publication until its CI-captured renv.lock is committed and VERSION is v1 or later."
+          else
+            docker tag omix-r-visualization:ci ghcr.io/nidap-community/omix-r-visualization:${{ github.sha }}
+            docker tag omix-r-visualization:ci ghcr.io/nidap-community/omix-r-visualization:"$visualization_version"
+            docker push ghcr.io/nidap-community/omix-r-visualization:${{ github.sha }}
+            docker push ghcr.io/nidap-community/omix-r-visualization:"$visualization_version"
+          fi
           if [[ "$statistics_version" == *-v0 ]]; then
             echo "r-statistics is still a bootstrap definition; skipping publication until its CI-captured renv.lock is committed and VERSION is v1 or later."
           else
@@ -193,6 +263,7 @@ jobs:
         run: |
           base_version="$(tr -d '[:space:]' < starter-environments/r-base/VERSION)"
           pathway_version="$(tr -d '[:space:]' < starter-environments/r-pathway/VERSION)"
+          visualization_version="$(tr -d '[:space:]' < starter-environments/r-visualization/VERSION)"
           statistics_version="$(tr -d '[:space:]' < starter-environments/r-statistics/VERSION)"
           base_ref="ghcr.io/nidap-community/omix-r-base:$base_version"
           pathway_ref="ghcr.io/nidap-community/omix-r-pathway:$pathway_version"
@@ -204,6 +275,11 @@ jobs:
             echo
             echo "- \`$base_ref@$base_digest\`"
             echo "- \`$pathway_ref@$pathway_digest\`"
+            if [[ "$visualization_version" != *-v0 ]]; then
+              visualization_ref="ghcr.io/nidap-community/omix-r-visualization:$visualization_version"
+              visualization_digest="$(docker buildx imagetools inspect "$visualization_ref" --format '{{.Manifest.Digest}}')"
+              echo "- \`$visualization_ref@$visualization_digest\`"
+            fi
             if [[ "$statistics_version" != *-v0 ]]; then
               statistics_digest="$(docker buildx imagetools inspect "$statistics_ref" --format '{{.Manifest.Digest}}')"
               echo "- \`$statistics_ref@$statistics_digest\`"
@@ -234,6 +310,7 @@ jobs:
           source_tag="${{ inputs.existing_source_tag }}"
           base_version="$(tr -d '[:space:]' < starter-environments/r-base/VERSION)"
           pathway_version="$(tr -d '[:space:]' < starter-environments/r-pathway/VERSION)"
+          visualization_version="$(tr -d '[:space:]' < starter-environments/r-visualization/VERSION)"
           statistics_version="$(tr -d '[:space:]' < starter-environments/r-statistics/VERSION)"
           base_source="ghcr.io/nidap-community/omix-r-base:$source_tag"
           pathway_source="ghcr.io/nidap-community/omix-r-pathway:$source_tag"
@@ -246,6 +323,14 @@ jobs:
           docker buildx imagetools inspect "$pathway_source"
           docker buildx imagetools create --prefer-index=false --tag "$base_target" "$base_source"
           docker buildx imagetools create --prefer-index=false --tag "$pathway_target" "$pathway_source"
+          if [[ "$visualization_version" == *-v0 ]]; then
+            echo "r-visualization is still a bootstrap definition; skipping manifest adoption until VERSION is v1 or later."
+          else
+            visualization_source="ghcr.io/nidap-community/omix-r-visualization:$source_tag"
+            visualization_target="ghcr.io/nidap-community/omix-r-visualization:$visualization_version"
+            docker buildx imagetools inspect "$visualization_source"
+            docker buildx imagetools create --prefer-index=false --tag "$visualization_target" "$visualization_source"
+          fi
           if docker buildx imagetools inspect "$statistics_source"; then
             docker buildx imagetools create --prefer-index=false --tag "$statistics_target" "$statistics_source"
           else
@@ -256,6 +341,7 @@ jobs:
         run: |
           base_version="$(tr -d '[:space:]' < starter-environments/r-base/VERSION)"
           pathway_version="$(tr -d '[:space:]' < starter-environments/r-pathway/VERSION)"
+          visualization_version="$(tr -d '[:space:]' < starter-environments/r-visualization/VERSION)"
           statistics_version="$(tr -d '[:space:]' < starter-environments/r-statistics/VERSION)"
           base_ref="ghcr.io/nidap-community/omix-r-base:$base_version"
           pathway_ref="ghcr.io/nidap-community/omix-r-pathway:$pathway_version"
@@ -267,6 +353,11 @@ jobs:
             echo
             echo "- \`$base_ref@$base_digest\`"
             echo "- \`$pathway_ref@$pathway_digest\`"
+            if [[ "$visualization_version" != *-v0 ]]; then
+              visualization_ref="ghcr.io/nidap-community/omix-r-visualization:$visualization_version"
+              visualization_digest="$(docker buildx imagetools inspect "$visualization_ref" --format '{{.Manifest.Digest}}')"
+              echo "- \`$visualization_ref@$visualization_digest\`"
+            fi
             if statistics_digest="$(docker buildx imagetools inspect "$statistics_ref" --format '{{.Manifest.Digest}}' 2>/dev/null)"; then
               echo "- \`$statistics_ref@$statistics_digest\`"
             fi

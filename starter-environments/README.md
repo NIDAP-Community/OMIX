@@ -6,6 +6,7 @@ module-specific code or user data.
 
 ```text
 r-base -> r-pathway -> OMIX-GSEA-Preranked-Legacy
+       -> r-visualization -> OMIX-Gene-Boxplots, OMIX-Volcano-Plot
        -> r-statistics -> OMIX-DEG-Analysis
 ```
 
@@ -20,6 +21,7 @@ The image family is intended for local and shared execution targets:
 | --- | --- | --- |
 | `r-base` | Pinned R and common build/runtime libraries | all R environments |
 | `r-pathway` | Pathway and gene-set analysis libraries | GSEA, GSVA, L2P |
+| `r-visualization` | Plotting and statistical-visualization libraries | Gene Boxplots, Volcano Plot, GSEA Filters |
 | `r-statistics` | Bulk statistical-analysis libraries | DEG and future statistical modules |
 
 Images are built by the `Starter Environments` GitHub workflow. Normal pushes

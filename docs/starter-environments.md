@@ -24,10 +24,10 @@ image digest plus the module Git commit and input-data provenance. CI builds
 starter environments for validation; publication to GHCR is explicitly
 requested through the manual workflow-dispatch input.
 
-`r-pathway/renv.lock` records the fully resolved CRAN and Bioconductor package
-set captured from its validated image. The base image, R version,
-Bioconductor release, lockfile, and non-CRAN package commits must remain
-pinned for a reproducible rebuild.
+Each environment's `renv.lock`, when present, records the fully resolved
+package set captured from its validated image. The base image, R version,
+Bioconductor release where applicable, lockfile, and non-CRAN package commits
+must remain pinned for a reproducible rebuild.
 
 ## Publishing a shared image
 
