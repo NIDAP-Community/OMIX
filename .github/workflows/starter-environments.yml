@@ -61,6 +61,10 @@ jobs:
         id: changes
         uses: dorny/paths-filter@v3
         with:
+          # Require every rule in a filter to match. Without this, a negative
+          # README rule matches changes anywhere else in the repository and
+          # falsely selects every starter environment.
+          predicate-quantifier: every
           filters: |
             base:
               - 'starter-environments/r-base/**'
