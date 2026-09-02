@@ -18,3 +18,7 @@ Bridges may define an explicit conversion policy when it is documented and
 tested. `OmixSeurat`, for example, aggregates raw counts for one selected cell
 type by donor and condition; it does not expose individual cells as DEG
 replicates.
+
+For the MOO dependency and serialization boundary, see the
+[MOO object boundary](../docs/module-contract.md#moo-object-boundary) in the
+module contract before adding a MOSuite- or MOObject-based bridge.

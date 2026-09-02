@@ -88,3 +88,21 @@ to convert its objects into those contracts. A bridge must document its source
 object assumptions, preserve conversion provenance, and test its supported
 ecosystem version. It must not introduce platform runtime paths or UI into the
 monorepo's portable code.
+
+### MOO object boundary
+
+Use a lightweight object package for ordinary MOO reading and extraction. Do
+not add the full MOSuite workflow package to a shared OMIX runtime or a
+downstream adapter merely to read a MOO.
+
+The current legacy `moo/moo-filt.rds` output is serialized as
+`MOSuite::multiOmicDataSet`, so it remains a MOSuite compatibility artifact.
+It cannot be read by a runtime that has only MOObject. Until the producing
+workflow writes a validated `MOObject::multiOmicDataSet`, use the portable
+table handoff instead.
+
+When an MOObject handoff is introduced, preserve the legacy MOO and write a
+parallel, explicitly named MOO containing the filtered integer-like `filt`
+counts, aligned metadata, annotation, and portable provenance. The OMIX bridge
+must then import only MOObject and Core, pin and validate the object interface,
+and complete an end-to-end module test in that minimal runtime.
