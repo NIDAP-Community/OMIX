@@ -32,7 +32,16 @@ Rscript modules/OMIX-DEG-Analysis/scripts/run_deg_analysis.R \
 
 The count table contains one feature-ID column followed by sample columns. The
 metadata sample-ID values must match those sample columns exactly. The output
-directory receives `DEG_Analysis.csv` and `DEG_Analysis_run_summary.txt`.
+directory receives a portable downstream bundle:
+
+- `DEG_Analysis.csv`: differential-expression results with the modeled
+  sample-level expression values;
+- `Sample_Metadata.csv`: metadata for exactly the samples whose expression is
+  included in `DEG_Analysis.csv`, in matching order; and
+- `DEG_Analysis_run_summary.txt`: run provenance and modeling details.
+
+Keep `DEG_Analysis.csv` and `Sample_Metadata.csv` together when passing results
+to a downstream visualization or pathway module.
 
 ### Local paired-pseudobulk fixture
 

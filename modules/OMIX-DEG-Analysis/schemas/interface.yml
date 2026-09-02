@@ -52,6 +52,9 @@ outputs:
   deg_analysis:
     path: DEG_Analysis.csv
     format: csv
+  sample_metadata:
+    path: Sample_Metadata.csv
+    format: csv
   run_summary:
     path: DEG_Analysis_run_summary.txt
     format: text

@@ -127,6 +127,21 @@ results <- omix_deg_analysis(
 )
 
 utils::write.csv(results, file.path(opt$output_dir, "DEG_Analysis.csv"), row.names = FALSE, na = "")
+output_samples <- selected_samples[selected_samples %in% names(results)]
+if (length(output_samples) == 0L) {
+  stop("The DEG result does not contain any modeled sample-expression columns for metadata export.")
+}
+output_metadata <- metadata[
+  match(output_samples, as.character(metadata[[opt$sample_names_column]])),
+  ,
+  drop = FALSE
+]
+utils::write.csv(
+  output_metadata,
+  file.path(opt$output_dir, "Sample_Metadata.csv"),
+  row.names = FALSE,
+  na = ""
+)
 run_summary <- attr(results, "omix_deg_run")
 writeLines(c(
   "OMIX DEG Analysis run summary",

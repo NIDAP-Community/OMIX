@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.4 - 2026-09-02
+
+- Export `Sample_Metadata.csv` beside `DEG_Analysis.csv`, restricted and
+  ordered to the sample-expression columns present in the DEG result. The two
+  files form one portable downstream data bundle.
+
 ## 0.1.3 - 2026-08-27
 
 - Restored the saved voom mean-variance trend diagnostic alongside the
