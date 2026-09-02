@@ -1,0 +1,57 @@
+interface_version: 1
+entrypoint: scripts/run_gene_boxplots.R
+inputs:
+  expression_table:
+    required: true
+    formats: [csv, tsv, txt, rds]
+    description: Gene-by-sample expression values such as normalized CPM, voom-scale expression, or batch-corrected expression.
+  metadata_table:
+    required: true
+    formats: [csv, tsv, txt, rds]
+    description: Sample metadata containing sample IDs and a grouping column.
+  deg_table:
+    required_when: statistics_mode == precomputed_deg
+    formats: [csv, tsv, txt, rds]
+    description: Optional differential-expression results; it may be the same table as expression_table.
+parameters:
+  genes:
+    type: string
+    required: true
+    description: Comma-separated feature identifiers to plot.
+  gene_column:
+    type: string
+    default: GeneName
+  sample_column:
+    type: string
+    default: Sample
+  category_column:
+    type: string
+    default: Group
+  statistics_mode:
+    type: string
+    default: precomputed_deg
+    allowed: [precomputed_deg, within_plot, none]
+  pvalue_type:
+    type: string
+    default: nominal
+    allowed: [nominal, adjusted]
+  statistical_method:
+    type: string
+    default: anova
+    allowed: [anova, t-test, kruskal]
+  output_dir:
+    type: path
+    default: results
+outputs:
+  gene_boxplots:
+    path: gene_boxplots/
+    format: png
+    description: One boxplot or violin plot per requested gene.
+  statistics:
+    path: gene_boxplot_statistics.csv
+    format: csv
+    description: Pairwise p-values used to annotate the plots.
+  expression_long:
+    path: gene_boxplot_expression_long.csv
+    format: csv
+    description: Long-form expression values used in every plot.

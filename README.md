@@ -12,6 +12,7 @@ OMIX/
 |-- modules/                           Independent analysis modules
 |   |-- OMIX-GSEA-Preranked-Legacy/
 |   |-- OMIX-DEG-Analysis/
+|   |-- OMIX-Gene-Boxplots/
 |   |-- OMIX-L2P-Single/
 |   `-- OMIX-L2P-Multi/
 |-- docs/                              Repository and module conventions
@@ -61,6 +62,7 @@ interface and runtime layer; it is not required to run the module locally.
 | Module | Deployment repository | Purpose | Status |
 | --- | --- | --- | --- |
 | [OMIX-DEG-Analysis](modules/OMIX-DEG-Analysis) | [OMIX-DEG-Analysis](https://github.com/NIDAP-Community/OMIX-DEG-Analysis) | Raw-count differential expression | Review |
+| [OMIX-Gene-Boxplots](modules/OMIX-Gene-Boxplots) | [OMIX-Gene-Boxplots](https://github.com/NIDAP-Community/OMIX-Gene-Boxplots) | Gene-expression boxplots with optional model-consistent DEG annotations | Review |
 | [OMIX-GSEA-Preranked-Legacy](modules/OMIX-GSEA-Preranked-Legacy) | [OMIX-GSEA-Preranked-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy) | Legacy preranked GSEA | Active |
 | [OMIX-Volcano-Plot](modules/OMIX-Volcano-Plot) | [OMIX-Volcano-Plot](https://github.com/NIDAP-Community/OMIX-Volcano-Plot) | Differential-expression volcano plot | Active |
 | [OMIX-L2P-Single](modules/OMIX-L2P-Single) | [OMIX-L2P-Single](https://github.com/NIDAP-Community/OMIX-L2P-Single) | Single-comparison L2P | Active |
