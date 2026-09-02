@@ -17,7 +17,9 @@ The image contains the plotting stack (`ggplot2`, `dplyr`, `tidyr`, `plotly`,
 This OMIX-owned bootstrap definition uses the immutable base image
 `omix-r-base:r4.4.3-v1`. It verifies that every declared package is actually
 loadable, including `plotly`; the completed legacy image exposed a missing
-`plotly` installation despite declaring it.
+`plotly` installation despite declaring it. It installs `cmake` and
+`libuv1-dev` locally because `plotly`'s `htmlwidgets` dependency chain needs
+the `fs` package, which requires a usable `libuv` build path.
 
 The initial `r4.4.3-v0` version is validation-only and cannot be published.
 Its CI artifact will provide the fully resolved `renv.lock`. Commit that lock,
