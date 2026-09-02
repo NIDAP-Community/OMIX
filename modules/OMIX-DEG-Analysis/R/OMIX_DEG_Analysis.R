@@ -31,7 +31,8 @@
 #' @param filter_low_expression Apply `edgeR::filterByExpr()` using the
 #'   biological group design. Default: `TRUE`.
 #' @param normalization_method Combined normalization profile. `"TMM"` is the
-#'   default. Other supported profiles are `"TMM + Quantile"`, `"Quantile"`,
+#'   default. The recommended alternative order is `"Quantile"`, then
+#'   `"TMM + Quantile"`; other supported profiles are
 #'   `"TMM + Scale"`, `"TMM + Cyclic Loess"`, `"TMMwsp"`, `"RLE"`, and
 #'   `"Upper Quartile"`.
 #' @param normalization_diagnostics Write before-and-after normalization
@@ -551,8 +552,8 @@ omix_deg_analysis <- function(
 .omix_deg_normalization_profile <- function(value) {
   profiles <- list(
     "TMM" = c(label = "TMM", library_size = "TMM", voom_scale = "none"),
-    "TMM + Quantile" = c(label = "TMM + Quantile", library_size = "TMM", voom_scale = "quantile"),
     "Quantile" = c(label = "Quantile", library_size = "none", voom_scale = "quantile"),
+    "TMM + Quantile" = c(label = "TMM + Quantile", library_size = "TMM", voom_scale = "quantile"),
     "TMM + Scale" = c(label = "TMM + Scale", library_size = "TMM", voom_scale = "scale"),
     "TMM + Cyclic Loess" = c(label = "TMM + Cyclic Loess", library_size = "TMM", voom_scale = "cyclicloess"),
     "TMMwsp" = c(label = "TMMwsp", library_size = "TMMwsp", voom_scale = "none"),

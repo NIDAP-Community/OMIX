@@ -97,7 +97,8 @@ independent DEG replicates.
 | Dataset type | Recommended workflow | Reason |
 | --- | --- | --- |
 | **Typical dataset** (standard knockouts, treatments, diverse human tissues) | **Normalization Method: `TMM`** (default) [1, 2] | Preserves the observed biological range while correcting RNA-composition bias. |
-| **High technical noise** (for example, varying platforms or batch-heavy historical data) | **Normalization Method: `TMM + Quantile`** | Forces log-CPM distributions to align and can reduce severe, non-linear technical variation, at the risk of attenuating subtle or global biology. [2] |
+| **High technical noise** (for example, varying platforms or batch-heavy historical data) | **Normalization Method: `Quantile`** | Force-aligns log-CPM distributions to reduce severe, non-linear technical variation, at the risk of attenuating subtle or global biology. [2] |
+| **Hybrid sensitivity analysis** after evaluating Quantile | **Normalization Method: `TMM + Quantile`** | Retains TMM library-size normalization before voom-scale quantile normalization. Use only when the diagnostics and study design support that extra combination. |
 
 `TMM + Scale` equalizes sample medians, while `TMM + Cyclic Loess` is a
 slower, pairwise alternative that can be more robust when differential
@@ -107,17 +108,19 @@ normalization alone; use it only when that deliberate choice fits the study.
 ### Choosing a profile
 
 - Start with **`TMM`** for a new bulk RNA-seq analysis.
-- Try **`TMM + Scale`** when QC shows a modest, sample-wide median shift after
+- Use **`Quantile`** next when QC shows severe technical mismatch of whole
+  distributions. It is intentionally strong and can obscure genuine global
+  shifts.
+- Evaluate **`TMM + Quantile`** third when a hybrid profile is justified by
+  the diagnostics and the study design.
+- Use **`TMM + Scale`** when QC shows a modest, sample-wide median shift after
   TMM and there is good reason to regard it as technical.
-- Use **`TMM + Quantile`** only when QC shows a severe technical mismatch of
-  whole distributions. It is intentionally stronger and can obscure genuine
-  global shifts.
 - Use **`TMM + Cyclic Loess`** as a sensitivity analysis for nonlinear,
   sample-specific distribution differences, particularly with unbalanced
   differential expression.
-- Use **`Quantile`**, **`TMMwsp`**, **`RLE`**, or **`Upper Quartile`** for a
-  deliberate legacy/reproducibility comparison or a documented special case;
-  they are not routine first choices.
+- Use **`TMMwsp`**, **`RLE`**, or **`Upper Quartile`** for a deliberate
+  legacy/reproducibility comparison or a documented special case; they are
+  not routine first choices.
 
 Normalization does not replace modelling known technical batch variables.
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.5 - 2026-09-02
+
+- Reordered the normalization guidance and public interface to recommend TMM,
+  then Quantile, then TMM + Quantile, before the remaining specialist
+  profiles.
+
 ## 0.1.4 - 2026-09-02
 
 - Export `Sample_Metadata.csv` beside `DEG_Analysis.csv`, restricted and

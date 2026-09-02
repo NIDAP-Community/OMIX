@@ -43,7 +43,7 @@ parameters:
   normalization_method:
     type: string
     default: TMM
-    allowed: [TMM, TMM + Quantile, Quantile, TMM + Scale, TMM + Cyclic Loess, TMMwsp, RLE, Upper Quartile]
+    allowed: [TMM, Quantile, TMM + Quantile, TMM + Scale, TMM + Cyclic Loess, TMMwsp, RLE, Upper Quartile]
   write_normalization_diagnostics:
     type: boolean
     default: true

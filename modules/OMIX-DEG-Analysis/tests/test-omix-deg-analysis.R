@@ -24,6 +24,20 @@ make_unpaired_fixture <- function() {
 }
 
 fixture <- make_unpaired_fixture()
+stopifnot(identical(
+  names(formals(.omix_deg_normalization_profile)),
+  "value"
+))
+profile_error <- tryCatch(
+  .omix_deg_normalization_profile("not-a-profile"),
+  error = conditionMessage
+)
+stopifnot(
+  identical(
+    profile_error,
+    "normalization_method must be one of: TMM, Quantile, TMM + Quantile, TMM + Scale, TMM + Cyclic Loess, TMMwsp, RLE, Upper Quartile."
+  )
+)
 unpaired <- omix_deg_analysis(
   Dataset = fixture$dataset,
   Metadata_Table = fixture$metadata,
