@@ -38,7 +38,8 @@ directory receives a portable downstream bundle:
   sample-level expression values;
 - `Sample_Metadata.csv`: metadata for exactly the samples whose expression is
   included in `DEG_Analysis.csv`, in matching order; and
-- `DEG_Analysis_run_summary.txt`: run provenance and modeling details.
+- `run_summary.txt`: run provenance and modeling details. The canonical
+  downstream DEG table is the only output whose filename contains `DEG`.
 
 Keep `DEG_Analysis.csv` and `Sample_Metadata.csv` together when passing results
 to a downstream visualization or pathway module.

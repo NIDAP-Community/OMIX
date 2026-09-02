@@ -56,7 +56,7 @@ outputs:
     path: Sample_Metadata.csv
     format: csv
   run_summary:
-    path: DEG_Analysis_run_summary.txt
+    path: run_summary.txt
     format: text
   normalization_boxplots:
     path: normalization_boxplots.png

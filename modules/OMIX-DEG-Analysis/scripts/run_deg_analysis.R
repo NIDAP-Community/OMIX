@@ -155,5 +155,5 @@ writeLines(c(
   paste("genes modelled:", run_summary$genes_modelled),
   paste("expression output:", run_summary$expression_output),
   paste("adjusted columns:", paste(run_summary$adjusted_columns, collapse = ", "))
-), file.path(opt$output_dir, "DEG_Analysis_run_summary.txt"))
+), file.path(opt$output_dir, "run_summary.txt"))
 message("Wrote results to ", normalizePath(opt$output_dir, mustWork = TRUE))
