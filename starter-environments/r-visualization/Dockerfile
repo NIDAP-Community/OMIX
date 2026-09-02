@@ -1,6 +1,3 @@
-# The bootstrap definition is deliberately tagged `v0` and must not be
-# published. CI captures its fully resolved lockfile; the first release will
-# restore that lockfile and use a `v1` version tag.
 ARG BASE_IMAGE=ghcr.io/nidap-community/omix-r-base:r4.4.3-v1
 FROM ${BASE_IMAGE}
 
@@ -14,13 +11,12 @@ RUN apt-get update \
         libuv1-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN R -q -e "packages <- c( \
-  'dplyr', 'tidyr', 'ggplot2', 'ggrepel', 'ggbeeswarm', 'broom', \
-  'multcomp', 'multcompView', 'RColorBrewer', 'stringr', 'optparse', \
-  'patchwork', 'pheatmap', 'plotly' \
-); \
-install.packages(packages, repos = 'https://cloud.r-project.org'); \
-missing <- packages[!vapply(packages, requireNamespace, logical(1), quietly = TRUE)]; \
-if (length(missing)) stop('Required visualization package(s) failed to install: ', paste(missing, collapse = ', '))"
-
 WORKDIR /workspace
+
+COPY renv.lock ./renv.lock
+
+RUN R -q -e "renv::restore( \
+  lockfile = 'renv.lock', \
+  library = .libPaths()[1], \
+  prompt = FALSE \
+)"

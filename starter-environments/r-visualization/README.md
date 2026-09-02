@@ -14,14 +14,14 @@ The image contains the plotting stack (`ggplot2`, `dplyr`, `tidyr`, `plotly`,
 
 ## Release contract
 
-This OMIX-owned bootstrap definition uses the immutable base image
-`omix-r-base:r4.4.3-v1`. It verifies that every declared package is actually
+This OMIX-owned runtime uses the immutable base image
+`omix-r-base:r4.4.3-v1` and the CI-captured `renv.lock` to restore its R
+dependencies reproducibly. It verifies that every declared package is actually
 loadable, including `plotly`; the completed legacy image exposed a missing
 `plotly` installation despite declaring it. It installs `cmake` and
 `libuv1-dev` locally because `plotly`'s `htmlwidgets` dependency chain needs
 the `fs` package, which requires a usable `libuv` build path.
 
-The initial `r4.4.3-v0` version is validation-only and cannot be published.
-Its CI artifact will provide the fully resolved `renv.lock`. Commit that lock,
-replace the bootstrap installation step with `renv::restore()`, and change the
-version to `r4.4.3-v1` before the first OMIX-owned release.
+The first OMIX-owned release is `r4.4.3-v1`. Every later dependency update must
+produce a new CI-verified lockfile and a new image version. Capsules and other
+consumers must pin an immutable published image tag or digest, never `latest`.

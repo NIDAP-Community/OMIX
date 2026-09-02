@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       target:
-        description: Starter environment to validate (all is required to publish)
+        description: Starter environment to build (select one to publish only that image)
         required: true
         default: auto
         type: choice
@@ -147,8 +147,8 @@ jobs:
               ;;
           esac
 
-          if [[ "$REQUESTED_PUBLISH" == "true" && "$REQUESTED_TARGET" != "all" ]]; then
-            echo "Publishing requires target=all so every image is validated together." >&2
+          if [[ "$REQUESTED_PUBLISH" == "true" && "$REQUESTED_TARGET" == "auto" ]]; then
+            echo "Publishing requires an explicit target (or all); auto has no deterministic release scope." >&2
             exit 1
           fi
 
@@ -366,7 +366,7 @@ jobs:
           retention-days: 90
 
       - name: Log in to GHCR
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish && inputs.target == 'all' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish }}
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -374,31 +374,50 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish starter images
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish && inputs.target == 'all' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish }}
+        env:
+          PUBLISH_BASE: ${{ steps.targets.outputs.base }}
+          PUBLISH_PATHWAY: ${{ steps.targets.outputs.pathway }}
+          PUBLISH_VISUALIZATION: ${{ steps.targets.outputs.visualization }}
+          PUBLISH_STATISTICS: ${{ steps.targets.outputs.statistics }}
         run: |
+          set -euo pipefail
+
           base_version="$(tr -d '[:space:]' < starter-environments/r-base/VERSION)"
           pathway_version="$(tr -d '[:space:]' < starter-environments/r-pathway/VERSION)"
           visualization_version="$(tr -d '[:space:]' < starter-environments/r-visualization/VERSION)"
           statistics_version="$(tr -d '[:space:]' < starter-environments/r-statistics/VERSION)"
-          docker tag omix-r-base:ci ghcr.io/nidap-community/omix-r-base:${{ github.sha }}
-          docker tag omix-r-base:ci ghcr.io/nidap-community/omix-r-base:"$base_version"
-          docker tag omix-r-pathway:ci ghcr.io/nidap-community/omix-r-pathway:${{ github.sha }}
-          docker tag omix-r-pathway:ci ghcr.io/nidap-community/omix-r-pathway:"$pathway_version"
-          docker push ghcr.io/nidap-community/omix-r-base:${{ github.sha }}
-          docker push ghcr.io/nidap-community/omix-r-base:"$base_version"
-          docker push ghcr.io/nidap-community/omix-r-pathway:${{ github.sha }}
-          docker push ghcr.io/nidap-community/omix-r-pathway:"$pathway_version"
-          if [[ "$visualization_version" == *-v0 ]]; then
-            echo "r-visualization is still a bootstrap definition; skipping publication until its CI-captured renv.lock is committed and VERSION is v1 or later."
-          else
+
+          if [[ "$PUBLISH_BASE" == "true" ]]; then
+            docker tag omix-r-base:ci ghcr.io/nidap-community/omix-r-base:${{ github.sha }}
+            docker tag omix-r-base:ci ghcr.io/nidap-community/omix-r-base:"$base_version"
+            docker push ghcr.io/nidap-community/omix-r-base:${{ github.sha }}
+            docker push ghcr.io/nidap-community/omix-r-base:"$base_version"
+          fi
+
+          if [[ "$PUBLISH_PATHWAY" == "true" ]]; then
+            docker tag omix-r-pathway:ci ghcr.io/nidap-community/omix-r-pathway:${{ github.sha }}
+            docker tag omix-r-pathway:ci ghcr.io/nidap-community/omix-r-pathway:"$pathway_version"
+            docker push ghcr.io/nidap-community/omix-r-pathway:${{ github.sha }}
+            docker push ghcr.io/nidap-community/omix-r-pathway:"$pathway_version"
+          fi
+
+          if [[ "$PUBLISH_VISUALIZATION" == "true" ]]; then
+            if [[ "$visualization_version" == *-v0 ]]; then
+              echo "r-visualization is still a bootstrap definition; commit its CI-captured renv.lock and change VERSION to v1 or later before publishing." >&2
+              exit 1
+            fi
             docker tag omix-r-visualization:ci ghcr.io/nidap-community/omix-r-visualization:${{ github.sha }}
             docker tag omix-r-visualization:ci ghcr.io/nidap-community/omix-r-visualization:"$visualization_version"
             docker push ghcr.io/nidap-community/omix-r-visualization:${{ github.sha }}
             docker push ghcr.io/nidap-community/omix-r-visualization:"$visualization_version"
           fi
-          if [[ "$statistics_version" == *-v0 ]]; then
-            echo "r-statistics is still a bootstrap definition; skipping publication until its CI-captured renv.lock is committed and VERSION is v1 or later."
-          else
+
+          if [[ "$PUBLISH_STATISTICS" == "true" ]]; then
+            if [[ "$statistics_version" == *-v0 ]]; then
+              echo "r-statistics is still a bootstrap definition; commit its CI-captured renv.lock and change VERSION to v1 or later before publishing." >&2
+              exit 1
+            fi
             docker tag omix-r-statistics:ci ghcr.io/nidap-community/omix-r-statistics:${{ github.sha }}
             docker tag omix-r-statistics:ci ghcr.io/nidap-community/omix-r-statistics:"$statistics_version"
             docker push ghcr.io/nidap-community/omix-r-statistics:${{ github.sha }}
@@ -406,28 +425,39 @@ jobs:
           fi
 
       - name: Record published image digests
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish && inputs.target == 'all' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish }}
+        env:
+          PUBLISH_BASE: ${{ steps.targets.outputs.base }}
+          PUBLISH_PATHWAY: ${{ steps.targets.outputs.pathway }}
+          PUBLISH_VISUALIZATION: ${{ steps.targets.outputs.visualization }}
+          PUBLISH_STATISTICS: ${{ steps.targets.outputs.statistics }}
         run: |
+          set -euo pipefail
+
           base_version="$(tr -d '[:space:]' < starter-environments/r-base/VERSION)"
           pathway_version="$(tr -d '[:space:]' < starter-environments/r-pathway/VERSION)"
           visualization_version="$(tr -d '[:space:]' < starter-environments/r-visualization/VERSION)"
           statistics_version="$(tr -d '[:space:]' < starter-environments/r-statistics/VERSION)"
-          base_ref="ghcr.io/nidap-community/omix-r-base:$base_version"
-          pathway_ref="ghcr.io/nidap-community/omix-r-pathway:$pathway_version"
-          statistics_ref="ghcr.io/nidap-community/omix-r-statistics:$statistics_version"
-          base_digest="$(docker buildx imagetools inspect "$base_ref" --format '{{.Manifest.Digest}}')"
-          pathway_digest="$(docker buildx imagetools inspect "$pathway_ref" --format '{{.Manifest.Digest}}')"
           {
             echo '## Published OMIX starter environments'
             echo
-            echo "- \`$base_ref@$base_digest\`"
-            echo "- \`$pathway_ref@$pathway_digest\`"
-            if [[ "$visualization_version" != *-v0 ]]; then
+            if [[ "$PUBLISH_BASE" == "true" ]]; then
+              base_ref="ghcr.io/nidap-community/omix-r-base:$base_version"
+              base_digest="$(docker buildx imagetools inspect "$base_ref" --format '{{.Manifest.Digest}}')"
+              echo "- \`$base_ref@$base_digest\`"
+            fi
+            if [[ "$PUBLISH_PATHWAY" == "true" ]]; then
+              pathway_ref="ghcr.io/nidap-community/omix-r-pathway:$pathway_version"
+              pathway_digest="$(docker buildx imagetools inspect "$pathway_ref" --format '{{.Manifest.Digest}}')"
+              echo "- \`$pathway_ref@$pathway_digest\`"
+            fi
+            if [[ "$PUBLISH_VISUALIZATION" == "true" ]]; then
               visualization_ref="ghcr.io/nidap-community/omix-r-visualization:$visualization_version"
               visualization_digest="$(docker buildx imagetools inspect "$visualization_ref" --format '{{.Manifest.Digest}}')"
               echo "- \`$visualization_ref@$visualization_digest\`"
             fi
-            if [[ "$statistics_version" != *-v0 ]]; then
+            if [[ "$PUBLISH_STATISTICS" == "true" ]]; then
+              statistics_ref="ghcr.io/nidap-community/omix-r-statistics:$statistics_version"
               statistics_digest="$(docker buildx imagetools inspect "$statistics_ref" --format '{{.Manifest.Digest}}')"
               echo "- \`$statistics_ref@$statistics_digest\`"
             fi
