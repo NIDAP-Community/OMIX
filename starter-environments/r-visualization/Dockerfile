@@ -15,8 +15,17 @@ WORKDIR /workspace
 
 COPY renv.lock ./renv.lock
 
-RUN R -q -e "renv::restore( \
+# Restore the lockfile from CRAN source archives in dependency order. The
+# binary package endpoint can otherwise test a package before its locked
+# dependency is available (for example, fontawesome before htmltools).
+ENV RENV_CONFIG_PPM_ENABLED=FALSE \
+    RENV_CONFIG_INSTALL_JOBS=1
+RUN R -q -e "options(pkgType = 'source'); \
+repos <- c(CRAN = 'https://cran.r-project.org'); \
+options(repos = repos); \
+renv::restore( \
   lockfile = 'renv.lock', \
   library = .libPaths()[1], \
+  repos = repos, \
   prompt = FALSE \
 )"

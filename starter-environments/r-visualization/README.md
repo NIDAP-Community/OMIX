@@ -22,6 +22,10 @@ loadable, including `plotly`; the completed legacy image exposed a missing
 `libuv1-dev` locally because `plotly`'s `htmlwidgets` dependency chain needs
 the `fs` package, which requires a usable `libuv` build path.
 
+The lockfile is restored from CRAN source archives with one install job at a
+time. This avoids binary repository restore-order failures in which a package
+is tested before its locked dependency has been installed.
+
 `r4.4.3-v1` remains the original adopted image record. `r4.4.3-v2` is the
 first image built and validated from this repository's locked visualization
 definition. Every later dependency update must produce a new CI-verified
