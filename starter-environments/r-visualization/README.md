@@ -22,6 +22,8 @@ loadable, including `plotly`; the completed legacy image exposed a missing
 `libuv1-dev` locally because `plotly`'s `htmlwidgets` dependency chain needs
 the `fs` package, which requires a usable `libuv` build path.
 
-The first OMIX-owned release is `r4.4.3-v1`. Every later dependency update must
-produce a new CI-verified lockfile and a new image version. Capsules and other
-consumers must pin an immutable published image tag or digest, never `latest`.
+`r4.4.3-v1` remains the original adopted image record. `r4.4.3-v2` is the
+first image built and validated from this repository's locked visualization
+definition. Every later dependency update must produce a new CI-verified
+lockfile and a new image version. Capsules and other consumers must pin an
+immutable published image tag or digest, never `latest`.
