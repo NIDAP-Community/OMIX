@@ -1,74 +1,53 @@
 # OMIX Gene Boxplots
 
-Create one publication-ready gene-expression boxplot per requested gene. The
-module is platform-neutral: it reads ordinary expression and metadata tables
-from paths you provide and writes ordinary PNG and CSV files. Its scientific
-and visual implementation is the preserved CCBR `Boxplot_with_Stats.R` code,
-not a simplified replacement.
+Create one publication-ready, sample-level expression boxplot per selected
+gene, with model-consistent DEG annotations when available.
 
-**Deployment repository:** [OMIX-Gene-Boxplots](https://github.com/NIDAP-Community/OMIX-Gene-Boxplots)
+**Runtime profile:** [`r-visualization`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
+**Entry point:** `scripts/run_gene_boxplots.R`
+
+## What it does
+
+The module plots selected genes from a sample-level expression table alongside
+their individual observations. It can annotate each group comparison with the
+p-values already calculated by an upstream DEG model, or it can run a clearly
+labelled exploratory within-plot test.
+
+Each requested comparison is drawn as a horizontal bar spanning its two
+corresponding groups and labelled with the selected nominal or adjusted
+p-value.
 
 ## When to use it
 
 Use this module after an expression or differential-expression workflow when
 you want to show the sample-level values behind selected genes. It accepts
-voom-scale, normalized-CPM, or batch-corrected expression values; do not supply
-raw counts unless a raw-count display is specifically intended.
+voom-scale, normalized-CPM, or batch-corrected expression values; do not
+supply raw counts unless a raw-count display is specifically intended.
 
-The default `precomputed_deg` mode annotates the boxplot using the p-values
-already calculated by the DEG model. This is the preferred mode for a result
-such as `DEG_Analysis.csv`, because it preserves the original design, batch
-terms, donor blocking, and contrast. `within_plot` is available for simple
-exploratory comparisons, but it deliberately performs a new independent test
-on the plotted values and is not a substitute for the original DEG model.
+Use `precomputed_deg` when a result such as `DEG_Analysis.csv` is available.
+It retains the original design, batch terms, donor blocking, and contrast. Use
+`within_plot` only for a simple exploratory comparison of the displayed
+values; it is not a replacement for the original DEG model.
 
-Each displayed comparison is drawn as a horizontal bar spanning its two
-corresponding groups, labelled with the selected nominal or adjusted p-value.
+## Inputs
 
-## Preserved implementation and OMIX boundary
+| Input | Requirements |
+| --- | --- |
+| Expression table | CSV, TSV, TXT, or RDS gene-by-sample expression table. The default gene-ID column is `GeneName`. |
+| Metadata table | CSV, TSV, TXT, or RDS table. The default sample-ID column is `Sample`; group labels are read from `Group`. |
+| DEG table | Required with `--statistics_mode precomputed_deg`. It may be the same file as the expression table when that export contains both expression and DEG statistics. |
 
-[`R/Boxplot_with_Stats.R`](R/Boxplot_with_Stats.R) contains the original
-implementation, including its public `gene_boxplot_with_stats()` and
-`gene_boxplot_with_deg_results()` functions, category-order handling,
-duplicate-gene behavior, covariate-aware tests, compact-letter annotations,
-beeswarm option, palette controls, and layout controls. It is the compatibility
-reference and should not be refactored without regression tests against it.
+Sample IDs in the metadata must exactly match the expression-table sample
+column names. For precomputed annotations, the DEG table must contain
+comparison columns such as `B-A_pval` and/or `B-A_adjpval`.
 
-`omix_gene_boxplots()` is deliberately a thin wrapper. It maps ordinary input
-tables and standardized output paths to the preserved functions; it does not
-recalculate their logic. Its only intentional OMIX default difference is that
-**nominal** p-values are selected by default for precomputed DEG annotations
-(`pvalue_to_plot = "raw"` in the preserved function). Choose `adjusted` when
-you want the original DEG-wrapper default instead.
+## Run locally or on HPC
 
-## Plot appearance
-
-The default visual style is the established CCBR template: groups are assigned
-**Deep Red**, **Vivid Blue**, **Green**, **Purple**, and subsequent original
-custom colors in display order; boxes are lightly filled; individual
-observations are small filled circles; and a right-side legend is shown.
-Comparison bars and italic p-value labels are black. Leave `colors` empty to
-retain these defaults, or provide comma-separated original color names in group
-order. The preserved functions expose the complete original appearance API.
-
-## Required tables
-
-`expression_table` must contain a gene identifier column (default `GeneName`)
-and one numeric expression column per sample.
-
-`metadata_table` must contain the sample ID column (default `Sample`) and a
-grouping column (default `Group`). Sample IDs must exactly match expression
-column names.
-
-For `precomputed_deg`, provide `deg_table`, containing columns named like
-`B-A_pval` and/or `B-A_adjpval`. The DEG table may be the same as the
-expression table when one exported table contains both expression values and
-DEG statistics.
-
-## Run from the command line
+After restoring the `r-visualization` runtime profile and setting `OMIX_ROOT`
+to the OMIX checkout, use model-consistent DEG annotations as follows:
 
 ```bash
-Rscript scripts/run_gene_boxplots.R \
+Rscript "$OMIX_ROOT/modules/OMIX-Gene-Boxplots/scripts/run_gene_boxplots.R" \
   --expression_table /path/to/DEG_Analysis.csv \
   --metadata_table /path/to/Sample_Metadata.csv \
   --deg_table /path/to/DEG_Analysis.csv \
@@ -78,27 +57,50 @@ Rscript scripts/run_gene_boxplots.R \
   --output_dir results/gene-boxplots
 ```
 
-For a simple exploratory test rather than a precomputed DEG annotation:
-
-```bash
-Rscript scripts/run_gene_boxplots.R \
-  --expression_table normalized_expression.csv \
-  --metadata_table Sample_Metadata.csv \
-  --genes GeneA,GeneB \
-  --statistics_mode within_plot \
-  --statistical_method anova \
-  --output_dir results/within-plot
-```
+For a simple exploratory test rather than a precomputed DEG annotation, use
+an expression table, metadata table, `--statistics_mode within_plot`, and an
+appropriate `--statistical_method` such as `anova`, `t-test`, or `kruskal`.
 
 ## Outputs
 
-- `gene_boxplots/<gene>.png` — one plot per gene.
-- `gene_boxplot_statistics.csv` — pairwise values used for annotations.
-- `gene_boxplot_expression_long.csv` — exact sample-level values displayed.
-- `gene_boxplot_run_summary.csv` — the selected analysis settings and data
-  scope.
+| File | Contents |
+| --- | --- |
+| `gene_boxplots/<gene>.png` | One preserved-style plot per requested gene. |
+| `gene_boxplot_statistics.csv` | Pairwise values used for the annotations. |
+| `gene_boxplot_expression_long.csv` | Exact sample-level values displayed in every plot. |
+| `gene_boxplot_run_summary.csv` | Selected analysis settings and input scope. |
 
-The first two artifacts use the same original plotting and statistics code;
-the long table and run summary are additive OMIX workflow records.
+## Method notes
 
-See `schemas/interface.yml` for the machine-readable interface contract.
+### Preserved implementation
+
+[`R/Boxplot_with_Stats.R`](R/Boxplot_with_Stats.R) is the compatibility
+reference. It contains the original public
+`gene_boxplot_with_stats()` and `gene_boxplot_with_deg_results()` functions,
+including category-order handling, duplicate-gene behavior, covariate-aware
+tests, compact-letter annotations, beeswarm support, palette controls, and
+layout controls. `omix_gene_boxplots()` is a thin wrapper that maps ordinary
+input tables and standardized output paths to those functions; it does not
+recalculate their logic.
+
+The intentional OMIX default difference is that precomputed DEG annotations
+use **nominal** p-values by default (`pvalue_to_plot = "raw"` in the preserved
+function). Select `adjusted` when appropriate for the question.
+
+### Plot appearance
+
+The default visual style is the established CCBR template: groups are assigned
+**Deep Red**, **Vivid Blue**, **Green**, **Purple**, and subsequent original
+custom colors in display order; boxes are lightly filled; individual
+observations are small filled circles; and a right-side legend is shown.
+Comparison bars and italic p-value labels are black. Leave `colors` empty to
+retain these defaults, or supply comma-separated original color names in group
+order.
+
+## Interface and deployment
+
+See [`schemas/interface.yml`](schemas/interface.yml) for the complete
+machine-readable input, parameter, and output contract.
+
+**Deployment repository:**
+[OMIX-Gene-Boxplots](https://github.com/NIDAP-Community/OMIX-Gene-Boxplots)

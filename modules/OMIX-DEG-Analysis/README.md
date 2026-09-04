@@ -1,24 +1,47 @@
 # OMIX DEG Analysis
 
-Portable bulk RNA-seq differential-expression analysis from raw counts and
-sample metadata. It applies design-aware filtering, edgeR TMM normalization,
-limma-voom modelling, and optional `duplicateCorrelation` blocking for genuine
-repeated-measures designs.
+Run design-aware bulk RNA-seq differential-expression analysis from raw counts
+and sample metadata.
 
-## Run locally
+**Runtime profile:** [`r-statistics`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
+**Entry point:** `scripts/run_deg_analysis.R`
 
-Install the standard R dependencies once:
+## What it does
 
-```r
-install.packages("BiocManager")
-BiocManager::install(c("edgeR", "limma"))
-install.packages("optparse")
-```
+The module applies design-aware low-expression filtering, library-size
+normalization, limma-voom modelling, and optional `duplicateCorrelation`
+blocking for genuine repeated-measures designs. Known technical batch terms
+are included in the fitted model. It returns DEG statistics plus sample-level
+expression values suitable for downstream visualization.
 
-Run from the OMIX repository root with explicit paths:
+## When to use it
+
+Use this module for bulk RNA-seq counts, or for donor-level pseudobulk counts
+derived from single-cell data. It expects biological replicates, not individual
+cells. For repeated samples from the same donor or participant, set the donor
+column; do not use technical batch as a donor surrogate.
+
+## Inputs
+
+The standard table input consists of two CSV, TSV, TXT, or RDS files:
+
+| Input | Requirements |
+| --- | --- |
+| Raw counts | Integer-like feature-by-sample count table. The default feature-ID column is `GeneName`; remaining columns are sample IDs. |
+| Sample metadata | One row per sample with a unique sample-ID column. The default ID column is `Sample`; `Group` and, when applicable, `Batch` are common analysis columns. |
+
+Metadata sample IDs must exactly match the count-table sample columns. Supply
+the biological group column, contrast, optional fixed covariates, optional
+technical batch column, and—only for genuine repeated measures—optional donor
+column.
+
+## Run locally or on HPC
+
+After restoring the `r-statistics` runtime profile and setting `OMIX_ROOT` to
+the OMIX checkout, run the portable CLI with explicit paths:
 
 ```bash
-Rscript modules/OMIX-DEG-Analysis/scripts/run_deg_analysis.R \
+Rscript "$OMIX_ROOT/modules/OMIX-DEG-Analysis/scripts/run_deg_analysis.R" \
   --input_type table \
   --counts /path/to/raw_counts.csv \
   --metadata /path/to/sample_metadata.csv \
@@ -27,141 +50,98 @@ Rscript modules/OMIX-DEG-Analysis/scripts/run_deg_analysis.R \
   --contrast_variable_columns Group \
   --contrasts B-A \
   --batch_effect_columns Batch \
+  --normalization_method TMM \
   --output_dir results/deg
 ```
 
-The count table contains one feature-ID column followed by sample columns. The
-metadata sample-ID values must match those sample columns exactly. The output
-directory receives a portable downstream bundle:
+## Outputs
 
-- `DEG_Analysis.csv`: differential-expression results with the modeled
-  sample-level expression values;
-- `Sample_Metadata.csv`: metadata for exactly the samples whose expression is
-  included in `DEG_Analysis.csv`, in matching order; and
-- `run_summary.txt`: run provenance and modeling details. The canonical
-  downstream DEG table is the only output whose filename contains `DEG`.
+| File | Contents |
+| --- | --- |
+| `DEG_Analysis.csv` | Differential-expression results plus the model-ready sample-level expression block. When a batch term is fitted, those expression values are batch-adjusted voom-scale log-CPM values. |
+| `Sample_Metadata.csv` | Metadata for exactly the samples represented in the DEG expression block, in matching order. |
+| `run_summary.txt` | Input, filtering, model, contrast, and normalization provenance. |
+| `normalization_boxplots.png` | Before-and-after filtered log-CPM distribution summary. |
+| `normalization_densities.png` | Before-and-after filtered log-CPM density summary. |
+| `voom_mean_variance.png` | Final voom mean-variance trend used to estimate precision weights. |
 
-Keep `DEG_Analysis.csv` and `Sample_Metadata.csv` together when passing results
-to a downstream visualization or pathway module.
+Keep `DEG_Analysis.csv` and `Sample_Metadata.csv` together when passing an
+analysis to a downstream module. `DEG_Analysis.csv` is the canonical
+downstream DEG table.
 
-### Local paired-pseudobulk fixture
+## Method notes
 
-For a reproducible local integration test, generate the Kang et al. IFN-beta
-PBMC CD14+ monocyte fixture. It contains eight donors observed in both `ctrl`
-and `stim` conditions, producing 16 donor-by-condition profiles. The data are
-created under ignored `data/debug/` and are never part of a release.
+### Experimental design
 
-```r
-BiocManager::install("muscData")
-```
+- Every comparison group needs at least two biological samples.
+- The donor column is only for repeated measurements from the same biological
+  participant. Technical replicates within a donor-by-group combination are
+  rejected rather than selected silently.
+- Batch adjustment is fitted with the statistical model. The appended
+  expression block supports downstream visualization; it does not replace the
+  model statistics.
+
+### Normalization
+
+| Dataset type | Recommended normalization | Rationale |
+| --- | --- | --- |
+| Typical bulk RNA-seq dataset | `TMM` (default) | Corrects composition bias while retaining the observed biological range. |
+| High technical noise or strongly mismatched distributions | `Quantile` | Force-aligns voom-scale distributions, which can reduce severe technical variation but can attenuate subtle or global biology. |
+| Sensitivity analysis after evaluating Quantile | `TMM + Quantile` | Applies library-size normalization before voom-scale quantile normalization. |
+
+`TMM + Scale` equalizes sample medians and is appropriate only when a modest
+sample-wide median shift is credibly technical. `TMM + Cyclic Loess` is a
+slower pairwise alternative for nonlinear, sample-specific distribution
+differences, particularly with unbalanced differential expression. `TMMwsp`,
+`RLE`, and `Upper Quartile` are deliberate legacy or special-case comparisons,
+not routine first choices.
+
+Normalization does not replace modelling known technical batch variables. The
+diagnostic plots above are written by default; disable them with
+`--write_normalization_diagnostics false`.
+
+## Optional object integrations
+
+### MOSuite MOO
+
+Set `--input_type moo` and supply `--moo /path/to/moo.rds` to use the optional
+[OmixMOSuite bridge](../../bridges/mosuite/README.md). The bridge extracts the
+MOO raw-count layer and embedded sample metadata, validates their alignment,
+and passes the same portable table contract to this module. Do not use a
+prefiltered MOO layer as the count-model input; the module performs its own
+design-aware filtering.
+
+### Seurat pseudobulk
+
+Use the optional [OmixSeurat bridge](../../bridges/seurat/README.md) to select
+a cell type and sum raw `RNA` `counts` by donor and condition. It returns the
+same count-table-plus-metadata contract used above and depends on
+`SeuratObject`, not the full Seurat package.
+
+### Reproducible paired-pseudobulk fixture
+
+For a local integration test, generate the Kang et al. IFN-beta PBMC CD14+
+monocyte fixture. It creates 16 donor-by-condition profiles for eight donors
+under ignored `data/debug/`:
 
 ```bash
 Rscript modules/OMIX-DEG-Analysis/scripts/create_kang_pseudobulk_fixture.R
 ```
 
-Run the resulting files with `--contrast_variable_columns Group`,
+Run the resulting table with `--contrast_variable_columns Group`,
 `--contrasts stim-ctrl`, and `--donor_variable_column Donor`.
 
-## Optional MOSuite MOO input
+## Interface and deployment
 
-MOO input is an optional interoperability path, not a requirement for this
-module. Install the pinned MOSuite version, OMIX Core, and `OmixMOSuite` as
-described in [the bridge README](../../bridges/mosuite/README.md), then run:
+See [`schemas/interface.yml`](schemas/interface.yml) for the complete
+machine-readable input, parameter, and output contract.
 
-```bash
-Rscript modules/OMIX-DEG-Analysis/scripts/run_deg_analysis.R \
-  --input_type moo \
-  --moo /path/to/moo.rds \
-  --contrast_variable_columns Group \
-  --contrasts B-A \
-  --batch_effect_columns Batch \
-  --output_dir results/deg
-```
+**Deployment repository:**
+[OMIX-DEG-Analysis](https://github.com/NIDAP-Community/OMIX-DEG-Analysis)
 
-The bridge extracts the MOO's **raw** count layer and embedded sample
-metadata, validates their sample alignment, and passes the portable table
-contract to the DEG function. Do not use a prefiltered MOO layer as input to
-the count model; it applies its own design-aware filtering.
+## References
 
-## Optional Seurat pseudobulk input
-
-For a Seurat object, use the optional
-[OmixSeurat bridge](../../bridges/seurat/README.md) to select a cell type and
-sum raw `RNA` `counts` by donor and condition. It returns the same portable
-count-table-plus-metadata contract used above. The bridge depends on
-`SeuratObject`, not the full Seurat package, and does not treat cells as
-independent DEG replicates.
-
-## Summary of normalization best practices
-
-| Dataset type | Recommended workflow | Reason |
-| --- | --- | --- |
-| **Typical dataset** (standard knockouts, treatments, diverse human tissues) | **Normalization Method: `TMM`** (default) [1, 2] | Preserves the observed biological range while correcting RNA-composition bias. |
-| **High technical noise** (for example, varying platforms or batch-heavy historical data) | **Normalization Method: `Quantile`** | Force-aligns log-CPM distributions to reduce severe, non-linear technical variation, at the risk of attenuating subtle or global biology. [2] |
-| **Hybrid sensitivity analysis** after evaluating Quantile | **Normalization Method: `TMM + Quantile`** | Retains TMM library-size normalization before voom-scale quantile normalization. Use only when the diagnostics and study design support that extra combination. |
-
-`TMM + Scale` equalizes sample medians, while `TMM + Cyclic Loess` is a
-slower, pairwise alternative that can be more robust when differential
-expression is unbalanced. `Quantile` omits TMM and applies voom-scale quantile
-normalization alone; use it only when that deliberate choice fits the study.
-
-### Choosing a profile
-
-- Start with **`TMM`** for a new bulk RNA-seq analysis.
-- Use **`Quantile`** next when QC shows severe technical mismatch of whole
-  distributions. It is intentionally strong and can obscure genuine global
-  shifts.
-- Evaluate **`TMM + Quantile`** third when a hybrid profile is justified by
-  the diagnostics and the study design.
-- Use **`TMM + Scale`** when QC shows a modest, sample-wide median shift after
-  TMM and there is good reason to regard it as technical.
-- Use **`TMM + Cyclic Loess`** as a sensitivity analysis for nonlinear,
-  sample-specific distribution differences, particularly with unbalanced
-  differential expression.
-- Use **`TMMwsp`**, **`RLE`**, or **`Upper Quartile`** for a deliberate
-  legacy/reproducibility comparison or a documented special case; they are
-  not routine first choices.
-
-Normalization does not replace modelling known technical batch variables.
-
-### Normalization diagnostics
-
-The portable CLI writes `normalization_boxplots.png`,
-`normalization_densities.png`, and `voom_mean_variance.png` by default. The
-first two compare filtered log-CPM values before normalization with the final
-voom values used for modelling. The mean-variance plot shows the voom trend
-used to estimate precision weights and is useful for checking low-count
-filtering and model preparation. Disable these outputs with
-`--write_normalization_diagnostics false`. When calling `omix_deg_analysis()`
-directly, set `normalization_diagnostics = TRUE` and supply
-`diagnostics_output_dir` to write the same files.
-
-### References
-
-1. Robinson MD, Oshlack A. A scaling normalization method for differential expression analysis of RNA-seq data. *Genome Biology*. 2010;11:R25. [doi:10.1186/gb-2010-11-3-r25](https://doi.org/10.1186/gb-2010-11-3-r25)
+1. Robinson MD, Oshlack A. A scaling normalization method for differential
+   expression analysis of RNA-seq data. *Genome Biology*. 2010;11:R25.
+   [doi:10.1186/gb-2010-11-3-r25](https://doi.org/10.1186/gb-2010-11-3-r25)
 2. [limma documentation: `voom` and `normalizeBetweenArrays`](https://bioconductor.org/packages/devel/bioc/manuals/limma/man/limma.pdf)
-
-## Design notes
-
-- Use `--donor_variable_column` only for genuine repeated measurements from
-  the same biological donor or participant.
-- Every comparison group must contain at least two biological samples. For
-  single-cell input, aggregate raw counts by donor and condition first; cells
-  are not independent replicates.
-- Technical replicates within the same donor-by-group combination are rejected
-  rather than selected silently.
-- Batch adjustment is included in the fitted model. The optional expression
-  block appended to the DEG table is for downstream visualization and does not
-  replace the statistics.
-
-The implementation is in `R/OMIX_DEG_Analysis.R`. See
-[`schemas/interface.yml`](schemas/interface.yml) for the machine-readable
-interface and [`tests/test-omix-deg-analysis.R`](tests/test-omix-deg-analysis.R)
-for direct regression tests.
-
-## Deployment adapter
-
-The corresponding deployment repository is
-[OMIX-DEG-Analysis](https://github.com/NIDAP-Community/OMIX-DEG-Analysis).
-It may supply a user interface and runtime configuration, while this module
-remains the canonical scientific implementation.

@@ -1,0 +1,16 @@
+name: omix-gsea-visualization-legacy
+display_name: OMIX-GSEA-Visualization-Legacy
+version: 1.0.0
+module_type: pathway
+status: review
+owner: OMIX Team
+description: Generate legacy GSEA enrichment-score, ranked-gene, and leading-edge expression visualizations from explicit GSEA, DEG, metadata, and MSigDB inputs.
+data_policy: No data are committed. Callers supply explicit MSigDB, filtered-GSEA, DEG-table, metadata, and output paths through the portable CLI or a deployment adapter.
+runtime_profile: r-pathway
+runtime_overlay:
+  bioconductor:
+    - ComplexHeatmap
+entrypoint: scripts/run_gsea_visualization.R
+deployment_adapters:
+  - platform: code-ocean
+    repository: https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy

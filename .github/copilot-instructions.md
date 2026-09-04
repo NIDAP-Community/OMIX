@@ -1,34 +1,19 @@
 # OMIX Copilot Instructions
 
-Read `docs/developer-guide.md` and `docs/module-contract.md` before changing
-OMIX architecture or module code.
+Follow the repository-wide [AGENTS.md](../AGENTS.md) before changing OMIX.
+For detailed workflow, read [the AI contributor guide](../docs/ai-contributor-guide.md)
+and the [module contract](../docs/module-contract.md).
 
-## Required boundaries
+## Copilot essentials
 
-- `modules/<name>/` is platform-neutral. Never add platform-specific UI,
-  metadata, environment, or runtime directories there.
-- Put reusable scientific R functions in a module's `R/`; use `scripts/` for
-  an explicit-path CLI. Do not assume `/data` or `/results` in a module.
-- Keep platform-specific UI metadata, workflow discovery, mounted paths,
-  runtime entry points, and setup in the separate adapter repository.
-- Treat an adapter as a deployment layer, not a directory mirror. Export only
-  the released scientific function files to `code/functions/`.
-- Record each supported adapter in the canonical module's
-  `deployment_adapters` metadata and README. Keep the adapter README and
-  `OMIX_MODULE_SOURCE.md` linked back to that canonical module.
-- Place shared, reusable container definitions in `starter-environments/`.
-  Pin dependencies and preserve nonstandard package provenance.
-
-## When editing
-
-1. Identify whether the request is scientific/module behavior, a deployment
-   adapter behavior, or a shared-environment change.
-2. Update the implementation, schema, tests, documentation, and changelog in
-   the owning location.
-3. Run `Rscript tests/test-monorepo-layout.R` after structural changes.
-4. Do not add generated outputs, debug data, package inventories, or secrets
-   to Git.
-
-If a change begins in an adapter but affects scientific behavior or a reusable
-interface, make the canonical module the final source of truth and then export
-the release back to the adapter.
+- Classify the request as canonical scientific behavior, an optional bridge,
+  deployment translation, or a shared runtime before editing.
+- Keep `modules/<name>/` platform-neutral with explicit input and output paths.
+  Do not assume mounted input or output directories in a canonical module.
+- Update the owning implementation, schema, tests, README, and changelog
+  together when a public scientific interface changes.
+- Preserve documented statistical defaults, legacy output contracts, and
+  established plotting behavior unless the request explicitly changes them.
+- Do not add generated outputs, debug data, package caches, or secrets to Git.
+- Run `Rscript tests/test-monorepo-layout.R` after structural changes and
+  report module-specific or external validation separately.

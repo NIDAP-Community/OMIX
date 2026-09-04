@@ -1,162 +1,88 @@
-# OMIX GSEA
+# OMIX GSEA Preranked Legacy
 
-Gene Set Enrichment Analysis (GSEA) for pre-ranked gene lists using the fgsea package. Part of the OMIX analysis suite.
+Perform pre-ranked gene-set enrichment analysis from differential-expression
+ranking statistics and a supplied gene-set database.
 
-**Deployment repository:** [OMIX-GSEA-Preranked-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy)
+**Runtime profile:** [`r-pathway`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
+**Entry point:** `scripts/run_gsea.R`
 
-## Overview
+## What it does
 
-**Version**: v5.1.0 | **Part of the OMIX analysis suite**
+GSEA tests whether genes from a pathway concentrate toward either end of a
+ranked differential-expression list. The module uses `fgsea` to calculate
+enrichment scores, normalized enrichment scores, p-values, FDR, and leading
+edge genes for one or more contrasts.
 
-Gene Set Enrichment Analysis (GSEA) determines whether predefined gene sets show statistically significant, concordant differences between two biological states. This tool uses **pre-ranked gene lists** from differential expression analysis to evaluate pathway enrichment using the fast fgsea algorithm.
+## When to use it
 
-### What is GSEA?
+Use pre-ranked GSEA when a well-specified DEG model produces a continuous
+ranking statistic and you want to detect coordinated pathway changes without
+first selecting a hard DEG cutoff. Use L2P when you instead want
+over-representation analysis of a defined gene subset.
 
-Unlike over-representation analysis (ORA) which tests if specific genes are enriched in a pathway, GSEA evaluates whether genes in a pathway are **concentrated at the top or bottom of a ranked gene list**. This approach:
+## Inputs
 
-- Uses **all genes** in your data, not just significant ones
-- Considers **gene rankings** (t-statistics, fold changes), preserving biological signal
-- Identifies **subtle but coordinated changes** in pathway activity
-- Is **more sensitive** to pathway-level effects than ORA
+Provide two input files:
 
-### Key Features
+| Input | Requirements |
+| --- | --- |
+| DEG table | CSV, TSV, or RDS table with one gene-ID column and one or more ranking-score columns. |
+| Pathways database | CSV, TSV, or RDS gene-set membership database, such as an MSigDB release. |
 
-- **Pre-ranked GSEA**: Uses your gene rankings (t-statistics, log fold-change) directly
-- **Comprehensive MSigDB coverage**: Access to Hallmark, GO, REACTOME, KEGG, and more
-- **Cross-species support**: Automatic ortholog mapping for non-human organisms
-- **Multiple contrasts**: Analyze multiple comparisons in a single run
-- **Fast permutation testing**: Efficient multi-level split Monte-Carlo scheme
-- **Leading edge genes**: Identifies core genes driving enrichment signals
-- **Publication-ready outputs**: Enrichment statistics, FDR correction, and plots
+By default, the module looks for ranking columns that end in `_tstat`, for
+example `Treatment-Control_tstat`. It auto-detects `GeneName`, then `Gene
+Symbols` and other common identifier columns; specify `--gene_names_column`
+when the input uses a different name.
 
-## How It Works
+## Run locally or on HPC
 
-1. **Input**: Ranked gene list from differential expression (e.g., sorted by t-statistic)
-2. **Enrichment Calculation**: For each pathway, calculates an enrichment score (ES) that reflects whether pathway genes are concentrated at the top (upregulated) or bottom (downregulated) of the ranking
-3. **Statistical Testing**: Permutation testing determines if ES is significantly different from random
-4. **FDR Correction**: Benjamini-Hochberg correction controls for multiple testing
-5. **Output**: Normalized enrichment scores (NES), p-values, FDR, and leading edge genes
-
-## When to Use GSEA vs. ORA
-
-**Use GSEA when:**
-- You want to detect subtle, coordinated pathway changes
-- You have well-powered experiments with reliable gene rankings
-- You want to use information from all genes, not just significant ones
-- You're analyzing bulk RNA-seq with good statistical power
-
-**Use ORA (L2P tools) when:**
-- You have a clear set of differentially expressed genes
-- You want simpler, more interpretable results
-- You're working with heterogeneous data (e.g., single-cell)
-- You want to compare enrichment across multiple conditions side-by-side
-
-## Input Requirements
-
-### DEG Table (Data Asset or Upload)
-
-Differential expression results with:
-- **Gene identifiers** (e.g., HGNC symbols)
-- **Ranking scores**: t-statistics or log fold-changes for each comparison
-- **Format**: RDS, CSV, or TSV
-
-**Column naming pattern:** `{comparison}_{suffix}`  
-Example: `TreatmentA_tstat`, `TreatmentB_tstat`, `Control_tstat`
-
-The module intentionally does not include demo data. Supply explicit input paths
-when running locally, in a container, or from another platform.
-
-## Run from the command line
-
-The module entry point is platform-neutral:
+After restoring the `r-pathway` runtime profile and setting `OMIX_ROOT` to the
+OMIX checkout, run:
 
 ```bash
-Rscript scripts/run_gsea.R \
+Rscript "$OMIX_ROOT/modules/OMIX-GSEA-Preranked-Legacy/scripts/run_gsea.R" \
   --deg_table /path/to/DEG_Analysis.csv \
-  --pathways_database /path/to/pathways.rds \
-  --output_dir results
+  --pathways_database /path/to/MSigDB.rds \
+  --gene_scores_suffix _tstat \
+  --species Mouse \
+  --output_dir results/gsea
 ```
 
-The same command-line contract is the intended integration point for a Galaxy
-tool wrapper, an HPC job script, or a container entry point. Platform adapters
-may choose inputs differently, but must call this interface with explicit
-paths.
+## Outputs
 
-## Supported Species
+| File | Contents |
+| --- | --- |
+| `gsea_results.csv` | Pathway, contrast, enrichment statistics, FDR, pathway size, and leading-edge genes. |
+| `gsea_pvalue_tables.png` | Visual summary of pathway p-values. |
 
-Human, Mouse, Rat, Dog, Rabbit, Zebrafish, Drosophila, Chimpanzee, Macaque
+## Method notes
 
-Non-human genes are automatically converted to human orthologs before pathway analysis, then results are mapped back to original gene IDs.
+- GSEA uses every ranked gene, rather than only genes passing a DEG threshold.
+- Positive and negative normalized enrichment scores correspond to the two
+  ends of the supplied ranking; interpret direction in the context of the
+  contrast definition.
+- The pathway database determines the available collections. Hallmark (`H`) is
+  often a useful first collection for concise biological interpretation.
+- Non-human inputs are mapped to human orthologs for pathway testing, then
+  results are mapped back to the original identifiers where possible.
+- Preserve the exact database release, ranking statistic, module commit, and
+  runtime lockfile with downstream results.
 
-## Pathway Collections
+## Interface and deployment
 
-Access to **MSigDB collections** including:
+See [`schemas/interface.yml`](schemas/interface.yml) for the complete
+machine-readable input, parameter, and output contract.
 
-- **Hallmark** (H): Core biological states and processes (50 gene sets)
-- **Curated pathways** (C2): REACTOME, KEGG, BioCarta, WikiPathways
-- **Regulatory targets** (C3): Transcription factors, microRNAs
-- **Gene Ontology** (C5): Biological process, cellular component, molecular function
-- **Oncogenic** (C6): Cancer gene signatures
-- **Immunologic** (C7): Immune cell states and perturbations
-- **Cell type** (C8): Cell type marker genes
-
-**Recommendation**: Start with Hallmark for the most interpretable results.
-
-## Output Files
-
-### 1. gsea_results.csv
-
-Complete enrichment results table:
-- Pathway name and collection
-- **NES** (Normalized Enrichment Score): Positive = enriched in upregulated genes, negative = downregulated
-- **P-value** and **FDR**: Statistical significance
-- Gene set size and overlap
-- **Leading edge genes**: Core genes driving enrichment
-
-### 2. Plots (if generated)
-
-- Enrichment plots showing pathway distribution across gene rankings
-- Summary tables of significant pathways
-
-## Key Result Metrics
-
-- **NES (Normalized Enrichment Score)**: Effect size; |NES| > 1.5 typically indicates strong enrichment
-- **P-value**: Raw statistical significance from permutation test
-- **FDR (False Discovery Rate)**: Multiple testing-corrected p-value; < 0.05 is typically significant
-- **Leading Edge Genes**: Subset of pathway genes contributing most to enrichment
-
-## Algorithm Details
-
-Uses the **fgsea** R Bioconductor package:
-- **Fast pre-ranked GSEA**: Adaptive multi-level split Monte-Carlo permutation scheme
-- **Permutation testing**: Estimates significance while preserving gene-gene correlations
-- **FDR correction**: Benjamini-Hochberg procedure controls false discovery rate
-- **Normalized scoring**: Accounts for pathway size differences
-
-## Method Comparison
-
-| Feature | GSEA (this tool) | ORA (L2P tools) |
-|---------|------------------|-----------------|
-| Input | Ranked gene list | Gene subset (DEGs) |
-| Uses all genes | ✓ | ✗ |
-| Statistical power | Higher for subtle effects | Higher for strong effects |
-| Interpretation | Enrichment score + direction | Hit count + odds ratio |
-| Multi-contrast viz | Table | Bubble plot |
+**Deployment repository:**
+[OMIX-GSEA-Preranked-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy)
 
 ## References
 
-- **fgsea**: Korotkevich G et al. (2021). Fast gene set enrichment analysis. *bioRxiv*. doi:10.1101/060012
-- **Original GSEA**: Subramanian A et al. (2005). Gene set enrichment analysis: A knowledge-based approach for interpreting genome-wide expression profiles. *PNAS*. doi:10.1073/pnas.0506580102
-- **MSigDB**: Liberzon A et al. (2015). The Molecular Signatures Database (MSigDB) hallmark gene set collection. *Cell Systems*. doi:10.1016/j.celsys.2015.12.004
-
-## Support
-
-For questions or issues:
-- **NIDAP Team**: NCICCBRNIDAP@mail.nih.gov
-- **CCBR**: CCR Collaborative Bioinformatics Resource
-
-See `schemas/interface.yml` for the machine-readable input and output contract.
-
----
-
-**OMIX Collection** | **Bioinformatics** | **Pathway Analysis** | **R** | **GSEA**
+- Korotkevich G, et al. Fast gene set enrichment analysis. *bioRxiv*. 2021.
+  [doi:10.1101/060012](https://doi.org/10.1101/060012)
+- Subramanian A, et al. Gene set enrichment analysis: a knowledge-based
+  approach for interpreting genome-wide expression profiles. *PNAS*. 2005.
+  [doi:10.1073/pnas.0506580102](https://doi.org/10.1073/pnas.0506580102)
+- Liberzon A, et al. The Molecular Signatures Database hallmark gene set
+  collection. *Cell Systems*. 2015.
+  [doi:10.1016/j.cels.2015.12.004](https://doi.org/10.1016/j.cels.2015.12.004)

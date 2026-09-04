@@ -109,5 +109,9 @@ Before requesting review or a release:
 - **Contributors:** start here, then read the detailed
   [module contract](module-contract.md).
 - **Reviewers:** use the review checklist to identify ownership drift.
-- **AI coding assistants:** follow `.github/copilot-instructions.md`; it is a
-  concise, enforceable version of this guide.
+- **AI coding assistants:** start with [`AGENTS.md`](../AGENTS.md), then read
+  the [AI contributor guide](ai-contributor-guide.md). GitHub Copilot also
+  reads the concise `.github/copilot-instructions.md` entry point.
+- **Deployment-adapter authors:** follow the
+  [deployment adapter guide](deployment-adapter-guide.md) and begin from its
+  README, source-record, and agent-instruction templates.

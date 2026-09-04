@@ -1,0 +1,62 @@
+interface_version: 1
+entrypoint: scripts/run_gsea_visualization.R
+inputs:
+  msigdb_database:
+    required: true
+    formats: [csv, rds]
+    description: MSigDB membership database from the same release used for upstream GSEA; restores pathway membership when absent from filtered results.
+  gsea_filter_results:
+    required: true
+    formats: [csv, rds]
+    description: Filtered GSEA result table with contrast, collection, pathway, enrichment statistics, and preferably pathway and leading-edge membership.
+  deg_table:
+    required: true
+    formats: [csv, rds]
+    description: DEG table with a feature identifier, wide contrast-specific ranking statistics, and sample-level normalized or batch-corrected expression columns.
+  sample_metadata:
+    required: true
+    formats: [csv, rds]
+    description: Sample metadata aligned to the sample-expression columns in the DEG table.
+parameters:
+  contrast_filter:
+    type: string
+    default: none
+    allowed: [none, keep, remove]
+  contrasts:
+    type: string
+    description: Optional comma-separated contrast names used with keep or remove mode.
+  top_n_pathways:
+    type: integer
+    default: 1
+    description: Top pathways per contrast and collection; 0 selects all pathways.
+  top_n_by_sign:
+    type: boolean
+    default: false
+  max_plots_in_pdf:
+    type: integer
+    default: 0
+    description: Global output cap; 0 means unlimited.
+  plots_to_include:
+    type: string
+    default: ES+RNK+LE
+    allowed: [ES, ES+RNK, ES+LE, ES+RNK+LE, LE]
+  heatmap_transform:
+    type: string
+    default: z-score
+    allowed: [z-score, center by row mean, center by row median, none]
+  heatmap_gene_names_column:
+    type: string
+    default: GeneName
+  heatmap_sample_names_column:
+    type: string
+    default: Sample
+  heatmap_group_column:
+    type: string
+    default: Group
+outputs:
+  enrichment_plots:
+    path: GSEA-Vis-Enrichment-Plots.pdf
+    format: pdf
+  running_enrichment_scores:
+    path: GSEA-Vis-RunningES.csv
+    format: csv
