@@ -1,6 +1,7 @@
 name: omix-volcano-plot
 display_name: OMIX Volcano Plot
 version: 1.0.0
+interface_version: 1
 module_type: visualization
 status: active
 owner: OMIX Team

@@ -12,6 +12,9 @@ and the [module contract](../docs/module-contract.md).
   Do not assume mounted input or output directories in a canonical module.
 - Update the owning implementation, schema, tests, README, and changelog
   together when a public scientific interface changes.
+- Apply the [versioning policy](../docs/versioning-and-releases.md): update
+  the module semantic version for user-visible behavior and the interface
+  version only when the public contract changes.
 - Preserve documented statistical defaults, legacy output contracts, and
   established plotting behavior unless the request explicitly changes them.
 - Do not add generated outputs, debug data, package caches, or secrets to Git.

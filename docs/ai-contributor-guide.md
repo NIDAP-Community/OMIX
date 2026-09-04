@@ -69,8 +69,11 @@ For a scientific or reusable-interface change:
 4. Update the module README using the
    [README guide](module-readme-guide.md), and add a changelog entry for
    externally visible behavior.
-5. Update `module.yml` only when identity, runtime profile, data policy, or
-   adapter registry changes.
+5. Apply the [versioning policy](versioning-and-releases.md): update the
+   semantic module version for an externally visible behavior change and the
+   interface version when the public contract changes. Then update
+   `module.yml` for any identity, runtime-profile, data-policy, or adapter
+   registry change.
 
 Do not hard-code deployment paths such as mounted input or output directories
 in canonical code. A module must work from explicit paths in local R, Docker,
@@ -120,6 +123,9 @@ the README and changelog.
   wide lockfile that pulls unrelated dependencies into every module.
 - Change and publish a shared runtime only when its definition changes. Target
   the affected profile rather than rebuilding unrelated runtime families.
+- Do not create a module or adapter release tag merely because a branch merged.
+  A tag represents the versioned, validated state described in
+  [Versioning and releases](versioning-and-releases.md).
 
 ## Validate proportionally
 

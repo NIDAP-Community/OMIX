@@ -89,6 +89,28 @@ the responsibility of the separate deployment adapter.
   have passed CI. A Git sync alone does not update a capsule's already-built
   environment.
 
+## Versioning and release records
+
+Use [Versioning and releases](versioning-and-releases.md) as the authoritative
+policy. In brief, each module carries two independent identities:
+
+- `version` is a semantic version for the module's scientific behavior and
+  portable capability.
+- `interface_version` is a positive integer for the public input, parameter,
+  output, and CLI contract.
+
+Use a patch increment for a compatible bug fix, a minor increment for a
+backward-compatible feature, and a major increment for a breaking contract or
+a deliberate scientific-method/default change that can alter results. Increase
+`interface_version` only when the public contract changes. Update the
+changelog whenever a user-visible behavior changes.
+
+An adapter release is separate from a module release. Its
+`OMIX_MODULE_SOURCE.md` must state the canonical module version and exact
+source ref that were exported, plus its own tag, platform validation, and
+immutable runtime identity when available. Do not fill in unavailable values
+with guesses: use a clearly marked pending state until validation is complete.
+
 ## Review and release checklist
 
 Before requesting review or a release:
@@ -103,9 +125,12 @@ Before requesting review or a release:
 5. Confirm that no generated outputs, debug data, tokens, or platform files
    were staged in the monorepo.
 6. Update user documentation and the module changelog for externally visible
-   behavior changes.
+   behavior changes. Confirm the module and interface versions were updated
+   according to the versioning policy.
 7. For a platform release, synchronize the adapter, select the intended
-   environment, and run a platform validation before publishing a release.
+   environment, run a platform validation, and then record the adapter tag,
+   platform release identifier, and immutable runtime identity before
+   publishing a release.
 
 ## How to use this guide
 

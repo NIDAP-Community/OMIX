@@ -16,6 +16,8 @@ for the repository's detailed contracts.
    documentation structure.
 5. [Deployment adapter guide](docs/deployment-adapter-guide.md) — required
    ownership, documentation, and release rules when an adapter is needed.
+6. [Versioning and releases](docs/versioning-and-releases.md) — version
+   ownership, release records, and the canonical-to-adapter promotion flow.
 
 If these documents appear to conflict, preserve the module contract and report
 the ambiguity rather than silently choosing a new architecture.
@@ -60,6 +62,12 @@ the ambiguity rather than silently choosing a new architecture.
   inherited by a separate checkout.
 - Backport a reusable or scientific fix to the canonical module before
   treating it as released.
+- Keep `module.yml`'s semantic `version` and integer `interface_version`
+  current. Update the changelog for every externally visible change; use the
+  versioning guide to decide whether the change is patch, minor, or major.
+- Do not create a Git tag, platform release record, or immutable runtime claim
+  until its corresponding validation has completed. Record pending fields
+  honestly in an adapter's `OMIX_MODULE_SOURCE.md`.
 - Do not rebuild or publish a shared runtime unless its Dockerfile, lockfile,
   or runtime definition changed and the targeted validation has passed.
 - Record module commit, lockfile/runtime identity, and input-data provenance

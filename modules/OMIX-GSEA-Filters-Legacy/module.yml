@@ -1,6 +1,7 @@
 name: omix-gsea-filters-legacy
 display_name: OMIX-GSEA-Filters-Legacy
 version: 1.0.0
+interface_version: 1
 module_type: pathway
 status: active
 owner: OMIX Team

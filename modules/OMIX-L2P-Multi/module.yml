@@ -1,6 +1,7 @@
 name: omix-l2p-multi
 display_name: OMIX-L2P-Multi
 version: 1.0.0
+interface_version: 1
 module_type: pathway
 status: active
 owner: OMIX Team

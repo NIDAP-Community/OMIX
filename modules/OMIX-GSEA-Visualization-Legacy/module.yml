@@ -1,6 +1,7 @@
 name: omix-gsea-visualization-legacy
 display_name: OMIX-GSEA-Visualization-Legacy
 version: 1.0.0
+interface_version: 1
 module_type: pathway
 status: review
 owner: OMIX Team

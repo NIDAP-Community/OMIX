@@ -10,7 +10,7 @@ the canonical OMIX scientific implementation.
 | Canonical module | [<module name>](<canonical module URL>) |
 | Interface contract | [schemas/interface.yml](<canonical schema URL>) |
 | Development contract | [OMIX module contract](https://github.com/NIDAP-Community/OMIX/blob/main/docs/module-contract.md) |
-| Released source reference | See [OMIX_MODULE_SOURCE.md](OMIX_MODULE_SOURCE.md) |
+| Version and source record | See [OMIX_MODULE_SOURCE.md](OMIX_MODULE_SOURCE.md) |
 
 The canonical module owns scientific functions, portable CLI behavior, tests,
 and the reusable input/output contract. This repository owns the deployment
@@ -54,7 +54,7 @@ aligned sample metadata.
 
 - **Runtime profile:** `<runtime profile>`
 - **Pinned environment:** `<image version and digest, or lockfile reference>`
-- **Canonical source:** `<module path and Git reference>`
+- **Canonical source and adapter release record:** [OMIX_MODULE_SOURCE.md](OMIX_MODULE_SOURCE.md)
 
 Record the input-data identity and selected parameters with any released
 scientific result.

@@ -10,11 +10,14 @@ OMIX/
 |   |-- mosuite/                       OmixMOSuite MOO-to-table bridge
 |   `-- seurat/                        OmixSeurat pseudobulk bridge
 |-- modules/                           Independent analysis modules
-|   |-- OMIX-GSEA-Preranked-Legacy/
 |   |-- OMIX-DEG-Analysis/
+|   |-- OMIX-GSEA-Filters-Legacy/
+|   |-- OMIX-GSEA-Preranked-Legacy/
+|   |-- OMIX-GSEA-Visualization-Legacy/
 |   |-- OMIX-Gene-Boxplots/
 |   |-- OMIX-L2P-Single/
-|   `-- OMIX-L2P-Multi/
+|   |-- OMIX-L2P-Multi/
+|   `-- OMIX-Volcano-Plot/
 |-- docs/                              Repository and module conventions
 `-- tests/                             Repository-level contract checks
 ```
@@ -75,6 +78,11 @@ Read the [developer guide](docs/developer-guide.md) and
 implementation. Use the [module README guide](docs/module-readme-guide.md)
 when documenting a canonical module. The compact instructions for GitHub Copilot are in
 [.github/copilot-instructions.md](.github/copilot-instructions.md).
+
+Use [versioning and releases](docs/versioning-and-releases.md) to distinguish
+module versions, public-interface versions, adapter tags, platform releases,
+and runtime identities. A module or adapter is not formally released merely
+because it has been merged to its default branch.
 
 AI coding assistants should start with [AGENTS.md](AGENTS.md) and follow the
 [AI contributor guide](docs/ai-contributor-guide.md).

@@ -1,6 +1,7 @@
 name: omix-gsea-preranked-legacy
 display_name: OMIX-GSEA-Preranked-Legacy
 version: 5.1.0
+interface_version: 1
 module_type: pathway
 status: active
 owner: OMIX Team

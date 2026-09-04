@@ -16,6 +16,12 @@ modules/<module-name>/
 `-- CHANGELOG.md           Module release history
 ```
 
+Its `module.yml` must declare both a semantic module `version` (for the
+scientific capability) and a positive integer `interface_version` (for its
+public table, parameter, and CLI contract). The two versions change for
+different reasons; follow [Versioning and releases](versioning-and-releases.md)
+instead of treating them as interchangeable.
+
 The monorepo is platform-neutral. Modules must not contain platform-specific
 UI metadata, environment Dockerfiles, or mounted-path assumptions.
 Platform-specific repositories or build outputs own those adapters. A module's
@@ -48,7 +54,8 @@ and HPC use.
 ### Development and release flow
 
 1. For a scientific or reusable-interface change, edit the canonical OMIX
-   module first; update its tests, schema, and changelog as appropriate.
+   module first; update its tests, schema, changelog, and version metadata as
+   appropriate.
 2. Run the module and repository checks, then export the released R
    implementation to the corresponding deployment repository when needed.
 3. For a change discovered in an adapter, test it there first. If it
@@ -59,7 +66,9 @@ and HPC use.
    only in the deployment repository.
 
 Each deployment repository should contain `OMIX_MODULE_SOURCE.md`, identifying
-its canonical module and linking developers to this contract.
+its canonical module and linking developers to this contract. It also records
+the canonical version/ref exported into the adapter, its own release tag,
+platform-release validation, and pinned runtime identity when those are known.
 
 ### Adapter registry and bidirectional links
 

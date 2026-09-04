@@ -43,6 +43,24 @@ for (module_dir in module_dirs) {
     )
   }
 
+  module_metadata <- readLines(file.path(module_dir, "module.yml"), warn = FALSE)
+  module_version <- sub("^version:[[:space:]]*", "", grep("^version:[[:space:]]*", module_metadata, value = TRUE))
+  interface_version <- sub("^interface_version:[[:space:]]*", "", grep("^interface_version:[[:space:]]*", module_metadata, value = TRUE))
+  if (length(module_version) != 1L || !grepl("^[0-9]+\\.[0-9]+\\.[0-9]+$", module_version)) {
+    stop(
+      "Module contract failed for ", basename(module_dir),
+      ": module.yml must contain exactly one semantic version (X.Y.Z).",
+      call. = FALSE
+    )
+  }
+  if (length(interface_version) != 1L || !grepl("^[1-9][0-9]*$", interface_version)) {
+    stop(
+      "Module contract failed for ", basename(module_dir),
+      ": module.yml must contain exactly one positive integer interface_version.",
+      call. = FALSE
+    )
+  }
+
   forbidden_platform_paths <- c(
     ".codeocean",
     "metadata",

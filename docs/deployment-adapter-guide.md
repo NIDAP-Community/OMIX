@@ -6,8 +6,9 @@ layout, and runtime translation. It does not own a second version of the
 scientific method.
 
 Read the [module contract](module-contract.md), [developer guide](developer-guide.md),
-and [AI contributor guide](ai-contributor-guide.md) before creating or changing
-an adapter.
+[AI contributor guide](ai-contributor-guide.md), and
+[versioning and release policy](versioning-and-releases.md) before creating or
+changing an adapter.
 
 ## When an adapter is warranted
 
@@ -19,7 +20,8 @@ from local R, a container, or HPC does not need an adapter.
 The canonical module must already exist and have a documented public contract:
 
 - explicit-path CLI under `scripts/`;
-- `module.yml` with a runtime profile and adapter registry;
+- `module.yml` with module and interface versions, a runtime profile, and an
+  adapter registry;
 - `schemas/interface.yml`;
 - direct tests, README, and changelog; and
 - a reviewed scientific implementation under `R/`.
@@ -46,7 +48,7 @@ Every adapter repository should contain the following files at its root:
 | File | Purpose |
 | --- | --- |
 | `README.md` | User-facing deployment instructions and clear link to the canonical module. |
-| `OMIX_MODULE_SOURCE.md` | Exact canonical module, source reference, exported scientific files, and synchronization rules. |
+| `OMIX_MODULE_SOURCE.md` | Canonical versions/source reference, exported scientific files, synchronization rules, and adapter release record. |
 | `AGENTS.md` | Repository-local instructions for coding agents, including the adapter boundary and validation procedure. |
 | `.github/copilot-instructions.md` | Brief Copilot entry point that links to `AGENTS.md`. |
 
@@ -60,7 +62,7 @@ Use this order in every user-facing adapter README:
 
 1. **Title and summary** — identify the analysis and deployment purpose.
 2. **Canonical OMIX module** — link to the module, interface schema, module
-   contract, and the source reference recorded in `OMIX_MODULE_SOURCE.md`.
+   contract, and the version/source reference recorded in `OMIX_MODULE_SOURCE.md`.
 3. **What this deployment adds** — UI, input discovery, workflow handoff, or
    runtime behavior unique to the deployment.
 4. **Inputs** — data assets, uploads, expected files, column requirements,
@@ -82,10 +84,11 @@ only the behavior introduced by the deployment.
 
 ## Scientific exports and synchronization
 
-- Export only released scientific functions from the canonical module into the
+- Export only validated scientific functions from the canonical module into the
   adapter's `code/functions/` directory.
-- Record the canonical module path, Git reference or commit, exported files,
-  and any intentional adapter-only differences in `OMIX_MODULE_SOURCE.md`.
+- Record the canonical module and interface versions, immutable Git reference,
+  exported files, and any intentional adapter-only differences in
+  `OMIX_MODULE_SOURCE.md`.
 - Do not edit an exported scientific function in the adapter as a permanent
   fix. Make the change in the canonical module, validate it, and re-export.
 - The adapter entry point may translate UI parameters, resolve attached inputs,
@@ -115,6 +118,10 @@ only the behavior introduced by the deployment.
 - Before release, verify the adapter's Git state, canonical source reference,
   app-panel/schema agreement, environment identity, input provenance, and a
   successful platform run.
+- Create an adapter tag only after platform validation. Record that tag, the
+  platform release identifier, and the runtime tag plus resolved digest in
+  `OMIX_MODULE_SOURCE.md`. State **Pending** for unavailable facts; do not
+  invent release evidence.
 
 ## Audit checklist
 
