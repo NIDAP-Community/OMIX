@@ -34,8 +34,17 @@ will be passed to a downstream GSEA visualization module.
 
 ## Run locally or on HPC
 
-After restoring the `r-visualization` runtime profile and setting `OMIX_ROOT`
-to the OMIX checkout, run:
+Set `OMIX_ROOT` to the OMIX checkout, then prepare a writable runtime project:
+
+```bash
+export OMIX_RUN=/path/to/omix-gsea-filters-runtime
+Rscript "$OMIX_ROOT/scripts/restore-omix-runtime.R" \
+  --module OMIX-GSEA-Filters-Legacy \
+  --project "$OMIX_RUN"
+cd "$OMIX_RUN"
+```
+
+Run:
 
 ```bash
 Rscript "$OMIX_ROOT/modules/OMIX-GSEA-Filters-Legacy/scripts/run_gsea_filters.R" \

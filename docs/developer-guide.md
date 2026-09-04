@@ -79,7 +79,10 @@ the responsibility of the separate deployment adapter.
   as versioned OCI images. Use the version tag plus the resolved image digest
   from the publication workflow for every tested release; never use `latest`
   for a capsule, Docker, or HPC release.
-- Module-specific overlays or platform-only setup remain in the adapter.
+- Declare a portable module-specific runtime overlay, when needed, in the
+  module's `module.yml` with an explicit package version. The shared
+  `restore-omix-runtime.R` helper applies it after restoring the selected
+  profile lock. Platform-only setup remains in the adapter.
 - Pin package versions in the environment lockfile. Record package provenance
   for packages installed from tarballs or other nonstandard sources.
 - Rebuild and publish an image only after its lockfile and Dockerfile changes

@@ -9,7 +9,8 @@ data_policy: No data are committed. Callers supply explicit MSigDB, filtered-GSE
 runtime_profile: r-pathway
 runtime_overlay:
   bioconductor:
-    - ComplexHeatmap
+    - package: ComplexHeatmap
+      version: 2.22.0
 entrypoint: scripts/run_gsea_visualization.R
 deployment_adapters:
   - platform: code-ocean

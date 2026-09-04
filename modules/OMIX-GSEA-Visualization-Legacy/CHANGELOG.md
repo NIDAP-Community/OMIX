@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Declared the required Bioconductor 3.20 `ComplexHeatmap` 2.22.0 runtime
+  overlay so the portable leading-edge heatmap option can be provisioned with
+  the shared runtime helper and recorded in the effective run lockfile.
+
 ## 1.0.0
 
 - Promoted the established legacy GSEA visualization implementation into a

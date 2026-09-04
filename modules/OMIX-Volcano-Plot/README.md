@@ -34,8 +34,17 @@ provide matching comma-separated column lists explicitly.
 
 ## Run locally or on HPC
 
-After restoring the `r-visualization` runtime profile and setting `OMIX_ROOT`
-to the OMIX checkout, run:
+Set `OMIX_ROOT` to the OMIX checkout, then prepare a writable runtime project:
+
+```bash
+export OMIX_RUN=/path/to/omix-volcano-runtime
+Rscript "$OMIX_ROOT/scripts/restore-omix-runtime.R" \
+  --module OMIX-Volcano-Plot \
+  --project "$OMIX_RUN"
+cd "$OMIX_RUN"
+```
+
+Run:
 
 ```bash
 Rscript "$OMIX_ROOT/modules/OMIX-Volcano-Plot/scripts/run_volcano_plot.R" \

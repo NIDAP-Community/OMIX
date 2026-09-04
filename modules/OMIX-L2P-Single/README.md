@@ -40,8 +40,17 @@ naming convention.
 
 ## Run locally or on HPC
 
-After restoring the `r-pathway` runtime profile and setting `OMIX_ROOT` to the
-OMIX checkout, run the entry point with explicit paths:
+Set `OMIX_ROOT` to the OMIX checkout, then prepare a writable runtime project:
+
+```bash
+export OMIX_RUN=/path/to/omix-l2p-single-runtime
+Rscript "$OMIX_ROOT/scripts/restore-omix-runtime.R" \
+  --module OMIX-L2P-Single \
+  --project "$OMIX_RUN"
+cd "$OMIX_RUN"
+```
+
+Run the entry point with explicit paths:
 
 ```bash
 Rscript "$OMIX_ROOT/modules/OMIX-L2P-Single/scripts/run_l2p_single.R" \

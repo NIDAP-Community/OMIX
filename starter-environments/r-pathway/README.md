@@ -23,6 +23,12 @@ they are installed from the immutable `L2P_REF` commit in
 [`Dockerfile`](Dockerfile). This preserves their source provenance without
 using a mutable `master` branch.
 
+For a local `renv` project, use the root
+[`restore-omix-runtime.R`](../../scripts/restore-omix-runtime.R) helper rather
+than restoring this lockfile directly. It restores the shared lock, installs
+those two immutable source archives, applies any versioned module overlay, and
+snapshots the complete effective lockfile in the writable run project.
+
 `gridExtra` 2.3.1 is included for GSEA plot assembly. Its CRAN source archive
 used for the release has SHA-256
 `de42e501ac2c6a70bd0ffc18d7703e9b0e6b878c610df09756183c3e52445c82`.

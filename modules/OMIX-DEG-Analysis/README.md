@@ -37,8 +37,18 @@ column.
 
 ## Run locally or on HPC
 
-After restoring the `r-statistics` runtime profile and setting `OMIX_ROOT` to
-the OMIX checkout, run the portable CLI with explicit paths:
+Set `OMIX_ROOT` to the OMIX checkout, then prepare a writable runtime project
+with the shared helper:
+
+```bash
+export OMIX_RUN=/path/to/omix-deg-runtime
+Rscript "$OMIX_ROOT/scripts/restore-omix-runtime.R" \
+  --module OMIX-DEG-Analysis \
+  --project "$OMIX_RUN"
+cd "$OMIX_RUN"
+```
+
+Run the portable CLI with explicit paths:
 
 ```bash
 Rscript "$OMIX_ROOT/modules/OMIX-DEG-Analysis/scripts/run_deg_analysis.R" \

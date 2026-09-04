@@ -44,9 +44,19 @@ than plotting an incompatible combination.
 
 ## Run locally or on HPC
 
-Restore the `r-pathway` runtime profile, including the module's
-`ComplexHeatmap` Bioconductor overlay, set `OMIX_ROOT` to the monorepo checkout,
-and run:
+Prepare a writable runtime project with the repository helper. It restores
+`r-pathway`, installs the pinned `ComplexHeatmap` 2.22.0 Bioconductor overlay,
+and writes the complete effective lockfile to `$OMIX_RUN/renv.lock`.
+
+```bash
+export OMIX_RUN=/path/to/omix-gsea-visualization-runtime
+Rscript "$OMIX_ROOT/scripts/restore-omix-runtime.R" \
+  --module OMIX-GSEA-Visualization-Legacy \
+  --project "$OMIX_RUN"
+cd "$OMIX_RUN"
+```
+
+Then run:
 
 ```bash
 Rscript "$OMIX_ROOT/modules/OMIX-GSEA-Visualization-Legacy/scripts/run_gsea_visualization.R" \

@@ -56,6 +56,79 @@ packages.
 
 ## Execution targets
 
-- **Docker:** bind-mount explicit input and output directories.
-- **HPC:** pull the same image digest with Apptainer/Singularity and bind the
-  required input and output directories.
+For either target, first identify the module's `runtime_profile` in
+`modules/<module>/module.yml`, then use the matching published image. The
+version tags below are release identifiers; replace a tag with the resolved
+`@sha256:<digest>` from the publication summary for a recorded analysis.
+
+| Runtime profile | Published image tag |
+| --- | --- |
+| `r-statistics` | `ghcr.io/nidap-community/omix-r-statistics:r4.4.3-bioconductor3.20-v1` |
+| `r-visualization` | `ghcr.io/nidap-community/omix-r-visualization:r4.4.3-v2` |
+| `r-pathway` | `ghcr.io/nidap-community/omix-r-pathway:r4.4.3-bioconductor3.20-v1` |
+
+### Docker
+
+Bind-mount the OMIX checkout read-only, explicit input and output folders, and
+a writable runtime folder. Provision the run folder once for the selected
+module, then run its portable CLI from that folder so `renv` activates the
+effective lockfile.
+
+```bash
+export OMIX_ROOT=/path/to/OMIX
+export OMIX_MODULE=OMIX-DEG-Analysis
+export OMIX_IMAGE=ghcr.io/nidap-community/omix-r-statistics:r4.4.3-bioconductor3.20-v1
+export OMIX_RUN=$PWD/omix-runtime
+mkdir -p "$OMIX_RUN" "$PWD/input" "$PWD/results"
+
+docker run --rm \
+  -v "$OMIX_ROOT:/omix:ro" \
+  -v "$OMIX_RUN:/runtime" \
+  -w /runtime \
+  "$OMIX_IMAGE" \
+  Rscript /omix/scripts/restore-omix-runtime.R \
+    --module "$OMIX_MODULE" \
+    --project /runtime
+
+docker run --rm \
+  -v "$OMIX_ROOT:/omix:ro" \
+  -v "$OMIX_RUN:/runtime" \
+  -v "$PWD/input:/data:ro" \
+  -v "$PWD/results:/results" \
+  -w /runtime \
+  "$OMIX_IMAGE" \
+  Rscript "/omix/modules/$OMIX_MODULE/scripts/run_deg_analysis.R" \
+    --input_type table \
+    --counts /data/raw_counts.csv \
+    --metadata /data/sample_metadata.csv \
+    --contrast_variable_columns Group \
+    --contrasts B-A \
+    --output_dir /results
+```
+
+Replace the final command and its explicit arguments with the selected
+module's CLI example. For `OMIX-GSEA-Visualization-Legacy`, use the `r-pathway`
+image; the preparation command installs its pinned `ComplexHeatmap` overlay
+into the mounted runtime project before the analysis command runs.
+
+### Apptainer or Singularity on HPC
+
+Pull the same image digest, bind the same four directories, and use the two
+commands above with `apptainer exec` (or `singularity exec`) in place of
+`docker run`. For example:
+
+```bash
+apptainer pull omix-r-statistics.sif \
+  docker://ghcr.io/nidap-community/omix-r-statistics@sha256:<digest>
+
+apptainer exec \
+  --bind "$OMIX_ROOT:/omix:ro,$OMIX_RUN:/runtime,$PWD/input:/data:ro,$PWD/results:/results" \
+  --pwd /runtime \
+  omix-r-statistics.sif \
+  Rscript /omix/scripts/restore-omix-runtime.R \
+    --module OMIX-DEG-Analysis \
+    --project /runtime
+```
+
+The second `apptainer exec` command invokes the chosen module's CLI exactly as
+in the Docker example.

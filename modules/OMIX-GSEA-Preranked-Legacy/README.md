@@ -36,8 +36,17 @@ when the input uses a different name.
 
 ## Run locally or on HPC
 
-After restoring the `r-pathway` runtime profile and setting `OMIX_ROOT` to the
-OMIX checkout, run:
+Set `OMIX_ROOT` to the OMIX checkout, then prepare a writable runtime project:
+
+```bash
+export OMIX_RUN=/path/to/omix-gsea-runtime
+Rscript "$OMIX_ROOT/scripts/restore-omix-runtime.R" \
+  --module OMIX-GSEA-Preranked-Legacy \
+  --project "$OMIX_RUN"
+cd "$OMIX_RUN"
+```
+
+Run:
 
 ```bash
 Rscript "$OMIX_ROOT/modules/OMIX-GSEA-Preranked-Legacy/scripts/run_gsea.R" \

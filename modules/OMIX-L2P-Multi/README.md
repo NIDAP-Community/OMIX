@@ -36,8 +36,17 @@ not follow the conventional comparison-prefix pattern.
 
 ## Run locally or on HPC
 
-After restoring the `r-pathway` runtime profile and setting `OMIX_ROOT` to the
-OMIX checkout, invoke the portable CLI:
+Set `OMIX_ROOT` to the OMIX checkout, then prepare a writable runtime project:
+
+```bash
+export OMIX_RUN=/path/to/omix-l2p-multi-runtime
+Rscript "$OMIX_ROOT/scripts/restore-omix-runtime.R" \
+  --module OMIX-L2P-Multi \
+  --project "$OMIX_RUN"
+cd "$OMIX_RUN"
+```
+
+Invoke the portable CLI:
 
 ```bash
 Rscript "$OMIX_ROOT/modules/OMIX-L2P-Multi/scripts/run_l2p_multi.R" \
