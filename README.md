@@ -1,28 +1,28 @@
 # OMIX
 
-OMIX is an R bioinformatics monorepo. It combines an installable shared R
-package with independent analysis modules.
+OMIX is a portable R toolkit for reproducible omics analyses. It provides
+independent modules for differential expression, pathway analysis, and
+visualization that run from explicit input and output paths on a workstation,
+in a container, or on HPC.
 
-```text
-OMIX/
-|-- core/                              Shared R package: Omix
-|-- bridges/                           Optional ecosystem-specific R packages
-|   |-- mosuite/                       OmixMOSuite MOO-to-table bridge
-|   `-- seurat/                        OmixSeurat pseudobulk bridge
-|-- modules/                           Independent analysis modules
-|   |-- OMIX-DEG-Analysis/
-|   |-- OMIX-GSEA-Filters-Legacy/
-|   |-- OMIX-GSEA-Preranked-Legacy/
-|   |-- OMIX-GSEA-Visualization-Legacy/
-|   |-- OMIX-Gene-Boxplots/
-|   |-- OMIX-L2P-Single/
-|   |-- OMIX-L2P-Multi/
-|   `-- OMIX-Volcano-Plot/
-|-- docs/                              Repository and module conventions
-`-- tests/                             Repository-level contract checks
-```
+## Start here
 
-## Core package
+1. Choose an analysis from the [module catalog](#module-catalog).
+2. Open its README to confirm that its scientific aim and required input tables
+   fit your study.
+3. Restore its runtime profile once, then run the module's explicit-path CLI
+   with your own input and output locations. The
+   [local/HPC example](#run-a-module-on-biowulf-or-another-shared-r-system)
+   uses DEG Analysis.
+4. Preserve the resulting effective `renv.lock`, module commit, immutable
+   image digest where applicable, command, and input checksums with the
+   results. See the [runtime guide](docs/runtime-guide.md).
+
+You do not need a deployment platform to use OMIX. The canonical modules are
+ordinary R source and command-line programs; optional deployment repositories
+provide additional platform-specific interfaces.
+
+## Shared packages and extensions
 
 `core/` is the installable `Omix` package. It currently provides reusable
 color palette utilities, including `get_color_palette()`.
@@ -37,8 +37,6 @@ library(Omix)
 
 See [core/README.md](core/README.md) for the full utility guide and local
 contributor setup.
-
-## Optional bridge packages
 
 `bridges/` contains separately installable packages that convert a supported
 external data object into a portable Core contract. They are not dependencies
@@ -73,23 +71,17 @@ interface and runtime layer; it is not required to run the module locally.
 | [OMIX-L2P-Single](modules/OMIX-L2P-Single) | [OMIX-L2P-Single](https://github.com/NIDAP-Community/OMIX-L2P-Single) | Single-comparison L2P | Active |
 | [OMIX-L2P-Multi](modules/OMIX-L2P-Multi) | [OMIX-L2P-Multi](https://github.com/NIDAP-Community/OMIX-L2P-Multi) | Multi-comparison L2P | Active |
 
-Read the [developer guide](docs/developer-guide.md) and
-[module contract](docs/module-contract.md) before adding or releasing module
-implementation. Use the [module README guide](docs/module-readme-guide.md)
-when documenting a canonical module. The compact instructions for GitHub Copilot are in
-[.github/copilot-instructions.md](.github/copilot-instructions.md).
+## Contribute or automate work
 
-Use [versioning and releases](docs/versioning-and-releases.md) to distinguish
-module versions, public-interface versions, adapter tags, platform releases,
-and runtime identities. A module or adapter is not formally released merely
-because it has been merged to its default branch.
+For a portable module change, read the [module contract](docs/module-contract.md)
+and [contributor guide](docs/contributor-guide.md). Adapter authors also need
+the [deployment adapter guide](docs/deployment-adapter-guide.md). The
+[documentation map](docs/README.md) routes every other task, while
+[AGENTS.md](AGENTS.md) is the concise entry point for coding agents.
 
-AI coding assistants should start with [AGENTS.md](AGENTS.md) and follow the
-[AI contributor guide](docs/ai-contributor-guide.md).
-
-Deployment adapters are documented in the
-[deployment adapter guide](docs/deployment-adapter-guide.md), including
-reusable README, source-record, and agent-instruction templates.
+Use [versioning and releases](docs/versioning-and-releases.md) for release
+decisions. Automated release work additionally follows the
+[release automation contract](docs/release-automation-contract.md).
 
 ## Starter environments
 
@@ -97,7 +89,7 @@ Shared runtime definitions live in [`starter-environments/`](starter-environment
 They are built once for a scientific domain and then used by module-specific
 container overlays. This keeps pathway modules independent of MOSuite while
 allowing the same pinned OCI image to run locally, in Docker, and on HPC.
-See [docs/starter-environments.md](docs/starter-environments.md).
+See the [runtime guide](docs/runtime-guide.md).
 
 ## Run a module on Biowulf or another shared R system
 
@@ -187,8 +179,20 @@ unrelated pathway and visualization dependencies for every analysis. The
 profile locks above are the canonical shared runtime definitions; each run
 project's generated lock records the selected profile plus module-specific
 dependencies. For a fully containerized Docker, Apptainer, or Singularity run,
-use the matching pinned OCI image as described in
-[docs/starter-environments.md](docs/starter-environments.md).
+use the matching pinned OCI image as described in the
+[runtime guide](docs/runtime-guide.md).
+
+## Repository organization
+
+```text
+OMIX/
+|-- core/                 Shared R package: Omix
+|-- bridges/              Optional object-conversion R packages
+|-- modules/              Canonical portable analyses
+|-- starter-environments/ Shared versioned runtime definitions
+|-- docs/                 Contributor and runtime guidance
+`-- tests/                Repository-level contract checks
+```
 
 ## Checks
 

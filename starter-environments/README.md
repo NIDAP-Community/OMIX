@@ -47,6 +47,6 @@ from OMIX.
 No research or reference data belongs in a starter image. Attach or mount
 versioned data assets at runtime under `/data` instead.
 
-See [runtime reproducibility](../docs/runtime-reproducibility.md) for the
-required result record, current immutable image references, and the difference
-between re-running a published image and rebuilding a new runtime release.
+See the [runtime guide](../docs/runtime-guide.md) for the required result
+record, current immutable image references, and the difference between
+re-running a published image and rebuilding a new runtime release.

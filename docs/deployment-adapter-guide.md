@@ -5,8 +5,8 @@ execution environment. It may own an interactive UI, input discovery, output
 layout, and runtime translation. It does not own a second version of the
 scientific method.
 
-Read the [module contract](module-contract.md), [developer guide](developer-guide.md),
-[AI contributor guide](ai-contributor-guide.md), and
+Read the [module contract](module-contract.md),
+[contributor guide](contributor-guide.md), and
 [versioning and release policy](versioning-and-releases.md) before creating or
 changing an adapter.
 

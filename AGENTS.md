@@ -1,26 +1,21 @@
 # OMIX Agent Instructions
 
-These instructions apply to any AI coding assistant or automated contributor
-working in this repository. They are a concise entry point, not a replacement
-for the repository's detailed contracts.
+These instructions apply to any AI coding assistant or automated contributor.
+They are a routing page and hard-rule summary, not a second contributor guide.
 
 ## Read before changing code
 
-1. [Developer guide](docs/developer-guide.md) — practical workflow and
-   ownership boundaries.
-2. [Module contract](docs/module-contract.md) — required module structure and
-   the canonical-module versus deployment-adapter boundary.
-3. [AI contributor guide](docs/ai-contributor-guide.md) — discovery,
-   implementation, validation, and handoff procedure.
-4. [Module README guide](docs/module-readme-guide.md) — required user-facing
-   documentation structure.
-5. [Deployment adapter guide](docs/deployment-adapter-guide.md) — required
-   ownership, documentation, and release rules when an adapter is needed.
-6. [Versioning and releases](docs/versioning-and-releases.md) — version
-   ownership, release records, and the canonical-to-adapter promotion flow.
-7. [Release automation contract](docs/release-automation-contract.md) —
-   machine-facing request, evidence, approval, and stop conditions for an
-   automated release workflow.
+1. [Module contract](docs/module-contract.md) — required architecture and the
+   canonical-module versus deployment-adapter boundary.
+2. [Contributor guide](docs/contributor-guide.md) — discovery, implementation,
+   README writing, validation, and handoff.
+3. Add the [deployment adapter guide](docs/deployment-adapter-guide.md) only
+   for adapter work, the [runtime guide](docs/runtime-guide.md) only for
+   environment or reproducibility work, and
+   [versioning and releases](docs/versioning-and-releases.md) only for release
+   work.
+4. An automated release additionally requires the
+   [release automation contract](docs/release-automation-contract.md).
 
 If these documents appear to conflict, preserve the module contract and report
 the ambiguity rather than silently choosing a new architecture.
@@ -42,19 +37,18 @@ the ambiguity rather than silently choosing a new architecture.
 
 ## Working rules
 
-1. Inspect the affected module's `module.yml`, `schemas/interface.yml`, tests,
-   README, and current Git state before editing.
-2. Classify the request before changing files: canonical scientific behavior,
-   bridge behavior, deployment translation, or shared runtime.
-3. Preserve scientific defaults, input/output contracts, and documented legacy
-   behavior. Do not refactor plotting aesthetics or statistical behavior merely
-   for code style.
+1. Inspect the affected module's `module.yml`, schema, tests, README, and Git
+   state before editing; preserve unrelated changes.
+2. Classify the request as canonical behavior, bridge behavior, deployment
+   translation, or shared runtime before changing files.
+3. Preserve scientific defaults, input/output contracts, legacy behavior, and
+   established plot aesthetics. Do not refactor them merely for code style.
 4. Do not commit generated outputs, debug data, credentials, package caches,
    or other large derived artifacts.
 5. Run the affected tests and `Rscript tests/test-monorepo-layout.R` after a
-   structural change. Report any validation that could not be run.
-6. Make narrowly scoped changes and summarize files changed, validation run,
-   and remaining external validation needed.
+   structural change. Report every validation not run.
+6. Make narrowly scoped changes and summarize changed files, validation, and
+   remaining external work.
 
 ## Release discipline
 
