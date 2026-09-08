@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "resolved_on": "2026-09-08",
+  "registry": "ghcr.io/nidap-community",
+  "platform": "linux/amd64",
+  "notes": [
+    "A tag is convenient for people; a digest is the reproducible OCI identity.",
+    "Record the digest used by a result alongside the canonical OMIX commit, module overlay if any, explicit CLI command, and checksums of input data.",
+    "These records were resolved directly from the GHCR version tags on 2026-09-08. They describe how to re-run an existing release and do not claim that a historical image can be rebuilt byte-for-byte from a later source checkout."
+  ],
+  "images": {
+    "r-base": {
+      "version": "r4.4.3-v1",
+      "image": "ghcr.io/nidap-community/omix-r-base",
+      "digest": "sha256:a762f2c8ae0657c9578e15d28672b3dcecb3de129edf7cbd7469c340c791547a",
+      "immutable_reference": "ghcr.io/nidap-community/omix-r-base@sha256:a762f2c8ae0657c9578e15d28672b3dcecb3de129edf7cbd7469c340c791547a",
+      "r_version": "4.4.3",
+      "lockfile": null,
+      "required_packages": {
+        "jsonlite": "2.0.0",
+        "renv": "1.2.4",
+        "yaml": "2.3.12"
+      },
+      "provenance": "historical release; use the digest for execution"
+    },
+    "r-statistics": {
+      "version": "r4.4.3-bioconductor3.20-v1",
+      "image": "ghcr.io/nidap-community/omix-r-statistics",
+      "digest": "sha256:1325722877fec5167d171aa766ddf7bbfd056e4999bf40fd8c1eabee495da667",
+      "immutable_reference": "ghcr.io/nidap-community/omix-r-statistics@sha256:1325722877fec5167d171aa766ddf7bbfd056e4999bf40fd8c1eabee495da667",
+      "r_version": "4.4.3",
+      "bioconductor_version": "3.20",
+      "lockfile": "starter-environments/r-statistics/renv.lock",
+      "lockfile_sha256": "e86f6e0c2175bff1b4c1d73be67928fa9d808e78f325f407b3b7d278c1c71156",
+      "provenance": "package set verified against the published image on 2026-09-08"
+    },
+    "r-visualization": {
+      "version": "r4.4.3-v2",
+      "image": "ghcr.io/nidap-community/omix-r-visualization",
+      "digest": "sha256:1d9f453b49412aa05e9d3420cd4b1b4ea0beac4923cb40572af38b0ae2a46830",
+      "immutable_reference": "ghcr.io/nidap-community/omix-r-visualization@sha256:1d9f453b49412aa05e9d3420cd4b1b4ea0beac4923cb40572af38b0ae2a46830",
+      "r_version": "4.4.3",
+      "lockfile": "starter-environments/r-visualization/renv.lock",
+      "lockfile_sha256": "ad17b0bec64cad3f97dfcc9e352f183fe99dcf77555b6bab6494ec277aa81b32",
+      "provenance": "digest resolved; package-set re-verification pending"
+    },
+    "r-pathway": {
+      "version": "r4.4.3-bioconductor3.20-v1",
+      "image": "ghcr.io/nidap-community/omix-r-pathway",
+      "digest": "sha256:d17cf62638a60afb8ee93e4d18f8b1f99f08642fe6e78effadebea3a176b19ed",
+      "immutable_reference": "ghcr.io/nidap-community/omix-r-pathway@sha256:d17cf62638a60afb8ee93e4d18f8b1f99f08642fe6e78effadebea3a176b19ed",
+      "r_version": "4.4.3",
+      "bioconductor_version": "3.20",
+      "lockfile": "starter-environments/r-pathway/renv.lock",
+      "lockfile_sha256": "66b0b93e7b1f05dd9429e542c8fdca89b38770667827b53ffca80400b286795c",
+      "required_packages": {
+        "l2p": "0.0.14",
+        "l2psupp": "0.0.14"
+      },
+      "additional_sources": {
+        "l2p_commit": "ab389bc978441f1893414da7a07e803bea971205",
+        "l2p_0.0-14_sha256": "0702383b23eccaa1cfa6bc2be5292bc0d64b24e9372206bf3b1825fda32c2e86",
+        "l2psupp_0.0-14_sha256": "48a3c8ec20ea6aec3e4fae490a18b613ada74ae1f9d11b481902711eba50c82a"
+      },
+      "provenance": "digest resolved; package-set re-verification pending"
+    }
+  }
+}

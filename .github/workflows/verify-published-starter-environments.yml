@@ -1,0 +1,86 @@
+name: Verify Published Starter Environments
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Published runtime to verify
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - r-base
+          - r-statistics
+          - r-visualization
+          - r-pathway
+
+jobs:
+  select-targets:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.value }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: matrix
+        env:
+          TARGET: ${{ inputs.target }}
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          import os
+
+          with open("starter-environments/release-manifest.json", encoding="utf-8") as handle:
+              manifest = json.load(handle)
+
+          target = os.environ["TARGET"]
+          profiles = list(manifest["images"])
+          if target != "all":
+              if target not in manifest["images"]:
+                  raise SystemExit(f"Unknown target: {target}")
+              profiles = [target]
+
+          include = []
+          for profile in profiles:
+              entry = manifest["images"][profile]
+              include.append({
+                  "profile": profile,
+                  "reference": entry["immutable_reference"],
+                  "lockfile": entry.get("lockfile") or "",
+                  "lockfile_sha256": entry.get("lockfile_sha256") or "",
+              })
+          print("value=" + json.dumps({"include": include}, separators=(",", ":")))
+          PY
+
+  verify:
+    needs: select-targets
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.select-targets.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify checked-in lockfile checksum
+        if: ${{ matrix.lockfile != '' }}
+        env:
+          LOCKFILE: ${{ matrix.lockfile }}
+          EXPECTED_SHA256: ${{ matrix.lockfile_sha256 }}
+        run: |
+          set -euo pipefail
+          actual="$(sha256sum "$LOCKFILE" | awk '{print $1}')"
+          test "$actual" = "$EXPECTED_SHA256"
+
+      - name: Pull immutable published image
+        run: docker pull '${{ matrix.reference }}'
+
+      - name: Verify published package set
+        run: |
+          docker run --rm \
+            --volume "${{ github.workspace }}:/omix:ro" \
+            --entrypoint Rscript \
+            '${{ matrix.reference }}' \
+            /omix/scripts/verify-published-runtime.R \
+              --manifest /omix/starter-environments/release-manifest.json \
+              --profile '${{ matrix.profile }}'

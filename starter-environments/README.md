@@ -33,8 +33,10 @@ code change.
 
 Each starter environment has a `VERSION` file. A manual publication uses that
 version tag and the Git commit tag; it does not publish a mutable `latest` tag.
-After publication, CI records the resolved digest in the workflow summary.
-Use that digest in a reproducible module release record.
+After publication, CI records the resolved digest in the workflow summary and
+the release maintainer adds it to
+[`release-manifest.json`](release-manifest.json). Use that digest-qualified
+reference in a reproducible module release record; a tag alone is not enough.
 
 Before the first publication from OMIX, ensure that the corresponding GHCR
 package is associated with the `NIDAP-Community/OMIX` repository or grants its
@@ -44,3 +46,7 @@ from OMIX.
 
 No research or reference data belongs in a starter image. Attach or mount
 versioned data assets at runtime under `/data` instead.
+
+See [runtime reproducibility](../docs/runtime-reproducibility.md) for the
+required result record, current immutable image references, and the difference
+between re-running a published image and rebuilding a new runtime release.

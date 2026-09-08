@@ -24,6 +24,12 @@ image digest plus the module Git commit and input-data provenance. CI builds
 starter environments for validation; publication to GHCR is explicitly
 requested through the manual workflow-dispatch input.
 
+The current immutable image references and profile-lock checksums are recorded
+in [`starter-environments/release-manifest.json`](../starter-environments/release-manifest.json).
+Use a digest-qualified reference for a result, rather than only its readable
+version tag. The full result-record requirements are in
+[Runtime reproducibility](runtime-reproducibility.md).
+
 Each environment's `renv.lock`, when present, records the fully resolved
 package set captured from its validated image. The base image, R version,
 Bioconductor release where applicable, lockfile, and non-CRAN package commits
