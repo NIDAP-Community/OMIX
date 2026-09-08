@@ -95,12 +95,14 @@ path to a run. Use this order where applicable:
 
 1. **Title and one-sentence aim**
 2. **What it does** and **When to use it**
-3. **Inputs** — file types, key columns, and alignment rules
-4. **Run locally or on HPC** — one complete explicit-path command matching
+3. **Quick start** — runtime profile, entry point, and a link to the complete
+   command below
+4. **Inputs** — file types, key columns, and alignment rules
+5. **Run locally or on HPC** — one complete explicit-path command matching
    `module.yml`'s entry point
-5. **Outputs** — stable output files and their intended downstream use
-6. **Method notes** — only defaults or assumptions that affect interpretation
-7. **Optional integrations, interface, deployment link, and references**
+6. **Outputs** — stable output files and their intended downstream use
+7. **Method notes** — only defaults or assumptions that affect interpretation
+8. **Optional integrations, interface, deployment link, and references**
 
 Use `module.yml` and `schemas/interface.yml` as the source of truth. Link to
 the root README for environment setup instead of duplicating installation

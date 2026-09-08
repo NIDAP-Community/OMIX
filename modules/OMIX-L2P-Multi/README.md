@@ -3,9 +3,6 @@
 Compare L2P over-representation results across multiple differential-expression
 contrasts from one wide DEG table.
 
-**Runtime profile:** [`r-pathway`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
-**Entry point:** `scripts/run_l2p_multi.R`
-
 ## What it does
 
 L2P Multi performs one over-representation analysis per requested comparison,
@@ -18,6 +15,15 @@ several contrasts.
 Use this module when the same experiment has several comparisons and you need
 to identify pathways that are shared, specific, or directionally different
 across them. Use [OMIX-L2P-Single](../OMIX-L2P-Single) for one comparison.
+
+## Quick start
+
+**Runtime profile:** [`r-pathway`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
+
+**Command:** `scripts/run_l2p_multi.R`
+
+Choose a wide DEG table and comparison list, then use the copyable command in
+[Run locally or on HPC](#run-locally-or-on-hpc).
 
 ## Inputs
 

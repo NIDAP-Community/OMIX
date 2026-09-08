@@ -2,9 +2,6 @@
 
 Create publication-ready volcano plots from differential-expression results.
 
-**Runtime profile:** [`r-visualization`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
-**Entry point:** `scripts/run_volcano_plot.R`
-
 ## What it does
 
 The module displays each feature by effect size and statistical significance,
@@ -18,6 +15,15 @@ Use a volcano plot after a fitted differential-expression analysis to inspect
 the direction, magnitude, and significance of individual features. It is a
 visual summary of the DEG model; it does not refit statistics from expression
 values.
+
+## Quick start
+
+**Runtime profile:** [`r-visualization`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
+
+**Command:** `scripts/run_volcano_plot.R`
+
+Choose one DEG result and comparison, then use the copyable command in
+[Run locally or on HPC](#run-locally-or-on-hpc).
 
 ## Inputs
 

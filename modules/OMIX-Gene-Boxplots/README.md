@@ -3,9 +3,6 @@
 Create one publication-ready, sample-level expression boxplot per selected
 gene, with model-consistent DEG annotations when available.
 
-**Runtime profile:** [`r-visualization`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
-**Entry point:** `scripts/run_gene_boxplots.R`
-
 ## What it does
 
 The module plots selected genes from a sample-level expression table alongside
@@ -28,6 +25,15 @@ Use `precomputed_deg` when a result such as `DEG_Analysis.csv` is available.
 It retains the original design, batch terms, donor blocking, and contrast. Use
 `within_plot` only for a simple exploratory comparison of the displayed
 values; it is not a replacement for the original DEG model.
+
+## Quick start
+
+**Runtime profile:** [`r-visualization`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
+
+**Command:** `scripts/run_gene_boxplots.R`
+
+Choose the expression and metadata tables, then use the copyable command in
+[Run locally or on HPC](#run-locally-or-on-hpc).
 
 ## Inputs
 

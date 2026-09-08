@@ -3,9 +3,6 @@
 Run design-aware bulk RNA-seq differential-expression analysis from raw counts
 and sample metadata.
 
-**Runtime profile:** [`r-statistics`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
-**Entry point:** `scripts/run_deg_analysis.R`
-
 ## What it does
 
 The module applies design-aware low-expression filtering, library-size
@@ -20,6 +17,15 @@ Use this module for bulk RNA-seq counts, or for donor-level pseudobulk counts
 derived from single-cell data. It expects biological replicates, not individual
 cells. For repeated samples from the same donor or participant, set the donor
 column; do not use technical batch as a donor surrogate.
+
+## Quick start
+
+**Runtime profile:** [`r-statistics`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
+
+**Command:** `scripts/run_deg_analysis.R`
+
+After checking the count and metadata requirements below, use the copyable
+explicit-path command in [Run locally or on HPC](#run-locally-or-on-hpc).
 
 ## Inputs
 

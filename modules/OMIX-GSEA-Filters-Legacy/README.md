@@ -3,9 +3,6 @@
 Filter and subset GSEA result tables for focused review or downstream pathway
 visualization.
 
-**Runtime profile:** [`r-visualization`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
-**Entry point:** `scripts/run_gsea_filters.R`
-
 ## What it does
 
 The module filters a GSEA results table by significance, enrichment score,
@@ -18,6 +15,15 @@ portable CSV and RDS export.
 Use this module after [OMIX-GSEA-Preranked-Legacy](../OMIX-GSEA-Preranked-Legacy)
 when you want a transparent, reproducible subset of pathways for interpretation
 or enrichment-curve and leading-edge visualization.
+
+## Quick start
+
+**Runtime profile:** [`r-visualization`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
+
+**Command:** `scripts/run_gsea_filters.R`
+
+After checking the expected GSEA columns below, use the copyable command in
+[Run locally or on HPC](#run-locally-or-on-hpc).
 
 ## Inputs
 

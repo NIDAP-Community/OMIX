@@ -3,9 +3,6 @@
 Perform pre-ranked gene-set enrichment analysis from differential-expression
 ranking statistics and a supplied gene-set database.
 
-**Runtime profile:** [`r-pathway`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
-**Entry point:** `scripts/run_gsea.R`
-
 ## What it does
 
 GSEA tests whether genes from a pathway concentrate toward either end of a
@@ -19,6 +16,15 @@ Use pre-ranked GSEA when a well-specified DEG model produces a continuous
 ranking statistic and you want to detect coordinated pathway changes without
 first selecting a hard DEG cutoff. Use L2P when you instead want
 over-representation analysis of a defined gene subset.
+
+## Quick start
+
+**Runtime profile:** [`r-pathway`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
+
+**Command:** `scripts/run_gsea.R`
+
+After selecting a DEG ranking and matching gene-set database, use the
+copyable command in [Run locally or on HPC](#run-locally-or-on-hpc).
 
 ## Inputs
 

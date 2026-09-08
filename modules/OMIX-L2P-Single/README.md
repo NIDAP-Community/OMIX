@@ -3,9 +3,6 @@
 Run a single-comparison L2P over-representation analysis from a
 differential-expression (DEG) table.
 
-**Runtime profile:** [`r-pathway`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
-**Entry point:** `scripts/run_l2p_single.R`
-
 ## What it does
 
 L2P tests whether selected pathway collections are over-represented among the
@@ -19,6 +16,15 @@ Use L2P when you have one contrast of interest and want an interpretable
 over-representation analysis of its differentially expressed genes. For a
 ranked, all-gene pathway analysis, use
 [OMIX-GSEA-Preranked-Legacy](../OMIX-GSEA-Preranked-Legacy) instead.
+
+## Quick start
+
+**Runtime profile:** [`r-pathway`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
+
+**Command:** `scripts/run_l2p_single.R`
+
+Choose one comparison from a compatible DEG table, then use the copyable
+command in [Run locally or on HPC](#run-locally-or-on-hpc).
 
 ## Inputs
 

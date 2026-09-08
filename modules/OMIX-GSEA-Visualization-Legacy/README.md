@@ -4,9 +4,6 @@ Generate the established GSEA enrichment-score (ES), ranked-gene (RNK), and
 leading-edge (LE) heatmap panels from explicit, compatible pathway-analysis
 inputs.
 
-**Runtime profile:** [`r-pathway`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
-**Entry point:** `scripts/run_gsea_visualization.R`
-
 ## What it does
 
 The module preserves the legacy GSEA visualization implementation while making
@@ -19,6 +16,15 @@ score values used in each plot.
 Use it after [OMIX-GSEA-Filters-Legacy](../OMIX-GSEA-Filters-Legacy) when you
 need publication-oriented enrichment curves and leading-edge expression
 heatmaps for pathways selected from an upstream GSEA result.
+
+## Quick start
+
+**Runtime profile:** [`r-pathway`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
+
+**Command:** `scripts/run_gsea_visualization.R`
+
+Use compatible inputs from one biological analysis, then follow the copyable
+command in [Run locally or on HPC](#run-locally-or-on-hpc).
 
 ## Inputs
 
