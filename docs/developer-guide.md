@@ -111,6 +111,12 @@ source ref that were exported, plus its own tag, platform validation, and
 immutable runtime identity when available. Do not fill in unavailable values
 with guesses: use a clearly marked pending state until validation is complete.
 
+For an automated release workflow, use the
+[release automation contract](release-automation-contract.md). It requires an
+explicit proposed version and change classification from a responsible person;
+automation may validate and prepare a release, but must not infer scientific
+intent or finalize a tag without approved evidence.
+
 ## Review and release checklist
 
 Before requesting review or a release:

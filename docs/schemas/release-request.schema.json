@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/NIDAP-Community/OMIX/docs/schemas/release-request.schema.json",
+  "title": "OMIX release automation request",
+  "type": "object",
+  "required": ["request_id", "mode", "canonical", "validations", "approval", "adapters", "runtime"],
+  "additionalProperties": false,
+  "properties": {
+    "request_id": {"type": "string", "minLength": 1},
+    "mode": {"enum": ["plan", "prepare", "finalize"]},
+    "canonical": {
+      "type": "object",
+      "required": ["module", "source_ref", "current_version", "proposed_version", "current_interface_version", "proposed_interface_version", "change_class", "rationale"],
+      "additionalProperties": false,
+      "properties": {
+        "module": {"type": "string", "pattern": "^omix-[a-z0-9-]+$"},
+        "source_ref": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "current_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "proposed_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "current_interface_version": {"type": "integer", "minimum": 1},
+        "proposed_interface_version": {"type": "integer", "minimum": 1},
+        "change_class": {"enum": ["documentation", "patch", "minor", "major", "interface_break", "adapter_only", "runtime_only"]},
+        "rationale": {"type": "string", "minLength": 1}
+      }
+    },
+    "validations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "command", "source_ref", "result", "evidence_uri"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "command": {"type": "string", "minLength": 1},
+          "source_ref": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+          "result": {"enum": ["passed", "failed", "not_run"]},
+          "evidence_uri": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "required": ["status", "approved_by", "approved_at", "source_ref"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {"enum": ["pending", "approved", "rejected"]},
+        "approved_by": {"type": "string", "minLength": 1},
+        "approved_at": {"type": "string", "minLength": 1},
+        "source_ref": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "adapters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["repository", "source_ref", "proposed_version", "export_verification", "platform_validation"],
+        "additionalProperties": false,
+        "properties": {
+          "repository": {"type": "string", "minLength": 1},
+          "source_ref": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+          "proposed_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+          "export_verification": {"type": "string", "minLength": 1},
+          "platform_validation": {
+            "type": "object",
+            "required": ["status", "validated_at", "evidence_uri", "published_release_id"],
+            "additionalProperties": false,
+            "properties": {
+              "status": {"enum": ["passed", "failed", "pending"]},
+              "validated_at": {"type": "string", "minLength": 1},
+              "evidence_uri": {"type": "string", "minLength": 1},
+              "published_release_id": {"type": ["string", "null"]}
+            }
+          }
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "required": ["status", "identity", "pending_reason"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {"enum": ["recorded", "pending"]},
+        "identity": {"type": ["string", "null"]},
+        "pending_reason": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

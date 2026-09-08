@@ -45,3 +45,7 @@ before editing.
   adapter tag, platform release identifier, and runtime tag plus digest in
   `OMIX_MODULE_SOURCE.md`; mark unavailable values as pending rather than
   guessing.
+- For automated preparation or finalization, follow the canonical
+  [release automation contract](https://github.com/NIDAP-Community/OMIX/blob/main/docs/release-automation-contract.md).
+  Do not infer a version, create or move a tag, or claim a successful
+  deployment without the requested evidence and approval.

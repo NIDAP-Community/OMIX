@@ -122,6 +122,10 @@ only the behavior introduced by the deployment.
   platform release identifier, and the runtime tag plus resolved digest in
   `OMIX_MODULE_SOURCE.md`. State **Pending** for unavailable facts; do not
   invent release evidence.
+- An automated workflow must use the canonical
+  [release automation contract](release-automation-contract.md). It may
+  prepare a reviewable adapter release but may finalize a tag only with the
+  recorded platform-validation evidence and approval.
 
 ## Audit checklist
 

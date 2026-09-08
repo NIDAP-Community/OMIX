@@ -126,6 +126,10 @@ the README and changelog.
 - Do not create a module or adapter release tag merely because a branch merged.
   A tag represents the versioned, validated state described in
   [Versioning and releases](versioning-and-releases.md).
+- An AI or workflow agent that prepares or finalizes a release must follow the
+  [release automation contract](release-automation-contract.md). It may not
+  infer a version bump from changed paths, manufacture validation evidence, or
+  retag an existing release.
 
 ## Validate proportionally
 

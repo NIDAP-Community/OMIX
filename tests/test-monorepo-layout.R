@@ -11,7 +11,11 @@ required_root_paths <- c(
   "core/R",
   "modules",
   "bridges/README.md",
-  "docs/module-contract.md"
+  "docs/module-contract.md",
+  "docs/versioning-and-releases.md",
+  "docs/release-automation-contract.md",
+  "docs/schemas/release-request.schema.json",
+  "templates/release-automation/release-request.json"
 )
 
 missing_root_paths <- required_root_paths[

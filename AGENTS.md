@@ -18,6 +18,9 @@ for the repository's detailed contracts.
    ownership, documentation, and release rules when an adapter is needed.
 6. [Versioning and releases](docs/versioning-and-releases.md) — version
    ownership, release records, and the canonical-to-adapter promotion flow.
+7. [Release automation contract](docs/release-automation-contract.md) —
+   machine-facing request, evidence, approval, and stop conditions for an
+   automated release workflow.
 
 If these documents appear to conflict, preserve the module contract and report
 the ambiguity rather than silently choosing a new architecture.
@@ -68,6 +71,9 @@ the ambiguity rather than silently choosing a new architecture.
 - Do not create a Git tag, platform release record, or immutable runtime claim
   until its corresponding validation has completed. Record pending fields
   honestly in an adapter's `OMIX_MODULE_SOURCE.md`.
+- An automated release workflow must follow the release automation contract.
+  It may not infer a scientific version bump, alter a Git tag, or finalize a
+  release without the required structured request, evidence, and approval.
 - Do not rebuild or publish a shared runtime unless its Dockerfile, lockfile,
   or runtime definition changed and the targeted validation has passed.
 - Record module commit, lockfile/runtime identity, and input-data provenance

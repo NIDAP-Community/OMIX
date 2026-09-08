@@ -83,6 +83,12 @@ backported, reviewed, tested, and re-exported. Future automation may detect
 drift and open a review item, but must not automatically overwrite either
 source of record.
 
+Automated release workflows must also follow the
+[release automation contract](release-automation-contract.md). That contract
+turns this policy into explicit request fields, validation evidence, human
+approval gates, idempotency rules, and stop conditions; it does not authorize
+an agent to infer scientific intent from a diff.
+
 ## Runtime records
 
 For a shared container, record both a readable OCI tag and its resolved image

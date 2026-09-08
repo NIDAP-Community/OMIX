@@ -1,0 +1,48 @@
+{
+  "request_id": "release-2026-09-08-omix-deg-analysis-v0.1.4",
+  "mode": "plan",
+  "canonical": {
+    "module": "omix-deg-analysis",
+    "source_ref": "0123456789abcdef0123456789abcdef01234567",
+    "current_version": "0.1.3",
+    "proposed_version": "0.1.4",
+    "current_interface_version": 1,
+    "proposed_interface_version": 1,
+    "change_class": "patch",
+    "rationale": "Describe the human-approved compatible correction and why it is a patch."
+  },
+  "validations": [
+    {
+      "name": "module tests",
+      "command": "Rscript modules/OMIX-DEG-Analysis/tests/test-module-layout.R",
+      "source_ref": "0123456789abcdef0123456789abcdef01234567",
+      "result": "not_run",
+      "evidence_uri": "Pending: attach a durable CI artifact or run summary."
+    }
+  ],
+  "approval": {
+    "status": "pending",
+    "approved_by": "Pending human approval",
+    "approved_at": "Pending",
+    "source_ref": "0123456789abcdef0123456789abcdef01234567"
+  },
+  "adapters": [
+    {
+      "repository": "https://github.com/NIDAP-Community/OMIX-DEG-Analysis",
+      "source_ref": "0123456789abcdef0123456789abcdef01234567",
+      "proposed_version": "0.1.4",
+      "export_verification": "Pending: record a SHA-256 or byte-for-byte comparison against the canonical source.",
+      "platform_validation": {
+        "status": "pending",
+        "validated_at": "Pending",
+        "evidence_uri": "Pending: attach the representative platform-run record.",
+        "published_release_id": null
+      }
+    }
+  ],
+  "runtime": {
+    "status": "pending",
+    "identity": null,
+    "pending_reason": "Record an immutable OCI digest or lockfile/overlay reference before finalization."
+  }
+}
