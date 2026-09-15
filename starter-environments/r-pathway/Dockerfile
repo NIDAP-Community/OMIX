@@ -22,7 +22,9 @@ RUN apt-get update \
 # restoration preserves dependency order; the binary restore path can test a
 # package before its binary dependency is available.
 WORKDIR /opt/omix/r-pathway
-COPY renv.lock renv.lock
+# The r-pathway image is built from the OMIX repository root so it can include
+# the versioned shared pathway-plot package. Keep the profile lock explicit.
+COPY starter-environments/r-pathway/renv.lock renv.lock
 # Do not transform the dated CRAN source snapshot into a PPM binary endpoint.
 # Source packages are installed sequentially so each package's dependencies are
 # loadable during renv's post-install verification.
@@ -57,5 +59,12 @@ RUN curl --fail --location --retry 3 \
       https://raw.githubusercontent.com/CCBR/l2p/${L2P_REF}/l2psupp_0.0-14.tar.gz \
     && R -q -e "install.packages(c('/tmp/l2p_0.0-14.tar.gz', '/tmp/l2psupp_0.0-14.tar.gz'), repos = NULL)" \
     && rm /tmp/l2p_0.0-14.tar.gz /tmp/l2psupp_0.0-14.tar.gz
+
+# Shared bubble-plot behaviour is versioned with the OMIX source checkout.
+# It is installed after the locked CRAN/Bioconductor dependencies and beside
+# the two immutable L2P tarballs above.
+COPY packages/OmixPathwayPlots /tmp/OmixPathwayPlots
+RUN R CMD INSTALL --library="$R_LIBS_USER" /tmp/OmixPathwayPlots \
+    && rm -rf /tmp/OmixPathwayPlots
 
 WORKDIR /workspace

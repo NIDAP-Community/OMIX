@@ -4,12 +4,16 @@ on:
   pull_request:
     paths:
       - starter-environments/**
+      - packages/OmixPathwayPlots/**
+      - .dockerignore
       - .github/workflows/starter-environments.yml
   push:
     branches:
       - main
     paths:
       - starter-environments/**
+      - packages/OmixPathwayPlots/**
+      - .dockerignore
       - .github/workflows/starter-environments.yml
   workflow_dispatch:
     inputs:
@@ -50,6 +54,7 @@ jobs:
     outputs:
       base: ${{ steps.changes.outputs.base }}
       pathway: ${{ steps.changes.outputs.pathway }}
+      pathway_package: ${{ steps.changes.outputs.pathway_package }}
       visualization: ${{ steps.changes.outputs.visualization }}
       statistics: ${{ steps.changes.outputs.statistics }}
       workflow: ${{ steps.changes.outputs.workflow }}
@@ -72,6 +77,10 @@ jobs:
             pathway:
               - 'starter-environments/r-pathway/**'
               - '!starter-environments/r-pathway/README.md'
+            pathway_package:
+              - 'packages/OmixPathwayPlots/**'
+              - '!packages/OmixPathwayPlots/README.md'
+              - '!packages/OmixPathwayPlots/CHANGELOG.md'
             visualization:
               - 'starter-environments/r-visualization/**'
               - '!starter-environments/r-visualization/README.md'
@@ -105,6 +114,7 @@ jobs:
           REQUESTED_PUBLISH: ${{ inputs.publish || 'false' }}
           BASE_CHANGED: ${{ needs.filter.outputs.base }}
           PATHWAY_CHANGED: ${{ needs.filter.outputs.pathway }}
+          PATHWAY_PACKAGE_CHANGED: ${{ needs.filter.outputs.pathway_package }}
           VISUALIZATION_CHANGED: ${{ needs.filter.outputs.visualization }}
           STATISTICS_CHANGED: ${{ needs.filter.outputs.statistics }}
         run: |
@@ -119,6 +129,9 @@ jobs:
             auto)
               base="$BASE_CHANGED"
               pathway="$PATHWAY_CHANGED"
+              if [[ "$PATHWAY_PACKAGE_CHANGED" == "true" ]]; then
+                pathway=true
+              fi
               visualization="$VISUALIZATION_CHANGED"
               statistics="$STATISTICS_CHANGED"
               if [[ "$base" == "true" ]]; then
@@ -184,11 +197,13 @@ jobs:
             docker build \
               --build-arg BASE_IMAGE=omix-r-base:ci \
               --tag omix-r-pathway:ci \
-              starter-environments/r-pathway
+              --file starter-environments/r-pathway/Dockerfile \
+              .
           else
             docker build \
               --tag omix-r-pathway:ci \
-              starter-environments/r-pathway
+              --file starter-environments/r-pathway/Dockerfile \
+              .
           fi
 
       - name: Build r-visualization

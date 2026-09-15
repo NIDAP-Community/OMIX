@@ -1,0 +1,10 @@
+# r-pathway deliberately builds from the repository root so it can install the
+# shared OmixPathwayPlots source package. Limit that context to its own inputs.
+*
+!starter-environments/
+!starter-environments/r-pathway/
+!starter-environments/r-pathway/Dockerfile
+!starter-environments/r-pathway/renv.lock
+!packages/
+!packages/OmixPathwayPlots/
+!packages/OmixPathwayPlots/**

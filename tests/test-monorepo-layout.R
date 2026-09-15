@@ -9,6 +9,7 @@ required_root_paths <- c(
   "core/DESCRIPTION",
   "core/NAMESPACE",
   "core/R",
+  "packages",
   "modules",
   "bridges/README.md",
   "docs/module-contract.md",
@@ -95,6 +96,21 @@ for (bridge_dir in bridge_dirs) {
     stop(
       "Bridge contract failed for ", basename(bridge_dir), ": ",
       paste(missing_bridge_paths, collapse = ", "),
+      call. = FALSE
+    )
+  }
+}
+
+shared_package_dirs <- list.dirs(file.path(repo_root, "packages"), recursive = FALSE)
+required_shared_package_paths <- c("DESCRIPTION", "NAMESPACE", "R", "tests", "README.md")
+for (shared_package_dir in shared_package_dirs) {
+  missing_shared_package_paths <- required_shared_package_paths[
+    !file.exists(file.path(shared_package_dir, required_shared_package_paths))
+  ]
+  if (length(missing_shared_package_paths) > 0L) {
+    stop(
+      "Shared package contract failed for ", basename(shared_package_dir), ": ",
+      paste(missing_shared_package_paths, collapse = ", "),
       call. = FALSE
     )
   }
