@@ -25,7 +25,7 @@ For each analysis, retain:
 | --- | --- |
 | Scientific source | OMIX commit, module name, semantic version, and interface version |
 | Runtime | Profile, immutable OCI reference, platform architecture, and lockfile SHA-256 |
-| Module additions | Exact declared overlay package/version, when present |
+| Module additions | Exact declared overlay package/version, when present; for `r-pathway`, the OMIX commit supplying `OmixPathwayPlots` |
 | Invocation | Explicit CLI command and all parameters |
 | Inputs and outputs | Immutable asset/version identifier or SHA-256 checksums |
 

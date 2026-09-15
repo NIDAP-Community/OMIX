@@ -121,11 +121,6 @@
 #' including fold change, p-value, significance category, and label columns.
 #' Side effect: volcano plot is rendered.
 #'
-#' @importFrom dplyr .
-#' @importFrom ggplot2 .
-#' @importFrom stringr .
-#' @importFrom ggrepel .
-#' @export
 volcano_plot_enhanced <- function(
   deg_table,
   pvalue_type = "nominal",

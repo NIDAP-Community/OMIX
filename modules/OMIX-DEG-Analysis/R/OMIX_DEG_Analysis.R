@@ -57,7 +57,6 @@
 #' @return A data frame with gene-level statistics followed by one downstream
 #'   expression column per selected sample. A run summary is attached in the
 #'   `omix_deg_run` attribute.
-#' @export
 omix_deg_analysis <- function(
   Dataset,
   Metadata_Table,

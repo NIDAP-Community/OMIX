@@ -50,6 +50,14 @@ of `Omix` or ordinary table-based modules.
 See [bridges/README.md](bridges/README.md) for the extension contract and
 installation guidance.
 
+`packages/` contains optional shared R packages. These packages are not Core
+dependencies: install one only when a module or local workflow needs its
+capability.
+
+| Package | Runtime profile | Purpose |
+| --- | --- | --- |
+| [OmixPathwayPlots](packages/OmixPathwayPlots) | `r-pathway` | Standardize supported GSEA/L2P tables and render the shared pathway bubble plot. |
+
 ## Module catalog
 
 Each directory under `modules/` is independent from the other modules and
@@ -146,6 +154,9 @@ the result provenance; it records the exact environment used for that run.
 source commit recorded in its Dockerfile. Those packages are deliberately
 outside the shared lock because they are not hosted by CRAN or Bioconductor;
 the helper records them in the effective run lock after installation.
+It also installs the source-controlled
+[`OmixPathwayPlots`](packages/OmixPathwayPlots) package from the same OMIX
+checkout, so record the OMIX commit alongside the generated effective lock.
 
 Run a module from that activated run project. For example, this invokes the
 portable DEG interface while leaving all data paths under your control:
@@ -188,6 +199,7 @@ use the matching pinned OCI image as described in the
 OMIX/
 |-- core/                 Shared R package: Omix
 |-- bridges/              Optional object-conversion R packages
+|-- packages/             Optional shared R packages
 |-- modules/              Canonical portable analyses
 |-- starter-environments/ Shared versioned runtime definitions
 |-- docs/                 Contributor and runtime guidance

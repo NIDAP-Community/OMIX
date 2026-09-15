@@ -27,10 +27,18 @@ the ambiguity rather than silently choosing a new architecture.
   environment setup, or generated results.
 - Put reusable scientific functions in `R/` and the portable CLI in `scripts/`.
   Keep the matching schema, tests, README, and changelog current.
+- Module `R/` files are sourced code, not installed R packages. Do not add
+  roxygen package directives such as `@export`, `@import`, or `@importFrom`
+  there; reserve them for a standard package under `packages/<name>/` with a
+  `DESCRIPTION` and `NAMESPACE`.
 - Keep deployment translation in its separate repository. The canonical module
   remains the source of truth for scientific behavior and reusable interfaces.
 - Use `bridges/<ecosystem>/` only for stable, portable external-object
   conversion. Do not add ecosystem-specific extraction to Core by default.
+- Use `packages/<name>/` for a stable optional R package shared by multiple
+  modules when its dependencies would make Core unnecessarily heavy. Keep the
+  package platform-neutral, independently tested, and documented before a
+  module adopts it.
 - Add a dependency shared by multiple modules to the appropriate
   `starter-environments/` runtime profile; keep one-module dependencies local
   to that module or its deployment overlay.

@@ -22,6 +22,26 @@ public table, parameter, and CLI contract). The two versions change for
 different reasons; follow [Versioning and releases](versioning-and-releases.md)
 instead of treating them as interchangeable.
 
+### R source modules are not R packages
+
+The files under `modules/<name>/R/` are ordinary R source files. A module is
+run by sourcing those files from its explicit-path CLI; it does not have a
+package `DESCRIPTION` or `NAMESPACE`. Consequently, package-oriented roxygen
+directives such as `@export`, `@import`, and `@importFrom` have no runtime
+effect in a module and must not be used there. In particular, do not use a
+placeholder such as `@importFrom dplyr .` to document a dependency.
+
+Roxygen `@param`, `@return`, and narrative comments may be retained as
+source-level documentation, but they do not generate installed help for a
+module. Declare a module's runtime profile in `module.yml`, document
+user-facing dependencies in its README, and use explicit package namespaces
+or explicit dependency checks in code where practical.
+
+By contrast, `packages/<name>/` is a standard R package with its own
+`DESCRIPTION` and `NAMESPACE`. Only there are roxygen package directives
+appropriate: `@export` defines public package functions, and `@importFrom`
+must name the actual symbols imported.
+
 The monorepo is platform-neutral. Modules must not contain platform-specific
 UI metadata, environment Dockerfiles, or mounted-path assumptions.
 Platform-specific repositories or build outputs own those adapters. A module's
@@ -85,8 +105,34 @@ targets before release. This keeps the monorepo the scientific source of truth
 without hiding the platform-specific deployment path.
 
 Shared utilities belong in `core/` only after two or more modules need the same
-stable behavior. A module should otherwise own its implementation and declare
-its own dependencies and data policy in `module.yml`.
+stable behavior **and** the utility fits Core's intentionally lightweight
+dependency policy. A module should otherwise own its implementation and
+declare its own dependencies and data policy in `module.yml`.
+
+## Optional shared R packages
+
+Use `packages/<package-name>/` for a stable, portable R package needed by two
+or more modules when it does not belong in lightweight Core. This is the home
+for a shared renderer, formatter, or method helper with dependencies that are
+appropriate for a runtime profile but not for every table-based OMIX use.
+
+An optional shared package must have a standard R-package layout:
+
+```text
+packages/<package-name>/
+|-- DESCRIPTION
+|-- NAMESPACE
+|-- R/
+|-- tests/
+`-- README.md
+```
+
+Its README must state the supported contracts, installation command, stable
+defaults, and the module(s) it serves. It must not contain platform UI,
+mounted-path discovery, a deployment runtime, or generated results. A module
+continues to own its scientific selection and interpretation rules; a shared
+package should only own behavior that is genuinely common and has direct
+regression coverage.
 
 ## Optional ecosystem bridges
 

@@ -14,6 +14,7 @@ from local R, containers, HPC, and workflow wrappers.
 | --- | --- | --- |
 | Scientific method, reusable parameter, table contract, or portable CLI | Canonical module | `modules/<name>/` |
 | External-object conversion | Optional bridge | `bridges/<ecosystem>/` |
+| Stable optional helper with dependencies unsuitable for Core | Shared R package | `packages/<package-name>/` |
 | UI, mounted-input discovery, result location, or platform entry point | Deployment adapter | Separate adapter repository |
 | Dependency shared by several modules | Shared runtime profile | `starter-environments/<profile>/` |
 
@@ -72,6 +73,13 @@ the canonical implementation exists.
 Keep reusable utilities in `core/` only after two or more modules need the
 same stable behavior. Keep object extraction in an optional bridge, not Core,
 unless it is a portable contract shared across ecosystems.
+
+When two or more modules need an optional renderer or helper whose dependency
+tree does not belong in Core, add a standard R package under
+`packages/<package-name>/`. Give it a focused README and direct tests, add its
+dependencies to the selected shared runtime only when they are not already
+there, and do not migrate a module until its current behavior has a regression
+fixture.
 
 ## Preserve scientific behavior
 
