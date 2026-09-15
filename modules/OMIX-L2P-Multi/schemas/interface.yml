@@ -9,13 +9,67 @@ parameters:
   comparisons:
     required: true
     type: string
-    description: Comma-separated comparison identifiers used to infer matching DEG columns when explicit columns are not supplied.
+    description: Comma-separated comparison identifiers in the desired analysis and shared bubble-plot order. These identifiers infer matching DEG columns when explicit columns are not supplied.
   species:
     type: string
     default: Human
   collections_to_include:
     type: string
     default: H
+  select_by_rank:
+    type: boolean
+    default: false
+    description: Select DEG lists using the significance and fold-change thresholds. Set true to use the legacy t-statistic rank method.
+  significance_threshold:
+    type: number
+    default: 0.05
+    description: Maximum nominal p-value, or the threshold applied to an explicitly selected adjusted-p-value column, for DEG-list selection.
+  fold_change_threshold:
+    type: number
+    default: 1.2
+    description: Minimum absolute linear fold change for DEG-list selection. For a log-fold-change column, the corresponding log2 threshold is used.
+  top_pathways:
+    type: integer
+    default: 10
+    deprecated: true
+    description: Retained for backwards-compatible calls; it no longer limits the exported results or figure.
+  p_value_limit:
+    type: number
+    default: 0.05
+    description: Nominal p-value or FDR threshold used to retain exported pathways.
+  use_fdr_for_significance:
+    type: boolean
+    default: false
+  minimum_pathway_hit_count:
+    type: integer
+    default: 5
+  number_of_significant_events:
+    type: integer
+    default: 1
+    description: Number of distinct comparisons in which a pathway must meet export criteria.
+  maximum_pathways_to_plot:
+    type: integer
+    default: 20
+    deprecated: true
+    description: Retained for backwards-compatible calls to the low-level legacy renderer. It does not affect the default shared bubble-plot outputs; use pathway_bubble_top_n instead.
+  pathway_bubble_plots:
+    type: boolean
+    default: true
+    description: Write the shared OMIX combined and collection-specific bubble plots.
+  pathway_bubble_top_n:
+    type: integer
+    default: 20
+    description: Top significant pathways selected independently for each shared bubble-plot scope; 0 includes all eligible pathways.
+  pathway_bubble_significance_statistic:
+    type: string
+    default: padj
+    allowed: [padj, pval]
+    description: Adjusted p-value/FDR (`padj`, default) or nominal p-value (`pval`) used to select shared bubble-plot pathways and encode circle-versus-X significance.
+  collection_color_scale:
+    type: string
+    default: independent
+    allowed: [independent, shared]
+    description: Whether collection-specific bubble plots use their own score range or the shared combined range.
   output_dir:
     type: path
     default: results
@@ -23,9 +77,15 @@ outputs:
   l2p_multi_results:
     path: l2p_multi_results.csv
     format: csv
+    description: All pathways significant in at least the requested number of comparisons, with available comparison-level enrichment values.
   l2p_multi_provenance:
     path: l2p_multi_results_provenance.csv
     format: csv
-  l2p_multi_plot:
-    path: l2p_multi_plot.png
+  pathway_bubble_plots:
+    path: L2P-Multi-Pathway-Bubble_*.png
     format: png
+    description: Shared combined, faceted cross-collection, and collection-specific pathway bubble plots.
+  pathway_bubble_manifest:
+    path: L2P-Multi-Pathway-Bubble_manifest.csv
+    format: csv
+    description: Significance statistic and threshold, selection scopes, pathway counts, score limits, dimensions, and files for the shared bubble plots.

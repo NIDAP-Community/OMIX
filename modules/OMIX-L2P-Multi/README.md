@@ -67,16 +67,45 @@ Rscript "$OMIX_ROOT/modules/OMIX-L2P-Multi/scripts/run_l2p_multi.R" \
 
 | File | Contents |
 | --- | --- |
-| `l2p_multi_results.csv` | Combined pathway-level results, retaining comparison identity. |
+| `l2p_multi_results.csv` | All pathways significant in at least `--number_of_significant_events` comparisons, with their available comparison-level enrichment values. |
 | `l2p_multi_results_provenance.csv` | Resolved input columns and analysis provenance for every comparison. |
-| `l2p_multi_plot.png` | Comparison-aware summary plot. |
+| `L2P-Multi-Pathway-Bubble_combined_pathways.png` | Shared combined-pathway bubble plot showing the top selected pathways regardless of source collection. |
+| `L2P-Multi-Pathway-Bubble_across_collections.png` | Shared faceted bubble plot showing the top selected pathways across source collections, with one panel per collection. |
+| `L2P-Multi-Pathway-Bubble_<collection>.png` | One shared-style bubble plot for each selected pathway collection. |
+| `L2P-Multi-Pathway-Bubble_manifest.csv` | Bubble-plot selections, colour limits, output dimensions, and file names. |
 
 ## Method notes
 
 - `--comparisons` is required; list comparison names exactly as they occur in
-  the DEG column prefixes.
+  the DEG column prefixes and in the desired analysis and shared bubble-plot
+  order. For example, `B-A,C-A,C-B` requires matching `C-B_*` columns; it does
+  not invert an available `B-C_*` result.
+- By default, each comparison's up- and downregulated gene lists use nominal
+  p-value <= 0.05 and absolute fold change >= 1.2. This uses the inferred
+  `<comparison>_pval` and `<comparison>_FC` columns when they are available.
+  To use the legacy top/bottom t-statistic ranking method instead, pass
+  `--select_by_rank true`; its rank-specific options then apply.
 - `--collections_to_include` defaults to `H` (MSigDB Hallmark), which is a
   useful compact starting collection for multi-comparison interpretation.
+- Export selection and figure selection are deliberately separate. A pathway
+  is retained in `l2p_multi_results.csv` when it meets the chosen p-value (or
+  FDR) and hit-count criteria in at least one comparison by default.
+- `--top_pathways` is retained only for backwards-compatible invocations and
+  no longer filters the exported CSV.
+- Shared bubble plots are written by default. `--pathway_bubble_top_n`
+  defaults to 20; set it to `0` to show all eligible pathways. The combined
+  plot selects its top paths across all collections, while each collection plot
+  selects its own top paths. Collection plots use their own score colour range
+  by default so a high-amplitude source cannot wash out another source; set
+  `--collection_color_scale shared` for direct colour comparison across plots.
+  They omit redundant collection prefixes from axis labels, while the combined
+  plot retains the prefixes to distinguish source collections.
+  `--pathway_bubble_significance_statistic` defaults to `padj`, so FDR
+  determines both the displayed top pathways and circle-versus-X significance
+  encoding; set it to `pval` for nominal p-values instead.
+- `--maximum_pathways_to_plot` defaults to 20 for direct low-level R calls.
+  It and the other legacy bubble-rendering options do not affect the default
+  CLI outputs; use `--pathway_bubble_top_n` for the shared plots.
 - Results are only as comparable as the input DEG models. Use tables generated
   from a consistent count, normalization, and statistical-model workflow.
 

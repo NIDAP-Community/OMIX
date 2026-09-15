@@ -1,3 +1,77 @@
+#' Select pathways eligible for the multi-comparison L2P export
+#'
+#' A pathway is eligible when it meets the selected nominal-p-value or FDR
+#' threshold and minimum hit count in at least the requested number of distinct
+#' comparisons. This is deliberately independent of plot row selection.
+#'
+#' @param l2p_results Nested list of L2P result tables, one list per
+#'   comparison and one table per direction.
+#' @param comparison_labels Character labels corresponding to `l2p_results`.
+#' @param p_value_limit Significance threshold.
+#' @param use_fdr_for_significance Whether to use FDR rather than nominal
+#'   p-values for significance.
+#' @param minimum_pathway_hit_count Minimum hit count; a pathway must have more
+#'   hits than this value, matching the established L2P threshold.
+#' @param number_of_significant_events Number of distinct comparisons in which
+#'   a pathway must be significant.
+#' @return A sorted character vector of selected pathway names.
+select_l2p_multi_export_pathways <- function(
+    l2p_results,
+    comparison_labels = names(l2p_results),
+    p_value_limit = 0.05,
+    use_fdr_for_significance = FALSE,
+    minimum_pathway_hit_count = 5L,
+    number_of_significant_events = 1L) {
+  if (!is.list(l2p_results) || length(l2p_results) == 0L) {
+    stop("`l2p_results` must be a non-empty nested list.", call. = FALSE)
+  }
+  comparison_labels <- as.character(comparison_labels)
+  if (length(comparison_labels) != length(l2p_results) || any(is.na(comparison_labels) | !nzchar(comparison_labels))) {
+    stop("`comparison_labels` must provide one non-empty label per comparison.", call. = FALSE)
+  }
+  p_value_limit <- as.numeric(p_value_limit)[1L]
+  minimum_pathway_hit_count <- as.numeric(minimum_pathway_hit_count)[1L]
+  number_of_significant_events <- suppressWarnings(as.integer(number_of_significant_events)[1L])
+  if (!is.finite(p_value_limit) || p_value_limit <= 0 || p_value_limit > 1) {
+    stop("`p_value_limit` must be greater than zero and no more than one.", call. = FALSE)
+  }
+  if (!is.finite(minimum_pathway_hit_count) || minimum_pathway_hit_count < 0) {
+    stop("`minimum_pathway_hit_count` must be a non-negative finite number.", call. = FALSE)
+  }
+  if (is.na(number_of_significant_events) || number_of_significant_events < 1L) {
+    stop("`number_of_significant_events` must be a positive integer.", call. = FALSE)
+  }
+
+  significance_column <- if (isTRUE(use_fdr_for_significance)) "fdr" else "pval"
+  pathways_by_comparison <- lapply(l2p_results, function(direction_tables) {
+    if (!is.list(direction_tables) || length(direction_tables) == 0L) {
+      stop("Every comparison must contain one or more directional L2P result tables.", call. = FALSE)
+    }
+    pathway_names <- unlist(lapply(direction_tables, function(table) {
+      required_columns <- c("pathway_name", "number_hits", significance_column)
+      if (!is.data.frame(table) || !all(required_columns %in% names(table))) {
+        stop(
+          "Each directional L2P table must contain: ",
+          paste(required_columns, collapse = ", "), ".",
+          call. = FALSE
+        )
+      }
+      hits <- suppressWarnings(as.numeric(table$number_hits))
+      significance <- suppressWarnings(as.numeric(table[[significance_column]]))
+      pathway <- trimws(as.character(table$pathway_name))
+      pathway[
+        is.finite(hits) & hits > minimum_pathway_hit_count &
+          is.finite(significance) & significance < p_value_limit &
+          !is.na(pathway) & nzchar(pathway)
+      ]
+    }), use.names = FALSE)
+    unique(pathway_names)
+  })
+
+  pathway_counts <- table(unlist(pathways_by_comparison, use.names = FALSE))
+  sort(names(pathway_counts[pathway_counts >= number_of_significant_events]))
+}
+
 #' L2P Analysis for Multiple Comparisons [CCBR] [scRNA-seq] [Bulk]
 #'
 #' @description
@@ -67,15 +141,14 @@
 #' "Column Used to Rank Genes" parameter under the "Genelist selected by
 #' t-statistic rank" section. If FALSE, you need to set other parameters in
 #' "Genelist selected by fold-change and pval" section of the template to set
-#' thresholds on significance and fold change columns instead. This latter
-#' (FALSE) parameterization may be appropriate if you have heterogeneous data
-#' like Single Cell RNA-Seq data or highly variable data (e.g. few significant
-#' genes). Set to TRUE by default. Default: \code{TRUE}.
+#' thresholds on significance and fold change columns instead. The threshold
+#' method is the default: nominal p-value <= 0.05 and absolute fold change >=
+#' 1.2. Set this to TRUE to use the legacy t-statistic ranking method.
+#' Default: \code{FALSE}.
 #' @param top_pathways
-#' Numeric. Select number (n) of top pathways for comparing across groups. If
-#' a pathway is found to be among the top n significant in at least x
-#' contrasts (x being the number of significant events, below), it will be
-#' considered for comparison across all groups. Default: \code{10}.
+#' Deprecated compatibility parameter. It no longer limits the exported
+#' pathway table. Use \code{maximum_pathways_to_plot} to restrict only the
+#' number of pathway rows shown in the summary plot. Default: \code{10}.
 #' @param number_of_significant_events
 #' Numeric. Filter to pathways that have at least n number of instances in
 #' significant enrichment Default: \code{1}.
@@ -196,9 +269,9 @@
 #' Default: \code{NULL}.
 #' @param export_plot_file
 #' Character. Optional output file path for saving the plot with
-#' \code{ggplot2::ggsave}. Defaults to
-#' \code{file.path(getwd(), "l2p_multi_v93_plot.png")}. Set to
-#' \code{NULL} to disable plot export.
+#' \code{ggplot2::ggsave}. Defaults to \code{NULL}, which disables the
+#' legacy renderer. Supply a path only when a legacy plot is specifically
+#' required; the portable CLI writes shared \pkg{OmixPathwayPlots} figures.
 #' @param export_plot_width
 #' Numeric. Plot width (in inches) used when saving with
 #' \code{ggplot2::ggsave}. Default: \code{14}.
@@ -220,13 +293,6 @@
 #' contrasts, including pathway name, category, direction, hit counts,
 #' enrichment score, p-value, FDR, and gene lists.
 #'
-#' @importFrom dplyr .
-#' @importFrom tidyr .
-#' @importFrom ggplot2 .
-#' @importFrom stringr .
-#' @importFrom magrittr .
-#' @importFrom l2p .
-#' @export
 l2p_multi <- function(
   deg_table,
   gene_names_column = NULL,
@@ -240,7 +306,7 @@ l2p_multi <- function(
   custom_pathways = NULL,
   custom_pathway_name_column = "gene_set_name",
   custom_pathway_gene_column = "gene_symbol",
-  select_by_rank = TRUE,
+  select_by_rank = FALSE,
   top_pathways = 10,
   number_of_significant_events = 1,
   select_top_percentage_of_genes = TRUE,
@@ -258,7 +324,7 @@ l2p_multi <- function(
   pathway_size_limit = 500,
   p_value_limit = 0.05,
   use_fdr_for_significance = FALSE,
-  maximum_pathways_to_plot = 15,
+  maximum_pathways_to_plot = 20,
   pathways_to_remove = NULL,
   rename_groups = NULL,
   vertical_line_placement = c(),
@@ -272,7 +338,7 @@ l2p_multi <- function(
   x_axis_tick_font_size = 14,
   x_axis_tick_labels = NULL,
   y_axis_tick_labels = NULL,
-  export_plot_file = file.path(getwd(), "l2p_multi_v93_plot.png"),
+  export_plot_file = NULL,
   export_plot_width = 14,
   export_plot_height = 16,
   column_spacing = 0.5,
@@ -938,6 +1004,11 @@ l2p_multi <- function(
     analysis_p_value_limit = p_value_limit,
     analysis_use_fdr_for_significance = use_fdr_for_significance,
     analysis_top_pathways = top_pathways,
+    analysis_export_pathway_policy = paste0(
+      "Retain pathways meeting the selected significance and hit-count criteria in at least ",
+      number_of_significant_events,
+      " distinct comparison(s); top_pathways does not truncate the result export."
+    ),
     analysis_number_of_significant_events = number_of_significant_events,
     analysis_maximum_pathways_to_plot = maximum_pathways_to_plot,
     analysis_x_axis_title_font_size = x_axis_title_font_size,
@@ -1077,25 +1148,6 @@ l2p_multi <- function(
       x$allgenesinpw <- x[[genes_column]]
     }
     return(x)
-  }
-
-  select_top_paths <- function(l2p_tbl) {
-    filtered <- l2p_tbl %>%
-      dplyr::filter(number_hits > minimum_pathway_hit_count)
-
-    if (use_fdr_for_significance) {
-      filtered <- filtered %>%
-        dplyr::filter(fdr < p_value_limit) %>%
-        dplyr::arrange(fdr, pval)
-    } else {
-      filtered <- filtered %>%
-        dplyr::filter(pval < p_value_limit) %>%
-        dplyr::arrange(pval, fdr)
-    }
-
-    filtered %>%
-      head(top_pathways) %>%
-      dplyr::select(pathway_name)
   }
 
   rank_pathways_for_plot <- function(pathall_tbl) {
@@ -1419,29 +1471,20 @@ l2p_multi <- function(
   }
 
   colname <- unlist(names(genelists))
-  pathlist <- list()
-
-  for (i in 1:length(l2presults)) {
-    paths <- lapply(l2presults[[i]], select_top_paths)
-    pathlist[[i]] <- unlist(lapply(paths, function(x) {
-      unlist(x, use.names = FALSE)
-    }))
-  }
-
-  path.all <- data.frame(pathwayname = unlist(pathlist))
-
-  path.all %>%
-    group_by(pathwayname) %>%
-    tally() %>%
-    arrange(dplyr::desc(n)) %>%
-    dplyr::filter(n >= number_of_significant_events) %>%
-    dplyr::pull(pathwayname) -> path.select
+  path.select <- select_l2p_multi_export_pathways(
+    l2p_results = l2presults,
+    comparison_labels = colname,
+    p_value_limit = p_value_limit,
+    use_fdr_for_significance = use_fdr_for_significance,
+    minimum_pathway_hit_count = minimum_pathway_hit_count,
+    number_of_significant_events = number_of_significant_events
+  )
 
   if (length(path.select) == 0) {
     stop(
       paste0(
         "ERROR: No pathways passed selection thresholds. Try ",
-        "relaxing pathway filters (p/FDR, top pathways, hit count, ",
+        "relaxing pathway filters (p/FDR, hit count, ",
         "or significant event count)."
       )
     )
@@ -1579,6 +1622,46 @@ l2p_multi <- function(
   pathall %>% dplyr::filter(!pathway_name %in% pathways_to_remove) -> pathall
 
   pathall_output <- pathall
+  # The portable CLI now uses OmixPathwayPlots as its sole figure renderer.
+  # Retain this legacy branch only for direct callers that explicitly request
+  # an `export_plot_file`, without spending time constructing an unused plot.
+  if (is.null(export_plot_file) || !nzchar(export_plot_file)) {
+    if (!update_genes) {
+      pathall_output <- pathall_output %>%
+        dplyr::select(-orig_genes)
+    }
+
+    if (!is.null(export_results_file) && nzchar(export_results_file)) {
+      utils::write.csv(pathall_output, export_results_file, row.names = FALSE)
+      final_analysis_provenance <- c(
+        analysis_provenance,
+        list(
+          analysis_input_gene_count = length(gene_universe_orig),
+          analysis_selected_gene_count = length(selected_gene_universe),
+          analysis_selected_gene_counts_by_list = paste(
+            names(genelistnums),
+            genelistnums,
+            sep = "=",
+            collapse = ";"
+          ),
+          analysis_gene_universe_count = if (is.null(gene_universe)) {
+            "built-in"
+          } else {
+            length(gene_universe)
+          },
+          analysis_result_row_count = nrow(pathall_output)
+        )
+      )
+      provenance_file <- write_provenance_csv(
+        final_analysis_provenance,
+        export_results_file
+      )
+      cat(sprintf("\nSaved provenance to %s\n", provenance_file))
+    }
+
+    return(pathall_output)
+  }
+
   pathall_plot <- pathall_output
 
   ranked_pathways_for_plot <- rank_pathways_for_plot(pathall_plot)

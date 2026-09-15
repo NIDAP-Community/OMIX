@@ -1,0 +1,24 @@
+Package: OmixPathwayPlots
+Type: Package
+Title: Shared Pathway Bubble Plots for OMIX Results
+Version: 0.2.0
+Authors@R: c(
+    person("Margaret", "Cam", email = "maggie.cam@nih.gov", role = c("aut", "cre")),
+    person("Aleksandra", "Michalowski", email = "aleksandra.michalowski@nih.gov", role = "aut"),
+    person("Dante", "Smith", email = "dante.smith@nih.gov", role = "aut"),
+    person("Tyler", "Malys", email = "tyler.malys@nih.gov", role = "aut"))
+Description: Standardizes supported GSEA and L2P pathway-result tables and
+    renders the shared pathway bubble-plot aesthetic. This optional package
+    keeps plotting dependencies out of the lightweight Omix Core package.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.2
+Depends: R (>= 4.1.0)
+Imports:
+    ggplot2,
+    scales,
+    stringr
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

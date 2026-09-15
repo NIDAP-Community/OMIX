@@ -30,15 +30,19 @@ option_list <- list(
   make_option("--species", type = "character", default = "Human"),
   make_option("--update_genes", type = "character", default = "true"),
   make_option("--collections_to_include", type = "character", default = "H"),
-  make_option("--select_by_rank", type = "character", default = "true"),
+  make_option("--select_by_rank", type = "character", default = "false"),
   make_option("--select_top_percentage_of_genes", type = "character", default = "true"),
   make_option("--select_top_genes", type = "integer", default = 500L),
   make_option("--significance_threshold", type = "double", default = 0.05),
   make_option("--fold_change_threshold", type = "double", default = 1.2),
   make_option("--minimum_number_of_deg_genes", type = "integer", default = 100L),
-  make_option("--top_pathways", type = "integer", default = 10L),
+  make_option("--top_pathways", type = "integer", default = 10L, help = "Deprecated compatibility option; use --maximum_pathways_to_plot to limit only the figure."),
   make_option("--number_of_significant_events", type = "integer", default = 1L),
-  make_option("--maximum_pathways_to_plot", type = "integer", default = 15L),
+  make_option("--maximum_pathways_to_plot", type = "integer", default = 20L),
+  make_option("--pathway_bubble_plots", type = "character", default = "true", help = "Write shared OMIX pathway bubble plots in addition to the legacy summary figure [default: %default]"),
+  make_option("--pathway_bubble_top_n", type = "integer", default = 20L, help = "Top pathways in each shared bubble-plot selection; 0 means all eligible pathways [default: %default]"),
+  make_option("--pathway_bubble_significance_statistic", type = "character", default = "padj", help = "padj (FDR) or pval (nominal p-value) used for shared bubble-plot selection and significance shapes [default: %default]"),
+  make_option("--collection_color_scale", type = "character", default = "independent", help = "independent or shared collection-specific bubble-plot colour scales [default: %default]"),
   make_option("--plot_bubble_size", type = "character", default = "pval"),
   make_option("--plot_bubble_color", type = "character", default = "enrichment_score"),
   make_option("--plot_bubble_max_color", type = "double", default = 1),
@@ -81,6 +85,15 @@ for (required_option in c("deg_table", "comparisons")) {
 }
 if (!file.exists(opt$deg_table)) stop("ERROR: DEG table was not found: ", opt$deg_table)
 if (!is.null(opt$custom_pathways) && nzchar(opt$custom_pathways) && !file.exists(opt$custom_pathways)) stop("ERROR: Custom pathways file was not found: ", opt$custom_pathways)
+if (!opt$collection_color_scale %in% c("independent", "shared")) {
+  stop("ERROR: `--collection_color_scale` must be independent or shared", call. = FALSE)
+}
+if (!opt$pathway_bubble_significance_statistic %in% c("padj", "pval")) {
+  stop("ERROR: `--pathway_bubble_significance_statistic` must be padj or pval", call. = FALSE)
+}
+if (is.na(opt$pathway_bubble_top_n) || opt$pathway_bubble_top_n < 0L) {
+  stop("ERROR: `--pathway_bubble_top_n` must be zero or a positive integer", call. = FALSE)
+}
 
 as_list <- function(value) {
   if (is.null(value) || !nzchar(trimws(value))) return(NULL)
@@ -95,6 +108,31 @@ as_logical <- function(value, option_name) {
   normalized <- tolower(value)
   if (!normalized %in% c("true", "false")) stop("ERROR: `--", option_name, "` must be true or false")
   identical(normalized, "true")
+}
+write_pathway_bubble_outputs <- function(results, output_dir, top_n_pathways, collection_color_scale, significance_statistic, p_value_cutoff, comparisons) {
+  if (!requireNamespace("OmixPathwayPlots", quietly = TRUE)) {
+    stop(
+      "ERROR: OmixPathwayPlots is required for shared pathway-bubble plots. ",
+      "Use the current OMIX r-pathway runtime or set --pathway_bubble_plots false.",
+      call. = FALSE
+    )
+  }
+  plots <- OmixPathwayPlots::plot_pathway_bubble_set(
+    results,
+    input_format = "l2p",
+    p_value_column = significance_statistic,
+    p_value_cutoff = p_value_cutoff,
+    top_n_pathways = top_n_pathways,
+    selection_scopes = c("combined_single_panel", "across_all_collections", "within_each_collection"),
+    selection_contrasts = comparisons,
+    plot_contrasts = comparisons,
+    collection_color_scale = collection_color_scale
+  )
+  OmixPathwayPlots::save_pathway_bubble_set(
+    plots,
+    output_dir = output_dir,
+    file_prefix = "L2P-Multi-Pathway-Bubble"
+  )
 }
 read_table <- function(path) {
   extension <- tolower(tools::file_ext(path))
@@ -118,6 +156,7 @@ load_custom_pathways <- function(path) {
   read.delim(path, stringsAsFactors = FALSE, check.names = FALSE)
 }
 
+comparisons <- as_list(opt$comparisons)
 deg_table <- read_table(opt$deg_table)
 if (!is.data.frame(deg_table)) stop("ERROR: Loaded DEG table is not a data frame")
 dir.create(opt$output_dir, recursive = TRUE, showWarnings = FALSE)
@@ -128,7 +167,7 @@ results <- l2p_multi(
   t_statistic_columns = as_list(opt$t_statistic_columns),
   significance_columns = as_list(opt$significance_columns),
   fold_change_columns = as_list(opt$fold_change_columns),
-  comparisons = as_list(opt$comparisons),
+  comparisons = comparisons,
   species = opt$species,
   update_genes = as_logical(opt$update_genes, "update_genes"),
   collections_to_include = as_list(opt$collections_to_include),
@@ -167,12 +206,25 @@ results <- l2p_multi(
   x_axis_tick_font_size = opt$x_axis_tick_font_size,
   x_axis_tick_labels = as_list(opt$x_axis_tick_labels),
   y_axis_tick_labels = as_list(opt$y_axis_tick_labels),
-  export_plot_file = file.path(opt$output_dir, "l2p_multi_plot.png"),
+  export_plot_file = NULL,
   export_plot_width = opt$plot_width,
   export_plot_height = opt$plot_height,
   column_spacing = opt$column_spacing,
   export_results_file = file.path(opt$output_dir, "l2p_multi_results.csv")
 )
+
+if (as_logical(opt$pathway_bubble_plots, "pathway_bubble_plots")) {
+  bubble_outputs <- write_pathway_bubble_outputs(
+    results = results,
+    output_dir = opt$output_dir,
+    top_n_pathways = opt$pathway_bubble_top_n,
+    collection_color_scale = opt$collection_color_scale,
+    significance_statistic = opt$pathway_bubble_significance_statistic,
+    p_value_cutoff = opt$p_value_limit,
+    comparisons = comparisons
+  )
+  message("Shared pathway-bubble manifest: ", bubble_outputs$manifest)
+}
 
 message("L2P Multi analysis complete. Results saved to: ", opt$output_dir)
 invisible(results)

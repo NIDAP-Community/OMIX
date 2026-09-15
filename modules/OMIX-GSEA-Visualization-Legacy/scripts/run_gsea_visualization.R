@@ -23,8 +23,12 @@ option_list <- list(
   make_option("--output_dir", type = "character", default = "results", help = "Output directory [default: %default]"),
   make_option("--contrast_filter", type = "character", default = "none", help = "none, keep, or remove [default: %default]"),
   make_option("--contrasts", type = "character", default = NULL, help = "Comma-separated contrasts for keep/remove mode"),
-  make_option("--top_n_pathways", type = "integer", default = 1L, help = "Top pathways per contrast and collection; 0 means all [default: %default]"),
+  make_option("--top_n_pathways", type = "integer", default = 20L, help = "Top pathways per contrast and collection; 0 means all [default: %default]"),
   make_option("--top_n_by_sign", type = "logical", default = FALSE, help = "Apply top N separately to positive and negative ES [default: %default]"),
+  make_option("--pathway_bubble_plots", type = "logical", default = TRUE, help = "Write shared OMIX pathway bubble plots in addition to legacy enrichment panels [default: %default]"),
+  make_option("--pathway_bubble_top_n", type = "integer", default = 20L, help = "Top pathways in each shared bubble-plot selection; 0 means all pathways after contrast filtering [default: %default]"),
+  make_option("--pathway_bubble_significance_statistic", type = "character", default = "padj", help = "padj (FDR) or pval (nominal p-value) used for shared bubble-plot selection and significance shapes [default: %default]"),
+  make_option("--collection_color_scale", type = "character", default = "independent", help = "independent or shared collection-specific bubble-plot colour scales [default: %default]"),
   make_option("--max_plots_in_pdf", type = "integer", default = 0L, help = "Global plot limit; 0 means unlimited [default: %default]"),
   make_option("--plots_to_include", type = "character", default = "ES+RNK+LE", help = "ES, ES+RNK, ES+LE, ES+RNK+LE, or LE [default: %default]"),
   make_option("--running_score_line_color", type = "character", default = "ES sign", help = "ES sign or green [default: %default]"),
@@ -184,6 +188,31 @@ validate_choice <- function(value, choices, parameter) {
   value
 }
 
+write_pathway_bubble_outputs <- function(gsea_results, output_dir, top_n_pathways, collection_color_scale, significance_statistic, contrasts = NULL) {
+  if (!requireNamespace("OmixPathwayPlots", quietly = TRUE)) {
+    stop(
+      "ERROR: OmixPathwayPlots is required for shared pathway-bubble plots. ",
+      "Use the current OMIX r-pathway runtime or set --pathway_bubble_plots false.",
+      call. = FALSE
+    )
+  }
+  plots <- OmixPathwayPlots::plot_pathway_bubble_set(
+    gsea_results,
+    input_format = "gsea",
+    p_value_column = significance_statistic,
+    top_n_pathways = top_n_pathways,
+    selection_scopes = c("combined_single_panel", "across_all_collections", "within_each_collection"),
+    selection_contrasts = contrasts,
+    plot_contrasts = contrasts,
+    collection_color_scale = collection_color_scale
+  )
+  OmixPathwayPlots::save_pathway_bubble_set(
+    plots,
+    output_dir = output_dir,
+    file_prefix = "GSEA-Vis-Pathway-Bubble"
+  )
+}
+
 main <- function() {
   paths <- list(
     msigdb = require_file(opt$msigdb_database, "msigdb_database"),
@@ -192,6 +221,15 @@ main <- function() {
     metadata = require_file(opt$sample_metadata, "sample_metadata")
   )
   opt$contrast_filter <- validate_choice(opt$contrast_filter, c("none", "keep", "remove"), "contrast_filter")
+  opt$collection_color_scale <- validate_choice(opt$collection_color_scale, c("independent", "shared"), "collection_color_scale")
+  opt$pathway_bubble_significance_statistic <- validate_choice(
+    opt$pathway_bubble_significance_statistic,
+    c("padj", "pval"),
+    "pathway_bubble_significance_statistic"
+  )
+  if (is.na(opt$pathway_bubble_top_n) || opt$pathway_bubble_top_n < 0L) {
+    stop("ERROR: --pathway_bubble_top_n must be zero or a positive integer", call. = FALSE)
+  }
   opt$plots_to_include <- validate_choice(opt$plots_to_include, c("ES", "ES+RNK", "ES+LE", "ES+RNK+LE", "LE"), "plots_to_include")
   opt$heatmap_transform <- validate_choice(opt$heatmap_transform, c("z-score", "center by row mean", "center by row median", "none"), "heatmap_transform")
   opt$heatmap_gene_order <- validate_choice(opt$heatmap_gene_order, c("rank", "cluster", "input"), "heatmap_gene_order")
@@ -254,6 +292,18 @@ main <- function() {
     pdf_height = opt$pdf_height,
     output_dir = opt$output_dir
   )
+  if (isTRUE(opt$pathway_bubble_plots)) {
+    bubble_contrasts <- if (length(plot_contrasts) == 0L) NULL else plot_contrasts
+    bubble_outputs <- write_pathway_bubble_outputs(
+      gsea_results = gsea,
+      output_dir = opt$output_dir,
+      top_n_pathways = opt$pathway_bubble_top_n,
+      collection_color_scale = opt$collection_color_scale,
+      significance_statistic = opt$pathway_bubble_significance_statistic,
+      contrasts = bubble_contrasts
+    )
+    message("Shared pathway-bubble manifest: ", bubble_outputs$manifest)
+  }
   message(result$message)
   if (!is.null(result$files$pdf)) message("PDF: ", result$files$pdf)
   if (!is.null(result$files$running_es)) message("Running ES: ", result$files$running_es)

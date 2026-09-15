@@ -40,6 +40,13 @@ example `Treatment-Control_tstat`. It auto-detects `GeneName`, then `Gene
 Symbols` and other common identifier columns; specify `--gene_names_column`
 when the input uses a different name.
 
+Use `--contrasts` only when you want a subset or a specific analysis and plot
+order. For example, `--contrasts B-A,C-A,C-B` uses precisely those score
+columns in that order. If it is omitted, GSEA uses every column ending in the
+selected `--gene_scores_suffix`, in the input table's column order. Requested
+contrast names must exactly match the prefixes of available score columns;
+GSEA does not silently reverse a contrast such as `B-C` into `C-B`.
+
 ## Run locally or on HPC
 
 Set `OMIX_ROOT` to the OMIX checkout, then prepare a writable runtime project:
@@ -59,6 +66,7 @@ Rscript "$OMIX_ROOT/modules/OMIX-GSEA-Preranked-Legacy/scripts/run_gsea.R" \
   --deg_table /path/to/DEG_Analysis.csv \
   --pathways_database /path/to/MSigDB.rds \
   --gene_scores_suffix _tstat \
+  --contrasts B-A,C-A,C-B \
   --species Mouse \
   --output_dir results/gsea
 ```
@@ -73,6 +81,9 @@ Rscript "$OMIX_ROOT/modules/OMIX-GSEA-Preranked-Legacy/scripts/run_gsea.R" \
 ## Method notes
 
 - GSEA uses every ranked gene, rather than only genes passing a DEG threshold.
+- `--contrasts` is optional. Leaving it blank discovers all matching score
+  columns; supplying it both limits the analysis and establishes contrast
+  order for the p-value summary panels and result factor levels.
 - Positive and negative normalized enrichment scores correspond to the two
   ends of the supplied ranking; interpret direction in the context of the
   contrast definition.

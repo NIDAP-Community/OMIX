@@ -21,6 +21,7 @@ option_list <- list(
   make_option("--gene_names_column", type = "character", default = NULL, help = "Gene-symbol column; auto-detects GeneName, then Gene Symbols when omitted"),
   make_option("--species", type = "character", default = "Human", help = "Species in the DEG table [default: %default]"),
   make_option("--gene_scores_suffix", type = "character", default = "_tstat", help = "Suffix for ranking-score columns [default: %default]"),
+  make_option("--contrasts", type = "character", default = NULL, help = "Optional comma-separated contrast names. When supplied, only these contrasts are analyzed and plotted in this order; when omitted, every matching score column is used in table-column order."),
   make_option("--pathways_species", type = "character", default = "Human", help = "Species in the pathways database [default: %default]"),
   make_option("--collections", type = "character", default = "H: hallmark gene sets,C2:CP:REACTOME: Reactome gene sets", help = "Comma-separated collections [default: %default]"),
   make_option("--min_geneset_size", type = "integer", default = 15L, help = "Minimum geneset size [default: %default]"),
@@ -99,6 +100,11 @@ resolve_gene_names_column <- function(path, requested) {
 opt$gene_names_column <- resolve_gene_names_column(opt$deg_table, opt$gene_names_column)
 
 collections <- trimws(strsplit(opt$collections, ",", fixed = TRUE)[[1]])
+contrasts <- if (is.null(opt$contrasts) || !nzchar(trimws(opt$contrasts))) {
+  character()
+} else {
+  trimws(strsplit(opt$contrasts, ",", fixed = TRUE)[[1]])
+}
 collapse_redundancy <- tolower(opt$collapse_redundancy) == "true"
 dir.create(opt$output_dir, showWarnings = FALSE, recursive = TRUE)
 
@@ -108,6 +114,8 @@ results <- GSEA_Preranked(
   Gene_Names_Column = opt$gene_names_column,
   species = opt$species,
   Gene_Scores_Column_s_Suffix = opt$gene_scores_suffix,
+  Contrasts_Filter = if (length(contrasts) == 0L) "none" else "keep",
+  Contrasts = contrasts,
   Pathways_Database_Species = opt$pathways_species,
   Collections_to_Include = collections,
   Minimum_Gene_Set_Size = opt$min_geneset_size,

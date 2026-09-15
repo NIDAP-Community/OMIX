@@ -7,6 +7,12 @@ Version numbers correspond to adapter release versions (integers: v1, v2, v3, et
 
 ## [Unreleased]
 
+### Added
+- Add an optional `--contrasts` argument to select and order preranked GSEA
+  contrasts. When it is omitted, all columns matching `--gene_scores_suffix`
+  are used in source-table column order. Invalid requested contrast names now
+  fail before analysis with the available names listed.
+
 ### Changed
 - Moved the reusable GSEA implementation to `R/GSEA_Preranked.R` and added
   the platform-neutral `scripts/run_gsea.R` entry point (2026-08-17).

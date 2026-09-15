@@ -20,6 +20,10 @@
 #' Character. Optional comparison ID such as \code{B-A}. When supplied, missing
 #' column selections are derived as \code{B-A_tstat}, \code{B-A_pval}, and
 #' \code{B-A_FC}. Explicit column parameters override derived columns.
+#' @param plot_title_prefix
+#' Optional display-only prefix for upregulated and downregulated plot titles.
+#' This is useful when independent single-comparison runs are batched by an
+#' external caller. It does not alter result values or output file names.
 #' @param t_statistic_column
 #' Character. If "Select By Rank" (above) is TRUE, set a single column used to
 #' select the genes of interest. This is usually the column containing
@@ -64,10 +68,10 @@
 #' "Column Used to Rank Genes" parameter under the "Genelist selected by
 #' t-statistic rank" section. If FALSE, you need to set other parameters in
 #' "Genelist selected by fold-change and pval" section of the template to set
-#' thresholds on significance and fold change columns instead. This latter
-#' (FALSE) parameterization may be appropriate if you have heterogeneous data
-#' like Single Cell RNA-Seq data or highly variable data (e.g. few significant
-#' genes). Set to TRUE by default. Default: \code{TRUE}.
+#' thresholds on significance and fold change columns instead. The threshold
+#' method is the default: nominal p-value <= 0.05 and absolute fold change >=
+#' 1.2. Set this to TRUE to use the legacy t-statistic ranking method.
+#' Default: \code{FALSE}.
 #' @param select_top_percentage_of_genes
 #' Logical. If "Select By Rank" (above) is TRUE, select top percentage of up
 #' and downregulated genes ranked by t-statistic. If TRUE, set at 10%. If
@@ -90,7 +94,7 @@
 #' Default is 50. Ideally should be ~10% of all genes Default: \code{50}.
 #' @param number_of_pathways_to_plot
 #' Numeric. Number of top pathways (by smallest pval) to display in bubble
-#' plot Default: \code{12}.
+#' plot Default: \code{20}.
 #' @param pathway_axis_label_max_length
 #' Numeric. Set pathway axis label maximum length as shown in Y-axis, set to
 #' 50 by default. The effective wrap length is shortened automatically when
@@ -185,13 +189,6 @@
 #' exported, run provenance is written to a companion \code{_provenance.csv}
 #' file.
 #'
-#' @importFrom dplyr .
-#' @importFrom ggplot2 .
-#' @importFrom stringr .
-#' @importFrom magrittr .
-#' @importFrom l2p .
-#' @importFrom grid .
-#' @export
 l2p_single <- function(
   deg_table,
   gene_names_column = NULL,
@@ -199,18 +196,19 @@ l2p_single <- function(
   significance_column = NULL,
   fold_change_column = NULL,
   comparison = NULL,
+  plot_title_prefix = NULL,
   species = "Human",
   collections_to_include = c("GO", "REACTOME", "KEGG"),
   custom_pathways = NULL,
   custom_pathway_name_column = "gene_set_name",
   custom_pathway_gene_column = "gene_symbol",
-  select_by_rank = TRUE,
+  select_by_rank = FALSE,
   select_top_percentage_of_genes = TRUE,
   select_top_genes = 500,
   significance_threshold = 0.05,
   fold_change_threshold = 1.2,
   minimum_number_of_deg_genes = 50,
-  number_of_pathways_to_plot = 12,
+  number_of_pathways_to_plot = 20,
   pathway_axis_label_max_length = 50,
   plot_top_pathways_up = TRUE,
   pathways_to_use_up = NULL,
@@ -751,6 +749,8 @@ l2p_single <- function(
     analysis_l2p_version = as.character(utils::packageVersion("l2p")),
     analysis_l2psupp_version = as.character(utils::packageVersion("l2psupp")),
     analysis_species = species,
+    analysis_comparison = collapse_for_provenance(comparison),
+    analysis_plot_title_prefix = collapse_for_provenance(plot_title_prefix),
     analysis_gene_column = collapse_for_provenance(gene_names_column),
     analysis_rank_column = collapse_for_provenance(t_statistic_column),
     analysis_significance_column = collapse_for_provenance(significance_column),
@@ -1138,7 +1138,20 @@ l2p_single <- function(
   genes_to_include <- list()
   x <- list()
   lastgene <- list()
-  plotitle <- list("Upregulated Pathways", "Downregulated Pathways")
+  plot_directions <- c("Upregulated Pathways", "Downregulated Pathways")
+  plot_title_prefix <- if (is.null(plot_title_prefix) || length(plot_title_prefix) == 0L) {
+    ""
+  } else {
+    trimws(as.character(plot_title_prefix)[1L])
+  }
+  if (is.na(plot_title_prefix) || !nzchar(plot_title_prefix)) {
+    plot_title_prefix <- NULL
+  }
+  plotitle <- if (is.null(plot_title_prefix)) {
+    as.list(plot_directions)
+  } else {
+    as.list(paste(plot_title_prefix, plot_directions, sep = " — "))
+  }
 
   # Select Upregulated genes
   if (!is.null(numselect)) {
@@ -1578,7 +1591,10 @@ l2p_single <- function(
         digits = 3,
         format = "f"
       ))
-      l2p_result$direction <- plotitle[[i]]
+      # Direction remains a stable machine-readable result value. The optional
+      # comparison prefix is display-only and is recorded separately in the
+      # per-run provenance and the CLI run manifest.
+      l2p_result$direction <- plot_directions[[i]]
 
       x[[i]] <- l2p_result %>%
         dplyr::filter(number_hits >= minimum_pathway_hit_count) %>%
@@ -1686,7 +1702,10 @@ l2p_single <- function(
         plotitle[[i]]
       )
 
-      direction_suffix <- tolower(gsub("\\s+", "_", plotitle[[i]]))
+      # Keep exported file names stable regardless of an optional display-only
+      # comparison prefix in the figure title. Batched CLI runs use separate
+      # comparison directories, so direction alone is sufficient on disk.
+      direction_suffix <- tolower(gsub("\\s+", "_", plot_directions[[i]]))
       plot_outputs[[paste0(direction_suffix, "_bar")]] <- bar_plot
       plot_outputs[[paste0(direction_suffix, "_bubble")]] <- bubble_plot
     }

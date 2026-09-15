@@ -74,9 +74,12 @@ Rscript "$OMIX_ROOT/modules/OMIX-GSEA-Visualization-Legacy/scripts/run_gsea_visu
   --output_dir results/gsea-visualization
 ```
 
-Use `--contrast_filter keep --contrasts B-A` to focus a comparison, or set
-`--top_n_pathways 0` to plot every filtered pathway. The complete portable
-contract is in [`schemas/interface.yml`](schemas/interface.yml).
+By default, the module plots the top **20 pathways within each contrast ×
+collection**. Use `--contrast_filter keep --contrasts B-A` to focus a
+comparison, or set `--top_n_pathways 0` to plot every filtered pathway. This
+within-collection default ensures that a large collection cannot crowd out a
+smaller one. The complete portable contract is in
+[`schemas/interface.yml`](schemas/interface.yml).
 
 ## Outputs
 
@@ -84,6 +87,10 @@ contract is in [`schemas/interface.yml`](schemas/interface.yml).
 | --- | --- |
 | `GSEA-Vis-Enrichment-Plots.pdf` | Multi-page ES, RNK, and/or LE heatmap figures. |
 | `GSEA-Vis-RunningES.csv` | Per-gene ranks and running enrichment scores used in the rendered panels. |
+| `GSEA-Vis-Pathway-Bubble_combined_pathways.png` | Shared combined-pathway bubble plot showing the top selected pathways regardless of source collection. |
+| `GSEA-Vis-Pathway-Bubble_across_collections.png` | Shared faceted bubble plot showing the top selected pathways across source collections, with one panel per collection. |
+| `GSEA-Vis-Pathway-Bubble_<collection>.png` | One shared-style bubble plot for each selected pathway collection. |
+| `GSEA-Vis-Pathway-Bubble_manifest.csv` | Bubble-plot selections, colour limits, output dimensions, and file names. |
 
 ## Method notes
 
@@ -95,8 +102,19 @@ contract is in [`schemas/interface.yml`](schemas/interface.yml).
 - The module first uses pathway membership carried by the filtered GSEA table,
   retaining that analysis provenance. It consults MSigDB only when membership
   must be restored.
-- `top_n_pathways` is applied within contrast × collection. Set
-  `top_n_by_sign` to select positive and negative ES pathways independently.
+- `top_n_pathways` defaults to 20 and is applied within contrast × collection.
+  Set `top_n_by_sign` to select positive and negative ES pathways
+  independently.
+- Shared bubble plots are written by default without replacing the legacy PDF.
+  `--pathway_bubble_top_n` defaults to 20 and applies the shared selection
+  policy: a single combined plot ranks pathways across all included
+  collections, then one collection-specific plot is made per source. Set it
+  to `0` to include all pathways after contrast filtering. Collection plots use independent
+  score colour ranges by default; set `--collection_color_scale shared` to
+  compare colours directly across sources. `--pathway_bubble_significance_statistic`
+  defaults to `padj`, so FDR determines both the displayed top pathways and
+  circle-versus-X significance encoding; set it to `pval` for nominal
+  p-values instead.
 
 ## Interface and deployment
 

@@ -86,11 +86,6 @@
 #' @return A filtered GSEA results data frame retaining only gene sets that
 #' pass the user-defined significance and NES thresholds.
 #'
-#' @importFrom dplyr .
-#' @importFrom ggplot2 .
-#' @importFrom plotly .
-#' @importFrom RColorBrewer .
-#' @export
 GSEA_Filters <- function(
     gsea_table,
     columns_to_sort_output_by,

@@ -27,11 +27,29 @@ parameters:
     description: Optional comma-separated contrast names used with keep or remove mode.
   top_n_pathways:
     type: integer
-    default: 1
-    description: Top pathways per contrast and collection; 0 selects all pathways.
+    default: 20
+    description: Top pathways within each contrast and collection; 0 selects all pathways.
   top_n_by_sign:
     type: boolean
     default: false
+  pathway_bubble_plots:
+    type: boolean
+    default: true
+    description: Write shared OMIX bubble plots in addition to the preserved legacy ES, RNK, and leading-edge panels.
+  pathway_bubble_top_n:
+    type: integer
+    default: 20
+    description: Top significant pathways selected independently for each shared bubble-plot scope; 0 includes all pathways after contrast filtering.
+  pathway_bubble_significance_statistic:
+    type: string
+    default: padj
+    allowed: [padj, pval]
+    description: Adjusted p-value/FDR (`padj`, default) or nominal p-value (`pval`) used to select shared bubble-plot pathways and encode circle-versus-X significance.
+  collection_color_scale:
+    type: string
+    default: independent
+    allowed: [independent, shared]
+    description: Whether collection-specific bubble plots use their own score range or the shared combined range.
   max_plots_in_pdf:
     type: integer
     default: 0
@@ -60,3 +78,11 @@ outputs:
   running_enrichment_scores:
     path: GSEA-Vis-RunningES.csv
     format: csv
+  pathway_bubble_plots:
+    path: GSEA-Vis-Pathway-Bubble_*.png
+    format: png
+    description: Shared combined, faceted cross-collection, and collection-specific pathway bubble plots.
+  pathway_bubble_manifest:
+    path: GSEA-Vis-Pathway-Bubble_manifest.csv
+    format: csv
+    description: Significance statistic and threshold, selection scopes, pathway counts, score limits, dimensions, and files for the shared bubble plots.

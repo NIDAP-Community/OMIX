@@ -108,13 +108,97 @@
 #' @return A data frame of preranked GSEA results including NES, p-value,
 #' adjusted p-value, and leading-edge genes for each gene set.
 #'
-#' @importFrom dplyr .
-#' @importFrom fgsea .
-#' @importFrom ggplot2 .
-#' @importFrom tibble .
-#' @importFrom data.table .
-#' @importFrom patchwork .
-#' @export
+resolve_gsea_rank_columns <- function(
+    column_names,
+    score_suffix = "_tstat",
+    contrasts = character(),
+    contrasts_filter = c("none", "keep", "remove")) {
+  column_names <- as.character(column_names)
+  score_suffix <- as.character(score_suffix)[1L]
+  contrasts_filter <- match.arg(contrasts_filter)
+
+  if (is.na(score_suffix) || !nzchar(score_suffix)) {
+    stop("`score_suffix` must be one non-empty string.", call. = FALSE)
+  }
+
+  rank_columns <- column_names[endsWith(column_names, score_suffix)]
+  if (length(rank_columns) == 0L) {
+    stop(
+      "No ranking-score columns end in `", score_suffix, "`. Available columns: ",
+      paste(column_names, collapse = ", "),
+      call. = FALSE
+    )
+  }
+
+  rank_contrasts <- substr(
+    rank_columns,
+    1L,
+    nchar(rank_columns) - nchar(score_suffix)
+  )
+  if (any(!nzchar(rank_contrasts))) {
+    stop(
+      "Each ranking-score column must include a contrast prefix before `",
+      score_suffix, "`.",
+      call. = FALSE
+    )
+  }
+  if (anyDuplicated(rank_contrasts)) {
+    stop(
+      "Ranking-score columns resolve to duplicate contrast names: ",
+      paste(unique(rank_contrasts[duplicated(rank_contrasts)]), collapse = ", "),
+      call. = FALSE
+    )
+  }
+
+  contrasts <- trimws(as.character(contrasts))
+  contrasts <- contrasts[!is.na(contrasts) & nzchar(contrasts)]
+  if (anyDuplicated(contrasts)) {
+    stop("`contrasts` must not contain duplicate names.", call. = FALSE)
+  }
+
+  if (identical(contrasts_filter, "none")) {
+    if (length(contrasts) > 0L) {
+      warning(
+        "`contrasts` is ignored when `contrasts_filter = 'none'`; all matching columns are used.",
+        call. = FALSE
+      )
+    }
+    return(list(columns = rank_columns, contrasts = rank_contrasts))
+  }
+
+  if (length(contrasts) == 0L) {
+    stop(
+      "`contrasts` must name one or more available contrasts when `contrasts_filter = '",
+      contrasts_filter, "'`.",
+      call. = FALSE
+    )
+  }
+  unknown_contrasts <- setdiff(contrasts, rank_contrasts)
+  if (length(unknown_contrasts) > 0L) {
+    stop(
+      "Requested contrast(s) were not found for suffix `", score_suffix, "`: ",
+      paste(unknown_contrasts, collapse = ", "),
+      ". Available contrasts: ",
+      paste(rank_contrasts, collapse = ", "),
+      call. = FALSE
+    )
+  }
+
+  keep_index <- if (identical(contrasts_filter, "keep")) {
+    match(contrasts, rank_contrasts)
+  } else {
+    which(!rank_contrasts %in% contrasts)
+  }
+  if (length(keep_index) == 0L) {
+    stop("Contrast filtering removed every ranking-score column.", call. = FALSE)
+  }
+
+  list(
+    columns = rank_columns[keep_index],
+    contrasts = rank_contrasts[keep_index]
+  )
+}
+
 GSEA_Preranked <- function(
   DEG_Table,
   Pathways_Database,
@@ -824,126 +908,18 @@ GSEA_Preranked <- function(
     }
     gene_scores_column_s_suffix <- gene_score_alternative
   }
-  rank_columns <- colnames(deg_table)[grepl(
-    paste0("\\Q", gene_scores_column_s_suffix, "\\E$"),
-    colnames(deg_table)
-  )]
-  rank_contrasts <- unlist(strsplit(rank_columns, gene_scores_column_s_suffix))
-  contrasts_is_empty <-
-    length(Contrasts) == 0 || all(trimws(as.character(Contrasts)) == "")
-
-  if (Contrasts_Filter == "remove") {
-    if (!is.null(Contrasts)) {
-      if (contrasts_is_empty) {
-        stop(paste0(
-          "'ERROR: Contrasts' parameter is empty - remove the entry or ",
-          "specify it correctly'"
-        ))
-      }
-
-      all_contrasts <- rank_contrasts
-      index <- match(Contrasts, rank_contrasts)
-      rank_columns <- rank_columns[-index]
-      rank_contrasts <- rank_contrasts[-index]
-      removed <- setdiff(all_contrasts, rank_contrasts)
-      if (length(removed) < 1) {
-        cat(
-          sprintf(
-            paste0(
-              "WARNING:contrast(s) to remove (%s) not found; filter not ",
-              "applied\nIdentified contrast(s) used: %s\n"
-            ),
-            paste(Contrasts, collapse = ", "),
-            paste(rank_contrasts, collapse = ", ")
-          )
-        )
-      } else {
-        cat(sprintf(
-          "Removed contrast(s): %s\n",
-          paste(removed, collapse = ", ")
-        ))
-        cat(sprintf(
-          "Kept contrast(s): %s\n",
-          paste(rank_contrasts, collapse = ", ")
-        ))
-      }
-    } else if (is.null(Contrasts)) {
-      cat(
-        sprintf(
-          paste0(
-            "WARNING:contrast(s) to remove (%s) not found; filter not ",
-            "applied\nIdentified contrast(s) used: %s\n"
-          ),
-          paste(Contrasts, collapse = ", "),
-          paste(rank_contrasts, collapse = ", ")
-        )
-      )
-    }
-  } else if (Contrasts_Filter == "keep") {
-    if (!is.null(Contrasts)) {
-      if (contrasts_is_empty) {
-        stop(paste0(
-          "'ERROR: Contrasts' parameter is empty - remove the entry or ",
-          "specify it correctly'"
-        ))
-      }
-
-      all_contrasts <- rank_contrasts
-      index <- match(Contrasts, rank_contrasts)
-      rank_columns <- rank_columns[index]
-      rank_contrasts <- rank_contrasts[index]
-      removed <- setdiff(all_contrasts, rank_contrasts)
-      if (length(rank_contrasts) < 1) {
-        cat(
-          sprintf(
-            paste0(
-              "WARNING:contrast(s) to keep (%s) not found; filter not ",
-              "applied\nIdentified contrast(s) used: %s\n"
-            ),
-            paste(Contrasts, collapse = ", "),
-            paste(rank_contrasts, collapse = ", ")
-          )
-        )
-      } else {
-        cat(sprintf(
-          "Removed contrast(s): %s\n",
-          paste(removed, collapse = ", ")
-        ))
-        cat(sprintf(
-          "Kept contrast(s): %s\n",
-          paste(rank_contrasts, collapse = ", ")
-        ))
-      }
-    } else if (is.null(Contrasts)) {
-      cat(
-        sprintf(
-          paste0(
-            "WARNING:contrast(s) to keep (%s) not found; filter not ",
-            "applied\nIdentified contrast(s) used: %s\n"
-          ),
-          paste(Contrasts, collapse = ", "),
-          paste(rank_contrasts, collapse = ", ")
-        )
-      )
-    }
-  } else if (Contrasts_Filter == "none") {
-    if (!is.null(Contrasts)) {
-      cat(
-        sprintf(
-          paste0(
-            "WARNING:contrast filter not specified correctly; filter not ",
-            "applied\nIdentified contrast(s) used: %s\n"
-          ),
-          paste(rank_contrasts, collapse = ", ")
-        )
-      )
-    } else {
-      cat(sprintf(
-        'Filter contrast ("none"); Identified contrast(s) used: %s\n',
-        paste(rank_contrasts, collapse = ", ")
-      ))
-    }
-  }
+  rank_resolution <- resolve_gsea_rank_columns(
+    column_names = colnames(deg_table),
+    score_suffix = gene_scores_column_s_suffix,
+    contrasts = Contrasts,
+    contrasts_filter = Contrasts_Filter
+  )
+  rank_columns <- rank_resolution$columns
+  rank_contrasts <- rank_resolution$contrasts
+  cat(sprintf(
+    "Identified ranking contrast(s): %s\n",
+    paste(rank_contrasts, collapse = ", ")
+  ))
 
   # deg table
   need_ortholog <- ifelse(species == collection_species, FALSE, TRUE)
@@ -1048,7 +1024,12 @@ GSEA_Preranked <- function(
       values_drop_na = TRUE
     ) %>%
     dplyr::rename("gene_id" = Gene_Names_Column) %>%
-    dplyr::mutate(contrast = sub(gene_scores_column_s_suffix, "", contrast))
+    dplyr::mutate(
+      contrast = factor(
+        sub(paste0("\\Q", gene_scores_column_s_suffix, "\\E$"), "", contrast),
+        levels = rank_contrasts
+      )
+    )
   duplicates <-
     dplyr::group_by(deg_table, contrast, gene_id) %>%
     dplyr::filter(dplyr::n() > 1)

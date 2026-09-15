@@ -7,15 +7,35 @@ inputs:
     description: Differential-expression table containing one comparison or a wide table with comparison-prefixed columns.
 parameters:
   comparison:
-    required: true
+    required: false
     type: string
-    description: Comparison identifier used to infer matching DEG columns when explicit columns are not supplied.
+    description: One comparison identifier used to infer matching DEG columns when explicit columns are not supplied. Supply this or `comparisons`, not both.
+  comparisons:
+    required: false
+    type: string
+    description: Comma-separated comparison identifiers for independent batched runs in the requested order. Supply this or `comparison`, not both. Batched runs require comparison-prefixed DEG columns and do not accept explicit t-statistic, significance, or fold-change column overrides.
   species:
     type: string
     default: Human
   collections_to_include:
     type: string
     default: GO,REACTOME,KEGG
+  select_by_rank:
+    type: boolean
+    default: false
+    description: Select DEG lists using the significance and fold-change thresholds. Set true to use the legacy t-statistic rank method.
+  significance_threshold:
+    type: number
+    default: 0.05
+    description: Maximum nominal p-value, or the threshold applied to an explicitly selected adjusted-p-value column, for DEG-list selection.
+  fold_change_threshold:
+    type: number
+    default: 1.2
+    description: Minimum absolute linear fold change for DEG-list selection. For a log-fold-change column, the corresponding log2 threshold is used.
+  number_of_pathways_to_plot:
+    type: integer
+    default: 20
+    description: Number of top pathways displayed per upregulated or downregulated direction in the summary plot.
   output_dir:
     type: path
     default: results
@@ -27,5 +47,9 @@ outputs:
     path: l2p_results_provenance.csv
     format: csv
   l2p_plots:
-    path: l2p_plots.png
+    path: l2p_plots_*.png
     format: png
+  l2p_run_manifest:
+    path: l2p_single_run_manifest.csv
+    format: csv
+    description: One row per requested comparison, recording its output directory, files, status, and result-row count. Batched runs create one subdirectory per comparison.

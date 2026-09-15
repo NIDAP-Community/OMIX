@@ -16,6 +16,10 @@ parameters:
   gene_scores_suffix:
     type: string
     default: _tstat
+  contrasts:
+    type: string
+    required: false
+    description: Optional comma-separated contrast names. When supplied, only these contrasts are analyzed and plotted in the given order; when omitted, every column ending in gene_scores_suffix is used in source-table column order.
   species:
     type: string
     default: Human
