@@ -33,11 +33,13 @@ ENV RENV_CONFIG_PPM_ENABLED=FALSE \
 
 # Full Seurat is restored here only to read specialized legacy classes such as
 # SCTAssay. It is not an analysis dependency for DEG, Limma, pathway, or
-# visualization modules. The lock captures the registry dependency graph;
-# Core and OmixSeurat remain source-controlled OMIX packages below.
+# visualization modules. Restore from CRAN source archives: a dated snapshot
+# that predates a locked version cannot resolve that package's source. The lock
+# captures the registry dependency graph; Core and OmixSeurat remain
+# source-controlled OMIX packages below.
 RUN mkdir -p "$R_LIBS_USER" \
     && R -q -e "options(pkgType = 'source'); \
-options(repos = c(CRAN = 'https://p3m.dev/cran/2025-04-10')); \
+options(repos = c(CRAN = 'https://cran.r-project.org')); \
 renv::restore( \
   lockfile = '/opt/omix/r-seurat-conversion/renv.lock', \
   library = Sys.getenv('R_LIBS_USER'), \
