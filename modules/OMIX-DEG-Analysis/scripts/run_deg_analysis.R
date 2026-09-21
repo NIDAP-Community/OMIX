@@ -23,6 +23,13 @@ as_logical <- function(value, argument) {
   stop("--", argument, " must be true or false.")
 }
 
+as_auto_logical <- function(value, argument) {
+  if (is.null(value) || !nzchar(trimws(value)) || identical(tolower(trimws(value)), "auto")) {
+    return(NULL)
+  }
+  as_logical(value, argument)
+}
+
 read_tabular_input <- function(path) {
   extension <- tolower(tools::file_ext(path))
   if (extension == "rds") {
@@ -42,32 +49,70 @@ required_path <- function(path, label) {
   normalizePath(path, mustWork = TRUE)
 }
 
+read_pseudobulk_manifest <- function(path, analysis_mode) {
+  if (!nzchar(path)) return(NULL)
+  manifest_path <- required_path(path, "pseudobulk_manifest")
+  manifest <- tryCatch(
+    base::read.dcf(manifest_path),
+    error = function(error) stop("Could not read pseudobulk manifest: ", conditionMessage(error))
+  )
+  if (nrow(manifest) != 1L || !"matrix_type" %in% colnames(manifest)) {
+    stop("Pseudobulk manifest must contain exactly one record with matrix_type.")
+  }
+  expected_matrix_type <- switch(
+    analysis_mode,
+    raw_counts = "raw_integer_counts",
+    harmony_mean_expression = "harmony_corrected_mean_expression",
+    sct_mean_expression = "sctransform_mean_log2_expression"
+  )
+  if (!identical(unname(manifest[1L, "matrix_type"]), expected_matrix_type)) {
+    stop(
+      "Pseudobulk manifest matrix_type is '", manifest[1L, "matrix_type"],
+      "' but --analysis_mode ", analysis_mode,
+      " requires '", expected_matrix_type, "'."
+    )
+  }
+  list(path = manifest_path, values = as.list(manifest[1L, , drop = TRUE]))
+}
+
 option_list <- list(
   make_option("--input_type", type = "character", default = "table", help = "table or moo [default: %default]"),
-  make_option("--counts", type = "character", default = "", help = "Raw counts table for table input"),
+  make_option("--counts", type = "character", default = "", help = "Raw-count, Harmony-mean, or SCTransform-mean expression table for table input, according to --analysis_mode"),
   make_option("--metadata", type = "character", default = "", help = "Sample metadata table for table input"),
   make_option("--moo", type = "character", default = "", help = "MOSuite multiOmicDataSet RDS for MOO input"),
+  make_option("--pseudobulk_manifest", type = "character", default = "", help = "Optional Pseudobulk_Manifest.dcf written by OMIX-Seurat-Pseudobulk"),
+  make_option("--analysis_mode", type = "character", default = "raw_counts", help = "raw_counts, harmony_mean_expression, or sct_mean_expression [default: %default]"),
   make_option("--gene_names_column", type = "character", default = "GeneName"),
   make_option("--sample_names_column", type = "character", default = "Sample"),
   make_option("--samples_to_include", type = "character", default = ""),
   make_option("--contrast_variable_columns", type = "character", default = "Group"),
   make_option("--contrasts", type = "character", default = "B-A"),
   make_option("--covariate_columns", type = "character", default = ""),
-  make_option("--batch_effect_columns", type = "character", default = "Batch"),
+  make_option("--batch_effect_columns", type = "character", default = "auto", help = "Comma-separated technical batch columns; auto resolves to Batch for raw_counts and blank for continuous-expression modes"),
   make_option("--donor_variable_column", type = "character", default = ""),
-  make_option("--filter_low_expression", type = "character", default = "true"),
-  make_option("--return_batch_corrected_values", type = "character", default = "true"),
-  make_option("--remove_donor_effect_for_downstream", type = "character", default = "true"),
-  make_option("--normalization_method", type = "character", default = "TMM"),
-  make_option("--write_normalization_diagnostics", type = "character", default = "true"),
-  make_option("--summarization_method", type = "character", default = "sum"),
+  make_option("--filter_low_expression", type = "character", default = "auto"),
+  make_option("--return_batch_corrected_values", type = "character", default = "auto"),
+  make_option("--remove_donor_effect_for_downstream", type = "character", default = "auto"),
+  make_option("--normalization_method", type = "character", default = "auto"),
+  make_option("--write_normalization_diagnostics", type = "character", default = "auto"),
+  make_option("--summarization_method", type = "character", default = "auto"),
   make_option("--output_dir", type = "character", default = "results")
 )
 opt <- parse_args(OptionParser(option_list = option_list))
 
 input_type <- tolower(trimws(opt$input_type))
 if (!input_type %in% c("table", "moo")) stop("--input_type must be table or moo.")
+analysis_mode <- tolower(trimws(opt$analysis_mode))
+if (!analysis_mode %in% c("raw_counts", "harmony_mean_expression", "sct_mean_expression")) {
+  stop("--analysis_mode must be raw_counts, harmony_mean_expression, or sct_mean_expression.")
+}
 if (input_type == "moo") {
+  if (!identical(analysis_mode, "raw_counts")) {
+    stop("MOO input only supports --analysis_mode raw_counts.")
+  }
+  if (nzchar(opt$pseudobulk_manifest)) {
+    stop("--pseudobulk_manifest is only valid for table input.")
+  }
   if (!nzchar(opt$moo)) stop("--moo is required for MOO input.")
   if (!file.exists(opt$moo)) stop("MOO file does not exist: ", opt$moo)
   if (!requireNamespace("OmixMOSuite", quietly = TRUE)) {
@@ -87,12 +132,14 @@ if (input_type == "moo") {
 } else {
   counts_path <- required_path(opt$counts, "counts")
   metadata_path <- required_path(opt$metadata, "metadata")
+  manifest <- read_pseudobulk_manifest(opt$pseudobulk_manifest, analysis_mode)
   counts <- read_tabular_input(counts_path)
   metadata <- read_tabular_input(metadata_path)
   input_summary <- c(
     paste("input type: table"),
     paste("counts input:", counts_path),
-    paste("metadata input:", metadata_path)
+    paste("metadata input:", metadata_path),
+    if (is.null(manifest)) "pseudobulk manifest: not supplied" else paste("pseudobulk manifest:", manifest$path)
   )
 }
 
@@ -116,13 +163,21 @@ results <- omix_deg_analysis(
   contrasts = split_csv(opt$contrasts),
   covariate_columns = split_csv(opt$covariate_columns),
   donor_variable_column = split_csv(opt$donor_variable_column),
-  batch_effect_columns = split_csv(opt$batch_effect_columns),
-  filter_low_expression = as_logical(opt$filter_low_expression, "filter_low_expression"),
+  batch_effect_columns = if (identical(tolower(trimws(opt$batch_effect_columns)), "auto")) {
+    if (identical(analysis_mode, "raw_counts")) "Batch" else character()
+  } else {
+    split_csv(opt$batch_effect_columns)
+  },
+  analysis_mode = analysis_mode,
+  filter_low_expression = as_auto_logical(opt$filter_low_expression, "filter_low_expression"),
   normalization_method = opt$normalization_method,
-  normalization_diagnostics = as_logical(opt$write_normalization_diagnostics, "write_normalization_diagnostics"),
+  normalization_diagnostics = if (
+    identical(tolower(trimws(opt$write_normalization_diagnostics)), "auto") &&
+      identical(analysis_mode, "raw_counts")
+  ) TRUE else as_auto_logical(opt$write_normalization_diagnostics, "write_normalization_diagnostics"),
   diagnostics_output_dir = opt$output_dir,
-  return_batch_corrected_values = as_logical(opt$return_batch_corrected_values, "return_batch_corrected_values"),
-  remove_donor_effect_for_downstream = as_logical(opt$remove_donor_effect_for_downstream, "remove_donor_effect_for_downstream"),
+  return_batch_corrected_values = as_auto_logical(opt$return_batch_corrected_values, "return_batch_corrected_values"),
+  remove_donor_effect_for_downstream = as_auto_logical(opt$remove_donor_effect_for_downstream, "remove_donor_effect_for_downstream"),
   summarization_method = opt$summarization_method
 )
 
@@ -146,8 +201,10 @@ run_summary <- attr(results, "omix_deg_run")
 writeLines(c(
   "OMIX DEG Analysis run summary",
   input_summary,
+  paste("analysis mode:", run_summary$analysis_mode),
+  paste("input matrix type:", run_summary$input_matrix_type),
   paste("model type:", run_summary$model_type),
-  paste("normalization profile:", opt$normalization_method),
+  paste("normalization profile:", run_summary$normalization_method),
   paste("library-size normalization:", run_summary$library_size_normalization),
   paste("voom-scale normalization:", run_summary$voom_scale_normalization),
   paste("normalization diagnostics:", if (length(run_summary$normalization_diagnostic_files) == 0L) "not written" else paste(basename(run_summary$normalization_diagnostic_files), collapse = ", ")),

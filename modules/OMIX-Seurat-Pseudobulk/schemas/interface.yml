@@ -1,0 +1,79 @@
+interface_version: 1
+entrypoint: scripts/run_seurat_pseudobulk.R
+inputs:
+  seurat_rds:
+    required: true
+    formats: [rds]
+    description: Serialized Seurat object read through the r-seurat-conversion compatibility runtime. The declared assay/layer must match the selected aggregation_method; specialized legacy SCTAssay objects require full Seurat in that runtime.
+parameters:
+  donor_column:
+    type: string
+    required: true
+    description: Cell-metadata column identifying biological donors or other independent biological replicates.
+  group_column:
+    type: string
+    required: true
+    description: Cell-metadata column identifying the experimental condition written as Group for DEG analysis.
+  cell_type_column:
+    type: string
+    required: true
+    description: Cell-metadata column containing cell-type labels.
+  cell_type:
+    type: string
+    required: true
+    description: One exact cell-type label to retain before aggregation.
+  metadata_columns:
+    type: string
+    default: ""
+    description: Optional comma-separated sample-level columns, such as Batch or Sex. Every value must be invariant and non-missing within each donor-by-group profile.
+  cell_filter_column:
+    type: string
+    default: ""
+    description: Optional cell-level filter column; use only with cell_filter_values.
+  cell_filter_values:
+    type: string
+    default: ""
+    description: Optional comma-separated values retained from cell_filter_column.
+  aggregation_method:
+    type: string
+    default: sum_counts
+    allowed: [sum_counts, mean_harmony_corrected_expression, mean_sctransform_expression]
+    description: sum_counts creates raw pseudobulk for edgeR/voom. mean_harmony_corrected_expression averages a declared Harmony-corrected gene-expression layer for direct limma. mean_sctransform_expression averages Seurat SCT/data, then converts the donor means from log1p to log2 scale for direct limma.
+  assay:
+    type: string
+    default: auto
+    description: auto resolves to RNA for sum_counts, Harmony for mean_harmony_corrected_expression, and SCT for mean_sctransform_expression.
+  layer:
+    type: string
+    default: auto
+    description: auto resolves to counts for sum_counts and data for continuous-expression modes. mean_sctransform_expression requires data; explicitly name the validated Harmony-corrected expression layer when it is not data.
+  feature_id_column:
+    type: string
+    default: GeneName
+  min_cells:
+    type: integer
+    default: 20
+  on_insufficient_cells:
+    type: string
+    default: error
+    allowed: [error, drop]
+  output_dir:
+    type: path
+    default: results
+outputs:
+  donor_level_matrix:
+    path: Pseudobulk_Counts.csv, Harmony_Mean_Expression.csv, or SCT_Mean_Log2_Expression.csv
+    format: csv
+    description: GeneName-by-profile raw integer counts for sum_counts, donor-level Harmony-corrected mean expression for mean_harmony_corrected_expression, or donor-level log2 SCTransform corrected expression for mean_sctransform_expression.
+  sample_metadata:
+    path: Pseudobulk_Sample_Metadata.csv
+    format: csv
+    description: Aligned Sample, Donor, Group, CellType, Cells, and requested invariant covariates.
+  manifest:
+    path: Pseudobulk_Manifest.dcf
+    format: dcf
+    description: Declares matrix semantics, source layer, expected downstream module and mode, input kind, and recommended variance model.
+  run_summary:
+    path: Pseudobulk_Run_Summary.txt
+    format: text
+    description: Aggregation parameters, profile counts, correction provenance, and bridge provenance.

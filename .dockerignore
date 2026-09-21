@@ -5,6 +5,15 @@
 !starter-environments/r-pathway/
 !starter-environments/r-pathway/Dockerfile
 !starter-environments/r-pathway/renv.lock
+!starter-environments/r-singlecell/
+!starter-environments/r-singlecell/**
+!starter-environments/r-seurat-conversion/
+!starter-environments/r-seurat-conversion/**
+!core/
+!core/**
+!bridges/
+!bridges/seurat/
+!bridges/seurat/**
 !packages/
 !packages/OmixPathwayPlots/
 !packages/OmixPathwayPlots/**

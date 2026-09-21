@@ -8,6 +8,8 @@ module-specific code or user data.
 r-base -> r-pathway -> OMIX-GSEA-Preranked-Legacy
        -> r-visualization -> OMIX-Gene-Boxplots, OMIX-Volcano-Plot
        -> r-statistics -> OMIX-DEG-Analysis
+       -> r-seurat-conversion -> OMIX-Seurat-Pseudobulk
+       -> r-singlecell -> lightweight native-SeuratObject extraction
 ```
 
 The image family is intended for local and shared execution targets:
@@ -23,6 +25,8 @@ The image family is intended for local and shared execution targets:
 | `r-pathway` | Pathway and gene-set analysis libraries | GSEA, GSVA, L2P |
 | `r-visualization` | Plotting and statistical-visualization libraries | Gene Boxplots, Volcano Plot, GSEA Filters |
 | `r-statistics` | Bulk statistical-analysis libraries | DEG and future statistical modules |
+| `r-seurat-conversion` | Full-Seurat compatibility and portable object conversion | Seurat Pseudobulk (bootstrap; not yet released) |
+| `r-singlecell` | Lightweight SeuratObject extraction | Native standard-assay use only; no current module release target |
 
 Images are built by the `Starter Environments` GitHub workflow. Normal pushes
 and pull requests only build and validate images. Publishing to GHCR is a

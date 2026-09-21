@@ -1,0 +1,12 @@
+name: omix-seurat-pseudobulk
+display_name: OMIX Seurat Pseudobulk
+version: 0.4.0
+interface_version: 1
+module_type: single-cell-pseudobulk
+status: review
+owner: OMIX Team
+description: Aggregate one selected Seurat cell type into raw donor-by-group pseudobulk counts, Harmony-corrected donor means, or SCTransform donor means, with metadata and a compatible downstream-analysis manifest.
+data_policy: No data are committed. Callers supply an explicit Seurat RDS and cell-metadata column names; the module writes portable donor-level matrices, metadata, and provenance.
+runtime_profile: r-seurat-conversion
+entrypoint: scripts/run_seurat_pseudobulk.R
+deployment_adapters: []

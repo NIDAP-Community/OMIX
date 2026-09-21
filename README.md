@@ -70,7 +70,8 @@ interface and runtime layer; it is not required to run the module locally.
 
 | Module | Deployment repository | Purpose | Status |
 | --- | --- | --- | --- |
-| [OMIX-DEG-Analysis](modules/OMIX-DEG-Analysis) | [OMIX-DEG-Analysis](https://github.com/NIDAP-Community/OMIX-DEG-Analysis) | Raw-count differential expression | Review |
+| [OMIX-DEG-Analysis](modules/OMIX-DEG-Analysis) | [OMIX-DEG-Analysis](https://github.com/NIDAP-Community/OMIX-DEG-Analysis) | Raw-count, Harmony-corrected donor-mean, or SCTransform donor-mean differential expression | Review |
+| [OMIX-Limma-Analysis](modules/OMIX-Limma-Analysis) | — | Direct limma analysis for declared continuous expression and feature-score matrices | Development |
 | [OMIX-Gene-Boxplots](modules/OMIX-Gene-Boxplots) | [OMIX-Gene-Boxplots](https://github.com/NIDAP-Community/OMIX-Gene-Boxplots) | Gene-expression boxplots with optional model-consistent DEG annotations | Review |
 | [OMIX-GSEA-Preranked-Legacy](modules/OMIX-GSEA-Preranked-Legacy) | [OMIX-GSEA-Preranked-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy) | Legacy preranked GSEA | Active |
 | [OMIX-GSEA-Filters-Legacy](modules/OMIX-GSEA-Filters-Legacy) | [OMIX-GSEA-Filters-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy) | Filter and subset GSEA result tables | Active |
@@ -78,6 +79,7 @@ interface and runtime layer; it is not required to run the module locally.
 | [OMIX-Volcano-Plot](modules/OMIX-Volcano-Plot) | [OMIX-Volcano-Plot](https://github.com/NIDAP-Community/OMIX-Volcano-Plot) | Differential-expression volcano plot | Active |
 | [OMIX-L2P-Single](modules/OMIX-L2P-Single) | [OMIX-L2P-Single](https://github.com/NIDAP-Community/OMIX-L2P-Single) | Single-comparison L2P | Active |
 | [OMIX-L2P-Multi](modules/OMIX-L2P-Multi) | [OMIX-L2P-Multi](https://github.com/NIDAP-Community/OMIX-L2P-Multi) | Multi-comparison L2P | Active |
+| [OMIX-Seurat-Pseudobulk](modules/OMIX-Seurat-Pseudobulk) | — | Donor-level raw-count pseudobulk, Harmony-corrected means, or SCTransform means from one Seurat cell type | Review |
 
 ## Contribute or automate work
 
@@ -109,14 +111,19 @@ itself and accepts explicit input and output paths.
 Each module selects a **runtime profile** in its `module.yml`. Use the matching
 committed `renv.lock` below to create a user-local R project:
 
-| Runtime profile | Modules | Lockfile |
+| Runtime profile | Modules | Lockfile or status |
 | --- | --- | --- |
-| `r-statistics` | OMIX-DEG-Analysis | `starter-environments/r-statistics/renv.lock` |
+| `r-statistics` | OMIX-DEG-Analysis, OMIX-Limma-Analysis | `starter-environments/r-statistics/renv.lock` |
 | `r-visualization` | OMIX-GSEA-Filters-Legacy, OMIX-Gene-Boxplots, OMIX-Volcano-Plot | `starter-environments/r-visualization/renv.lock` |
 | `r-pathway` | OMIX-GSEA-Preranked-Legacy, OMIX-GSEA-Visualization-Legacy, OMIX-L2P-Single, OMIX-L2P-Multi | `starter-environments/r-pathway/renv.lock` |
+| `r-seurat-conversion` | OMIX-Seurat-Pseudobulk | Bootstrap validation pending; full-Seurat conversion profile, not yet usable with the runtime-restore helper |
 
-The validated locks target R 4.4.3 and Bioconductor 3.20. On Biowulf, check
-which R module is currently offered before loading the matching version:
+The released locks target R 4.4.3 and Bioconductor 3.20.
+`r-seurat-conversion` is a review-only bootstrap definition until its Linux CI
+build verifies the committed lockfile. It is intentionally the only profile
+that includes full Seurat; all downstream analytical profiles remain
+lightweight. On Biowulf, check which R module is currently offered before
+loading the matching version:
 
 ```bash
 module spider R

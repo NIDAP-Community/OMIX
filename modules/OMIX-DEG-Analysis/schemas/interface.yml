@@ -1,23 +1,32 @@
-interface_version: 1
+interface_version: 2
 entrypoint: scripts/run_deg_analysis.R
 inputs:
   table:
     required_when: input_type=table
-    counts:
+    matrix:
       formats: [csv, tsv, txt, rds]
-      description: Raw integer-like feature-by-sample count table with one feature-ID column.
+      description: Feature-by-sample raw integer counts for raw_counts, a declared log2-scale Harmony-corrected mean-expression matrix for harmony_mean_expression, or log2-scale SCT donor means written by OMIX-Seurat-Pseudobulk for sct_mean_expression.
     metadata:
       formats: [csv, tsv, txt, rds]
       description: Sample-level metadata table with a unique sample-ID column.
+    pseudobulk_manifest:
+      required: false
+      formats: [dcf]
+      description: Optional Pseudobulk_Manifest.dcf written by OMIX-Seurat-Pseudobulk. When supplied, it must match analysis_mode.
   moo:
     required_when: input_type=moo
     formats: [rds]
-    description: MOSuite multiOmicDataSet, converted by OmixMOSuite using the raw count layer and embedded sample metadata.
+    description: MOSuite multiOmicDataSet, converted by OmixMOSuite using the raw count layer and embedded sample metadata. Only valid for raw_counts.
 parameters:
   input_type:
     type: string
     default: table
     allowed: [table, moo]
+  analysis_mode:
+    type: string
+    default: raw_counts
+    allowed: [raw_counts, harmony_mean_expression, sct_mean_expression]
+    description: Select raw integer-count edgeR/voom analysis, direct limma on declared Harmony-corrected donor means, or direct limma on log2-scale SCT donor means. Do not interchange these modes.
   gene_names_column:
     type: string
     default: GeneName
@@ -34,24 +43,41 @@ parameters:
     type: string
   batch_effect_columns:
     type: string
-    default: Batch
+    default: auto
+    description: auto resolves to Batch for raw_counts and blank for continuous-expression modes. Technical batch terms are never allowed for harmony_mean_expression because upstream Harmony is the declared batch correction. For sct_mean_expression, include an unhandled technical batch as covariate_columns rather than using batch_effect_columns.
   donor_variable_column:
     type: string
   filter_low_expression:
-    type: boolean
-    default: true
+    type: boolean_or_auto
+    default: auto
+    description: Defaults to true only for raw_counts. Not available for continuous-expression modes.
   normalization_method:
     type: string
-    default: TMM
-    allowed: [TMM, Quantile, TMM + Quantile, TMM + Scale, TMM + Cyclic Loess, TMMwsp, RLE, Upper Quartile]
+    default: auto
+    allowed: [auto, None, TMM, Quantile, TMM + Quantile, TMM + Scale, TMM + Cyclic Loess, TMMwsp, RLE, Upper Quartile]
+    description: auto resolves to TMM for raw_counts and None for continuous-expression modes.
+  return_batch_corrected_values:
+    type: boolean_or_auto
+    default: auto
+    description: Defaults to true for raw_counts and false for continuous-expression modes.
+  remove_donor_effect_for_downstream:
+    type: boolean_or_auto
+    default: auto
+    description: Optional only for raw_counts. Continuous input is returned unchanged.
+  summarization_method:
+    type: string
+    default: auto
+    allowed: [auto, sum, mean, max]
+    description: auto resolves to sum for raw_counts and mean for continuous-expression modes.
   write_normalization_diagnostics:
-    type: boolean
-    default: true
-    description: Write before-and-after boxplot and density diagnostics for filtered log-CPM values.
+    type: boolean_or_auto
+    default: auto
+    description: Writes raw-count log-CPM and voom diagnostics only.
 outputs:
   deg_analysis:
     path: DEG_Analysis.csv
     format: csv
+    description: Differential-expression results whose first column is always GeneName, followed by contrast statistics and sample-level expression values. In continuous-expression modes, logFC is the limma coefficient on the declared log2 expression scale.
   sample_metadata:
     path: Sample_Metadata.csv
     format: csv
@@ -61,6 +87,12 @@ outputs:
   normalization_boxplots:
     path: normalization_boxplots.png
     format: png
+    required_when: analysis_mode=raw_counts and write_normalization_diagnostics=true
   normalization_densities:
     path: normalization_densities.png
     format: png
+    required_when: analysis_mode=raw_counts and write_normalization_diagnostics=true
+  voom_mean_variance:
+    path: voom_mean_variance.png
+    format: png
+    required_when: analysis_mode=raw_counts and write_normalization_diagnostics=true

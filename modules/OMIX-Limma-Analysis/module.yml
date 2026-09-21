@@ -1,0 +1,12 @@
+name: omix-limma-analysis
+display_name: OMIX Limma Analysis
+version: 0.1.0
+interface_version: 1
+module_type: statistical-analysis
+status: development
+owner: OMIX Team
+description: Template-preserving limma analysis for declared continuous feature-by-sample matrices, including corrected expression and enrichment scores.
+data_policy: No data are committed. Callers supply explicit continuous matrices and aligned sample metadata paths.
+runtime_profile: r-statistics
+entrypoint: scripts/run_limma_analysis.R
+deployment_adapters: []

@@ -16,6 +16,7 @@ make_seurat_fixture <- function() {
     donor = rep(c("D1", "D2", "D3"), each = 4L),
     condition = rep(rep(c("ctrl", "stim"), each = 2L), 3L),
     cell_type = rep("Mono", 12L),
+    Batch = rep(c("Run1", "Run2", "Run3"), each = 4L),
     qc_status = rep("pass", 12L),
     row.names = colnames(counts),
     stringsAsFactors = FALSE
@@ -42,6 +43,7 @@ test_that("Seurat bridge creates aligned donor-by-condition pseudobulk input", {
     group_column = "condition",
     cell_type_column = "cell_type",
     cell_type = "Mono",
+    sample_metadata_columns = "Batch",
     cell_filter_column = "qc_status",
     cell_filter_values = "pass",
     min_cells = 2L
@@ -50,9 +52,69 @@ test_that("Seurat bridge creates aligned donor-by-condition pseudobulk input", {
   expect_s3_class(input, "omix_standard_input")
   expect_equal(input$sample_columns, c("D1__ctrl", "D1__stim", "D2__ctrl", "D2__stim", "D3__ctrl", "D3__stim"))
   expect_equal(input$metadata$Cells, rep(2L, 6L))
+  expect_equal(input$metadata$Batch, c("Run1", "Run1", "Run2", "Run2", "Run3", "Run3"))
+  expect_identical(names(input$counts)[[1L]], "GeneName")
   expect_equal(input$counts$D1__ctrl, c(30, 33, 40))
   expect_equal(input$provenance$aggregation, "sum_by_donor_and_group")
   expect_equal(input$provenance$cell_filter_values, "pass")
+})
+
+test_that("Seurat bridge creates direct-limma donor means from a declared expression layer", {
+  object <- make_seurat_fixture()
+  raw_counts <- SeuratObject::LayerData(object, assay = "RNA", layer = "counts")
+  corrected_expression <- log2(as.matrix(raw_counts) + 1)
+  object <- SeuratObject::SetAssayData(
+    object,
+    assay = "RNA",
+    layer = "harmony_corrected",
+    new.data = corrected_expression
+  )
+
+  extracted <- omix_seurat_extract_expression(
+    object,
+    assay = "RNA",
+    layer = "harmony_corrected"
+  )
+  expect_s3_class(extracted, "omix_seurat_expression_cells")
+  expect_equal(extracted$provenance$source_matrix_type, "continuous_gene_expression")
+
+  input <- omix_seurat_to_expression_input(
+    object,
+    donor_column = "donor",
+    group_column = "condition",
+    cell_type_column = "cell_type",
+    cell_type = "Mono",
+    sample_metadata_columns = "Batch",
+    assay = "RNA",
+    layer = "harmony_corrected",
+    min_cells = 2L
+  )
+  expect_s3_class(input, "omix_expression_input")
+  expect_equal(input$sample_columns, c("D1__ctrl", "D1__stim", "D2__ctrl", "D2__stim", "D3__ctrl", "D3__stim"))
+  expect_equal(input$metadata$Cells, rep(2L, 6L))
+  expect_equal(
+    input$expression$D1__ctrl,
+    unname(rowMeans(corrected_expression[, c("Cell1", "Cell2"), drop = FALSE]))
+  )
+  expect_equal(input$provenance$aggregation, "mean_by_donor_and_group")
+})
+
+test_that("Seurat bridge rejects non-invariant retained sample metadata", {
+  object <- make_seurat_fixture()
+  object$Batch[c("Cell1", "Cell2")] <- c("Run1", "RunX")
+
+  expect_error(
+    omix_seurat_to_input(
+      object,
+      donor_column = "donor",
+      group_column = "condition",
+      cell_type_column = "cell_type",
+      cell_type = "Mono",
+      sample_metadata_columns = "Batch",
+      min_cells = 2L
+    ),
+    "Retained sample metadata must be invariant"
+  )
 })
 
 test_that("Seurat bridge reports under-populated donor-by-group profiles", {
