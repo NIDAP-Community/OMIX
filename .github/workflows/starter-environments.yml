@@ -27,6 +27,8 @@ on:
           - all
           - r-base
           - r-pathway
+          - r-seurat-conversion
+          - r-singlecell
           - r-visualization
           - r-statistics
       publish:
@@ -55,6 +57,8 @@ jobs:
       base: ${{ steps.changes.outputs.base }}
       pathway: ${{ steps.changes.outputs.pathway }}
       pathway_package: ${{ steps.changes.outputs.pathway_package }}
+      conversion: ${{ steps.changes.outputs.conversion }}
+      singlecell: ${{ steps.changes.outputs.singlecell }}
       visualization: ${{ steps.changes.outputs.visualization }}
       statistics: ${{ steps.changes.outputs.statistics }}
       workflow: ${{ steps.changes.outputs.workflow }}
@@ -77,10 +81,16 @@ jobs:
             pathway:
               - 'starter-environments/r-pathway/**'
               - '!starter-environments/r-pathway/README.md'
+            singlecell:
+              - 'starter-environments/r-singlecell/**'
+              - '!starter-environments/r-singlecell/README.md'
             pathway_package:
               - 'packages/OmixPathwayPlots/**'
               - '!packages/OmixPathwayPlots/README.md'
               - '!packages/OmixPathwayPlots/CHANGELOG.md'
+            conversion:
+              - 'starter-environments/r-seurat-conversion/**'
+              - '!starter-environments/r-seurat-conversion/README.md'
             visualization:
               - 'starter-environments/r-visualization/**'
               - '!starter-environments/r-visualization/README.md'
@@ -115,6 +125,8 @@ jobs:
           BASE_CHANGED: ${{ needs.filter.outputs.base }}
           PATHWAY_CHANGED: ${{ needs.filter.outputs.pathway }}
           PATHWAY_PACKAGE_CHANGED: ${{ needs.filter.outputs.pathway_package }}
+          CONVERSION_CHANGED: ${{ needs.filter.outputs.conversion }}
+          SINGLECELL_CHANGED: ${{ needs.filter.outputs.singlecell }}
           VISUALIZATION_CHANGED: ${{ needs.filter.outputs.visualization }}
           STATISTICS_CHANGED: ${{ needs.filter.outputs.statistics }}
         run: |
@@ -122,6 +134,8 @@ jobs:
 
           base=false
           pathway=false
+          conversion=false
+          singlecell=false
           visualization=false
           statistics=false
 
@@ -132,10 +146,14 @@ jobs:
               if [[ "$PATHWAY_PACKAGE_CHANGED" == "true" ]]; then
                 pathway=true
               fi
+              conversion="$CONVERSION_CHANGED"
+              singlecell="$SINGLECELL_CHANGED"
               visualization="$VISUALIZATION_CHANGED"
               statistics="$STATISTICS_CHANGED"
               if [[ "$base" == "true" ]]; then
                 pathway=true
+                conversion=true
+                singlecell=true
                 visualization=true
                 statistics=true
               fi
@@ -143,6 +161,8 @@ jobs:
             all)
               base=true
               pathway=true
+              conversion=true
+              singlecell=true
               visualization=true
               statistics=true
               ;;
@@ -151,6 +171,12 @@ jobs:
               ;;
             r-pathway)
               pathway=true
+              ;;
+            r-seurat-conversion)
+              conversion=true
+              ;;
+            r-singlecell)
+              singlecell=true
               ;;
             r-visualization)
               visualization=true
@@ -172,12 +198,14 @@ jobs:
           {
             echo "base=$base"
             echo "pathway=$pathway"
+            echo "conversion=$conversion"
+            echo "singlecell=$singlecell"
             echo "visualization=$visualization"
             echo "statistics=$statistics"
           } >> "$GITHUB_OUTPUT"
 
-          printf 'Selected targets: base=%s pathway=%s visualization=%s statistics=%s\n' \
-            "$base" "$pathway" "$visualization" "$statistics"
+          printf 'Selected targets: base=%s pathway=%s conversion=%s singlecell=%s visualization=%s statistics=%s\n' \
+            "$base" "$pathway" "$conversion" "$singlecell" "$visualization" "$statistics"
 
       - name: Build r-base
         if: steps.targets.outputs.base == 'true'
@@ -203,6 +231,38 @@ jobs:
             docker build \
               --tag omix-r-pathway:ci \
               --file starter-environments/r-pathway/Dockerfile \
+              .
+          fi
+
+      - name: Build r-singlecell
+        if: steps.targets.outputs.singlecell == 'true'
+        run: |
+          if [[ "${{ steps.targets.outputs.base }}" == "true" ]]; then
+            docker build \
+              --build-arg BASE_IMAGE=omix-r-base:ci \
+              --tag omix-r-singlecell:ci \
+              --file starter-environments/r-singlecell/Dockerfile \
+              .
+          else
+            docker build \
+              --tag omix-r-singlecell:ci \
+              --file starter-environments/r-singlecell/Dockerfile \
+              .
+          fi
+
+      - name: Build r-seurat-conversion
+        if: steps.targets.outputs.conversion == 'true'
+        run: |
+          if [[ "${{ steps.targets.outputs.base }}" == "true" ]]; then
+            docker build \
+              --build-arg BASE_IMAGE=omix-r-base:ci \
+              --tag omix-r-seurat-conversion:ci \
+              --file starter-environments/r-seurat-conversion/Dockerfile \
+              .
+          else
+            docker build \
+              --tag omix-r-seurat-conversion:ci \
+              --file starter-environments/r-seurat-conversion/Dockerfile \
               .
           fi
 
@@ -259,6 +319,34 @@ jobs:
               suppressPackageStartupMessages(library(package, character.only = TRUE))
               as.character(packageVersion(package))
             }, character(1))
+            writeLines(paste(sprintf("%s %s", packages, versions), collapse = "\\n"))
+          '
+
+      - name: Verify single-cell runtime
+        if: steps.targets.outputs.singlecell == 'true'
+        run: |
+          docker run --rm --entrypoint Rscript omix-r-singlecell:ci -e '
+            packages <- c("Omix", "OmixSeurat", "SeuratObject", "Matrix", "optparse")
+            versions <- vapply(packages, function(package) {
+              suppressPackageStartupMessages(library(package, character.only = TRUE))
+              as.character(packageVersion(package))
+            }, character(1))
+            writeLines(paste(sprintf("%s %s", packages, versions), collapse = "\\n"))
+          '
+
+      - name: Verify Seurat conversion runtime
+        if: steps.targets.outputs.conversion == 'true'
+        run: |
+          docker run --rm --entrypoint Rscript omix-r-seurat-conversion:ci -e '
+            packages <- c(
+              "Omix", "OmixSeurat", "Seurat", "SeuratObject", "sctransform",
+              "Matrix", "optparse"
+            )
+            versions <- vapply(packages, function(package) {
+              suppressPackageStartupMessages(library(package, character.only = TRUE))
+              as.character(packageVersion(package))
+            }, character(1))
+            stopifnot(methods::getClass("SCTAssay")@package == "Seurat")
             writeLines(paste(sprintf("%s %s", packages, versions), collapse = "\\n"))
           '
 
@@ -344,6 +432,82 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
+      - name: Capture single-cell package inventory
+        if: steps.targets.outputs.singlecell == 'true'
+        run: |
+          mkdir -p build-artifacts/singlecell
+          docker run --rm \
+            --volume "${{ github.workspace }}/build-artifacts/singlecell:/out" \
+            --entrypoint Rscript \
+            omix-r-singlecell:ci \
+            -e '
+              installed <- as.data.frame(installed.packages(lib.loc = .libPaths()))
+              write.csv(
+                installed[, c("Package", "Version", "Built", "LibPath")],
+                "/out/installed-packages.csv",
+                row.names = FALSE
+              )
+              writeLines(capture.output(sessionInfo()), "/out/sessionInfo.txt")
+              project <- tempfile("renv-project-")
+              dir.create(project)
+              renv::snapshot(
+                project = project,
+                library = .libPaths(),
+                lockfile = "/out/renv.lock",
+                type = "all",
+                exclude = c("littler", "Omix", "OmixSeurat"),
+                prompt = FALSE,
+                force = TRUE
+              )
+            '
+
+      - name: Upload single-cell package inventory
+        if: steps.targets.outputs.singlecell == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: singlecell-package-inventory
+          path: build-artifacts/singlecell
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Capture Seurat conversion package inventory
+        if: steps.targets.outputs.conversion == 'true'
+        run: |
+          mkdir -p build-artifacts/seurat-conversion
+          docker run --rm \
+            --volume "${{ github.workspace }}/build-artifacts/seurat-conversion:/out" \
+            --entrypoint Rscript \
+            omix-r-seurat-conversion:ci \
+            -e '
+              installed <- as.data.frame(installed.packages(lib.loc = .libPaths()))
+              write.csv(
+                installed[, c("Package", "Version", "Built", "LibPath")],
+                "/out/installed-packages.csv",
+                row.names = FALSE
+              )
+              writeLines(capture.output(sessionInfo()), "/out/sessionInfo.txt")
+              project <- tempfile("renv-project-")
+              dir.create(project)
+              renv::snapshot(
+                project = project,
+                library = .libPaths(),
+                lockfile = "/out/renv.lock",
+                type = "all",
+                exclude = c("littler", "Omix", "OmixSeurat"),
+                prompt = FALSE,
+                force = TRUE
+              )
+            '
+
+      - name: Upload Seurat conversion package inventory
+        if: steps.targets.outputs.conversion == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: seurat-conversion-package-inventory
+          path: build-artifacts/seurat-conversion
+          if-no-files-found: error
+          retention-days: 90
+
       - name: Capture resolved pathway package inventory
         if: steps.targets.outputs.pathway == 'true'
         run: |
@@ -399,6 +563,8 @@ jobs:
         env:
           PUBLISH_BASE: ${{ steps.targets.outputs.base }}
           PUBLISH_PATHWAY: ${{ steps.targets.outputs.pathway }}
+          PUBLISH_CONVERSION: ${{ steps.targets.outputs.conversion }}
+          PUBLISH_SINGLECELL: ${{ steps.targets.outputs.singlecell }}
           PUBLISH_VISUALIZATION: ${{ steps.targets.outputs.visualization }}
           PUBLISH_STATISTICS: ${{ steps.targets.outputs.statistics }}
         run: |
@@ -406,6 +572,8 @@ jobs:
 
           base_version="$(tr -d '[:space:]' < starter-environments/r-base/VERSION)"
           pathway_version="$(tr -d '[:space:]' < starter-environments/r-pathway/VERSION)"
+          conversion_version="$(tr -d '[:space:]' < starter-environments/r-seurat-conversion/VERSION)"
+          singlecell_version="$(tr -d '[:space:]' < starter-environments/r-singlecell/VERSION)"
           visualization_version="$(tr -d '[:space:]' < starter-environments/r-visualization/VERSION)"
           statistics_version="$(tr -d '[:space:]' < starter-environments/r-statistics/VERSION)"
 
@@ -421,6 +589,28 @@ jobs:
             docker tag omix-r-pathway:ci ghcr.io/nidap-community/omix-r-pathway:"$pathway_version"
             docker push ghcr.io/nidap-community/omix-r-pathway:${{ github.sha }}
             docker push ghcr.io/nidap-community/omix-r-pathway:"$pathway_version"
+          fi
+
+          if [[ "$PUBLISH_CONVERSION" == "true" ]]; then
+            if [[ "$conversion_version" == *-v0 ]]; then
+              echo "r-seurat-conversion is still a bootstrap definition; Linux CI must validate its committed lockfile and supported object-conversion tests before publishing." >&2
+              exit 1
+            fi
+            docker tag omix-r-seurat-conversion:ci ghcr.io/nidap-community/omix-r-seurat-conversion:${{ github.sha }}
+            docker tag omix-r-seurat-conversion:ci ghcr.io/nidap-community/omix-r-seurat-conversion:"$conversion_version"
+            docker push ghcr.io/nidap-community/omix-r-seurat-conversion:${{ github.sha }}
+            docker push ghcr.io/nidap-community/omix-r-seurat-conversion:"$conversion_version"
+          fi
+
+          if [[ "$PUBLISH_SINGLECELL" == "true" ]]; then
+            if [[ "$singlecell_version" == *-v0 ]]; then
+              echo "r-singlecell is still a bootstrap definition; commit its CI-captured renv.lock, replace the bootstrap installer, and change VERSION to v1 or later before publishing." >&2
+              exit 1
+            fi
+            docker tag omix-r-singlecell:ci ghcr.io/nidap-community/omix-r-singlecell:${{ github.sha }}
+            docker tag omix-r-singlecell:ci ghcr.io/nidap-community/omix-r-singlecell:"$singlecell_version"
+            docker push ghcr.io/nidap-community/omix-r-singlecell:${{ github.sha }}
+            docker push ghcr.io/nidap-community/omix-r-singlecell:"$singlecell_version"
           fi
 
           if [[ "$PUBLISH_VISUALIZATION" == "true" ]]; then
@@ -450,6 +640,8 @@ jobs:
         env:
           PUBLISH_BASE: ${{ steps.targets.outputs.base }}
           PUBLISH_PATHWAY: ${{ steps.targets.outputs.pathway }}
+          PUBLISH_CONVERSION: ${{ steps.targets.outputs.conversion }}
+          PUBLISH_SINGLECELL: ${{ steps.targets.outputs.singlecell }}
           PUBLISH_VISUALIZATION: ${{ steps.targets.outputs.visualization }}
           PUBLISH_STATISTICS: ${{ steps.targets.outputs.statistics }}
         run: |
@@ -457,6 +649,8 @@ jobs:
 
           base_version="$(tr -d '[:space:]' < starter-environments/r-base/VERSION)"
           pathway_version="$(tr -d '[:space:]' < starter-environments/r-pathway/VERSION)"
+          conversion_version="$(tr -d '[:space:]' < starter-environments/r-seurat-conversion/VERSION)"
+          singlecell_version="$(tr -d '[:space:]' < starter-environments/r-singlecell/VERSION)"
           visualization_version="$(tr -d '[:space:]' < starter-environments/r-visualization/VERSION)"
           statistics_version="$(tr -d '[:space:]' < starter-environments/r-statistics/VERSION)"
           {
@@ -471,6 +665,16 @@ jobs:
               pathway_ref="ghcr.io/nidap-community/omix-r-pathway:$pathway_version"
               pathway_digest="$(docker buildx imagetools inspect "$pathway_ref" --format '{{.Manifest.Digest}}')"
               echo "- \`$pathway_ref@$pathway_digest\`"
+            fi
+            if [[ "$PUBLISH_CONVERSION" == "true" ]]; then
+              conversion_ref="ghcr.io/nidap-community/omix-r-seurat-conversion:$conversion_version"
+              conversion_digest="$(docker buildx imagetools inspect "$conversion_ref" --format '{{.Manifest.Digest}}')"
+              echo "- \`$conversion_ref@$conversion_digest\`"
+            fi
+            if [[ "$PUBLISH_SINGLECELL" == "true" ]]; then
+              singlecell_ref="ghcr.io/nidap-community/omix-r-singlecell:$singlecell_version"
+              singlecell_digest="$(docker buildx imagetools inspect "$singlecell_ref" --format '{{.Manifest.Digest}}')"
+              echo "- \`$singlecell_ref@$singlecell_digest\`"
             fi
             if [[ "$PUBLISH_VISUALIZATION" == "true" ]]; then
               visualization_ref="ghcr.io/nidap-community/omix-r-visualization:$visualization_version"

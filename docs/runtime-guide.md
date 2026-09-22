@@ -9,6 +9,8 @@ are declared in that module's `module.yml` overlay.
 r-base -> r-statistics    -> bulk statistical modules
        -> r-visualization -> plotting and filtering modules
        -> r-pathway       -> GSEA and L2P modules
+       -> r-seurat-conversion -> legacy/current Seurat object conversion
+       -> r-singlecell        -> lightweight native-SeuratObject extraction
 ```
 
 ## Choose and reproduce a runtime
@@ -18,6 +20,15 @@ immutable image reference in
 [`starter-environments/release-manifest.json`](../starter-environments/release-manifest.json).
 A readable image tag is not an execution identity; record the full
 `image@sha256:...` reference with each result.
+
+`r-seurat-conversion` is currently a bootstrap definition for
+`OMIX-Seurat-Pseudobulk`, rather than a released runtime. It deliberately
+isolates full-Seurat compatibility to object conversion, including legacy
+`SCTAssay` objects. Its candidate lock is committed, but do not use it for a
+reproducible scientific run until Linux CI has validated that lock and the
+profile has a versioned digest record in the release manifest. `r-singlecell`
+remains a lightweight SeuratObject-only profile for standard assays; it is not
+the compatibility promise for legacy serialized objects.
 
 For each analysis, retain:
 

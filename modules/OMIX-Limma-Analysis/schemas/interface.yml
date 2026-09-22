@@ -1,0 +1,74 @@
+interface_version: 1
+entrypoint: scripts/run_limma_analysis.R
+inputs:
+  matrix:
+    required: true
+    formats: [csv, tsv, txt, rds]
+    description: Feature-by-sample continuous matrix. It must not contain raw integer RNA counts or untransformed relative proportions.
+  metadata:
+    required: true
+    formats: [csv, tsv, txt, rds]
+    description: Sample-level metadata with a unique sample-ID column aligned to matrix sample columns.
+parameters:
+  gene_names_column:
+    type: string
+    default: GeneName
+  sample_names_column:
+    type: string
+    default: Sample
+  samples_to_include:
+    type: string
+    default: ""
+    description: Optional comma-separated sample IDs. By default, all metadata samples found in the matrix are used.
+  contrast_variable_columns:
+    type: string
+    default: Group
+    description: One or two comma-separated metadata columns defining the modeled groups.
+  contrasts:
+    type: string
+    required: true
+    description: Comma-separated limma contrast expressions, such as B-A.
+  covariate_columns:
+    type: string
+    default: ""
+  donor_variable_column:
+    type: string
+    default: ""
+    description: Optional repeated-measure donor/patient column. Supply only when a donor has repeated modeled profiles.
+  summarization_method:
+    type: string
+    default: mean
+    allowed: [mean, max, sum]
+  input_kind:
+    type: string
+    default: log2_expression
+    allowed: [log2_expression, enrichment_score, continuous_score]
+    description: Declares the input scale and controls effect-size labeling. Relative proportions require a separately declared transform and are not accepted by this initial interface.
+  variance_model:
+    type: string
+    default: auto
+    allowed: [auto, ebayes, ebayes_trend]
+    description: auto uses a compatible Pseudobulk_Manifest.dcf recommendation when supplied and otherwise uses template-equivalent ebayes. ebayes_trend is explicit limma empirical-Bayes trend modeling for a declared mean-dependent variance relationship.
+  pseudobulk_manifest:
+    type: path
+    default: ""
+    description: Optional Pseudobulk_Manifest.dcf. It verifies that the input is a declared Harmony or SCTransform continuous-expression handoff, selects the recommended variance model when variance_model is auto, and rejects raw integer counts.
+  return_matrix:
+    type: boolean
+    default: true
+  output_dir:
+    type: path
+    default: results
+outputs:
+  limma_analysis:
+    path: Limma_Analysis.csv
+    format: csv
+    description: Template-compatible results. log2_expression uses signed FC and logFC columns; other input kinds use effect columns in the supplied score units.
+  sample_metadata:
+    path: Sample_Metadata.csv
+    format: csv
+    description: Metadata aligned to the modeled matrix columns.
+  run_summary:
+    path: run_summary.txt
+    format: text
+    description: Matrix provenance, model settings, design, and donor-correlation details.

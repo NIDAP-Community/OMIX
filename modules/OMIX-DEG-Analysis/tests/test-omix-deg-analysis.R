@@ -50,7 +50,7 @@ unpaired <- omix_deg_analysis(
   normalization_method = "TMM + Quantile"
 )
 
-stopifnot(all(c("Gene", "B-A_logFC", "B-A_pval", "B-A_adjpval") %in% colnames(unpaired)))
+stopifnot(all(c("GeneName", "B-A_logFC", "B-A_pval", "B-A_adjpval") %in% colnames(unpaired)))
 stopifnot(identical(tail(colnames(unpaired), 6L), fixture$metadata$Sample))
 stopifnot(identical(attr(unpaired, "omix_deg_run")$model_type, "linear"))
 stopifnot(identical(attr(unpaired, "omix_deg_run")$expression_output, "batch_adjusted_voom"))
@@ -134,4 +134,78 @@ stopifnot(
   grepl("Each comparison group must contain at least two biological samples", under_replicated_error, fixed = TRUE)
 )
 
-message("OMIX DEG raw-count model tests passed")
+continuous_dataset <- fixture$dataset
+continuous_dataset[, fixture$metadata$Sample] <- log2(as.matrix(continuous_dataset[, fixture$metadata$Sample]) + 1)
+continuous <- omix_deg_analysis(
+  Dataset = continuous_dataset,
+  Metadata_Table = fixture$metadata,
+  sample_names_column = "Sample",
+  samples_to_include = fixture$metadata$Sample,
+  gene_names_column = "Gene",
+  contrast_variable_columns = "Condition",
+  contrasts = "B-A",
+  analysis_mode = "harmony_mean_expression"
+)
+stopifnot(all(c("GeneName", "B-A_logFC", "B-A_pval", "B-A_adjpval") %in% colnames(continuous)))
+stopifnot(identical(attr(continuous, "omix_deg_run")$analysis_mode, "harmony_mean_expression"))
+stopifnot(identical(attr(continuous, "omix_deg_run")$normalization_method, "None"))
+stopifnot(identical(attr(continuous, "omix_deg_run")$expression_output, "input_harmony_corrected_expression"))
+stopifnot(identical(attr(continuous, "omix_deg_run")$adjusted_columns, character()))
+continuous_batch_error <- tryCatch(
+  omix_deg_analysis(
+    Dataset = continuous_dataset,
+    Metadata_Table = fixture$metadata,
+    sample_names_column = "Sample",
+    samples_to_include = fixture$metadata$Sample,
+    gene_names_column = "Gene",
+    contrast_variable_columns = "Condition",
+    contrasts = "B-A",
+    batch_effect_columns = "Batch",
+    analysis_mode = "harmony_mean_expression"
+  ),
+  error = conditionMessage
+)
+stopifnot(grepl("second batch adjustment", continuous_batch_error, fixed = TRUE))
+
+sct_continuous <- omix_deg_analysis(
+  Dataset = continuous_dataset,
+  Metadata_Table = fixture$metadata,
+  sample_names_column = "Sample",
+  samples_to_include = fixture$metadata$Sample,
+  gene_names_column = "Gene",
+  contrast_variable_columns = "Condition",
+  contrasts = "B-A",
+  analysis_mode = "sct_mean_expression"
+)
+stopifnot(identical(attr(sct_continuous, "omix_deg_run")$analysis_mode, "sct_mean_expression"))
+stopifnot(identical(attr(sct_continuous, "omix_deg_run")$input_matrix_type, "sctransform_mean_log2_expression"))
+stopifnot(identical(attr(sct_continuous, "omix_deg_run")$expression_output, "input_sctransform_log2_expression"))
+sct_with_batch_covariate <- omix_deg_analysis(
+  Dataset = continuous_dataset,
+  Metadata_Table = fixture$metadata,
+  sample_names_column = "Sample",
+  samples_to_include = fixture$metadata$Sample,
+  gene_names_column = "Gene",
+  contrast_variable_columns = "Condition",
+  contrasts = "B-A",
+  covariate_columns = "Batch",
+  analysis_mode = "sct_mean_expression"
+)
+stopifnot(identical(attr(sct_with_batch_covariate, "omix_deg_run")$modeled_covariates, "Batch"))
+sct_batch_error <- tryCatch(
+  omix_deg_analysis(
+    Dataset = continuous_dataset,
+    Metadata_Table = fixture$metadata,
+    sample_names_column = "Sample",
+    samples_to_include = fixture$metadata$Sample,
+    gene_names_column = "Gene",
+    contrast_variable_columns = "Condition",
+    contrasts = "B-A",
+    batch_effect_columns = "Batch",
+    analysis_mode = "sct_mean_expression"
+  ),
+  error = conditionMessage
+)
+stopifnot(grepl("covariate_columns", sct_batch_error, fixed = TRUE))
+
+message("OMIX DEG raw-count, Harmony-mean, and SCTransform-mean model tests passed")

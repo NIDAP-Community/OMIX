@@ -9,11 +9,12 @@ omix_seurat_to_input(
   group_column,
   cell_type_column,
   cell_type,
+  sample_metadata_columns = NULL,
   cell_filter_column = NULL,
   cell_filter_values = NULL,
   assay = "RNA",
   layer = "counts",
-  feature_id_column = "Gene",
+  feature_id_column = "GeneName",
   min_cells = 20L,
   on_insufficient_cells = c("error", "drop")
 )
@@ -26,11 +27,12 @@ omix_read_seurat_rds(path, ...)
 \item{group_column}{Cell-metadata column identifying experimental groups.}
 \item{cell_type_column}{Cell-metadata column identifying cell types.}
 \item{cell_type}{One exact cell-type value to aggregate.}
+\item{sample_metadata_columns}{Optional cell-metadata columns to retain in the pseudobulk sample metadata. Each value must be non-missing and invariant within every donor-by-group profile.}
 \item{cell_filter_column}{Optional cell-metadata column used for an explicit pre-aggregation filter.}
 \item{cell_filter_values}{Values retained from \code{cell_filter_column}.}
 \item{assay}{Assay containing raw counts.}
 \item{layer}{Assay layer containing raw counts.}
-\item{feature_id_column}{Output feature-ID column name.}
+\item{feature_id_column}{Output feature-ID column name. Defaults to \code{GeneName}.}
 \item{min_cells}{Minimum selected cells per donor-by-group profile.}
 \item{on_insufficient_cells}{Whether under-populated profiles cause an error or are dropped.}
 \item{path}{Path to an \code{.rds} file containing a Seurat object.}

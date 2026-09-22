@@ -6,4 +6,6 @@
 ._*
 archive/
 results/
+# Local Seurat objects used for manual validation; committed fixtures belong in tests/.
+modules/OMIX-Seurat-Pseudobulk/data/
 core/README.html
