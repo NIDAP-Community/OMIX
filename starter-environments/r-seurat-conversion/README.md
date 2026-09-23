@@ -26,12 +26,14 @@ or install Seurat.
 The Harmony embedding (`reductions$harmony@cell.embeddings`) is not a
 gene-expression matrix and is never a conversion target.
 
-## Bootstrap status
+## Release contract
 
-This initial definition is `v0` and is not publishable. Its candidate
-`renv.lock` is pinned to R 4.4.3 and the known working Seurat 5.3.0 stack. The
-targeted Linux CI build generates and serializes a synthetic object with an
-`SCTAssay`, then verifies the supported RNA, Harmony-assay, and SCT-assay
-conversions. Only after that evidence is recorded on the intended source
-commit may a maintainer change `VERSION` to `v1` and publish a
-digest-qualified image record.
+This profile's first publishable version is `r4.4.3-v1`. Its committed
+`renv.lock` is pinned to R 4.4.3 and the known working Seurat 5.3.0 stack, and
+the targeted Linux CI build generates and serializes a synthetic object with an
+`SCTAssay` before verifying the supported RNA, Harmony-assay, and SCT-assay
+conversions.
+
+After publishing, record the immutable GHCR digest in
+`starter-environments/release-manifest.json` and use that digest-qualified
+reference for reproducible scientific runs.

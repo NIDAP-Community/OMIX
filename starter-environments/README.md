@@ -25,7 +25,7 @@ The image family is intended for local and shared execution targets:
 | `r-pathway` | Pathway and gene-set analysis libraries | GSEA, GSVA, L2P |
 | `r-visualization` | Plotting and statistical-visualization libraries | Gene Boxplots, Volcano Plot, GSEA Filters |
 | `r-statistics` | Bulk statistical-analysis libraries | DEG and future statistical modules |
-| `r-seurat-conversion` | Full-Seurat compatibility and portable object conversion | Seurat Pseudobulk (bootstrap; not yet released) |
+| `r-seurat-conversion` | Full-Seurat compatibility and portable object conversion | Seurat Pseudobulk |
 | `r-singlecell` | Lightweight SeuratObject extraction | Native standard-assay use only; no current module release target |
 
 Images are built by the `Starter Environments` GitHub workflow. Normal pushes
