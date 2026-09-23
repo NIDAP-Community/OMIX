@@ -1,0 +1,15 @@
+name: omix-gsva
+display_name: OMIX GSVA
+version: 0.1.0
+interface_version: 1
+module_type: pathway
+status: development
+owner: OMIX Team
+description: Calculate sample-level pathway enrichment scores from normalized expression using the preserved CCBR GSVA template.
+data_policy: No study data or generated results are committed. Callers supply explicit normalized-expression, sample-metadata, and gene-set membership paths.
+runtime_profile: r-pathway
+entrypoint: scripts/run_gsva.R
+source_template: NIDAP/Templates/GSVA_v1.R
+source_template_version: 1
+source_template_sha256: 0d536870e979daa3a949e2a86aa12d72f25b160d26eec1148c0db33fc24b0c5d
+deployment_adapters: []

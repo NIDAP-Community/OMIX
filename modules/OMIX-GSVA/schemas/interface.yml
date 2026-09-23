@@ -1,0 +1,90 @@
+interface_version: 1
+entrypoint: scripts/run_gsva.R
+inputs:
+  normalized_data:
+    required: true
+    formats: [csv, tsv, txt]
+    description: Normalized continuous gene-by-sample expression table. The gene identifier column and selected sample columns must be present.
+  sample_metadata:
+    required: true
+    formats: [csv, tsv, txt]
+    description: Sample metadata containing one row per selected sample and a sample-ID column matching expression column names.
+  pathways_database:
+    required: true
+    formats: [csv, tsv, txt]
+    description: Long gene-set membership table with collection, gene_set_name, gene_symbol, and species columns.
+parameters:
+  gene_column:
+    type: string
+    default: Gene
+  sample_name_column:
+    type: string
+    default: Sample
+  samples_to_include:
+    type: string
+    default: ""
+    description: Optional comma-separated sample columns. When omitted, metadata sample IDs present in normalized_data are used in metadata order.
+  species:
+    type: string
+    default: Human
+    description: Species used to annotate normalized_data.
+  database_species:
+    type: string
+    default: Human
+    description: Species to select from the standard pathways database.
+  collections_to_include:
+    type: string
+    default: "H: hallmark gene sets"
+    description: Comma-separated collection names, matched exactly and kept together in one GSVA run.
+  custom_pathways_database:
+    type: boolean
+    default: false
+    description: When true, select custom_species instead of database_species from pathways_database.
+  custom_species:
+    type: string
+    default: Mouse
+  method:
+    type: string
+    default: gsva
+    allowed: [gsva, ssgsea, zscore, plage]
+  minimum_geneset_size:
+    type: integer
+    default: 15
+  maximum_geneset_size:
+    type: integer
+    default: 1200
+  update_genes:
+    type: boolean
+    default: true
+    description: Update expression and gene-set symbols with l2psupp before enrichment.
+  display_warnings:
+    type: integer
+    default: -1
+  input_delim:
+    type: string
+    default: "\t"
+    description: Delimiter shared by the three input tables; use a comma for CSV files.
+  image_width:
+    type: number
+    default: 12
+    units: inches
+  image_height:
+    type: number
+    default: 10
+    units: inches
+  output_dir:
+    type: path
+    default: results
+outputs:
+  gsva_results:
+    path: gsva_v1_results.csv
+    format: csv
+    description: Gene-set-by-sample enrichment score table with Geneset as the first column.
+  gsva_heatmap:
+    path: gsva_v1_heatmap.png
+    format: png
+    description: Row-scaled base-R heatmap of the enrichment score matrix.
+  run_summary:
+    path: gsva_run_summary.txt
+    format: text
+    description: Input paths, selected samples, collections, method, size limits, and template provenance.
