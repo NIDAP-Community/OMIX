@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Document the existing sample-wise sum applied to duplicate gene identifiers
+  and add a fixture regression for both the default and non-summing paths. No
+  scientific behavior or plot aesthetics changed.
+
 ## 0.2.0
 
 - Preserve the original `Boxplot_with_Stats.R` implementation verbatim as the

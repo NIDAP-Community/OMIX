@@ -102,6 +102,24 @@ The intentional OMIX default difference is that precomputed DEG annotations
 use **nominal** p-values by default (`pvalue_to_plot = "raw"` in the preserved
 function). Select `adjusted` when appropriate for the question.
 
+### Duplicate gene identifiers
+
+The preserved implementation defaults to `sum_duplicates = TRUE`. After the
+expression table is reshaped, all rows with the same gene identifier are
+collapsed to one value per gene and sample using an arithmetic **sum**. They
+are not averaged, and this rule is applied to the supplied values whether they
+are normalized CPM, voom-scale, or batch-corrected expression. Missing values
+are removed during the sum; a gene/sample group containing only missing values
+therefore becomes zero.
+
+The portable CLI does not currently expose a duplicate-handling option. Direct
+R callers can pass `sum_duplicates = FALSE` through `omix_gene_boxplots(...)`,
+but the preserved implementation then leaves duplicate rows separate rather
+than selecting a maximum row. This differs from the inherited parameter
+comment in the legacy function. Until that behavior is reviewed as a separate
+scientific change, provide unique gene identifiers upstream when sample-level
+normalized expression should not be added across duplicate rows.
+
 ### Plot appearance
 
 The default visual style is the established CCBR template: groups are assigned

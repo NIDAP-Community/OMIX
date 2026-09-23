@@ -6,6 +6,10 @@ module_dir <- normalizePath(file.path(dirname(test_file), ".."))
 legacy_file <- file.path(module_dir, "R", "Boxplot_with_Stats.R")
 source(file.path(module_dir, "R", "OMIX_Gene_Boxplots.R"))
 
+fixture_dir <- file.path(module_dir, "tests", "fixtures")
+test_device_file <- tempfile("omix-gene-boxplots-test-", fileext = ".pdf")
+grDevices::pdf(test_device_file)
+
 stopifnot(file.exists(legacy_file))
 stopifnot(exists("gene_boxplot_with_stats", mode = "function"))
 stopifnot(exists("gene_boxplot_with_deg_results", mode = "function"))
@@ -66,6 +70,53 @@ stopifnot(file.exists(file.path(out_dir, "gene_boxplot_statistics.csv")))
 stopifnot(file.exists(file.path(out_dir, "gene_boxplot_expression_long.csv")))
 stopifnot(file.exists(file.path(out_dir, "gene_boxplot_run_summary.csv")))
 
+# Fixture regression for duplicate identifiers. The preserved implementation
+# reshapes first, then sums values for each gene/sample pair by default. The
+# FALSE branch currently preserves each duplicate row; it does not choose a
+# maximum row. Keep both facts explicit so a future scientific change is
+# reviewed rather than introduced as an incidental refactor.
+duplicate_expression <- utils::read.csv(
+  file.path(fixture_dir, "duplicate-expression.csv"),
+  stringsAsFactors = FALSE,
+  check.names = FALSE
+)
+duplicate_metadata <- utils::read.csv(
+  file.path(fixture_dir, "duplicate-metadata.csv"),
+  stringsAsFactors = FALSE,
+  check.names = FALSE
+)
+expected_summed <- utils::read.csv(
+  file.path(fixture_dir, "duplicate-expected-summed-long.csv"),
+  stringsAsFactors = FALSE,
+  check.names = FALSE
+)
+
+summed <- boxplot_prepare_long(
+  normalized_counts = duplicate_expression,
+  sample_metadata = duplicate_metadata,
+  gene_column = "GeneName",
+  sample_column = "Sample",
+  category_column = "Group",
+  minimum_samples_per_category = 1L
+)$df_long
+summed$category <- as.character(summed$category)
+summed <- as.data.frame(summed[, names(expected_summed), drop = FALSE])
+stopifnot(isTRUE(all.equal(summed, expected_summed, check.attributes = FALSE)))
+
+not_summed <- boxplot_prepare_long(
+  normalized_counts = duplicate_expression,
+  sample_metadata = duplicate_metadata,
+  gene_column = "GeneName",
+  sample_column = "Sample",
+  category_column = "Group",
+  sum_duplicates = FALSE,
+  minimum_samples_per_category = 1L
+)$df_long
+gene_dup_a1 <- not_summed$value[
+  not_summed$gene == "GeneDup" & not_summed$sample == "A1"
+]
+stopifnot(identical(sort(gene_dup_a1), c(0.8, 1.2)))
+
 # Regression check for the original ANOVA/Tukey workflow. This prevents the
 # former simplified wrapper's erroneous fallback from ANOVA to t-tests.
 legacy_anova <- gene_boxplot_with_stats(
@@ -87,4 +138,6 @@ wrapped_anova <- omix_gene_boxplots(
 )
 stopifnot(isTRUE(all.equal(wrapped_anova$statistics, legacy_anova$stats, check.attributes = FALSE)))
 
+invisible(grDevices::dev.off())
+unlink(test_device_file)
 message("OMIX-Gene-Boxplots legacy compatibility checks passed")

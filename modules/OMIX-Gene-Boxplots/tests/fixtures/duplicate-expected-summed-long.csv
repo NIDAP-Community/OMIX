@@ -1,0 +1,9 @@
+gene,sample,value,category
+GeneDup,A1,2.0,A
+GeneDup,A2,3.5,A
+GeneDup,B1,4.5,B
+GeneDup,B2,6.0,B
+GeneSolo,A1,5.0,A
+GeneSolo,A2,6.0,A
+GeneSolo,B1,7.0,B
+GeneSolo,B2,8.0,B
