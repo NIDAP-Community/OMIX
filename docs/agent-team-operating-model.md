@@ -14,7 +14,22 @@ pull request reviewed by the coordinator.
 
 ## Team roles
 
-### Coordinator and integrator
+Use these stable names when assigning work or asking a role-specific question.
+The name identifies the responsibility, not a permanently running process, so
+the underlying worker can be restarted without changing how the team refers to
+the role.
+
+| Name | Role | Primary scope |
+| --- | --- | --- |
+| **Atlas** | Coordinator and integrator | Backlog, ownership, reviews, merge order, and release coordination |
+| **Helix** | Single-cell and differential expression | Seurat, pseudobulk, DEG, Limma, and related bridges |
+| **Compass** | Pathway analysis | GSVA, GSEA, L2P, pathway databases, and pathway plots |
+| **Canvas** | Visualization and reporting | Gene Boxplots, Volcano Plot, and shared visual behavior |
+| **Forge** | Runtime and reproducibility | Containers, `renv`, CI, GHCR, inventories, and immutable provenance |
+| **Harbor** | Deployment adapters | Code Ocean and other platform-specific integration |
+| **Beacon** | Quality and documentation | Independent testing, contracts, documentation, and provenance review |
+
+### Atlas — coordinator and integrator
 
 The coordinator owns the work queue and integration sequence. The coordinator:
 
@@ -31,21 +46,21 @@ The coordinator owns the work queue and integration sequence. The coordinator:
 The coordinator may make small integration edits, but should not silently
 rewrite a worker's scientific implementation during review.
 
-### Scientific module agents
+### Helix, Compass, and Canvas — scientific module agents
 
 Divide scientific work by stable domain boundary rather than by individual
 files:
 
-| Domain | Typical scope |
-| --- | --- |
-| Single-cell and differential expression | `OMIX-Seurat-Pseudobulk`, `OMIX-Limma-Analysis`, `OMIX-DEG-Analysis`, and `bridges/seurat` |
-| Pathway analysis | L2P, GSEA, GSVA, shared pathway-data interfaces, and `OMIXPathwayPlots` |
-| Visualization and reporting | Gene Boxplots, Volcano Plot, and shared visualization behavior |
+| Agent | Domain | Typical scope |
+| --- | --- | --- |
+| **Helix** | Single-cell and differential expression | `OMIX-Seurat-Pseudobulk`, `OMIX-Limma-Analysis`, `OMIX-DEG-Analysis`, and `bridges/seurat` |
+| **Compass** | Pathway analysis | L2P, GSEA, GSVA, shared pathway-data interfaces, and `OMIXPathwayPlots` |
+| **Canvas** | Visualization and reporting | Gene Boxplots, Volcano Plot, and shared visualization behavior |
 
 An agent changing scientific behavior must own the implementation, schema,
 tests, README, changelog, and representative command for that bounded change.
 
-### Runtime and reproducibility agent
+### Forge — runtime and reproducibility agent
 
 This agent owns `starter-environments/`, runtime lockfiles, container tests,
 package inventories, and immutable image provenance. It packages approved
@@ -54,7 +69,7 @@ the [runtime guide](runtime-guide.md), [versioning guide](versioning-and-release
 and, when automated, the
 [release automation contract](release-automation-contract.md).
 
-### Deployment-adapter agent
+### Harbor — deployment-adapter agent
 
 This agent translates a merged canonical module into a separate deployment
 repository. It owns platform entry points, mounted-input discovery, UI files,
@@ -62,7 +77,7 @@ adapter documentation, and `OMIX_MODULE_SOURCE.md`. It must follow the
 [deployment adapter guide](deployment-adapter-guide.md) and must not introduce
 independent scientific behavior.
 
-### Quality and documentation reviewer
+### Beacon — quality and documentation reviewer
 
 This role checks module-contract compliance, tests, schemas, examples, user
 documentation, generated-file exclusions, and provenance. It reports gaps; it
