@@ -85,8 +85,8 @@ stopifnot(
   inherits(harmony_input, "omix_expression_input"),
   identical(harmony_input$provenance$source_matrix_type, "continuous_gene_expression"),
   isTRUE(all.equal(
-    harmony_input$expression$D1__ctrl,
-    rowMeans(harmony_expression[, c("Cell1", "Cell2"), drop = FALSE])
+    unname(harmony_input$expression$D1__ctrl),
+    unname(rowMeans(harmony_expression[, c("Cell1", "Cell2"), drop = FALSE]))
   ))
 )
 
@@ -99,8 +99,8 @@ stopifnot(
   inherits(sct_input, "omix_expression_input"),
   inherits(readRDS(rds_path)[["SCT"]], "SCTAssay"),
   isTRUE(all.equal(
-    sct_input$expression$D1__ctrl,
-    rowMeans(as.matrix(sct_data[, c("Cell1", "Cell2"), drop = FALSE]))
+    unname(sct_input$expression$D1__ctrl),
+    unname(rowMeans(as.matrix(sct_data[, c("Cell1", "Cell2"), drop = FALSE])))
   ))
 )
 
