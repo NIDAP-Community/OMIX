@@ -14,7 +14,22 @@ pull request reviewed by the coordinator.
 
 ## Team roles
 
-### Coordinator and integrator
+Use these stable names when assigning work or asking a role-specific question.
+The name identifies the responsibility, not a permanently running process, so
+the underlying worker can be restarted without changing how the team refers to
+the role.
+
+| Name | Role | Primary scope |
+| --- | --- | --- |
+| **Atlas** | Coordinator and integrator | Backlog, ownership, reviews, merge order, and release coordination |
+| **Helix** | Single-cell and differential expression | Seurat, pseudobulk, DEG, Limma, and related bridges |
+| **Compass** | Pathway analysis | GSVA, GSEA, L2P, pathway databases, and pathway plots |
+| **Canvas** | Visualization and reporting | Gene Boxplots, Volcano Plot, and shared visual behavior |
+| **Forge** | Runtime and reproducibility | Containers, `renv`, CI, GHCR, inventories, and immutable provenance |
+| **Harbor** | Deployment adapters | Code Ocean and other platform-specific integration |
+| **Beacon** | Quality and documentation | Independent testing, contracts, documentation, and provenance review |
+
+### Atlas — coordinator and integrator
 
 The coordinator owns the work queue and integration sequence. The coordinator:
 
@@ -31,21 +46,21 @@ The coordinator owns the work queue and integration sequence. The coordinator:
 The coordinator may make small integration edits, but should not silently
 rewrite a worker's scientific implementation during review.
 
-### Scientific module agents
+### Helix, Compass, and Canvas — scientific module agents
 
 Divide scientific work by stable domain boundary rather than by individual
 files:
 
-| Domain | Typical scope |
-| --- | --- |
-| Single-cell and differential expression | `OMIX-Seurat-Pseudobulk`, `OMIX-Limma-Analysis`, `OMIX-DEG-Analysis`, and `bridges/seurat` |
-| Pathway analysis | L2P, GSEA, GSVA, shared pathway-data interfaces, and `OMIXPathwayPlots` |
-| Visualization and reporting | Gene Boxplots, Volcano Plot, and shared visualization behavior |
+| Agent | Domain | Typical scope |
+| --- | --- | --- |
+| **Helix** | Single-cell and differential expression | `OMIX-Seurat-Pseudobulk`, `OMIX-Limma-Analysis`, `OMIX-DEG-Analysis`, and `bridges/seurat` |
+| **Compass** | Pathway analysis | L2P, GSEA, GSVA, shared pathway-data interfaces, and `OMIXPathwayPlots` |
+| **Canvas** | Visualization and reporting | Gene Boxplots, Volcano Plot, and shared visualization behavior |
 
 An agent changing scientific behavior must own the implementation, schema,
 tests, README, changelog, and representative command for that bounded change.
 
-### Runtime and reproducibility agent
+### Forge — runtime and reproducibility agent
 
 This agent owns `starter-environments/`, runtime lockfiles, container tests,
 package inventories, and immutable image provenance. It packages approved
@@ -54,7 +69,7 @@ the [runtime guide](runtime-guide.md), [versioning guide](versioning-and-release
 and, when automated, the
 [release automation contract](release-automation-contract.md).
 
-### Deployment-adapter agent
+### Harbor — deployment-adapter agent
 
 This agent translates a merged canonical module into a separate deployment
 repository. It owns platform entry points, mounted-input discovery, UI files,
@@ -62,7 +77,7 @@ adapter documentation, and `OMIX_MODULE_SOURCE.md`. It must follow the
 [deployment adapter guide](deployment-adapter-guide.md) and must not introduce
 independent scientific behavior.
 
-### Quality and documentation reviewer
+### Beacon — quality and documentation reviewer
 
 This role checks module-contract compliance, tests, schemas, examples, user
 documentation, generated-file exclusions, and provenance. It reports gaps; it
@@ -185,13 +200,13 @@ as priorities change.
 
 | Priority | Work item | Suggested owner | Dependency or completion evidence |
 | --- | --- | --- | --- |
-| 1 | Promote and publish `r-seurat-conversion` as the first validated non-bootstrap release | Runtime agent | Green committed-lockfile and raw-count, Harmony-layer, and SCT-layer conversion tests; approved version; immutable digest and manifest record |
-| 2 | Validate Seurat pseudobulk outputs through the raw-count DEG and continuous-expression Limma paths | Single-cell/DEG agent | Representative end-to-end fixtures, matching sample metadata, manifests, and stable output schemas |
-| 3 | Build the GSVA canonical module from the existing template with mild cleanup | Pathway agent | Template provenance, explicit-path CLI, schema, focused tests, README, and changelog |
-| 4 | Determine how Gene Boxplots combines repeated gene identifiers | Visualization agent | Trace current behavior, document whether values are summed or averaged, and add a fixture-based regression test before changing behavior |
-| 5 | Assess a lightweight `MOObject` bridge | Bridge agent | Confirm the released object API and required generics without introducing full MOSuite as a dependency |
-| 6 | Specify a one-way pathway-database export for local, HPC, Code Ocean, and on-prem use | Pathway/data agent | Versioned geneset and membership schema, provenance, organism and identifier fields, and immutable export artifact |
-| 7 | Synchronize deployment adapters after canonical module changes settle | Deployment-adapter agent | Merged canonical commits, passing module tests, updated source records, and platform validation plan |
+| 1 | Promote and publish `r-seurat-conversion` as the first validated non-bootstrap release | **Forge** | Green committed-lockfile and raw-count, Harmony-layer, and SCT-layer conversion tests; approved version; immutable digest and manifest record |
+| 2 | Validate Seurat pseudobulk outputs through the raw-count DEG and continuous-expression Limma paths | **Helix** | Representative end-to-end fixtures, matching sample metadata, manifests, and stable output schemas |
+| 3 | Build the GSVA canonical module from the existing template with mild cleanup | **Compass** | Template provenance, explicit-path CLI, schema, focused tests, README, and changelog |
+| 4 | Determine how Gene Boxplots combines repeated gene identifiers | **Canvas** | Trace current behavior, document whether values are summed or averaged, and add a fixture-based regression test before changing behavior |
+| 5 | Assess a lightweight `MOObject` bridge | **Helix** | Confirm the released object API and required generics without introducing full MOSuite as a dependency |
+| 6 | Specify a one-way pathway-database export for local, HPC, Code Ocean, and on-prem use | **Compass** | Versioned geneset and membership schema, provenance, organism and identifier fields, and immutable export artifact |
+| 7 | Synchronize deployment adapters after canonical module changes settle | **Harbor** | Merged canonical commits, passing module tests, updated source records, and platform validation plan |
 
 ## Coordinator checklist
 
