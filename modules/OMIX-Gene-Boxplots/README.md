@@ -69,6 +69,7 @@ Rscript "$OMIX_ROOT/modules/OMIX-Gene-Boxplots/scripts/run_gene_boxplots.R" \
   --genes Nfil3,Tox,Zbtb16,Id2,Tcf7,Gata3,Bcl11b \
   --statistics_mode precomputed_deg \
   --pvalue_type nominal \
+  --duplicate_aggregation mean \
   --output_dir results/gene-boxplots
 ```
 
@@ -101,6 +102,26 @@ recalculate their logic.
 The intentional OMIX default difference is that precomputed DEG annotations
 use **nominal** p-values by default (`pvalue_to_plot = "raw"` in the preserved
 function). Select `adjusted` when appropriate for the question.
+
+### Duplicate gene identifiers
+
+The canonical OMIX wrapper defaults to `duplicate_aggregation = "mean"` and
+averages rows sharing the same gene identifier within each sample. This is the
+appropriate default for the module's normalized log-space expression inputs:
+it avoids increasing the plotted value merely because an identifier occurs on
+more than one row. Partial missing values are ignored; a gene/sample group in
+which every value is missing remains missing.
+
+Use `duplicate_aggregation = "sum"` to reproduce the original CCBR behavior,
+including converting an all-missing gene/sample group to zero. Use `"keep"`
+only when separate rows are intentional; each row then remains a separate
+plotted and statistical observation. The old direct-R `sum_duplicates`
+argument is accepted temporarily and maps `TRUE` to `"sum"` and `FALSE` to
+`"keep"`, with a deprecation warning.
+
+The aggregation is applied only to the expression table. Precomputed
+differential-expression statistics continue to come from `deg_results` and
+are not recalculated by this module.
 
 ### Plot appearance
 

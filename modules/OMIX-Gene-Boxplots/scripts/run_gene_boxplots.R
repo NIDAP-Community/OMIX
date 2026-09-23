@@ -43,6 +43,7 @@ option_list <- list(
   make_option("--pvalue_type", type = "character", default = "nominal", help = "nominal or adjusted [default: %default]"),
   make_option("--statistical_method", type = "character", default = "anova", help = "anova, t-test, or kruskal [default: %default]"),
   make_option("--p_adjust_method", type = "character", default = "BH"),
+  make_option("--duplicate_aggregation", type = "character", default = "mean", help = "mean, sum, or keep duplicate gene rows [default: %default]"),
   make_option("--minimum_samples_per_category", type = "integer", default = 3L),
   make_option("--plot_type", type = "character", default = "box", help = "box or violin [default: %default]"),
   make_option("--title", type = "character", default = "auto", help = "auto or one title used for all plots [default: %default]"),
@@ -71,6 +72,9 @@ if (!opt$statistics_mode %in% c("precomputed_deg", "within_plot", "none")) {
 if (!opt$pvalue_type %in% c("nominal", "adjusted")) {
   stop("ERROR: `--pvalue_type` must be nominal or adjusted")
 }
+if (!opt$duplicate_aggregation %in% c("mean", "sum", "keep")) {
+  stop("ERROR: `--duplicate_aggregation` must be mean, sum, or keep")
+}
 
 expression_table <- read_table_file(opt$expression_table, "expression_table")
 metadata_table <- read_table_file(opt$metadata_table, "metadata_table")
@@ -93,6 +97,7 @@ result <- omix_gene_boxplots(
   pvalue_type = opt$pvalue_type,
   statistical_method = opt$statistical_method,
   p_adjust_method = opt$p_adjust_method,
+  duplicate_aggregation = opt$duplicate_aggregation,
   minimum_samples_per_category = opt$minimum_samples_per_category,
   plot_type = opt$plot_type,
   title = opt$title,

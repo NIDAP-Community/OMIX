@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.0
+
+- Change the canonical wrapper and CLI default for duplicate gene identifiers
+  from sample-wise sum to sample-wise mean, appropriate for normalized
+  log-space expression.
+- Add the explicit `duplicate_aggregation` strategy with `mean`, legacy `sum`,
+  and `keep` modes, while temporarily mapping the old direct-R
+  `sum_duplicates` logical to its equivalent strategy.
+- Preserve plot aesthetics and the original CCBR functions unchanged.
+
 ## 0.2.0
 
 - Preserve the original `Boxplot_with_Stats.R` implementation verbatim as the

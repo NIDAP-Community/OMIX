@@ -1,0 +1,13 @@
+gene,sample,value,category
+GeneDup,A1,1.0,A
+GeneDup,A2,1.75,A
+GeneDup,B1,2.25,B
+GeneDup,B2,3.0,B
+GeneMissing,A1,NA,A
+GeneMissing,A2,3.0,A
+GeneMissing,B1,6.0,B
+GeneMissing,B2,4.0,B
+GeneSolo,A1,5.0,A
+GeneSolo,A2,6.0,A
+GeneSolo,B1,7.0,B
+GeneSolo,B2,8.0,B

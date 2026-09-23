@@ -1,0 +1,6 @@
+GeneName,A1,A2,B1,B2
+GeneDup,1.2,2.0,3.5,4.0
+GeneDup,0.8,1.5,1.0,2.0
+GeneMissing,,2.0,,4.0
+GeneMissing,,4.0,6.0,
+GeneSolo,5.0,6.0,7.0,8.0
