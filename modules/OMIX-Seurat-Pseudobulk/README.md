@@ -38,8 +38,8 @@ The module stops on an under-populated profile unless `--on_insufficient_cells d
 
 ## Quick start
 
-After the `r-seurat-conversion` runtime completes its bootstrap validation,
-restore that profile as described in the root README, then run:
+Restore the `r-seurat-conversion` profile as described in the root README, then
+run:
 
 ```bash
 Rscript modules/OMIX-Seurat-Pseudobulk/scripts/run_seurat_pseudobulk.R \
@@ -66,8 +66,9 @@ Rscript scripts/restore-omix-runtime.R \
   --module OMIX-Seurat-Pseudobulk --project /path/to/omix-runtime
 ```
 
-The initial profile remains `v0`; wait for its validated image digest before
-using it for a reproducible scientific result.
+For a reproducible scientific result, pin the published
+`r-seurat-conversion` image digest recorded in
+`starter-environments/release-manifest.json`.
 
 For a paired study, retain `Donor` in the output metadata and pass it to the
 compatible downstream module as `--donor_variable_column Donor`.
@@ -107,15 +108,14 @@ Rscript modules/OMIX-Seurat-Pseudobulk/scripts/run_seurat_pseudobulk.R \
   --output_dir /path/to/results/sct-means
 ```
 
-### Development-only smoke test before the runtime release
+### Development-only smoke test without the published runtime
 
-The initial `r-seurat-conversion` definition is a non-publishable bootstrap
-image. To exercise legacy `SCTAssay` conversion locally before its Linux
-lockfile is released, use a clean writable R library, install `Seurat`,
-`optparse`, and the Core dependencies, then install `core/` and
-`bridges/seurat/` from the *same OMIX commit*. Do not treat that ad hoc
-development environment as a reproducible scientific runtime; the committed
-lock and image digest will be the supported execution record.
+To exercise legacy `SCTAssay` conversion locally without restoring the runtime,
+use a clean writable R library, install `Seurat`, `optparse`, and the Core
+dependencies, then install `core/` and `bridges/seurat/` from the *same OMIX
+commit*. Do not treat that ad hoc development environment as a reproducible
+scientific runtime; the committed lock and published image digest remain the
+supported execution record.
 
 ## Outputs
 

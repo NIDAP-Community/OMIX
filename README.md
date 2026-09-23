@@ -116,14 +116,15 @@ committed `renv.lock` below to create a user-local R project:
 | `r-statistics` | OMIX-DEG-Analysis, OMIX-Limma-Analysis | `starter-environments/r-statistics/renv.lock` |
 | `r-visualization` | OMIX-GSEA-Filters-Legacy, OMIX-Gene-Boxplots, OMIX-Volcano-Plot | `starter-environments/r-visualization/renv.lock` |
 | `r-pathway` | OMIX-GSEA-Preranked-Legacy, OMIX-GSEA-Visualization-Legacy, OMIX-L2P-Single, OMIX-L2P-Multi | `starter-environments/r-pathway/renv.lock` |
-| `r-seurat-conversion` | OMIX-Seurat-Pseudobulk | Bootstrap validation pending; full-Seurat conversion profile, not yet usable with the runtime-restore helper |
+| `r-seurat-conversion` | OMIX-Seurat-Pseudobulk | `starter-environments/r-seurat-conversion/renv.lock` |
 
-The released locks target R 4.4.3 and Bioconductor 3.20.
-`r-seurat-conversion` is a review-only bootstrap definition until its Linux CI
-build verifies the committed lockfile. It is intentionally the only profile
-that includes full Seurat; all downstream analytical profiles remain
-lightweight. On Biowulf, check which R module is currently offered before
-loading the matching version:
+The released locks target R 4.4.3 and Bioconductor 3.20 where applicable.
+`r-seurat-conversion` is intentionally the only profile that includes full
+Seurat; all downstream analytical profiles remain lightweight. For
+reproducibility, use the published digest recorded in
+`starter-environments/release-manifest.json` once the maintainer adds the
+release record for the selected version. On Biowulf, check which R module is
+currently offered before loading the matching version:
 
 ```bash
 module spider R

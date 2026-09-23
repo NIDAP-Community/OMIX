@@ -21,14 +21,14 @@ immutable image reference in
 A readable image tag is not an execution identity; record the full
 `image@sha256:...` reference with each result.
 
-`r-seurat-conversion` is currently a bootstrap definition for
-`OMIX-Seurat-Pseudobulk`, rather than a released runtime. It deliberately
-isolates full-Seurat compatibility to object conversion, including legacy
-`SCTAssay` objects. Its candidate lock is committed, but do not use it for a
-reproducible scientific run until Linux CI has validated that lock and the
-profile has a versioned digest record in the release manifest. `r-singlecell`
-remains a lightweight SeuratObject-only profile for standard assays; it is not
-the compatibility promise for legacy serialized objects.
+`r-seurat-conversion` is the dedicated full-Seurat compatibility profile for
+`OMIX-Seurat-Pseudobulk`. It deliberately isolates full-Seurat compatibility to
+object conversion, including legacy `SCTAssay` objects. The committed lock is
+validated in Linux CI, but use the runtime for a reproducible scientific run
+only after the published image digest for the selected version is recorded in
+the release manifest. `r-singlecell` remains a lightweight SeuratObject-only
+profile for standard assays; it is not the compatibility promise for legacy
+serialized objects.
 
 For each analysis, retain:
 
