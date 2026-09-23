@@ -69,6 +69,7 @@ Rscript "$OMIX_ROOT/modules/OMIX-Gene-Boxplots/scripts/run_gene_boxplots.R" \
   --genes Nfil3,Tox,Zbtb16,Id2,Tcf7,Gata3,Bcl11b \
   --statistics_mode precomputed_deg \
   --pvalue_type nominal \
+  --duplicate_aggregation mean \
   --output_dir results/gene-boxplots
 ```
 
@@ -104,21 +105,23 @@ function). Select `adjusted` when appropriate for the question.
 
 ### Duplicate gene identifiers
 
-The preserved implementation defaults to `sum_duplicates = TRUE`. After the
-expression table is reshaped, all rows with the same gene identifier are
-collapsed to one value per gene and sample using an arithmetic **sum**. They
-are not averaged, and this rule is applied to the supplied values whether they
-are normalized CPM, voom-scale, or batch-corrected expression. Missing values
-are removed during the sum; a gene/sample group containing only missing values
-therefore becomes zero.
+The canonical OMIX wrapper defaults to `duplicate_aggregation = "mean"` and
+averages rows sharing the same gene identifier within each sample. This is the
+appropriate default for the module's normalized log-space expression inputs:
+it avoids increasing the plotted value merely because an identifier occurs on
+more than one row. Partial missing values are ignored; a gene/sample group in
+which every value is missing remains missing.
 
-The portable CLI does not currently expose a duplicate-handling option. Direct
-R callers can pass `sum_duplicates = FALSE` through `omix_gene_boxplots(...)`,
-but the preserved implementation then leaves duplicate rows separate rather
-than selecting a maximum row. This differs from the inherited parameter
-comment in the legacy function. Until that behavior is reviewed as a separate
-scientific change, provide unique gene identifiers upstream when sample-level
-normalized expression should not be added across duplicate rows.
+Use `duplicate_aggregation = "sum"` to reproduce the original CCBR behavior,
+including converting an all-missing gene/sample group to zero. Use `"keep"`
+only when separate rows are intentional; each row then remains a separate
+plotted and statistical observation. The old direct-R `sum_duplicates`
+argument is accepted temporarily and maps `TRUE` to `"sum"` and `FALSE` to
+`"keep"`, with a deprecation warning.
+
+The aggregation is applied only to the expression table. Precomputed
+differential-expression statistics continue to come from `deg_results` and
+are not recalculated by this module.
 
 ### Plot appearance
 

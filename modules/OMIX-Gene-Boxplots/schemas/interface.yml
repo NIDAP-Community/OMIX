@@ -39,6 +39,11 @@ parameters:
     type: string
     default: anova
     allowed: [anova, t-test, kruskal]
+  duplicate_aggregation:
+    type: string
+    default: mean
+    allowed: [mean, sum, keep]
+    description: How rows sharing a gene identifier are combined per sample. Mean is appropriate for the module's normalized log-space expression inputs; sum reproduces the legacy behavior; keep leaves rows separate.
   minimum_samples_per_category:
     type: integer
     default: 3

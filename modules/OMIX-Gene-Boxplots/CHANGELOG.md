@@ -1,10 +1,14 @@
 # Changelog
 
-## Unreleased
+## 1.0.0
 
-- Document the existing sample-wise sum applied to duplicate gene identifiers
-  and add a fixture regression for both the default and non-summing paths. No
-  scientific behavior or plot aesthetics changed.
+- Change the canonical wrapper and CLI default for duplicate gene identifiers
+  from sample-wise sum to sample-wise mean, appropriate for normalized
+  log-space expression.
+- Add the explicit `duplicate_aggregation` strategy with `mean`, legacy `sum`,
+  and `keep` modes, while temporarily mapping the old direct-R
+  `sum_duplicates` logical to its equivalent strategy.
+- Preserve plot aesthetics and the original CCBR functions unchanged.
 
 ## 0.2.0
 

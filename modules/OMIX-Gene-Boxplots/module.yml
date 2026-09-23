@@ -1,6 +1,6 @@
 name: omix-gene-boxplots
 display_name: OMIX Gene Boxplots
-version: 0.2.0
+version: 1.0.0
 interface_version: 1
 module_type: visualization
 status: review
