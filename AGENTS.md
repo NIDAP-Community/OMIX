@@ -16,6 +16,9 @@ They are a routing page and hard-rule summary, not a second contributor guide.
    work.
 4. An automated release additionally requires the
    [release automation contract](docs/release-automation-contract.md).
+5. When several contributors or coding agents are working concurrently, the
+   coordinator and workers must also follow the
+   [agent team operating model](docs/agent-team-operating-model.md).
 
 If these documents appear to conflict, preserve the module contract and report
 the ambiguity rather than silently choosing a new architecture.

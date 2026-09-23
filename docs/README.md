@@ -12,6 +12,7 @@ module locally, in a container, or on HPC.
 | Changing a shared R/container environment or reproducing a result | [Runtime guide](runtime-guide.md) |
 | Preparing a human-reviewed release | [Versioning and releases](versioning-and-releases.md) |
 | Building an automated release workflow | [Release automation contract](release-automation-contract.md) |
+| Coordinating several contributors or coding agents | [Agent team operating model](agent-team-operating-model.md) |
 
 `AGENTS.md` is the short entry point for an AI coding assistant. It directs
 the assistant to only the documents relevant to the requested change.
