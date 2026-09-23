@@ -29,7 +29,9 @@ gene-expression matrix and is never a conversion target.
 ## Bootstrap status
 
 This initial definition is `v0` and is not publishable. Its candidate
-`renv.lock` is pinned to R 4.4.3 and the known working Seurat 5.3.0 stack, but
-Linux CI must build the image and run the supported RNA, Harmony-assay, and
-SCT-assay conversion tests before a maintainer may change `VERSION` to `v1`
-and publish a digest-qualified image record.
+`renv.lock` is pinned to R 4.4.3 and the known working Seurat 5.3.0 stack. The
+targeted Linux CI build generates and serializes a synthetic object with an
+`SCTAssay`, then verifies the supported RNA, Harmony-assay, and SCT-assay
+conversions. Only after that evidence is recorded on the intended source
+commit may a maintainer change `VERSION` to `v1` and publish a
+digest-qualified image record.

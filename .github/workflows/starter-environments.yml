@@ -350,6 +350,15 @@ jobs:
             writeLines(paste(sprintf("%s %s", packages, versions), collapse = "\\n"))
           '
 
+      - name: Smoke-test serialized Seurat conversion
+        if: steps.targets.outputs.conversion == 'true'
+        run: |
+          docker run --rm \
+            --volume "${{ github.workspace }}/starter-environments/r-seurat-conversion/tests:/tests:ro" \
+            --entrypoint Rscript \
+            omix-r-seurat-conversion:ci \
+            /tests/test-seurat-conversion.R
+
       - name: Capture statistics package inventory
         if: steps.targets.outputs.statistics == 'true'
         run: |
