@@ -150,14 +150,17 @@ Use a lightweight object package for ordinary MOO reading and extraction. Do
 not add the full MOSuite workflow package to a shared OMIX runtime or a
 downstream adapter merely to read a MOO.
 
-The current legacy `moo/moo-filt.rds` output is serialized as
-`MOSuite::multiOmicDataSet`, so it remains a MOSuite compatibility artifact.
-It cannot be read by a runtime that has only MOObject. Until the producing
-workflow writes a validated `MOObject::multiOmicDataSet`, use the portable
-table handoff instead.
+The current legacy `moo/moo-filt.rds` output is serialized with a
+`MOSuite::multiOmicDataSet` class label. MOObject 0.5.0 provides an explicit
+compatibility reader that reconstructs supported legacy objects as current
+`MOObject::multiOmicDataSet` objects. The OMIX bridge validates representative
+legacy filtered-count and continuous-expression artifacts in a runtime that
+does not contain the full MOSuite package. Portable count and metadata tables
+remain the preferred cross-tool handoff when no object-aware consumer is
+needed.
 
-When an MOObject handoff is introduced, preserve the legacy MOO and write a
-parallel, explicitly named MOO containing the filtered integer-like `filt`
-counts, aligned metadata, annotation, and portable provenance. The OMIX bridge
-must then import only MOObject and Core, pin and validate the object interface,
-and complete an end-to-end module test in that minimal runtime.
+A producing workflow should use `MOObject::write_multiOmicDataSet()` for new
+artifacts when it adopts MOObject directly. Preserve the established filtered
+integer-like `filt` layer, aligned metadata, annotation, and provenance. The
+OMIX bridge imports only MOObject and Core, pins the supported object API, and
+keeps raw-count and declared continuous-expression handoffs separate.
