@@ -45,24 +45,31 @@
       "provenance": "digest resolved; package-set re-verification pending"
     },
     "r-pathway": {
-      "version": "r4.4.3-bioconductor3.20-v1",
+      "version": "r4.4.3-bioconductor3.20-v2",
       "image": "ghcr.io/nidap-community/omix-r-pathway",
-      "digest": "sha256:d17cf62638a60afb8ee93e4d18f8b1f99f08642fe6e78effadebea3a176b19ed",
-      "immutable_reference": "ghcr.io/nidap-community/omix-r-pathway@sha256:d17cf62638a60afb8ee93e4d18f8b1f99f08642fe6e78effadebea3a176b19ed",
+      "digest": "sha256:25ad9f50df5a4d7f70a7e3debed13f8d5c9b07cbc46d57fdf5c3cf4f2e767ddc",
+      "immutable_reference": "ghcr.io/nidap-community/omix-r-pathway@sha256:25ad9f50df5a4d7f70a7e3debed13f8d5c9b07cbc46d57fdf5c3cf4f2e767ddc",
       "r_version": "4.4.3",
       "bioconductor_version": "3.20",
       "lockfile": "starter-environments/r-pathway/renv.lock",
       "lockfile_sha256": "66b0b93e7b1f05dd9429e542c8fdca89b38770667827b53ffca80400b286795c",
       "required_packages": {
+        "GSVA": "2.0.7",
         "l2p": "0.0.14",
-        "l2psupp": "0.0.14"
+        "l2psupp": "0.0.14",
+        "OmixPathwayPlots": "0.2.0"
       },
       "additional_sources": {
         "l2p_commit": "ab389bc978441f1893414da7a07e803bea971205",
         "l2p_0.0-14_sha256": "0702383b23eccaa1cfa6bc2be5292bc0d64b24e9372206bf3b1825fda32c2e86",
         "l2psupp_0.0-14_sha256": "48a3c8ec20ea6aec3e4fae490a18b613ada74ae1f9d11b481902711eba50c82a"
       },
-      "provenance": "digest resolved; package-set re-verification pending"
+      "source_commit": "29a390a1273e7f493d17cc59f0a1670bb1c914c8",
+      "publication_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/35242190309",
+      "verification_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/35997759223",
+      "resolved_on": "2026-09-17",
+      "verified_on": "2026-09-24",
+      "provenance": "targeted Linux build and package inventory passed before publication; the published immutable digest passed lockfile, R, Bioconductor, GSVA, L2P, OmixPathwayPlots, and representative OMIX-GSVA verification after publication"
     },
     "r-seurat-conversion": {
       "version": "r4.4.3-v1",
