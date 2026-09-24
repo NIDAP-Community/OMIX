@@ -97,3 +97,18 @@ Both handoffs:
 deserialization to `MOObject::read_multiOmicDataSet()`. MOObject 0.5.0 includes
 a tested coercion path for compatible legacy MOSuite class labels. This bridge
 does not inspect private slots or depend on MOSuite workflow functions.
+
+The repository does not commit real workflow outputs. To verify a legacy
+`MOSuite-filter-counts` artifact in an isolated runtime, install only MOObject,
+OMIX Core, and this bridge, confirm that `MOSuite` is absent, and run:
+
+```bash
+Rscript bridges/mosuite/inst/validation/validate-real-mosuite-artifacts.R \
+  /path/to/moo-filt.rds \
+  /path/to/moo-with-batch-layer.rds
+```
+
+The validation reads and validates both legacy objects through MOObject,
+checks the integer-like `filt` handoff, checks the separately declared
+`batch_corrected_log2` handoff, verifies sample alignment and provenance, and
+confirms that a continuous batch layer cannot silently enter the count path.
