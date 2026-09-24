@@ -63,6 +63,23 @@
         "l2psupp_0.0-14_sha256": "48a3c8ec20ea6aec3e4fae490a18b613ada74ae1f9d11b481902711eba50c82a"
       },
       "provenance": "digest resolved; package-set re-verification pending"
+    },
+    "r-seurat-conversion": {
+      "version": "r4.4.3-v1",
+      "image": "ghcr.io/nidap-community/omix-r-seurat-conversion",
+      "digest": "sha256:4399e2e2da1947b555a96b52e0b33632312b0608d7cef8c74ad2b1947335862c",
+      "immutable_reference": "ghcr.io/nidap-community/omix-r-seurat-conversion@sha256:4399e2e2da1947b555a96b52e0b33632312b0608d7cef8c74ad2b1947335862c",
+      "r_version": "4.4.3",
+      "lockfile": "starter-environments/r-seurat-conversion/renv.lock",
+      "lockfile_sha256": "a0af1162d74d10fcf8cda9313e67b9db575d72adc04ed9b9d56f4909d0b08b29",
+      "required_packages": {
+        "Omix": "0.2.0",
+        "OmixSeurat": "0.3.0"
+      },
+      "source_commit": "a311257ee44f5782a570485838467c6d83cb88d6",
+      "publication_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/35920756817",
+      "resolved_on": "2026-09-23",
+      "provenance": "targeted Linux build, package verification, and serialized RNA, Harmony, and SCT conversion smoke tests passed before publication; immutable post-publish verification pending"
     }
   }
 }

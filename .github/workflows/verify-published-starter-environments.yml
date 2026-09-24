@@ -14,6 +14,7 @@ on:
           - r-statistics
           - r-visualization
           - r-pathway
+          - r-seurat-conversion
 
 jobs:
   select-targets:
@@ -84,3 +85,12 @@ jobs:
             /omix/scripts/verify-published-runtime.R \
               --manifest /omix/starter-environments/release-manifest.json \
               --profile '${{ matrix.profile }}'
+
+      - name: Smoke-test published serialized Seurat conversion
+        if: ${{ matrix.profile == 'r-seurat-conversion' }}
+        run: |
+          docker run --rm \
+            --volume "${{ github.workspace }}/starter-environments/r-seurat-conversion/tests:/tests:ro" \
+            --entrypoint Rscript \
+            '${{ matrix.reference }}' \
+            /tests/test-seurat-conversion.R
