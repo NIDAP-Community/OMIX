@@ -7,7 +7,7 @@
 usage <- function() {
   paste(
     "Usage:",
-    "  Rscript verify-published-runtime.R --manifest <release-manifest.json> --profile <r-base|r-statistics|r-visualization|r-pathway>",
+    "  Rscript verify-published-runtime.R --manifest <release-manifest.json> --profile <r-base|r-statistics|r-visualization|r-pathway|r-seurat-conversion>",
     sep = "\n"
   )
 }
