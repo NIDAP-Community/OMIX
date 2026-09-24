@@ -41,9 +41,13 @@ if (is.null(entry)) {
 }
 
 installed <- utils::installed.packages()
-observed_version <- function(package) {
-  if (!package %in% rownames(installed)) return(NA_character_)
-  installed[package, "Version"]
+installed_versions <- split(
+  as.character(installed[, "Version"]),
+  as.character(installed[, "Package"])
+)
+observed_versions <- function(package) {
+  versions <- installed_versions[[package]]
+  if (is.null(versions)) character() else unique(versions)
 }
 
 expected <- list()
@@ -65,15 +69,28 @@ if (!length(expected)) {
   stop("Manifest has neither a lockfile nor required packages for ", args$profile, call. = FALSE)
 }
 
-actual <- vapply(names(expected), observed_version, character(1))
-missing <- names(actual)[is.na(actual)]
-mismatch <- names(actual)[!is.na(actual) & actual != expected]
+actual <- lapply(names(expected), observed_versions)
+names(actual) <- names(expected)
+missing <- names(actual)[!lengths(actual)]
+mismatch <- names(actual)[
+  lengths(actual) > 0L &
+    !vapply(
+      names(actual),
+      function(package) expected[[package]] %in% actual[[package]],
+      logical(1)
+    )
+]
 if (length(missing) || length(mismatch)) {
+  observed <- vapply(
+    actual[mismatch],
+    function(versions) paste(versions, collapse = ", "),
+    character(1)
+  )
   details <- c(
     if (length(missing)) paste0("missing: ", paste(missing, collapse = ", ")),
     if (length(mismatch)) paste0(
       "version mismatch: ",
-      paste(sprintf("%s expected %s observed %s", mismatch, expected[mismatch], actual[mismatch]), collapse = "; ")
+      paste(sprintf("%s expected %s observed %s", mismatch, expected[mismatch], observed), collapse = "; ")
     )
   )
   stop("Published ", args$profile, " runtime does not match its release record (", paste(details, collapse = "; "), ").", call. = FALSE)
