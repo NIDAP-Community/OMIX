@@ -1,0 +1,110 @@
+name: Validate OMIX GSVA in r-pathway
+
+on:
+  pull_request:
+    paths:
+      - modules/OMIX-GSVA/**
+      - starter-environments/r-pathway/**
+      - .github/workflows/gsva-r-pathway-runtime.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+env:
+  # Published from OMIX 29a390a1273e7f493d17cc59f0a1670bb1c914c8 by
+  # Starter Environments run 35242190309. Keep the test on an immutable image.
+  R_PATHWAY_EXPECTED_DIGEST: sha256:25ad9f50df5a4d7f70a7e3debed13f8d5c9b07cbc46d57fdf5c3cf4f2e767ddc
+
+jobs:
+  gsva-runtime:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull the current published r-pathway release
+        id: runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(tr -d '[:space:]' < starter-environments/r-pathway/VERSION)"
+          image="ghcr.io/nidap-community/omix-r-pathway:${version}"
+          docker pull "$image"
+          digest_reference="$(docker inspect --format '{{index .RepoDigests 0}}' "$image")"
+          test -n "$digest_reference"
+          resolved_digest="${digest_reference##*@}"
+          test "$resolved_digest" = "$R_PATHWAY_EXPECTED_DIGEST"
+          {
+            echo "image=$image"
+            echo "digest_reference=$digest_reference"
+          } >> "$GITHUB_OUTPUT"
+          {
+            echo "### OMIX GSVA runtime"
+            echo "- Version tag: \`$version\`"
+            echo "- Resolved image: \`$digest_reference\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify the exact locked pathway runtime
+        env:
+          R_PATHWAY_IMAGE: ${{ steps.runtime.outputs.image }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected_lock_sha="$(sha256sum starter-environments/r-pathway/renv.lock | awk '{print $1}')"
+          image_lock_sha="$(docker run --rm \
+            --entrypoint sha256sum \
+            "$R_PATHWAY_IMAGE" \
+            /opt/omix/r-pathway/renv.lock | awk '{print $1}')"
+          test "$image_lock_sha" = "$expected_lock_sha"
+
+          docker run --rm \
+            --entrypoint Rscript \
+            "$R_PATHWAY_IMAGE" \
+            -e '
+              expected <- c(
+                GSVA = "2.0.7",
+                l2p = "0.0.14",
+                l2psupp = "0.0.14",
+                OmixPathwayPlots = "0.2.0"
+              )
+              observed <- vapply(names(expected), function(package) {
+                as.character(utils::packageVersion(package))
+              }, character(1))
+              stopifnot(
+                identical(paste(R.version$major, R.version$minor, sep = "."), "4.4.3"),
+                identical(as.character(BiocManager::version()), "3.20"),
+                identical(observed, expected)
+              )
+              writeLines(c(
+                paste("R", paste(R.version$major, R.version$minor, sep = ".")),
+                paste("Bioconductor", as.character(BiocManager::version())),
+                sprintf("%s %s", names(observed), observed)
+              ))
+            '
+
+      - name: Run OMIX GSVA tests in r-pathway
+        env:
+          R_PATHWAY_IMAGE: ${{ steps.runtime.outputs.image }}
+        run: |
+          docker run --rm \
+            --volume "${{ github.workspace }}:/omix:ro" \
+            --workdir /omix \
+            --entrypoint Rscript \
+            "$R_PATHWAY_IMAGE" \
+            modules/OMIX-GSVA/tests/test-module-layout.R
+
+          docker run --rm \
+            --volume "${{ github.workspace }}:/omix:ro" \
+            --workdir /omix \
+            --entrypoint Rscript \
+            "$R_PATHWAY_IMAGE" \
+            modules/OMIX-GSVA/tests/test-gsva-cli.R
