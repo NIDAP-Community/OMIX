@@ -200,13 +200,23 @@ as priorities change.
 
 | Priority | Work item | Agent name | Suggested owner | Dependency or completion evidence |
 | --- | --- | --- | --- | --- |
-| 1 | Promote and publish `r-seurat-conversion` as the first validated non-bootstrap release | **Forge** | Runtime agent | Green committed-lockfile and raw-count, Harmony-layer, and SCT-layer conversion tests; approved version; immutable digest and manifest record |
-| 2 | Validate Seurat pseudobulk outputs through the raw-count DEG and continuous-expression Limma paths | **Helix** | Single-cell/DEG agent | Representative end-to-end fixtures, matching sample metadata, manifests, and stable output schemas |
-| 3 | Build the GSVA canonical module from the existing template with mild cleanup | **Compass** | Pathway agent | Template provenance, explicit-path CLI, schema, focused tests, README, and changelog |
-| 4 | Determine how Gene Boxplots combines repeated gene identifiers | **Canvas** | Visualization agent | Trace current behavior, document whether values are summed or averaged, and add a fixture-based regression test before changing behavior |
-| 5 | Assess a lightweight `MOObject` bridge | **Helix** | Bridge agent | Confirm the released object API and required generics without introducing full MOSuite as a dependency |
-| 6 | Specify a one-way pathway-database export for local, HPC, Code Ocean, and on-prem use | **Compass** | Pathway/data agent | Versioned geneset and membership schema, provenance, organism and identifier fields, and immutable export artifact |
-| 7 | Synchronize deployment adapters after canonical module changes settle | **Harbor** | Deployment-adapter agent | Merged canonical commits, passing module tests, updated source records, and platform validation plan |
+| 1 | Synchronize the DEG Analysis adapter with canonical interface 2, including `analysis_mode` and pseudobulk-manifest discovery | **Harbor** | Deployment-adapter agent with Helix review | Raw-count, Harmony-mean, and SCT-mean modes appear correctly in the panel; automatic and explicit manifest paths are tested; adapter source/version records match canonical `0.4.0`/interface 2 |
+| 2 | Reconcile L2P Single and Multi app-panel names and defaults with their canonical CLIs, and determine why the deployed Code Ocean panels appear incomplete | **Harbor** | Deployment-adapter agent | Parameter/default comparison approved; primary versus advanced controls organized without changing scientific defaults silently; both capsules tested after synchronization |
+| 3 | Add the canonical Gene Boxplots `duplicate_aggregation` control to the adapter as an advanced parameter | **Harbor** | Deployment-adapter agent with Canvas review | Choices `mean`, `sum`, and `keep`; default `mean`; adapter source record updated from canonical module `1.0.0`; fixture and capsule run preserve normalized-expression behavior |
+| 4 | Repair deployment parameter bindings in GSEA Filters and Volcano Plot | **Harbor** | Deployment-adapter agent | GSEA Filters uses named parameters in a real capsule run; Volcano Plot supports canonical `resolution_dpi` with an explicit compatibility decision for the released `resolution_dpi_` alias |
+| 5 | Add an automated adapter-contract check for canonical CLI/schema, adapter CLI, panel parameter names, and defaults | **Harbor** | Deployment-adapter agent with Beacon review | CI reports missing controls, stale aliases, and default drift while allowing documented platform-managed or intentionally hidden parameters |
+| 6 | Update the `r-pathway` release record from the historical v1 entry to the already validated v2 immutable image | **Forge** | Runtime agent | Exact v2 digest, lockfile checksum, package versions, successful GSVA runtime run, and post-publication provenance recorded without rebuilding unrelated images |
+| 7 | Validate the lightweight `MOObject` bridge with a real `MOSuite-filter-counts` artifact in a minimal runtime | **Helix** | Bridge agent | Real-object read, validation, raw-count handoff, and continuous-expression handoff tests pass without installing full MOSuite; stale contract text updated |
+| 8 | Synchronize remaining deployment adapters after canonical and runtime decisions settle | **Harbor** | Deployment-adapter agent | Merged canonical commits, passing module tests, explicit source records, adapter versions, and platform validation plan |
+| 9 | Specify a one-way pathway-database export for local, HPC, Code Ocean, and on-prem use | **Compass** | Pathway/data agent | Versioned geneset and membership schema, provenance, organism and identifier fields, and immutable export artifact |
+| Deferred | Resolve the `OMIX-GSEA-Preranked-Legacy` Code Ocean/GitHub sync conflict without losing the intentional hidden-MSigDB panel behavior | **Harbor** | Deployment-adapter agent | Resume only when requested; preserve the capsule backup branches and attached `/data/msigdb` asset while keeping MSigDB hidden from the app panel; require a clean capsule run and tracked-tree review before sync |
+
+Recently completed work should be removed from this queue after its completion
+evidence is recorded in the relevant pull request, release manifest, and
+changelog. Current examples include the Gene Boxplots duplicate-aggregation
+fix, Seurat handoff tests, the canonical GSVA module, `r-seurat-conversion`
+publication and immutable verification, the lightweight `MOObject` bridge,
+and locked-runtime GSVA validation.
 
 ## Coordinator checklist
 
