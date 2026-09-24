@@ -95,6 +95,22 @@ only the behavior introduced by the deployment.
   and select deployment output directories. It must not silently change a
   scientific default or implement a second analysis algorithm.
 
+Scientific implementation has one direction of travel: canonical OMIX module
+to deployment adapter. A platform test may reveal a canonical defect, but the
+scientific owner must fix and validate it in OMIX before Harbor exports it back
+to the adapter. Do not resolve drift by making an adapter-only scientific edit.
+
+Before release, Beacon independently compares the adapter with both its
+recorded canonical commit and the current canonical module. The parity audit
+checks exported-file hashes; module and interface versions; CLI, schema, and
+app-panel parameter names, types, choices, and defaults; scientific
+documentation; fixture output equivalence; and runtime tag plus immutable
+digest. Record every intentional platform-only input, alias, preset, hidden
+control, or output-path translation in `OMIX_MODULE_SOURCE.md`. Beacon reports
+and blocks unexplained drift; scientific owners, Harbor, and Forge remediate
+their respective canonical, platform, and runtime scopes under Atlas's merge
+order.
+
 ## Inputs, outputs, and workflows
 
 - The app-panel parameter names and defaults must agree with the canonical
@@ -134,8 +150,13 @@ For an existing adapter, verify:
 - a current `README.md`, `OMIX_MODULE_SOURCE.md`, and `AGENTS.md` exist;
 - the canonical module lists the adapter in `module.yml` and its README;
 - the adapter links back to the canonical module and module contract;
-- exported scientific files are intentionally synchronized with the canonical
-  release;
+- exported scientific files match the recorded canonical commit and hashes,
+  and any lag from the current canonical module is reported explicitly;
+- CLI, schema, adapter CLI, and app-panel parameter names, types, choices, and
+  defaults agree, except for documented platform-only translations;
+- scientific documentation claims and fixture outputs agree across canonical
+  and deployment execution;
+- the runtime tag and immutable digest match the validated runtime record;
 - the runtime and input/output behavior are documented and tested; and
 - no credentials, generated results, package caches, or large inventories are
   committed.
