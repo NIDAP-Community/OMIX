@@ -176,6 +176,24 @@ Immutable commit SHA and pull-request URL.
 A green check is evidence only for the checks it actually ran. It is not by
 itself proof of deployment-platform validation or release approval.
 
+## Coordinator monitoring and local integration
+
+The coordinator actively monitors assigned work instead of waiting for a
+contributor to request status. During an active work wave, the coordinator:
+
+1. checks each agent queue periodically and records completed handoffs;
+2. alerts the project owner when a pull request is ready for review, including
+   its validation evidence and unresolved limitations;
+3. does not merge, publish, or release merely because checks are green; and
+4. keeps independent work moving when another adapter or external platform is
+   deferred or blocked.
+
+After the project owner merges pull requests, the coordinator verifies their
+live merged state, fast-forwards the clean local `main` checkout with
+`git merge --ff-only origin/main`, runs proportionate post-merge checks, and
+refreshes the queue from the merged repository state. The coordinator must not
+overwrite local work or assume that an IDE workspace switch changed Git state.
+
 ## Integration and release order
 
 When work is related, the coordinator normally merges it in this order:
@@ -198,25 +216,23 @@ This is a planning queue, not release authorization. The coordinator should
 move each item into a tracked issue before assigning it and update this section
 as priorities change.
 
-| Priority | Work item | Agent name | Suggested owner | Dependency or completion evidence |
-| --- | --- | --- | --- | --- |
-| 1 | Synchronize the DEG Analysis adapter with canonical interface 2, including `analysis_mode` and pseudobulk-manifest discovery | **Harbor** | Deployment-adapter agent with Helix review | Raw-count, Harmony-mean, and SCT-mean modes appear correctly in the panel; automatic and explicit manifest paths are tested; adapter source/version records match canonical `0.4.0`/interface 2 |
-| 2 | Reconcile L2P Single and Multi app-panel names and defaults with their canonical CLIs, and determine why the deployed Code Ocean panels appear incomplete | **Harbor** | Deployment-adapter agent | Parameter/default comparison approved; primary versus advanced controls organized without changing scientific defaults silently; both capsules tested after synchronization |
-| 3 | Add the canonical Gene Boxplots `duplicate_aggregation` control to the adapter as an advanced parameter | **Harbor** | Deployment-adapter agent with Canvas review | Choices `mean`, `sum`, and `keep`; default `mean`; adapter source record updated from canonical module `1.0.0`; fixture and capsule run preserve normalized-expression behavior |
-| 4 | Repair deployment parameter bindings in GSEA Filters and Volcano Plot | **Harbor** | Deployment-adapter agent | GSEA Filters uses named parameters in a real capsule run; Volcano Plot supports canonical `resolution_dpi` with an explicit compatibility decision for the released `resolution_dpi_` alias |
-| 5 | Add an automated adapter-contract check for canonical CLI/schema, adapter CLI, panel parameter names, and defaults | **Harbor** | Deployment-adapter agent with Beacon review | CI reports missing controls, stale aliases, and default drift while allowing documented platform-managed or intentionally hidden parameters |
-| 6 | Update the `r-pathway` release record from the historical v1 entry to the already validated v2 immutable image | **Forge** | Runtime agent | Exact v2 digest, lockfile checksum, package versions, successful GSVA runtime run, and post-publication provenance recorded without rebuilding unrelated images |
-| 7 | Validate the lightweight `MOObject` bridge with a real `MOSuite-filter-counts` artifact in a minimal runtime | **Helix** | Bridge agent | Real-object read, validation, raw-count handoff, and continuous-expression handoff tests pass without installing full MOSuite; stale contract text updated |
-| 8 | Synchronize remaining deployment adapters after canonical and runtime decisions settle | **Harbor** | Deployment-adapter agent | Merged canonical commits, passing module tests, explicit source records, adapter versions, and platform validation plan |
-| 9 | Specify a one-way pathway-database export for local, HPC, Code Ocean, and on-prem use | **Compass** | Pathway/data agent | Versioned geneset and membership schema, provenance, organism and identifier fields, and immutable export artifact |
-| Deferred | Resolve the `OMIX-GSEA-Preranked-Legacy` Code Ocean/GitHub sync conflict without losing the intentional hidden-MSigDB panel behavior | **Harbor** | Deployment-adapter agent | Resume only when requested; preserve the capsule backup branches and attached `/data/msigdb` asset while keeping MSigDB hidden from the app panel; require a clean capsule run and tracked-tree review before sync |
+| Priority | Work item | Status | Agent name | Suggested owner | Dependency or completion evidence |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Synchronize the DEG Analysis adapter with canonical interface 2, including `analysis_mode` and pseudobulk-manifest discovery | In progress | **Harbor** | Deployment-adapter agent with Helix review | Raw-count, Harmony-mean, and SCT-mean modes appear correctly in the panel; automatic and explicit manifest paths are tested; adapter source/version records match canonical `0.4.0`/interface 2 |
+| 2 | Reconcile L2P Single and Multi app-panel names and defaults with their canonical CLIs, and determine why the deployed Code Ocean panels appear incomplete | In progress | **Harbor** | Deployment-adapter agent | Parameter/default comparison approved; primary versus advanced controls organized without changing scientific defaults silently; both capsules tested after synchronization |
+| 3 | Add the canonical Gene Boxplots `duplicate_aggregation` control to the adapter as an advanced parameter | In progress | **Canvas** | Visualization agent with Harbor review | Choices `mean`, `sum`, and `keep`; default `mean`; adapter source record updated from canonical module `1.0.0`; fixture and capsule run preserve normalized-expression behavior |
+| 4 | Repair deployment parameter bindings in GSEA Filters and Volcano Plot | Ready | **Harbor** | Deployment-adapter agent | GSEA Filters uses named parameters in a real capsule run; Volcano Plot supports canonical `resolution_dpi` with an explicit compatibility decision for the released `resolution_dpi_` alias |
+| 5 | Add an automated adapter-contract check for canonical CLI/schema, adapter CLI, panel parameter names, and defaults | Ready after current adapter fixes | **Harbor** | Deployment-adapter agent with Beacon review | CI reports missing controls, stale aliases, and default drift while allowing documented platform-managed or intentionally hidden parameters |
+| 6 | Synchronize remaining deployment adapters after canonical and runtime decisions settle | Ready after current adapter fixes | **Harbor** | Deployment-adapter agent | Merged canonical commits, passing module tests, explicit source records, adapter versions, and platform validation plan |
+| Deferred | Resolve the `OMIX-GSEA-Preranked-Legacy` Code Ocean/GitHub sync conflict without losing the intentional hidden-MSigDB panel behavior | Deferred by project owner | **Harbor** | Deployment-adapter agent | Resume only when requested; preserve the capsule backup branches and attached `/data/msigdb` asset while keeping MSigDB hidden from the app panel; require a clean capsule run and tracked-tree review before sync |
 
 Recently completed work should be removed from this queue after its completion
 evidence is recorded in the relevant pull request, release manifest, and
 changelog. Current examples include the Gene Boxplots duplicate-aggregation
 fix, Seurat handoff tests, the canonical GSVA module, `r-seurat-conversion`
-publication and immutable verification, the lightweight `MOObject` bridge,
-and locked-runtime GSVA validation.
+publication and immutable verification, the lightweight `MOObject` bridge and
+real-artifact validation, the validated `r-pathway` v2 release record, locked
+GSVA runtime validation, and the portable pathway-data export contract.
 
 ## Coordinator checklist
 
