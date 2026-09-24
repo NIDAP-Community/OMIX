@@ -200,13 +200,19 @@ as priorities change.
 
 | Priority | Work item | Agent name | Suggested owner | Dependency or completion evidence |
 | --- | --- | --- | --- | --- |
-| 1 | Promote and publish `r-seurat-conversion` as the first validated non-bootstrap release | **Forge** | Runtime agent | Green committed-lockfile and raw-count, Harmony-layer, and SCT-layer conversion tests; approved version; immutable digest and manifest record |
-| 2 | Validate Seurat pseudobulk outputs through the raw-count DEG and continuous-expression Limma paths | **Helix** | Single-cell/DEG agent | Representative end-to-end fixtures, matching sample metadata, manifests, and stable output schemas |
-| 3 | Build the GSVA canonical module from the existing template with mild cleanup | **Compass** | Pathway agent | Template provenance, explicit-path CLI, schema, focused tests, README, and changelog |
-| 4 | Determine how Gene Boxplots combines repeated gene identifiers | **Canvas** | Visualization agent | Trace current behavior, document whether values are summed or averaged, and add a fixture-based regression test before changing behavior |
-| 5 | Assess a lightweight `MOObject` bridge | **Helix** | Bridge agent | Confirm the released object API and required generics without introducing full MOSuite as a dependency |
+| 1 | Resolve the `OMIX-GSEA-Preranked-Legacy` Code Ocean/GitHub merge conflict without losing capsule app-panel edits | **Harbor** | Deployment-adapter agent | Capsule changes committed first; GitHub `master` merged into the capsule branch; conflict resolved field by field; clean status; successful capsule run; tracked-tree parity documented |
+| 2 | Audit deployment app panels for useful CLI parameters that are missing from the UI, beginning with L2P Single, L2P Multi, and GSEA Preranked | **Harbor** | Deployment-adapter agent | Cross-adapter matrix of CLI/schema parameters versus `app-panel.json`; classify each as main, advanced, or intentionally hidden; preserve current defaults unless separately approved |
+| 3 | Update the `r-pathway` release record from the historical v1 entry to the already validated v2 immutable image | **Forge** | Runtime agent | Exact v2 digest, lockfile checksum, package versions, successful GSVA runtime run, and post-publication provenance recorded without rebuilding unrelated images |
+| 4 | Validate the lightweight `MOObject` bridge with a real `MOSuite-filter-counts` artifact in a minimal runtime | **Helix** | Bridge agent | Real-object read, validation, raw-count handoff, and continuous-expression handoff tests pass without installing full MOSuite; stale contract text updated |
+| 5 | Synchronize deployment adapters after the app-panel audit and remaining canonical/runtime decisions settle | **Harbor** | Deployment-adapter agent | Merged canonical commits, passing module tests, explicit source records, adapter versions, and platform validation plan |
 | 6 | Specify a one-way pathway-database export for local, HPC, Code Ocean, and on-prem use | **Compass** | Pathway/data agent | Versioned geneset and membership schema, provenance, organism and identifier fields, and immutable export artifact |
-| 7 | Synchronize deployment adapters after canonical module changes settle | **Harbor** | Deployment-adapter agent | Merged canonical commits, passing module tests, updated source records, and platform validation plan |
+
+Recently completed work should be removed from this queue after its completion
+evidence is recorded in the relevant pull request, release manifest, and
+changelog. Current examples include the Gene Boxplots duplicate-aggregation
+fix, Seurat handoff tests, the canonical GSVA module, `r-seurat-conversion`
+publication and immutable verification, the lightweight `MOObject` bridge,
+and locked-runtime GSVA validation.
 
 ## Coordinator checklist
 
