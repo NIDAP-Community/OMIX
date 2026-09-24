@@ -198,15 +198,15 @@ This is a planning queue, not release authorization. The coordinator should
 move each item into a tracked issue before assigning it and update this section
 as priorities change.
 
-| Priority | Work item | Suggested owner | Dependency or completion evidence |
-| --- | --- | --- | --- |
-| 1 | Promote and publish `r-seurat-conversion` as the first validated non-bootstrap release | **Forge** | Green committed-lockfile and raw-count, Harmony-layer, and SCT-layer conversion tests; approved version; immutable digest and manifest record |
-| 2 | Validate Seurat pseudobulk outputs through the raw-count DEG and continuous-expression Limma paths | **Helix** | Representative end-to-end fixtures, matching sample metadata, manifests, and stable output schemas |
-| 3 | Build the GSVA canonical module from the existing template with mild cleanup | **Compass** | Template provenance, explicit-path CLI, schema, focused tests, README, and changelog |
-| 4 | Determine how Gene Boxplots combines repeated gene identifiers | **Canvas** | Trace current behavior, document whether values are summed or averaged, and add a fixture-based regression test before changing behavior |
-| 5 | Assess a lightweight `MOObject` bridge | **Helix** | Confirm the released object API and required generics without introducing full MOSuite as a dependency |
-| 6 | Specify a one-way pathway-database export for local, HPC, Code Ocean, and on-prem use | **Compass** | Versioned geneset and membership schema, provenance, organism and identifier fields, and immutable export artifact |
-| 7 | Synchronize deployment adapters after canonical module changes settle | **Harbor** | Merged canonical commits, passing module tests, updated source records, and platform validation plan |
+| Priority | Work item | Agent name | Suggested owner | Dependency or completion evidence |
+| --- | --- | --- | --- | --- |
+| 1 | Promote and publish `r-seurat-conversion` as the first validated non-bootstrap release | **Forge** | Runtime agent | Green committed-lockfile and raw-count, Harmony-layer, and SCT-layer conversion tests; approved version; immutable digest and manifest record |
+| 2 | Validate Seurat pseudobulk outputs through the raw-count DEG and continuous-expression Limma paths | **Helix** | Single-cell/DEG agent | Representative end-to-end fixtures, matching sample metadata, manifests, and stable output schemas |
+| 3 | Build the GSVA canonical module from the existing template with mild cleanup | **Compass** | Pathway agent | Template provenance, explicit-path CLI, schema, focused tests, README, and changelog |
+| 4 | Determine how Gene Boxplots combines repeated gene identifiers | **Canvas** | Visualization agent | Trace current behavior, document whether values are summed or averaged, and add a fixture-based regression test before changing behavior |
+| 5 | Assess a lightweight `MOObject` bridge | **Helix** | Bridge agent | Confirm the released object API and required generics without introducing full MOSuite as a dependency |
+| 6 | Specify a one-way pathway-database export for local, HPC, Code Ocean, and on-prem use | **Compass** | Pathway/data agent | Versioned geneset and membership schema, provenance, organism and identifier fields, and immutable export artifact |
+| 7 | Synchronize deployment adapters after canonical module changes settle | **Harbor** | Deployment-adapter agent | Merged canonical commits, passing module tests, updated source records, and platform validation plan |
 
 ## Coordinator checklist
 
