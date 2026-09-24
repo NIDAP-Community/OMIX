@@ -80,10 +80,22 @@ independent scientific behavior.
 ### Beacon — quality and documentation reviewer
 
 This role checks module-contract compliance, tests, schemas, examples, user
-documentation, generated-file exclusions, and provenance. It reports gaps; it
-does not perform an unrequested broad refactor. The role may rotate between
-contributors, but should be independent of the task author for higher-risk
-scientific or release changes.
+documentation, generated-file exclusions, and provenance. Before an adapter
+release, Beacon independently audits cross-repository parity and blocks release
+when unexplained drift remains. The audit compares the adapter with its
+recorded canonical commit and file hashes, separately reports lag from the
+current canonical module, and checks CLI, schema, and app-panel parameter
+names, types, choices, and defaults; scientific documentation claims; fixture
+output equivalence; and the runtime tag plus immutable digest. Intentional
+platform-only differences must be recorded in `OMIX_MODULE_SOURCE.md`.
+
+Beacon reports drift but does not silently remediate it. Scientific owners fix
+canonical defects, Harbor re-exports approved code and fixes platform
+translation, Forge fixes runtime parity and provenance, and Atlas controls the
+order. Scientific implementation flows only from canonical OMIX modules to
+deployment repositories. The role may rotate between contributors, but should
+be independent of the task author for higher-risk scientific or release
+changes.
 
 ## Repository and branch rules
 
@@ -222,7 +234,7 @@ as priorities change.
 | 2 | Reconcile L2P Single and Multi app-panel names and defaults with their canonical CLIs, and determine why the deployed Code Ocean panels appear incomplete | In progress | **Harbor** | Deployment-adapter agent | Parameter/default comparison approved; primary versus advanced controls organized without changing scientific defaults silently; both capsules tested after synchronization |
 | 3 | Add the canonical Gene Boxplots `duplicate_aggregation` control to the adapter as an advanced parameter | In progress | **Canvas** | Visualization agent with Harbor review | Choices `mean`, `sum`, and `keep`; default `mean`; adapter source record updated from canonical module `1.0.0`; fixture and capsule run preserve normalized-expression behavior |
 | 4 | Repair deployment parameter bindings in GSEA Filters and Volcano Plot | Ready | **Harbor** | Deployment-adapter agent | GSEA Filters uses named parameters in a real capsule run; Volcano Plot supports canonical `resolution_dpi` with an explicit compatibility decision for the released `resolution_dpi_` alias |
-| 5 | Add an automated adapter-contract check for canonical CLI/schema, adapter CLI, panel parameter names, and defaults | Ready after current adapter fixes | **Harbor** | Deployment-adapter agent with Beacon review | CI reports missing controls, stale aliases, and default drift while allowing documented platform-managed or intentionally hidden parameters |
+| 5 | Add an automated adapter-contract check for canonical CLI/schema, adapter CLI, panel parameter names, and defaults | Ready after current adapter fixes | **Beacon** | Quality reviewer with Harbor remediation | CI reports missing controls, stale aliases, and default drift while allowing documented platform-managed or intentionally hidden parameters; Beacon reports failures and Harbor corrects adapter-owned translation |
 | 6 | Synchronize remaining deployment adapters after canonical and runtime decisions settle | Ready after current adapter fixes | **Harbor** | Deployment-adapter agent | Merged canonical commits, passing module tests, explicit source records, adapter versions, and platform validation plan |
 | Deferred | Resolve the `OMIX-GSEA-Preranked-Legacy` Code Ocean/GitHub sync conflict without losing the intentional hidden-MSigDB panel behavior | Deferred by project owner | **Harbor** | Deployment-adapter agent | Resume only when requested; preserve the capsule backup branches and attached `/data/msigdb` asset while keeping MSigDB hidden from the app panel; require a clean capsule run and tracked-tree review before sync |
 
