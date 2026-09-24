@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0.0",
+  "export_id": "synthetic-demo",
+  "export_version": "1.0.0",
+  "created_at": "2026-09-24T12:00:00Z",
+  "content_profile": "open",
+  "generator": {
+    "name": "synthetic-contract-fixture",
+    "version": "1.0.0",
+    "source_commit": "0000000"
+  },
+  "upstream": {
+    "system": "synthetic pathway catalog",
+    "snapshot_id": "synthetic-2026-09-24"
+  },
+  "sources": [
+    {
+      "source_id": "synthetic-open",
+      "name": "Synthetic open pathways",
+      "version": "1.0",
+      "retrieved_at": "2026-09-24T12:00:00Z",
+      "origin_url": "https://example.org/pathways",
+      "license_name": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "redistribution": "allowed",
+      "included": true,
+      "notes": "Fictional records used only for contract validation."
+    },
+    {
+      "source_id": "msigdb",
+      "name": "Molecular Signatures Database",
+      "version": "not-exported",
+      "retrieved_at": "2026-09-24T12:00:00Z",
+      "origin_url": "https://www.gsea-msigdb.org/gsea/msigdb/",
+      "license_name": "MSigDB license terms",
+      "license_url": "https://www.gsea-msigdb.org/gsea/msigdb/license_terms.jsp",
+      "redistribution": "restricted",
+      "included": false,
+      "notes": "Membership data are excluded. Provision separately only for authorized users."
+    }
+  ],
+  "organism_tax_ids": [9606],
+  "identifier_namespaces": ["HGNC_SYMBOL"],
+  "files": {
+    "genesets": {
+      "path": "genesets.tsv",
+      "media_type": "text/tab-separated-values",
+      "sha256": "dcc4d0ac1beee93172a14e1249290399de9073a35b186df65a389de53a4299cc",
+      "row_count": 2
+    },
+    "memberships": {
+      "path": "memberships.tsv",
+      "media_type": "text/tab-separated-values",
+      "sha256": "43db7bbde10e8399fa74bebeb26c38e0a95120b4c1112342908d5dd20bbcb8f8",
+      "row_count": 5
+    },
+    "notice": {
+      "path": "NOTICE.md",
+      "media_type": "text/markdown",
+      "sha256": "7aa37015607918c69369ee4a28e2c2027e287e1b5cc339e55b8a0b7262d47775"
+    }
+  }
+}
