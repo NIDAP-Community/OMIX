@@ -24,9 +24,9 @@ See the canonical [versioning and release policy](https://github.com/NIDAP-Commu
 
 ## Exported scientific files
 
-| Canonical file | Adapter copy | Purpose |
-| --- | --- | --- |
-| `R/<function>.R` | `code/functions/<function>.R` | <scientific implementation> |
+| Canonical file | Adapter copy | SHA-256 | Purpose |
+| --- | --- | --- | --- |
+| `R/<function>.R` | `code/functions/<function>.R` | `<SHA-256>` | <scientific implementation> |
 
 ## Syncweaver mapping
 
@@ -37,8 +37,9 @@ See the canonical [versioning and release policy](https://github.com/NIDAP-Commu
 - **Host-side drift:** `<None, explanation, or Pending verification>`
 
 `code/functions/` is generated from the canonical source above and must not be
-edited directly. Harbor owns the adapter files around it; Syncweaver proposes
-canonical updates; Beacon verifies parity before release.
+edited directly. During the interim, Harbor performs a byte-identical export;
+after onboarding, Syncweaver proposes canonical updates. Harbor owns the
+adapter files around it, and Beacon verifies parity before release.
 
 ## Ownership
 

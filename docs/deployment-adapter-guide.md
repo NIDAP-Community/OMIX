@@ -135,15 +135,18 @@ Harbor owns the initial repository bootstrap. Use this sequence:
    this file.
 6. Implement `code/run` as the deployment launcher and keep it free of
    scientific decisions.
-7. Configure Syncweaver to map the canonical module's complete `R/` directory
-   into `code/functions/`, pinned to an immutable canonical commit or release
-   tag. Let Syncweaver perform the first import so the initial and later
-   exports share the same provenance mechanism.
+7. Map the canonical module's complete `R/` directory into `code/functions/`,
+   pinned to an immutable canonical commit or release tag. Until Syncweaver is
+   ready for OMIX, Harbor performs this export using the controlled interim
+   procedure below. Once available, Syncweaver assumes maintenance of the same
+   path without changing its scientific contents.
 8. Record the mapping, canonical version, interface version, source reference,
    and exported files in `OMIX_MODULE_SOURCE.md`. Do not claim an adapter tag,
    platform release, or runtime digest until it has been validated.
-9. Build the App Panel from the canonical schema. Record every platform-only
-   alias, hidden control, preset, attached dataset, and path translation.
+9. Build the App Panel from the canonical schema. Expose every user-settable
+   canonical parameter with matching type, choices, and scientific default.
+   Record every platform-only alias, intentionally hidden platform-managed
+   input, preset, attached dataset, and path translation.
 10. Add tests for parameter translation, unambiguous input discovery, stable
     outputs, and a representative fixture. Confirm that the adapter sources
     the Syncweaver-managed files rather than a second scientific copy.
@@ -151,8 +154,30 @@ Harbor owns the initial repository bootstrap. Use this sequence:
     Code Ocean. Record the validated capsule release and immutable runtime
     digest before creating an adapter release tag.
 
-If Syncweaver cannot perform the initial import, stop and record that as a
-bootstrap blocker rather than establishing an untracked scientific copy.
+### Interim Harbor synchronization
+
+Until Syncweaver provides the required OMIX synchronization safeguards, Harbor
+may perform the initial and subsequent scientific exports manually. This is a
+temporary controlled operation, not permission to maintain adapter-specific
+science. For every export Harbor must:
+
+1. start from a merged, tested canonical commit or immutable module tag;
+2. copy the complete canonical module `R/` contents into `code/functions/`,
+   removing scientific files that no longer exist upstream;
+3. make no edits, renames, formatting changes, or behavioral substitutions in
+   the exported files;
+4. record the canonical module version, interface version, exact commit, file
+   mapping, and SHA-256 for every exported file in `OMIX_MODULE_SOURCE.md`;
+5. place the export in a reviewable adapter pull request that leaves
+   `.codeocean/`, `code/main.R`, runtime files, and other adapter-owned paths
+   intact;
+6. run the adapter contract and representative fixture tests; and
+7. obtain Beacon's independent byte-parity and interface review before merge.
+
+If the existing `code/functions/` contents differ from their claimed canonical
+source, Harbor must stop, preserve the diff, and report the drift. Timestamps do
+not determine which version is current. When Syncweaver is ready, onboard the
+same mapping and pinned source without creating a second scientific-code path.
 
 ## Standard adapter README
 
@@ -216,6 +241,11 @@ order.
 
 - The app-panel parameter names and defaults must agree with the canonical
   schema unless the adapter explicitly translates a platform-only field.
+- Every user-settable canonical parameter must be represented in the App Panel,
+  including advanced controls. A platform-managed input may remain hidden only
+  when the adapter supplies it reproducibly and the exception is recorded in
+  `OMIX_MODULE_SOURCE.md`; absence caused by an incomplete panel is not an
+  intentional exception.
 - Discover attached input recursively only when the selection is unambiguous;
   fail with candidate paths when more than one suitable file is found.
 - Prefer a single well-defined input bundle over unrelated independent files
