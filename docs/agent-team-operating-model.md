@@ -112,6 +112,25 @@ Several Harbor task instances may work in parallel when they use separate
 adapter repositories and worktrees. Atlas still assigns one owner per adapter
 and orders any shared canonical or runtime dependencies.
 
+#### Adapter work allocation
+
+The domain agents carry the scientific-contract and parity workload for the
+adapters in their domains; Harbor should not be the sole owner of the entire
+adapter backlog. Use this standing allocation unless Atlas records a narrower
+exception in the tracked issue:
+
+| Domain agent | Deployment adapters | Domain-owned work | Harbor-owned work |
+| --- | --- | --- | --- |
+| **Helix** | DEG Analysis | Canonical DEG schema, CLI/default classification, contract tests, and scientific-source review | Code Ocean entry point, mounted-input discovery, App Panel, source record, and platform validation plan |
+| **Compass** | L2P Single, L2P Multi, GSEA Filters, GSEA Preranked, and GSEA Visualization | Canonical pathway schemas, CLI/default classification, contract tests, and pathway-semantic review | Code Ocean entry points, mounted-input discovery, App Panels, source records, and platform validation plans |
+| **Canvas** | Gene Boxplots and Volcano Plot | Canonical visualization schemas, CLI/default classification, contract tests, aesthetics, and scientific-source review | Code Ocean entry points, mounted-input discovery, App Panels, source records, and platform validation plans |
+
+Each adapter therefore has a domain owner and a deployment specialist. The
+domain owner does not independently edit platform-owned files merely because
+the adapter is assigned to that domain. Harbor does not change scientific
+behavior to solve a platform problem. Beacon independently checks the resulting
+contract and source parity, while Atlas sequences dependencies and review.
+
 ### Beacon — quality and documentation reviewer
 
 This role checks module-contract compliance, tests, schemas, examples, user
@@ -324,9 +343,11 @@ a merge as Code Ocean validation.
 
 | Priority | Work item | Status | Branch/worktree | Agent name | Suggested owner | Dependency or completion evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Perform the interim first-pass canonical scientific-code synchronization for every mapped deployment repository | Assigned; implementation branches pending | One branch/worktree per adapter | **Harbor** | Deployment-adapter agent with the relevant scientific owner | For each adapter, export the complete canonical `R/` tree into `code/functions/` without modification; record module/interface versions, immutable commit, mapping, and per-file SHA-256; run adapter tests; obtain Beacon parity review; do not wait for Syncweaver |
-| 2 | Complete canonical public schemas for L2P, GSEA, Gene Boxplots, and Volcano Plot | Backlog; may proceed in parallel with scientific-file synchronization | Unassigned | Unassigned | Compass and Canvas, with Beacon review | Beacon's first audit found that several schemas omit public CLI controls; each scientific owner must classify controls as public, advanced, or internal and add contract tests before the corresponding App Panel is considered complete |
-| 3 | Audit every deployment App Panel and expose all user-settable canonical parameters | Assigned; gated per adapter by canonical schema completeness | One branch/worktree per adapter, combined with priority 1 only when review remains bounded | **Harbor** | Deployment-adapter agent with the relevant scientific owner | Compare canonical schema and CLI with adapter CLI and `.codeocean/app-panel.json`; match names, types, choices, order where meaningful, and defaults; document only genuine platform-managed hidden inputs such as an attached database; add a contract test and Code Ocean validation plan |
+| 1A | Complete the canonical DEG contract and scientific mapping required for deterministic adapter synchronization | Assigned; branch pending | One isolated OMIX branch/worktree | **Helix** | Single-cell and differential-expression owner, with Harbor and Beacon review | [Issue #28](https://github.com/NIDAP-Community/OMIX/issues/28); preserve DEG `0.4.0`/interface 2 behavior, classify all controls, add contract coverage, and deliver the canonical-to-adapter mapping before Harbor finalizes DEG adapter PR #1 |
+| 1B | Complete canonical pathway contracts and scientific mappings required for adapter synchronization | Assigned; branches pending | One bounded branch/worktree per compatible pathway outcome | **Compass** | Pathway-analysis owner, with Harbor and Beacon review | [Issue #29](https://github.com/NIDAP-Community/OMIX/issues/29); handle L2P Single and Multi first, then GSEA Filters and GSEA Visualization; GSEA Preranked canonical assessment may proceed but its deployment conflict remains deferred |
+| 1C | Complete canonical visualization contracts and scientific mappings required for adapter synchronization | Assigned; branches pending | One bounded branch/worktree per compatible visualization outcome | **Canvas** | Visualization owner, with Harbor and Beacon review | [Issue #30](https://github.com/NIDAP-Community/OMIX/issues/30); address Volcano Plot first, then Gene Boxplots contract/platform review; preserve established aesthetics and `duplicate_aggregation = mean` by default |
+| 2 | Perform interim byte-identical canonical scientific-code synchronization for every mapped deployment repository after its domain handoff | Assigned; gated independently per adapter by priorities 1A–1C | One Harbor-owned branch/worktree per adapter | **Harbor** | Deployment-adapter specialist with the allocated domain owner | Export the complete reviewed canonical `R/` tree into `code/functions/` without modification; record module/interface versions, immutable commit, mapping, and per-file SHA-256; run adapter tests; obtain domain-owner and Beacon parity review; do not wait for Syncweaver |
+| 3 | Audit every deployment App Panel and expose all user-settable canonical parameters | Assigned; gated per adapter by canonical schema completeness | One Harbor-owned branch/worktree per adapter, combined with priority 2 only when review remains bounded | **Harbor** | Deployment-adapter specialist with the allocated domain owner | Compare canonical schema and CLI with adapter CLI and `.codeocean/app-panel.json`; match names, types, choices, order where meaningful, and defaults; document only genuine platform-managed hidden inputs such as an attached database; add a contract test and Code Ocean validation plan |
 | 4 | Synchronize the DEG Analysis adapter with canonical interface 2, including `analysis_mode` and pseudobulk-manifest discovery | Draft PR open | `feature/interface2-adapter`; `OMIX-worktrees/Harbor-deg-interface2` | **Harbor** | Deployment-adapter agent with Helix review | [DEG adapter PR #1](https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1) remains a draft; it exports canonical `0.4.0`/interface 2 and adds interface/input tests; Code Ocean validation is pending |
 | 5 | Reconcile L2P Single and Multi App Panel names and defaults with their canonical CLIs | Draft PRs open | `feature/reconcile-l2p-single-panel` / `OMIX-worktrees/Harbor-l2p-single-panel`; `feature/reconcile-l2p-multi-panel` / `OMIX-worktrees/Harbor-l2p-multi-panel` | **Harbor** | Deployment-adapter agent with Compass review | [Single PR #2](https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2) and [Multi PR #2](https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/2) remain drafts; they add panel-contract checks and document intentional demo presets; reconcile them with priorities 1–3 before final review; Code Ocean validation is pending |
 | 6 | Complete platform validation for the canonical Gene Boxplots `duplicate_aggregation` control | Source merged; platform validation pending | Merged adapter commit `9a8eb2e` | **Canvas** | Visualization agent with Harbor review | [Gene Boxplots PR #1](https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/pull/1) merged with `mean`, `sum`, and `keep`, default `mean`, canonical `1.0.0` source parity, and fixture tests; Code Ocean validation is not recorded |
