@@ -276,6 +276,11 @@ order.
 
 ## Audit checklist
 
+Start with Beacon's current
+[deployment adapter inventory](deployment-adapter-inventory.md). Its JSON
+source is the durable, machine-readable status record; update and validate it
+when an audit changes a parity, interface, runtime, or platform claim.
+
 For an existing adapter, verify:
 
 - a current `README.md`, `OMIX_MODULE_SOURCE.md`, and `AGENTS.md` exist;
