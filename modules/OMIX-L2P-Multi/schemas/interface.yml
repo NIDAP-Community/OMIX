@@ -1,78 +1,325 @@
 interface_version: 1
 entrypoint: scripts/run_l2p_multi.R
+exposure_levels:
+  public: Standard user-facing control that deployment adapters should expose.
+  advanced: Supported user-facing control that deployment adapters should expose in an advanced section.
+  internal: Portable CLI plumbing, deprecated compatibility, or inactive legacy-renderer control that deployment adapters should not expose as a current setting.
 inputs:
   deg_table:
     required: true
+    type: path
+    exposure: public
     formats: [csv, tsv, txt, rds]
     description: Wide differential-expression table containing one or more comparison-specific statistics.
+  custom_pathways:
+    required: false
+    type: path
+    default: null
+    exposure: advanced
+    formats: [csv, tsv, txt, rds]
+    description: Optional custom pathway database. Delimited tables must contain pathway-name and gene-symbol columns; RDS may contain a compatible table or L2P pathway list.
 parameters:
   comparisons:
     required: true
     type: string
+    exposure: public
+    delimiter: ","
+    preserves_order: true
     description: Comma-separated comparison identifiers in the desired analysis and shared bubble-plot order. These identifiers infer matching DEG columns when explicit columns are not supplied.
+  output_dir:
+    type: path
+    default: results
+    exposure: internal
+    description: Portable result directory. Deployment adapters provide their platform-managed output location.
+  gene_names_column:
+    type: string
+    default: null
+    exposure: advanced
+    description: Optional exact gene-symbol column; common gene column names are inferred when omitted.
+  t_statistic_columns:
+    type: string
+    default: null
+    exposure: advanced
+    delimiter: ","
+    preserves_order: true
+    aligned_with: comparisons
+    description: Ordered signed-rank columns corresponding one-to-one with `comparisons`; inferred when omitted.
+  significance_columns:
+    type: string
+    default: null
+    exposure: advanced
+    delimiter: ","
+    preserves_order: true
+    aligned_with: comparisons
+    description: Ordered p-value or adjusted-p-value columns corresponding one-to-one with `comparisons`; inferred when omitted.
+  fold_change_columns:
+    type: string
+    default: null
+    exposure: advanced
+    delimiter: ","
+    preserves_order: true
+    aligned_with: comparisons
+    description: Ordered linear- or log-fold-change columns corresponding one-to-one with `comparisons`; inferred when omitted.
   species:
     type: string
     default: Human
+    exposure: public
+    allowed: [Human, Mouse, Macaque, Rat, Zebrafish, Rabbit, Drosophila]
+  update_genes:
+    type: boolean
+    default: true
+    exposure: advanced
+    description: Update input symbols for L2P and retain original symbols in the result.
   collections_to_include:
     type: string
     default: H
+    exposure: public
+    delimiter: ","
+    item_allowed: [GO, REACTOME, KEGG, PANTH, PID, BIOCYC, WikiPathways, H, C1, C2, C3, C4, C6, C7, C8]
+    description: Comma-separated built-in pathway collection codes. Custom pathways may be supplied independently.
   select_by_rank:
     type: boolean
     default: false
+    exposure: public
     description: Select DEG lists using the significance and fold-change thresholds. Set true to use the legacy t-statistic rank method.
+  select_top_percentage_of_genes:
+    type: boolean
+    default: true
+    exposure: advanced
+    description: With rank selection, use the top and bottom 10 percent rather than a fixed gene count.
+  select_top_genes:
+    type: integer
+    default: 500
+    exposure: advanced
+    minimum: 1
+    description: With rank selection and percentage selection disabled, number of genes selected from each end of each ranking.
   significance_threshold:
     type: number
     default: 0.05
-    description: Maximum nominal p-value, or the threshold applied to an explicitly selected adjusted-p-value column, for DEG-list selection.
+    exposure: public
+    minimum: 0
+    maximum: 1
+    description: Maximum nominal p-value, or the threshold applied to explicitly selected adjusted-p-value columns, for DEG-list selection.
   fold_change_threshold:
     type: number
     default: 1.2
-    description: Minimum absolute linear fold change for DEG-list selection. For a log-fold-change column, the corresponding log2 threshold is used.
+    exposure: public
+    minimum_exclusive: 0
+    description: Minimum absolute linear fold change for DEG-list selection. For log-fold-change columns, the corresponding log2 threshold is used.
+  minimum_number_of_deg_genes:
+    type: integer
+    default: 100
+    exposure: advanced
+    minimum: 0
+    description: Desired minimum selected-gene count per comparison and direction before the module reports a warning.
   top_pathways:
     type: integer
     default: 10
+    exposure: internal
     deprecated: true
-    description: Retained for backwards-compatible calls; it no longer limits the exported results or figure.
-  p_value_limit:
-    type: number
-    default: 0.05
-    description: Nominal p-value or FDR threshold used to retain exported pathways.
-  use_fdr_for_significance:
-    type: boolean
-    default: false
-  minimum_pathway_hit_count:
-    type: integer
-    default: 5
+    description: Accepted for backwards compatibility but does not limit the exported results or current shared figures.
   number_of_significant_events:
     type: integer
     default: 1
+    exposure: public
+    minimum: 1
     description: Number of distinct comparisons in which a pathway must meet export criteria.
   maximum_pathways_to_plot:
     type: integer
     default: 20
+    exposure: internal
     deprecated: true
-    description: Retained for backwards-compatible calls to the low-level legacy renderer. It does not affect the default shared bubble-plot outputs; use pathway_bubble_top_n instead.
+    description: Low-level legacy-renderer limit. The portable CLI disables that renderer; use `pathway_bubble_top_n` for current shared figures.
   pathway_bubble_plots:
     type: boolean
     default: true
+    exposure: public
     description: Write the shared OMIX combined and collection-specific bubble plots.
   pathway_bubble_top_n:
     type: integer
     default: 20
+    exposure: public
+    minimum: 0
     description: Top significant pathways selected independently for each shared bubble-plot scope; 0 includes all eligible pathways.
   pathway_bubble_significance_statistic:
     type: string
     default: padj
+    exposure: public
     allowed: [padj, pval]
     description: Adjusted p-value/FDR (`padj`, default) or nominal p-value (`pval`) used to select shared bubble-plot pathways and encode circle-versus-X significance.
   collection_color_scale:
     type: string
     default: independent
+    exposure: advanced
     allowed: [independent, shared]
     description: Whether collection-specific bubble plots use their own score range or the shared combined range.
-  output_dir:
-    type: path
-    default: results
+  plot_bubble_size:
+    type: string
+    default: pval
+    exposure: internal
+    allowed: [pval, fdr, number_hits]
+    description: Low-level legacy-renderer bubble-size mapping; inactive in the current portable CLI.
+  plot_bubble_color:
+    type: string
+    default: enrichment_score
+    exposure: internal
+    allowed: [enrichment_score, net_enrichment_score, percent_gene_hits_per_pathway]
+    description: Low-level legacy-renderer bubble-colour mapping; inactive in the current portable CLI.
+  plot_bubble_max_color:
+    type: number
+    default: 1
+    exposure: internal
+    minimum: 0
+    maximum: 1
+    description: Low-level legacy-renderer colour quantile; inactive in the current portable CLI.
+  pathway_axis_label_max_length:
+    type: integer
+    default: 45
+    exposure: internal
+    minimum: 1
+    description: Low-level legacy-renderer label wrap width; inactive in the current portable CLI.
+  pathway_axis_label_font_size:
+    type: number
+    default: 5
+    exposure: internal
+    minimum_exclusive: 0
+    description: Low-level legacy-renderer label size; inactive in the current portable CLI.
+  use_built_in_gene_universe:
+    type: boolean
+    default: false
+    exposure: advanced
+    description: Use the L2P built-in universe instead of all genes in the DEG table.
+  minimum_pathway_hit_count:
+    type: integer
+    default: 5
+    exposure: public
+    minimum: 0
+    description: Pathways must have more than this many selected-gene hits to meet export criteria.
+  pathway_size_limit:
+    type: integer
+    default: 500
+    exposure: advanced
+    minimum: 1
+    description: Remove pathways whose tested size is not below this limit.
+  p_value_limit:
+    type: number
+    default: 0.05
+    exposure: public
+    minimum_exclusive: 0
+    maximum: 1
+    description: Nominal p-value or FDR threshold used to retain exported pathways.
+  use_fdr_for_significance:
+    type: boolean
+    default: false
+    exposure: advanced
+    description: Apply `p_value_limit` to L2P FDR rather than nominal p-value for result export selection.
+  custom_pathway_name_column:
+    type: string
+    default: gene_set_name
+    exposure: advanced
+    description: Pathway-name column in a tabular custom pathway database.
+  custom_pathway_gene_column:
+    type: string
+    default: gene_symbol
+    exposure: advanced
+    description: Gene-symbol column in a tabular custom pathway database.
+  pathways_to_remove:
+    type: string
+    default: null
+    exposure: advanced
+    delimiter: ","
+    description: Comma-separated exact pathway names removed from the exported result and downstream shared plots.
+  rename_groups:
+    type: string
+    default: null
+    exposure: internal
+    delimiter: ","
+    preserves_order: true
+    description: Low-level legacy-renderer group labels; inactive in the current portable CLI.
+  vertical_line_placement:
+    type: string
+    default: null
+    exposure: internal
+    delimiter: ","
+    preserves_order: true
+    description: Low-level legacy-renderer separator positions; inactive in the current portable CLI.
+  use_panel_plot:
+    type: boolean
+    default: false
+    exposure: internal
+    description: Low-level legacy-renderer faceting control; inactive in the current portable CLI.
+  use_dynamic_pathway_font_size:
+    type: boolean
+    default: true
+    exposure: internal
+    description: Low-level legacy-renderer font control; inactive in the current portable CLI.
+  custom_pathway_order:
+    type: string
+    default: null
+    exposure: internal
+    delimiter: ","
+    preserves_order: true
+    description: Low-level legacy-renderer pathway order; inactive in the current portable CLI.
+  x_axis_title:
+    type: string
+    default: null
+    exposure: internal
+    description: Low-level legacy-renderer axis title; inactive in the current portable CLI.
+  y_axis_title:
+    type: string
+    default: null
+    exposure: internal
+    description: Low-level legacy-renderer axis title; inactive in the current portable CLI.
+  x_axis_title_font_size:
+    type: number
+    default: 14
+    exposure: internal
+    minimum_exclusive: 0
+    description: Low-level legacy-renderer font size; inactive in the current portable CLI.
+  y_axis_title_font_size:
+    type: number
+    default: 14
+    exposure: internal
+    minimum_exclusive: 0
+    description: Low-level legacy-renderer font size; inactive in the current portable CLI.
+  x_axis_tick_font_size:
+    type: number
+    default: 14
+    exposure: internal
+    minimum_exclusive: 0
+    description: Low-level legacy-renderer font size; inactive in the current portable CLI.
+  x_axis_tick_labels:
+    type: string
+    default: null
+    exposure: internal
+    delimiter: ","
+    preserves_order: true
+    description: Low-level legacy-renderer tick labels; inactive in the current portable CLI.
+  y_axis_tick_labels:
+    type: string
+    default: null
+    exposure: internal
+    delimiter: ","
+    preserves_order: true
+    description: Low-level legacy-renderer tick labels; inactive in the current portable CLI.
+  plot_width:
+    type: number
+    default: 14
+    exposure: internal
+    minimum_exclusive: 0
+    description: Low-level legacy-renderer width; inactive in the current portable CLI because shared figures size themselves from their selected rows.
+  plot_height:
+    type: number
+    default: 16
+    exposure: internal
+    minimum_exclusive: 0
+    description: Low-level legacy-renderer height; inactive in the current portable CLI because shared figures size themselves from their selected rows.
+  column_spacing:
+    type: number
+    default: 0.5
+    exposure: internal
+    minimum_exclusive: 0
+    description: Low-level legacy-renderer column spacing; inactive in the current portable CLI.
 outputs:
   l2p_multi_results:
     path: l2p_multi_results.csv

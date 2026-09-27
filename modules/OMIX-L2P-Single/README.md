@@ -120,7 +120,19 @@ same result, provenance, and plot files listed above.
 ## Interface and deployment
 
 See [`schemas/interface.yml`](schemas/interface.yml) for the complete
-machine-readable input, parameter, and output contract.
+machine-readable input, parameter, and output contract. Every portable CLI
+control is classified there as:
+
+- `public`: a standard user-facing control that an adapter should expose;
+- `advanced`: a supported user-facing control that belongs in an advanced
+  section; or
+- `internal`: portable output-path plumbing managed by the deployment rather
+  than shown as a scientific setting.
+
+The schema also records allowed choices, defaults, comma-delimited ordered
+values, and the mutual exclusion between `comparison` and `comparisons`.
+Deployment presets may differ only when the adapter documents the translation
+and its reason; the portable defaults in the schema remain canonical.
 
 **Deployment repository:**
 [OMIX-L2P-Single](https://github.com/NIDAP-Community/OMIX-L2P-Single)

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Complete the machine-readable CLI contract, classify every control as
+  public, advanced, or internal, and add regression checks for names, types,
+  defaults, choices, and comparison-aligned ordering. Current shared-plot
+  controls are distinguished from accepted but inactive legacy-renderer
+  arguments without changing scientific behavior.
 - **Breaking change:** pathway figures now use a default top-pathway limit of
   20 rather than 10 for shared plots and 15 for direct low-level legacy plots.
   Use `--pathway_bubble_top_n` or `--maximum_pathways_to_plot` to override
