@@ -1,24 +1,205 @@
 interface_version: 1
 entrypoint: scripts/run_volcano_plot.R
+control_classifications:
+  public: User-settable controls for ordinary Volcano Plot runs.
+  advanced: User-settable controls for plot tuning; deployment adapters must expose them with the same names, types, choices, and defaults.
+  internal: Implementation bindings derived by the portable CLI or a deployment adapter; they are not public CLI aliases.
 inputs:
   deg_table:
+    classification: public
     required: true
     formats: [csv, tsv, txt, rds]
     description: Differential-expression table containing a feature identifier, significance values, and log2 fold-change values.
 parameters:
+  output_dir:
+    classification: public
+    type: path
+    default: results
+    description: Directory for the plot file(s) and augmented Volcano Plot data table.
   pvalue_type:
+    classification: public
     type: string
     default: nominal
     allowed: [nominal, adjusted]
+    description: Select nominal or adjusted significance columns during automatic column detection.
+  column_with_feature_id:
+    classification: public
+    type: string
+    default: null
+    description: Feature identifier column; null enables automatic detection.
+  significance_column:
+    classification: public
+    type: string
+    default: null
+    description: One or more comma-separated significance columns; null enables automatic detection.
+  log2_fold_change_column:
+    classification: public
+    type: string
+    default: null
+    description: One or more comma-separated log2 fold-change columns; null enables automatic detection.
   p_value_threshold:
+    classification: public
     type: number
     default: 0.05
   log2_fold_change_threshold:
+    classification: public
     type: number
     default: 1.0
-  output_dir:
-    type: path
-    default: results
+  choose_feature_to_label_by:
+    classification: public
+    type: string
+    default: p-value
+    allowed: [p-value, fold-change]
+  number_of_features_to_label:
+    classification: public
+    type: integer
+    default: 30
+  label_only_my_feature_list:
+    classification: public
+    type: boolean
+    default: false
+  my_feature_list:
+    classification: public
+    type: string
+    default: ""
+    description: Optional comma- or space-delimited feature identifiers to label.
+  top_genes_labeled_only_if_passing_thresholds:
+    classification: public
+    type: boolean
+    default: true
+  label_size:
+    classification: public
+    type: number
+    default: 4
+  label_box_padding:
+    classification: public
+    type: number
+    default: 1
+  label_force:
+    classification: public
+    type: number
+    default: 1
+  label_max_overlaps:
+    classification: public
+    type: number
+    default: .inf
+    description: Maximum overlaps accepted by ggrepel; the canonical default is unlimited.
+  use_custom_axis_label:
+    classification: advanced
+    type: boolean
+    default: false
+  custom_significance_label:
+    classification: advanced
+    type: string
+    default: p-value
+  custom_log_fold_change_label:
+    classification: advanced
+    type: string
+    default: log2FC
+  plot_title:
+    classification: public
+    type: string
+    default: Volcano Plot
+  plot_subtitle:
+    classification: public
+    type: string
+    default: ""
+    description: Optional subtitle; blank uses the selected significance-column name.
+  y_limit:
+    classification: advanced
+    type: number
+    default: 0
+    description: Maximum y-axis value; zero enables automatic scaling.
+  use_auto_axis_capping:
+    classification: advanced
+    type: boolean
+    default: true
+  auto_axis_capping_quantile:
+    classification: advanced
+    type: number
+    default: 0.9999
+    description: Quantile strictly between 0.5 and 1 used for automatic axis capping.
+  auto_axis_capping_symmetric_x:
+    classification: advanced
+    type: boolean
+    default: true
+  custom_x_axis_limits:
+    classification: advanced
+    type: string
+    default: ""
+    description: Blank for automatic limits, one absolute bound for symmetric limits, or two comma-separated bounds.
+  x_limit_padding:
+    classification: advanced
+    type: number
+    default: 0
+  y_limit_padding:
+    classification: advanced
+    type: number
+    default: 0
+  plot_title_size:
+    classification: public
+    type: number
+    default: 16
+  axis_title_size:
+    classification: public
+    type: number
+    default: 14
+  axis_text_size:
+    classification: public
+    type: number
+    default: 12
+  point_size:
+    classification: public
+    type: number
+    default: 2
+  image_width:
+    classification: public
+    type: integer
+    default: 3000
+    units: pixels
+  image_height:
+    classification: public
+    type: integer
+    default: 3000
+    units: pixels
+  resolution_dpi:
+    classification: public
+    type: integer
+    default: 300
+    units: dots_per_inch
+    description: Canonical public output-resolution control. The trailing-underscore implementation argument is not a public alias.
+  color_not_significant:
+    classification: public
+    type: string
+    default: gray
+  color_fold_change_only:
+    classification: public
+    type: string
+    default: orange
+  color_significant_only:
+    classification: public
+    type: string
+    default: green4
+  color_significant_and_fold_change:
+    classification: public
+    type: string
+    default: red3
+internal_controls:
+  resolution_dpi_:
+    classification: internal
+    source_parameter: resolution_dpi
+    function_argument: resolution_dpi_
+    description: Existing R-function argument populated from the canonical resolution_dpi CLI parameter; it must not be exposed as a second canonical parameter.
+  auto_axis_capping_min_y_limit:
+    classification: internal
+    fixed_value: 0
+    function_argument: auto_axis_capping_min_y_limit
+    description: Fixed compatibility value supplied by the portable CLI.
+  output_file_path:
+    classification: internal
+    derived_from: output_dir
+    function_argument: output_file_path
+    description: Derived as output_dir/volcano_plot.png by the portable CLI.
 outputs:
   volcano_plots:
     path: volcano_plot.png

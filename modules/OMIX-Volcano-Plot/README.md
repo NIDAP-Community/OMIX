@@ -79,6 +79,40 @@ Rscript "$OMIX_ROOT/modules/OMIX-Volcano-Plot/scripts/run_volcano_plot.R" \
   statistical model in mind, including batch terms or repeated-measures
   blocking when present.
 
+## Parameter contract
+
+The machine-readable schema classifies each control so deployment adapters can
+reproduce the portable interface without making scientific or aesthetic
+decisions:
+
+- **Public** controls cover inputs, thresholds, labeling, plot text, dimensions,
+  resolution, colors, and the output directory. These are ordinary
+  user-settable parameters.
+- **Advanced** controls cover custom axis labels, automatic axis capping,
+  explicit axis limits, and axis padding. They remain user-settable and must
+  not be omitted from a deployment interface merely because they are advanced.
+- **Internal** controls are implementation bindings derived by the CLI. They
+  are documented for adapter authors but are not additional public parameter
+  names.
+
+The complete names, types, choices, and defaults are in
+[`schemas/interface.yml`](schemas/interface.yml). In particular,
+`resolution_dpi` is the canonical public name and its default is `300`.
+`resolution_dpi_` is only the existing argument name inside
+`volcano_plot_enhanced()`; it is not a supported CLI alias. Likewise, the
+canonical `label_max_overlaps` default is unlimited (`Inf`), not a finite
+deployment preset.
+
+### Deployment mapping
+
+| Canonical control | Deployment mapping requirement |
+| --- | --- |
+| `deg_table` | A deployment may obtain the explicit path from an upload, attached data, or unambiguous workflow discovery, then pass the resolved table to the canonical implementation. |
+| `output_dir` | A platform may manage the result directory, but must record that hidden path translation. |
+| `resolution_dpi` | Use this exact public name. A legacy deployment field named `resolution_dpi_` must be renamed or translated in the adapter layer; the canonical module does not adopt that alias. |
+| All other public and advanced parameters | Pass through using the schema name, type, choices, and default. |
+| `auto_axis_capping_min_y_limit`, `output_file_path`, and function argument `resolution_dpi_` | Keep internal. The CLI fixes or derives these values as recorded in the schema. |
+
 ## Interface and deployment
 
 See [`schemas/interface.yml`](schemas/interface.yml) for the complete
