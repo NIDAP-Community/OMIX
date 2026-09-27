@@ -1,0 +1,100 @@
+name: OMIX work item
+description: Define a bounded scientific, runtime, deployment, QA, or release task.
+title: "[Work]: "
+body:
+  - type: dropdown
+    id: change_class
+    attributes:
+      label: Change class
+      description: Select the class that determines required review and approval.
+      options:
+        - Documentation only
+        - Adapter only
+        - Runtime only
+        - Scientific patch
+        - Scientific default change
+        - Interface break
+        - Release or publication
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Assigned role and agent
+      description: Use Atlas, Helix, Compass, Canvas, Forge, Harbor, Beacon, or Unassigned. Name one primary owner.
+      placeholder: "Compass — pathway analysis"
+    validations:
+      required: true
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: State the exact user-visible or project outcome.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Owned scope
+      description: List the repositories, directories, and files this task may change.
+    validations:
+      required: true
+  - type: textarea
+    id: exclusions
+    attributes:
+      label: Out of scope
+      description: Identify behavior, repositories, and files that must remain unchanged.
+    validations:
+      required: true
+  - type: textarea
+    id: scientific_constraints
+    attributes:
+      label: Scientific and compatibility constraints
+      description: Record defaults, interfaces, legacy behavior, aesthetics, and downstream consumers to preserve.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and ordering
+      description: Link prerequisite issues, branches, PRs, runtime profiles, decisions, or external validation.
+  - type: textarea
+    id: validation
+    attributes:
+      label: Required validation and completion evidence
+      description: Name direct tests, fixtures, representative commands, platform runs, hashes, digests, or release records required.
+    validations:
+      required: true
+  - type: textarea
+    id: review
+    attributes:
+      label: Required independent review
+      description: Name the domain, runtime, adapter, parity, and project-owner approvals required by the change class.
+    validations:
+      required: true
+  - type: dropdown
+    id: release_authority
+    attributes:
+      label: Release authority
+      description: Work preparation never implies release approval.
+      options:
+        - Preparation only; no tag, publication, or platform release
+        - Project-owner release approval already recorded and linked below
+    validations:
+      required: true
+  - type: textarea
+    id: release_evidence
+    attributes:
+      label: Release approval evidence, if applicable
+      description: Link the explicit approval and immutable candidate commit. Leave blank for preparation-only work.
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Boundary confirmation
+      options:
+        - label: I identified the canonical source of scientific behavior.
+          required: true
+        - label: I will use an isolated branch or worktree and preserve unrelated changes.
+          required: true
+        - label: I will report validation not run and will not equate merge with platform validation or release.
+          required: true

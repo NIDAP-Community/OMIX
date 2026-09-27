@@ -52,13 +52,16 @@ the ambiguity rather than silently choosing a new architecture.
    state before editing; preserve unrelated changes.
 2. Classify the request as canonical behavior, bridge behavior, deployment
    translation, or shared runtime before changing files.
-3. Preserve scientific defaults, input/output contracts, legacy behavior, and
+3. For assigned team work, link the tracked work item, select its change class,
+   and follow the corresponding independent-review requirements in the agent
+   team operating model.
+4. Preserve scientific defaults, input/output contracts, legacy behavior, and
    established plot aesthetics. Do not refactor them merely for code style.
-4. Do not commit generated outputs, debug data, credentials, package caches,
+5. Do not commit generated outputs, debug data, credentials, package caches,
    or other large derived artifacts.
-5. Run the affected tests and `Rscript tests/test-monorepo-layout.R` after a
+6. Run the affected tests and `Rscript tests/test-monorepo-layout.R` after a
    structural change. Report every validation not run.
-6. Make narrowly scoped changes and summarize changed files, validation, and
+7. Make narrowly scoped changes and summarize changed files, validation, and
    remaining external work.
 
 ## Release discipline
