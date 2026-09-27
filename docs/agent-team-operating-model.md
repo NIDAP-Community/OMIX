@@ -75,7 +75,14 @@ This agent translates a merged canonical module into a separate deployment
 repository. It owns platform entry points, mounted-input discovery, UI files,
 adapter documentation, and `OMIX_MODULE_SOURCE.md`. It must follow the
 [deployment adapter guide](deployment-adapter-guide.md) and must not introduce
-independent scientific behavior.
+independent scientific behavior. Harbor creates the initial adapter repository
+and its Syncweaver mapping; after bootstrap, Syncweaver maintains the mapped
+scientific files while Harbor maintains the platform-owned adapter layer. Until
+Syncweaver is ready for OMIX, Harbor also performs controlled, byte-identical
+exports from canonical `R/` into adapter `code/functions/`, records the exact
+source and file hashes, and obtains Beacon review. Harbor must also ensure every
+user-settable canonical parameter is exposed in the App Panel; intentionally
+hidden platform-managed inputs require an explicit provenance record.
 
 ### Beacon — quality and documentation reviewer
 
@@ -90,12 +97,12 @@ output equivalence; and the runtime tag plus immutable digest. Intentional
 platform-only differences must be recorded in `OMIX_MODULE_SOURCE.md`.
 
 Beacon reports drift but does not silently remediate it. Scientific owners fix
-canonical defects, Harbor re-exports approved code and fixes platform
-translation, Forge fixes runtime parity and provenance, and Atlas controls the
-order. Scientific implementation flows only from canonical OMIX modules to
-deployment repositories. The role may rotate between contributors, but should
-be independent of the task author for higher-risk scientific or release
-changes.
+canonical defects, Syncweaver proposes approved canonical exports, Harbor fixes
+platform translation, Forge fixes runtime parity and provenance, and Atlas
+controls the order. Scientific implementation flows only from canonical OMIX
+modules to deployment repositories. The role may rotate between contributors,
+but should be independent of the task author for higher-risk scientific or
+release changes.
 
 ## Repository and branch rules
 
@@ -235,12 +242,14 @@ missing state, and never treat a merge as Code Ocean validation.
 
 | Priority | Work item | Status | Branch/worktree | Agent name | Suggested owner | Dependency or completion evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Synchronize the DEG Analysis adapter with canonical interface 2, including `analysis_mode` and pseudobulk-manifest discovery | Draft PR open | `feature/interface2-adapter`; `OMIX-worktrees/Harbor-deg-interface2` | **Harbor** | Deployment-adapter agent with Helix review | [DEG adapter PR #1](https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1) exports canonical `0.4.0`/interface 2 and adds interface/input tests; Code Ocean validation is pending |
-| 2 | Reconcile L2P Single and Multi app-panel names and defaults with their canonical CLIs, and determine why the deployed Code Ocean panels appear incomplete | Draft PRs open | `feature/reconcile-l2p-single-panel` / `OMIX-worktrees/Harbor-l2p-single-panel`; `feature/reconcile-l2p-multi-panel` / `OMIX-worktrees/Harbor-l2p-multi-panel` | **Harbor** | Deployment-adapter agent | [Single PR #2](https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2) and [Multi PR #2](https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/2) add panel-contract checks and document intentional demo presets; Code Ocean validation is pending |
-| 3 | Add the canonical Gene Boxplots `duplicate_aggregation` control to the adapter as an advanced parameter | Merged; platform validation pending | `feature/gene-boxplots-duplicate-aggregation`; `OMIX-worktrees/Canvas-gene-boxplots-adapter` | **Canvas** | Visualization agent with Harbor review | [Gene Boxplots PR #1](https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/pull/1) merged with `mean`, `sum`, and `keep`, default `mean`, canonical `1.0.0` source parity, and fixture tests; Code Ocean validation is not recorded |
-| 4 | Repair deployment parameter bindings in GSEA Filters and Volcano Plot | Not started | Unassigned | **Harbor** | Deployment-adapter agent | GSEA Filters requires a named-parameter capsule run; Volcano Plot requires canonical `resolution_dpi` support and an explicit compatibility decision for `resolution_dpi_` |
-| 5 | Add an automated adapter-contract check for canonical CLI/schema, adapter CLI, panel parameter names, and defaults | Not started; waits for current adapter fixes | Unassigned | **Beacon** | Quality reviewer with Harbor remediation | CI must report missing controls, stale aliases, and default drift while allowing documented platform-managed or intentionally hidden parameters; Beacon reports failures and Harbor corrects adapter translation |
-| 6 | Synchronize remaining deployment adapters after canonical and runtime decisions settle | Pending | Unassigned | **Harbor** | Deployment-adapter agent | Requires merged canonical commits, passing module tests, explicit source records, adapter versions, Beacon parity review, and a platform-validation plan |
+| 1 | Perform the interim first-pass canonical scientific-code synchronization for every mapped deployment repository | Not started | One branch/worktree per adapter | **Harbor** | Deployment-adapter agent with scientific-owner review | For each adapter, export the complete canonical `R/` tree into `code/functions/` without modification; record module/interface versions, immutable commit, mapping, and per-file SHA-256; run adapter tests; obtain Beacon parity review; do not wait for Syncweaver |
+| 2 | Audit every deployment App Panel and expose all user-settable canonical parameters | Not started | One branch/worktree per adapter, combined with priority 1 only when review remains bounded | **Harbor** | Deployment-adapter agent | Compare canonical schema and CLI with adapter CLI and `.codeocean/app-panel.json`; match names, types, choices, order where meaningful, and defaults; document only genuine platform-managed hidden inputs such as an attached database; add a contract test and Code Ocean validation plan |
+| 3 | Synchronize the DEG Analysis adapter with canonical interface 2, including `analysis_mode` and pseudobulk-manifest discovery | Draft PR open | `feature/interface2-adapter`; `OMIX-worktrees/Harbor-deg-interface2` | **Harbor** | Deployment-adapter agent with Helix review | [DEG adapter PR #1](https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1) exports canonical `0.4.0`/interface 2 and adds interface/input tests; Code Ocean validation is pending |
+| 4 | Reconcile L2P Single and Multi app-panel names and defaults with their canonical CLIs, and determine why the deployed Code Ocean panels appear incomplete | Draft PRs open | `feature/reconcile-l2p-single-panel` / `OMIX-worktrees/Harbor-l2p-single-panel`; `feature/reconcile-l2p-multi-panel` / `OMIX-worktrees/Harbor-l2p-multi-panel` | **Harbor** | Deployment-adapter agent | [Single PR #2](https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2) and [Multi PR #2](https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/2) add panel-contract checks and document intentional demo presets; Code Ocean validation is pending |
+| 5 | Add the canonical Gene Boxplots `duplicate_aggregation` control to the adapter as an advanced parameter | Merged; platform validation pending | `feature/gene-boxplots-duplicate-aggregation`; `OMIX-worktrees/Canvas-gene-boxplots-adapter` | **Canvas** | Visualization agent with Harbor review | [Gene Boxplots PR #1](https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/pull/1) merged with `mean`, `sum`, and `keep`, default `mean`, canonical `1.0.0` source parity, and fixture tests; Code Ocean validation is not recorded |
+| 6 | Repair deployment parameter bindings in GSEA Filters and Volcano Plot | Not started | Unassigned | **Harbor** | Deployment-adapter agent | GSEA Filters requires a named-parameter capsule run; Volcano Plot requires canonical `resolution_dpi` support and an explicit compatibility decision for `resolution_dpi_` |
+| 7 | Add an automated adapter-contract check for canonical CLI/schema, adapter CLI, panel parameter names, and defaults | Not started; waits for current adapter fixes | Unassigned | **Beacon** | Quality reviewer with Harbor remediation | CI must report missing controls, stale aliases, and default drift while allowing documented platform-managed or intentionally hidden parameters; Beacon reports failures and Harbor corrects adapter translation |
+| 8 | Transition synchronized deployment adapters from interim Harbor exports to Syncweaver maintenance | Pending Syncweaver readiness | Unassigned | **Harbor** | Deployment-adapter agent with Syncweaver maintainer and Beacon review | Requires the production Syncweaver safeguards, existing verified Harbor source records, equivalent path mappings, host-drift detection, passing adapter tests, and no second scientific-code path |
 | Deferred | Resolve the `OMIX-GSEA-Preranked-Legacy` Code Ocean/GitHub sync conflict without losing the intentional hidden-MSigDB panel behavior | Deferred by project owner | Pending Code Ocean capsule work | **Harbor** | Deployment-adapter agent | Resume only when requested; preserve the capsule backup branches and attached `/data/msigdb` asset while keeping MSigDB hidden from the app panel; require a clean capsule run and tracked-tree review before sync |
 
 Recently completed work should be removed from this queue after its completion

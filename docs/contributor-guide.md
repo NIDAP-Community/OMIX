@@ -20,8 +20,9 @@ from local R, containers, HPC, and workflow wrappers.
 
 An adapter is not a second scientific source of truth. If an adapter reveals a
 scientific or reusable-interface problem, fix and test the canonical module,
-then export the validated implementation back to the adapter. For adapter
-specific work, continue with the [deployment adapter guide](deployment-adapter-guide.md).
+then let Syncweaver propose the validated implementation update for the
+adapter. For adapter-specific work, continue with the
+[deployment adapter guide](deployment-adapter-guide.md).
 
 ## Discover before editing
 

@@ -69,8 +69,9 @@ Interface and module versions may therefore change together, or independently.
    and repository checks.
 3. Merge the canonical change. After its required validation, create its
    namespaced canonical module Git tag.
-4. Export only the listed scientific files to the deployment adapter. Preserve
-   platform UI, data discovery, output layout, and runtime setup there.
+4. Let Syncweaver export the canonical module's validated `R/` files into the
+   deployment adapter's `code/functions/` directory. Preserve platform UI,
+   data discovery, output layout, and runtime setup there.
 5. Update the adapter's `OMIX_MODULE_SOURCE.md` with the canonical module
    version, interface version, release tag (or pending state), and exact
    immutable source reference.
@@ -79,9 +80,9 @@ Interface and module versions may therefore change together, or independently.
 
 No automated process copies changes from an adapter back into canonical OMIX.
 Adapter-discovered scientific or reusable-interface fixes must be deliberately
-backported, reviewed, tested, and re-exported. Future automation may detect
-drift and open a review item, but must not automatically overwrite either
-source of record.
+backported, reviewed, and tested before Syncweaver proposes an adapter update.
+Automation may detect drift and open a review item, but must not silently
+overwrite host-side scientific edits or copy them back into canonical OMIX.
 
 Automated release workflows must also follow the
 [release automation contract](release-automation-contract.md). That contract

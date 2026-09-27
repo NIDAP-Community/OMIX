@@ -11,16 +11,26 @@ before editing.
   portable CLI behavior, schemas, and tests.
 - This repository owns deployment UI, attached-input discovery, result paths,
   runtime configuration, and the platform entry point.
-- Do not permanently change exported scientific functions here. Backport any
-  scientific or reusable-interface change to the canonical module, validate
-  it, then export the released function back into `code/functions/`.
+- `code/functions/` is a Syncweaver-managed export of the canonical module's
+  `R/` directory. Do not edit it directly. Backport any scientific or reusable-
+  interface change to the canonical module, validate it, and let Syncweaver
+  propose the updated export.
+- Harbor owns the initial repository scaffold, `.codeocean/`, `code/main.R`,
+  `code/run`, input discovery, result paths, platform documentation, and
+  adapter tests. Harbor must not create a second scientific implementation.
+- Until Syncweaver is ready for OMIX, Harbor may update `code/functions/` only
+  by copying the complete canonical `R/` tree byte-for-byte from a merged,
+  tested, immutable source reference; recording per-file SHA-256 values; and
+  obtaining Beacon parity review. No direct scientific edits are allowed.
 
 ## Working rules
 
-1. Inspect Git status, the app-panel definition, `OMIX_MODULE_SOURCE.md`, and
-   the canonical schema before editing.
+1. Inspect Git status, the app-panel definition, `.syncweaver-lock.json`,
+   `OMIX_MODULE_SOURCE.md`, and the canonical schema before editing.
 2. Keep UI parameter names and defaults aligned with the canonical contract.
-   Document any required platform-only translation explicitly.
+   Expose every user-settable canonical parameter, including advanced controls.
+   Document any required platform-only translation or intentionally hidden
+   platform-managed input explicitly.
 3. Discover attached data only when exactly one candidate matches; otherwise
    fail with the candidate paths and require explicit selection.
 4. Preserve stable output names and paired artifacts needed by downstream
@@ -32,6 +42,9 @@ before editing.
 7. Validate an adapter change with a representative deployment run. Report
    separately what was tested locally, in the deployment environment, and not
    tested.
+8. If `code/functions/` differs from its pinned canonical source, stop and
+   report the drift. Do not choose a winner by timestamp and do not overwrite
+   the difference silently.
 
 ## Release discipline
 

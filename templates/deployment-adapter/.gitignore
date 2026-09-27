@@ -1,0 +1,19 @@
+# Deployment-mounted inputs and generated outputs
+/data/
+/results/
+/scratch/
+
+# Local editor, R, and operating-system state
+.DS_Store
+.RData
+.Rhistory
+.Rproj.user/
+
+# Credentials and local environment overrides
+.env
+.env.*
+!.env.example
+
+# Package caches
+/renv/library/
+/renv/staging/
