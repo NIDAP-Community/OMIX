@@ -13,8 +13,9 @@ the canonical OMIX scientific implementation.
 | Version and source record | See [OMIX_MODULE_SOURCE.md](OMIX_MODULE_SOURCE.md) |
 
 The canonical module owns scientific functions, portable CLI behavior, tests,
-and the reusable input/output contract. This repository owns the deployment
-translation only.
+and the reusable input/output contract. Syncweaver exports its validated `R/`
+files into `code/functions/`. This repository owns the deployment translation
+around that managed export.
 
 ## What this deployment adds
 
@@ -69,7 +70,7 @@ changing a default.
 
 Read [AGENTS.md](AGENTS.md) and [OMIX_MODULE_SOURCE.md](OMIX_MODULE_SOURCE.md)
 before editing. Reusable scientific changes belong in the canonical OMIX
-module and are exported here only after validation.
+module and reach `code/functions/` through Syncweaver only after validation.
 
 ## References and support
 

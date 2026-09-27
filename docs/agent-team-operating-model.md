@@ -75,7 +75,9 @@ This agent translates a merged canonical module into a separate deployment
 repository. It owns platform entry points, mounted-input discovery, UI files,
 adapter documentation, and `OMIX_MODULE_SOURCE.md`. It must follow the
 [deployment adapter guide](deployment-adapter-guide.md) and must not introduce
-independent scientific behavior.
+independent scientific behavior. Harbor creates the initial adapter repository
+and its Syncweaver mapping; after bootstrap, Syncweaver maintains the mapped
+scientific files while Harbor maintains the platform-owned adapter layer.
 
 ### Beacon — quality and documentation reviewer
 
@@ -90,12 +92,12 @@ output equivalence; and the runtime tag plus immutable digest. Intentional
 platform-only differences must be recorded in `OMIX_MODULE_SOURCE.md`.
 
 Beacon reports drift but does not silently remediate it. Scientific owners fix
-canonical defects, Harbor re-exports approved code and fixes platform
-translation, Forge fixes runtime parity and provenance, and Atlas controls the
-order. Scientific implementation flows only from canonical OMIX modules to
-deployment repositories. The role may rotate between contributors, but should
-be independent of the task author for higher-risk scientific or release
-changes.
+canonical defects, Syncweaver proposes approved canonical exports, Harbor fixes
+platform translation, Forge fixes runtime parity and provenance, and Atlas
+controls the order. Scientific implementation flows only from canonical OMIX
+modules to deployment repositories. The role may rotate between contributors,
+but should be independent of the task author for higher-risk scientific or
+release changes.
 
 ## Repository and branch rules
 

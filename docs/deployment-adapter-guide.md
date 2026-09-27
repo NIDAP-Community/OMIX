@@ -30,7 +30,7 @@ The canonical module must already exist and have a documented public contract:
 
 | Responsibility | Canonical module | Deployment adapter |
 | --- | --- | --- |
-| Scientific functions and scientific defaults | Owns | Released export only |
+| Scientific functions and scientific defaults | Owns | Syncweaver-managed released export only |
 | Portable CLI and machine-readable contract | Owns | References |
 | UI, data attachment, workflow input discovery, and result location | Never | Owns |
 | Platform entry point and environment overlay | Never | Owns |
@@ -39,7 +39,7 @@ The canonical module must already exist and have a documented public contract:
 
 If an adapter test reveals a scientific, statistical, input-contract, or
 portable-interface issue, backport it to the canonical module, test it there,
-and export the released function back to the adapter.
+and let Syncweaver propose the released function update for the adapter.
 
 ## Required adapter files
 
@@ -51,10 +51,108 @@ Every adapter repository should contain the following files at its root:
 | `OMIX_MODULE_SOURCE.md` | Canonical versions/source reference, exported scientific files, synchronization rules, and adapter release record. |
 | `AGENTS.md` | Repository-local instructions for coding agents, including the adapter boundary and validation procedure. |
 | `.github/copilot-instructions.md` | Brief Copilot entry point that links to `AGENTS.md`. |
+| `.syncweaver-lock.json` | Machine-readable mapping from canonical `R/` to the pinned `code/functions/` export; generate it with Syncweaver rather than editing it by hand. |
+| `CHANGELOG.md` | Adapter-only changes, including UI, I/O translation, runtime selection, and platform releases. |
+| `.gitignore` | Excludes attached data, generated results, scratch files, credentials, and local caches. |
+| `code/main.R` | Thin platform entry point that resolves inputs and calls the managed scientific functions. |
+| `code/run` | Executable deployment launcher. |
 
 Copy the templates under [`templates/deployment-adapter/`](../templates/deployment-adapter/)
 when starting a new adapter. Replace every angle-bracket placeholder before
 release.
+
+## Standard repository layout
+
+Use the following layout for a Code Ocean deployment adapter. The
+[OMIX GSEA Preranked Legacy adapter](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy)
+is the reference for the platform components, but it is not a directory-for-
+directory template: older repositories may contain historical module
+directories, debug results, or package inventories that new adapters must not
+copy.
+
+```text
+<adapter repository>/
+├── .codeocean/
+│   ├── app-panel.json          # Harbor: UI and named-parameter bindings
+│   ├── datasets.json           # Harbor: attached-data declarations
+│   ├── environment.json        # Harbor/Forge: pinned runtime selection
+│   └── resources.json          # Harbor: deployment resource request
+├── .github/
+│   └── copilot-instructions.md
+├── code/
+│   ├── main.R                  # Harbor: platform input/output translation
+│   ├── run                     # Harbor: deployment launcher
+│   ├── README.md               # Optional App Panel user guide
+│   └── functions/              # Syncweaver: canonical module R/ export
+├── environment/                # Code Ocean environment export, when used
+├── container/                  # Optional portable deployment overlay
+├── metadata/                   # Optional platform/catalog metadata
+├── tests/                      # Adapter contract and representative-run tests
+├── .gitignore
+├── .syncweaver-lock.json       # Canonical source mapping and pinned commit
+├── AGENTS.md
+├── CHANGELOG.md
+├── OMIX_MODULE_SOURCE.md
+└── README.md
+```
+
+Ownership is path-specific:
+
+- Harbor owns `.codeocean/`, `code/main.R`, `code/run`, deployment-only
+  documentation, mounted-input discovery, output placement, and adapter tests.
+- Syncweaver owns the files under `code/functions/` after the initial source
+  mapping is established. It imports them from the canonical module's `R/`
+  directory at an immutable commit or module release tag.
+- Forge owns shared-runtime definitions and immutable image provenance. An
+  adapter may select or overlay a runtime, but it must not silently rebuild a
+  different scientific environment.
+- Beacon independently verifies source parity, interface translation, fixture
+  equivalence, and runtime provenance before release.
+
+Do not create empty `R/` or `schemas/` directories in a deployment repository;
+those belong to the canonical module. Do not copy generated `results/`, data,
+debug output, credentials, package caches, or package-inventory archives. A
+deployment-local `module.yml` is not required: canonical module metadata lives
+in OMIX, while adapter provenance lives in `OMIX_MODULE_SOURCE.md` and the
+Syncweaver lockfile.
+
+## Harbor: create a new deployment adapter
+
+Harbor owns the initial repository bootstrap. Use this sequence:
+
+1. Confirm that the canonical module has reviewed `R/` code, an explicit-path
+   CLI, `module.yml`, `schemas/interface.yml`, tests, README, and changelog.
+2. Create the deployment repository using the canonical module's display name
+   and established adapter naming convention.
+3. Copy `templates/deployment-adapter/` into the repository and replace every
+   placeholder. Add a `.gitignore` that excludes at least `/data/`, `/results/`,
+   and `/scratch/`.
+4. Create `.codeocean/`, `code/`, `tests/`, and only the conditional runtime or
+   metadata directories the deployment actually needs.
+5. Implement `code/main.R` as a thin adapter: resolve platform inputs,
+   translate named parameters, choose deployment output paths, and call the
+   canonical functions. Put no independent scientific algorithm or default in
+   this file.
+6. Implement `code/run` as the deployment launcher and keep it free of
+   scientific decisions.
+7. Configure Syncweaver to map the canonical module's complete `R/` directory
+   into `code/functions/`, pinned to an immutable canonical commit or release
+   tag. Let Syncweaver perform the first import so the initial and later
+   exports share the same provenance mechanism.
+8. Record the mapping, canonical version, interface version, source reference,
+   and exported files in `OMIX_MODULE_SOURCE.md`. Do not claim an adapter tag,
+   platform release, or runtime digest until it has been validated.
+9. Build the App Panel from the canonical schema. Record every platform-only
+   alias, hidden control, preset, attached dataset, and path translation.
+10. Add tests for parameter translation, unambiguous input discovery, stable
+    outputs, and a representative fixture. Confirm that the adapter sources
+    the Syncweaver-managed files rather than a second scientific copy.
+11. Ask Beacon to perform the independent parity audit, then run the adapter in
+    Code Ocean. Record the validated capsule release and immutable runtime
+    digest before creating an adapter release tag.
+
+If Syncweaver cannot perform the initial import, stop and record that as a
+bootstrap blocker rather than establishing an untracked scientific copy.
 
 ## Standard adapter README
 
@@ -84,21 +182,24 @@ only the behavior introduced by the deployment.
 
 ## Scientific exports and synchronization
 
-- Export only validated scientific functions from the canonical module into the
-  adapter's `code/functions/` directory.
+- Map the canonical module's complete validated `R/` directory into the
+  adapter's `code/functions/` directory. After bootstrap this path is managed
+  by Syncweaver, not Harbor.
 - Record the canonical module and interface versions, immutable Git reference,
   exported files, and any intentional adapter-only differences in
   `OMIX_MODULE_SOURCE.md`.
-- Do not edit an exported scientific function in the adapter as a permanent
-  fix. Make the change in the canonical module, validate it, and re-export.
+- Do not edit a Syncweaver-managed scientific function in the adapter. Make the
+  change in the canonical module, validate it, and let Syncweaver propose the
+  updated export. Host-side drift must be reported rather than overwritten
+  silently.
 - The adapter entry point may translate UI parameters, resolve attached inputs,
   and select deployment output directories. It must not silently change a
   scientific default or implement a second analysis algorithm.
 
 Scientific implementation has one direction of travel: canonical OMIX module
 to deployment adapter. A platform test may reveal a canonical defect, but the
-scientific owner must fix and validate it in OMIX before Harbor exports it back
-to the adapter. Do not resolve drift by making an adapter-only scientific edit.
+scientific owner must fix and validate it in OMIX before Syncweaver updates the
+adapter. Do not resolve drift by making an adapter-only scientific edit.
 
 Before release, Beacon independently compares the adapter with both its
 recorded canonical commit and the current canonical module. The parity audit

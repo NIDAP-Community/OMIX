@@ -28,6 +28,18 @@ See the canonical [versioning and release policy](https://github.com/NIDAP-Commu
 | --- | --- | --- |
 | `R/<function>.R` | `code/functions/<function>.R` | <scientific implementation> |
 
+## Syncweaver mapping
+
+- **Lockfile:** [`.syncweaver-lock.json`](.syncweaver-lock.json)
+- **Canonical source directory:** `modules/<module name>/R/`
+- **Adapter destination:** `code/functions/`
+- **Last content verification:** `<commit/check/date, or Pending>`
+- **Host-side drift:** `<None, explanation, or Pending verification>`
+
+`code/functions/` is generated from the canonical source above and must not be
+edited directly. Harbor owns the adapter files around it; Syncweaver proposes
+canonical updates; Beacon verifies parity before release.
+
 ## Ownership
 
 The canonical module owns scientific functions, portable CLI behavior, schemas,
@@ -39,11 +51,15 @@ point.
 
 1. Make reusable scientific or interface changes in the canonical module.
 2. Update its tests, schema, README, and changelog; validate the module.
-3. Update the canonical module/interface versions and source reference above.
-4. Export the listed scientific files without unreviewed behavior changes.
-5. Validate the adapter with representative platform inputs and record the
+3. Create the approved canonical module release or immutable source reference.
+4. Let Syncweaver update the mapped `code/functions/` files and lockfile through
+   a reviewable pull request. Update this source record in the same pull request,
+   either through approved automation or Harbor review. Do not overwrite host-
+   side drift silently.
+5. Have Beacon verify file parity and the adapter contract.
+6. Validate the adapter with representative platform inputs and record the
    resulting adapter tag, platform release, and immutable runtime identity
    above when they are available.
 
 If an adapter run reveals a scientific or reusable-interface issue, backport
-the fix to the canonical module before re-exporting it here.
+the fix to the canonical module before Syncweaver updates it here.

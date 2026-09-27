@@ -57,7 +57,7 @@ repositories intentionally divide ownership as follows:
 
 | Responsibility | Canonical OMIX module | Deployment repository |
 | --- | --- | --- |
-| Scientific R implementation | `R/` | Exported copy under `code/functions/` |
+| Scientific R implementation | `R/` | Syncweaver-managed export under `code/functions/` |
 | Platform-neutral command-line interface | `scripts/` | Not copied directly |
 | Input/output contract and tests | `schemas/`, `tests/` | References the released module contract |
 | Platform UI and metadata | Never | Platform-owned configuration |
@@ -76,12 +76,13 @@ and HPC use.
 1. For a scientific or reusable-interface change, edit the canonical OMIX
    module first; update its tests, schema, changelog, and version metadata as
    appropriate.
-2. Run the module and repository checks, then export the released R
-   implementation to the corresponding deployment repository when needed.
+2. Run the module and repository checks, then let Syncweaver export the
+   released `R/` implementation to the corresponding deployment repository's
+   `code/functions/` directory.
 3. For a change discovered in an adapter, test it there first. If it
    changes scientific behavior or the reusable interface, backport it to the
-   canonical module, validate it there, and then export the release back to
-   the adapter.
+   canonical module, validate it there, and then let Syncweaver export the
+   release back to the adapter.
 4. Keep UI fields, mounted-path discovery, output handling, and runtime setup
    only in the deployment repository.
 
