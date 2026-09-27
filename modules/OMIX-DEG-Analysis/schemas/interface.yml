@@ -4,75 +4,146 @@ inputs:
   table:
     required_when: input_type=table
     matrix:
+      cli: --counts
+      classification: public
+      type: path
+      default: ""
       formats: [csv, tsv, txt, rds]
       description: Feature-by-sample raw integer counts for raw_counts, a declared log2-scale Harmony-corrected mean-expression matrix for harmony_mean_expression, or log2-scale SCT donor means written by OMIX-Seurat-Pseudobulk for sct_mean_expression.
     metadata:
+      cli: --metadata
+      classification: public
+      type: path
+      default: ""
       formats: [csv, tsv, txt, rds]
       description: Sample-level metadata table with a unique sample-ID column.
     pseudobulk_manifest:
+      cli: --pseudobulk_manifest
+      classification: advanced
+      type: path
+      default: ""
       required: false
       formats: [dcf]
       description: Optional Pseudobulk_Manifest.dcf written by OMIX-Seurat-Pseudobulk. When supplied, it must match analysis_mode.
   moo:
+    cli: --moo
+    classification: public
+    type: path
+    default: ""
     required_when: input_type=moo
     formats: [rds]
     description: MOSuite multiOmicDataSet, converted by OmixMOSuite using the raw count layer and embedded sample metadata. Only valid for raw_counts.
 parameters:
   input_type:
+    cli: --input_type
+    classification: public
     type: string
     default: table
     allowed: [table, moo]
+    description: Select explicit matrix-plus-metadata table input or a compatible raw-count MOO object.
   analysis_mode:
+    cli: --analysis_mode
+    classification: public
     type: string
     default: raw_counts
     allowed: [raw_counts, harmony_mean_expression, sct_mean_expression]
     description: Select raw integer-count edgeR/voom analysis, direct limma on declared Harmony-corrected donor means, or direct limma on log2-scale SCT donor means. Do not interchange these modes.
   gene_names_column:
+    cli: --gene_names_column
+    classification: public
     type: string
     default: GeneName
+    description: Matrix column containing feature or gene identifiers.
   sample_names_column:
+    cli: --sample_names_column
+    classification: public
     type: string
     default: Sample
+    description: Metadata column whose values match the matrix sample columns.
+  samples_to_include:
+    cli: --samples_to_include
+    classification: advanced
+    type: string
+    default: ""
+    description: Optional comma-separated sample IDs. Blank uses all metadata samples that occur in the matrix.
   contrast_variable_columns:
+    cli: --contrast_variable_columns
+    classification: public
     type: string
     default: Group
+    description: One metadata column, or two comma-separated columns, defining the biological comparison groups.
   contrasts:
+    cli: --contrasts
+    classification: public
     type: string
     default: B-A
+    description: Comma-separated numerator-minus-denominator contrasts in the requested output order.
   covariate_columns:
+    cli: --covariate_columns
+    classification: advanced
     type: string
+    default: ""
+    description: Optional comma-separated metadata columns included as fixed effects.
   batch_effect_columns:
+    cli: --batch_effect_columns
+    classification: advanced
     type: string
     default: auto
     description: auto resolves to Batch for raw_counts and blank for continuous-expression modes. Technical batch terms are never allowed for harmony_mean_expression because upstream Harmony is the declared batch correction. For sct_mean_expression, include an unhandled technical batch as covariate_columns rather than using batch_effect_columns.
   donor_variable_column:
+    cli: --donor_variable_column
+    classification: advanced
     type: string
+    default: ""
+    description: Optional donor or participant column for genuine repeated-measures analysis.
   filter_low_expression:
+    cli: --filter_low_expression
+    classification: advanced
     type: boolean_or_auto
     default: auto
+    allowed: [auto, "true", "false"]
     description: Defaults to true only for raw_counts. Not available for continuous-expression modes.
   normalization_method:
+    cli: --normalization_method
+    classification: advanced
     type: string
     default: auto
     allowed: [auto, None, TMM, Quantile, TMM + Quantile, TMM + Scale, TMM + Cyclic Loess, TMMwsp, RLE, Upper Quartile]
     description: auto resolves to TMM for raw_counts and None for continuous-expression modes.
   return_batch_corrected_values:
+    cli: --return_batch_corrected_values
+    classification: advanced
     type: boolean_or_auto
     default: auto
+    allowed: [auto, "true", "false"]
     description: Defaults to true for raw_counts and false for continuous-expression modes.
   remove_donor_effect_for_downstream:
+    cli: --remove_donor_effect_for_downstream
+    classification: advanced
     type: boolean_or_auto
     default: auto
+    allowed: [auto, "true", "false"]
     description: Optional only for raw_counts. Continuous input is returned unchanged.
   summarization_method:
+    cli: --summarization_method
+    classification: advanced
     type: string
     default: auto
     allowed: [auto, sum, mean, max]
     description: auto resolves to sum for raw_counts and mean for continuous-expression modes.
   write_normalization_diagnostics:
+    cli: --write_normalization_diagnostics
+    classification: advanced
     type: boolean_or_auto
     default: auto
+    allowed: [auto, "true", "false"]
     description: Writes raw-count log-CPM and voom diagnostics only.
+  output_dir:
+    cli: --output_dir
+    classification: internal
+    type: path
+    default: results
+    description: Portable CLI output directory. Deployment adapters manage this path and do not expose it as a scientific user control.
 outputs:
   deg_analysis:
     path: DEG_Analysis.csv
