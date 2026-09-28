@@ -45,7 +45,7 @@ find_make_options <- function(expressions) {
 
 cli_options <- find_make_options(parse(file = cli_file, keep.source = FALSE))
 stopifnot(identical(sort(names(controls)), sort(names(cli_options))))
-stopifnot(identical(names(schema$exposure_levels), c("public", "advanced", "internal")))
+stopifnot(identical(names(schema$control_classifications), c("public", "advanced", "internal")))
 
 boolean_controls <- c(
   "select_by_rank", "select_top_percentage_of_genes",
@@ -74,7 +74,7 @@ for (name in names(cli_options)) {
   cli <- cli_options[[name]]
   contract <- controls[[name]]
   stopifnot(identical(contract$type, expected_schema_type(name, cli$cli_type)))
-  stopifnot(contract$exposure %in% names(schema$exposure_levels))
+  stopifnot(contract$classification %in% names(schema$control_classifications))
 
   schema_has_default <- "default" %in% names(contract)
   stopifnot(identical(schema_has_default, cli$has_default))
@@ -87,7 +87,7 @@ for (name in names(cli_options)) {
   }
 }
 
-expected_exposure <- list(
+expected_classification <- list(
   public = c(
     "deg_table", "comparison", "comparisons", "species",
     "collections_to_include", "select_by_rank", "significance_threshold",
@@ -111,13 +111,13 @@ expected_exposure <- list(
   ),
   internal = "output_dir"
 )
-for (exposure in names(expected_exposure)) {
+for (classification in names(expected_classification)) {
   observed <- names(controls)[vapply(
     controls,
-    function(control) identical(control$exposure, exposure),
+    function(control) identical(control$classification, classification),
     logical(1)
   )]
-  stopifnot(identical(sort(observed), sort(expected_exposure[[exposure]])))
+  stopifnot(identical(sort(observed), sort(expected_classification[[classification]])))
 }
 
 expected_allowed <- list(
