@@ -5,7 +5,7 @@
     "canonical_repository": "NIDAP-Community/OMIX",
     "canonical_repository_url": "https://github.com/NIDAP-Community/OMIX",
     "canonical_repository_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
-    "work_item": "https://github.com/NIDAP-Community/OMIX/issues/26",
+    "work_item": "https://github.com/NIDAP-Community/OMIX/issues/39",
     "policy": "docs/deployment-adapter-guide.md",
     "note": "Evidence-based inventory of adapters registered in canonical module.yml files, refreshed after the canonical schema-completion phase under issue #39. Pending and unknown values are not release claims; GitHub evidence is not Code Ocean validation."
   },

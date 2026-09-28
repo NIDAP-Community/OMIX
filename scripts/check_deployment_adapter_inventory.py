@@ -249,6 +249,12 @@ def link(label: str, url: str | None) -> str:
     return f"[{label}]({url})" if url else "None recorded"
 
 
+def tracked_work_item_label(url: str | None) -> str:
+    """Return a descriptive label without coupling the renderer to one issue."""
+    match = re.search(r"/issues/(\d+)/?$", url or "")
+    return f"issue #{match.group(1)}" if match else "tracked work item"
+
+
 def render(inventory: dict) -> str:
     snapshot = inventory["snapshot"]
     lines = [
@@ -258,7 +264,7 @@ def render(inventory: dict) -> str:
         "",
         f"- **Snapshot date:** {snapshot['date']}",
         f"- **Canonical OMIX commit:** [`{snapshot['canonical_repository_commit'][:12]}`]({snapshot['canonical_repository_url']}/commit/{snapshot['canonical_repository_commit']})",
-        f"- **Tracked work item:** {link('OMIX issue #26', snapshot['work_item'])}",
+        f"- **Tracked work item:** {link(tracked_work_item_label(snapshot.get('work_item')), snapshot.get('work_item'))}",
         f"- **Machine-readable source:** [`deployment-adapter-inventory.json`](deployment-adapter-inventory.json)",
         f"- **Validation/render command:** `python3 scripts/check_deployment_adapter_inventory.py --write-summary`",
         "",
@@ -309,6 +315,34 @@ def render(inventory: dict) -> str:
         for item in inventory["adapters"]
         if not item["syncweaver"]["lockfile_on_default_branch"]
     ]
+    incomplete_schemas = [
+        (item["id"], item["schema_completeness"]["status"])
+        for item in inventory["adapters"]
+        if item["schema_completeness"]["status"] != "verified"
+    ]
+    schema_finding = (
+        "- **Canonical schema completeness:** verified for all "
+        f"{len(inventory['adapters'])} registered adapters."
+        if not incomplete_schemas
+        else "- **Canonical schemas needing completion:** "
+        + ", ".join(f"{adapter_id} ({status})" for adapter_id, status in incomplete_schemas)
+        + "."
+    )
+    app_panels_needing_remediation = [
+        (item["id"], item["app_panel"]["coverage"]["status"])
+        for item in inventory["adapters"]
+        if item["app_panel"]["coverage"]["status"] != "verified"
+    ]
+    app_panel_finding = (
+        "- **App Panels needing remediation:** None."
+        if not app_panels_needing_remediation
+        else "- **App Panels needing remediation:** "
+        + ", ".join(
+            f"{adapter_id} ({status})"
+            for adapter_id, status in app_panels_needing_remediation
+        )
+        + "."
+    )
     lines.extend(
         [
             "",
@@ -317,7 +351,8 @@ def render(inventory: dict) -> str:
             f"- **Adapters behind current canonical science:** {', '.join(outdated) if outdated else 'None'}.",
             f"- **Adapters with adapter-only or legacy files co-located in `code/functions/`:** {', '.join(colocated) if colocated else 'None'}.",
             f"- **Adapters without a Syncweaver lockfile on the default branch:** {', '.join(no_lock) if no_lock else 'None'}.",
-            "- **Schema completeness and App Panel coverage:** pending a parameter-level contract audit for every adapter; file presence alone is not counted as completeness.",
+            schema_finding,
+            app_panel_finding,
             "- **Runtime provenance:** no adapter source record in this snapshot supplies both a pinned runtime tag and immutable digest.",
             "",
             "## Reading the statuses",

@@ -109,5 +109,90 @@ interface_version: 1
         self.assertLess(elapsed, 2.0, f"bounded parser took {elapsed:.3f} seconds")
 
 
+class DeploymentAdapterRendererTests(unittest.TestCase):
+    @staticmethod
+    def adapter(
+        adapter_id: str,
+        *,
+        schema_status: str = "verified",
+        app_panel_status: str = "verified",
+    ) -> dict:
+        return {
+            "id": adapter_id,
+            "canonical": {"module_version": "1.0.0", "interface_version": 1},
+            "deployment": {
+                "repository": f"https://example.org/{adapter_id}",
+                "default_branch": "main",
+                "default_branch_commit": "a" * 40,
+            },
+            "scientific_export": {
+                "recorded_parity": {"status": "verified"},
+                "current_parity": {"status": "verified"},
+                "extra_files_in_code_functions": [],
+            },
+            "schema_completeness": {"status": schema_status},
+            "app_panel": {"coverage": {"status": app_panel_status}},
+            "runtime": {"provenance": {"status": "partial"}},
+            "code_ocean_validation": {"status": "pending"},
+            "work_tracking": {"pull_requests": []},
+            "syncweaver": {
+                "lockfile_on_default_branch": False,
+                "readiness": {"status": "pending"},
+            },
+        }
+
+    @staticmethod
+    def inventory(adapters: list[dict]) -> dict:
+        return {
+            "snapshot": {
+                "date": "2026-09-28",
+                "canonical_repository_commit": "b" * 40,
+                "canonical_repository_url": "https://example.org/OMIX",
+                "work_item": "https://example.org/OMIX/issues/39",
+            },
+            "adapters": adapters,
+        }
+
+    def test_renderer_uses_dynamic_issue_and_current_statuses(self) -> None:
+        rendered = inventory.render(
+            self.inventory(
+                [
+                    self.adapter("Adapter-A", app_panel_status="outdated"),
+                    self.adapter("Adapter-B", app_panel_status="blocked"),
+                    self.adapter("Adapter-C"),
+                ]
+            )
+        )
+
+        self.assertIn("[issue #39](https://example.org/OMIX/issues/39)", rendered)
+        self.assertNotIn("issue #26", rendered)
+        self.assertIn(
+            "Canonical schema completeness:** verified for all 3 registered adapters.",
+            rendered,
+        )
+        self.assertIn(
+            "App Panels needing remediation:** Adapter-A (outdated), Adapter-B (blocked).",
+            rendered,
+        )
+        self.assertNotIn("pending a parameter-level contract audit for every adapter", rendered)
+
+    def test_renderer_reports_each_non_verified_schema_state(self) -> None:
+        rendered = inventory.render(
+            self.inventory(
+                [
+                    self.adapter("Adapter-A"),
+                    self.adapter("Adapter-B", schema_status="pending"),
+                    self.adapter("Adapter-C", schema_status="blocked"),
+                ]
+            )
+        )
+
+        self.assertIn(
+            "Canonical schemas needing completion:** Adapter-B (pending), Adapter-C (blocked).",
+            rendered,
+        )
+        self.assertNotIn("verified for all 3 registered adapters", rendered)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -4,7 +4,7 @@ This is Beacon's evidence-based snapshot of deployment adapters registered in ca
 
 - **Snapshot date:** 2026-09-28
 - **Canonical OMIX commit:** [`9f97039f15d0`](https://github.com/NIDAP-Community/OMIX/commit/9f97039f15d0d2f1458da352be14d7ada9723436)
-- **Tracked work item:** [OMIX issue #26](https://github.com/NIDAP-Community/OMIX/issues/26)
+- **Tracked work item:** [issue #39](https://github.com/NIDAP-Community/OMIX/issues/39)
 - **Machine-readable source:** [`deployment-adapter-inventory.json`](deployment-adapter-inventory.json)
 - **Validation/render command:** `python3 scripts/check_deployment_adapter_inventory.py --write-summary`
 
@@ -26,7 +26,8 @@ This is Beacon's evidence-based snapshot of deployment adapters registered in ca
 - **Adapters behind current canonical science:** OMIX-DEG-Analysis, OMIX-Volcano-Plot.
 - **Adapters with adapter-only or legacy files co-located in `code/functions/`:** OMIX-DEG-Analysis, OMIX-Gene-Boxplots, OMIX-L2P-Multi, OMIX-L2P-Single, OMIX-Volcano-Plot.
 - **Adapters without a Syncweaver lockfile on the default branch:** OMIX-DEG-Analysis, OMIX-GSEA-Filters-Legacy, OMIX-GSEA-Preranked-Legacy, OMIX-GSEA-Visualization-Legacy, OMIX-Gene-Boxplots, OMIX-L2P-Multi, OMIX-L2P-Single, OMIX-Volcano-Plot.
-- **Schema completeness and App Panel coverage:** pending a parameter-level contract audit for every adapter; file presence alone is not counted as completeness.
+- **Canonical schema completeness:** verified for all 8 registered adapters.
+- **App Panels needing remediation:** OMIX-DEG-Analysis (outdated), OMIX-GSEA-Filters-Legacy (blocked), OMIX-GSEA-Preranked-Legacy (blocked), OMIX-GSEA-Visualization-Legacy (outdated), OMIX-Gene-Boxplots (outdated), OMIX-L2P-Multi (outdated), OMIX-L2P-Single (outdated), OMIX-Volcano-Plot (blocked).
 - **Runtime provenance:** no adapter source record in this snapshot supplies both a pinned runtime tag and immutable digest.
 
 ## Reading the statuses
