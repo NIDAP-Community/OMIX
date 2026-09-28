@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Complete the existing interface-1 schema with every portable CLI input and
+  parameter, public/advanced/internal classifications, exact types, choices,
+  order, and defaults.
+- Add deterministic schema-to-CLI contract coverage while retaining the
+  fixture-tested `duplicate_aggregation = mean` default and the established
+  scientific and visual behavior.
+
 ## 1.0.0
 
 - Change the canonical wrapper and CLI default for duplicate gene identifiers

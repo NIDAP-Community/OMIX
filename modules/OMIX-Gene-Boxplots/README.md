@@ -133,6 +133,38 @@ Comparison bars and italic p-value labels are black. Leave `colors` empty to
 retain these defaults, or supply comma-separated original color names in group
 order.
 
+## Parameter contract
+
+The machine-readable schema classifies every portable CLI control for
+deterministic deployment comparison:
+
+- Three **public inputs** identify the expression, metadata, and optional DEG
+  tables. Fourteen **public parameters** cover gene and group selection,
+  statistics source, display settings, and output location.
+- Five **advanced parameters** cover within-plot p-value adjustment, duplicate
+  aggregation, and exported image dimensions. Advanced controls remain
+  user-settable and must retain their canonical defaults in a deployment.
+- Two **internal controls** document the canonical `deg_gene_column` derivation
+  and the deprecated direct-R `sum_duplicates` compatibility argument. Neither
+  is an additional public CLI control.
+
+The complete names, types, choices, order, and defaults are in
+[`schemas/interface.yml`](schemas/interface.yml). In particular,
+`duplicate_aggregation` remains `mean` by default for normalized log-space
+expression, with `sum` and `keep` available as compatibility modes. The
+portable CLI image defaults are 6 inches wide, 5 inches high, and 300 DPI.
+
+### Deployment mapping
+
+| Canonical control | Deployment mapping requirement |
+| --- | --- |
+| `expression_table`, `metadata_table`, and `deg_table` | A deployment may resolve uploads, attached data, or an unambiguous workflow result, then pass the resulting explicit paths to the canonical inputs. |
+| `output_dir` | A platform may manage the result directory, but must record that hidden path translation. |
+| `gene_column` | The canonical CLI applies this identifier column to both expression and DEG tables. A separately exposed deployment `deg_gene_column` is an adapter-only extension, not a canonical CLI parameter. |
+| `duplicate_aggregation` | Preserve canonical choices `mean`, `sum`, and `keep`, in that order, with default `mean`. |
+| All other public and advanced parameters | Pass through using the schema name, type, choices, order where meaningful, and default. |
+| `sum_duplicates` | Keep internal as deprecated direct-R compatibility; do not expose it alongside `duplicate_aggregation`. |
+
 ## Interface and deployment
 
 See [`schemas/interface.yml`](schemas/interface.yml) for the complete
