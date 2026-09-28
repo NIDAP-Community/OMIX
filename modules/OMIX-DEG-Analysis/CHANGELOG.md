@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Completed the machine-readable CLI contract with explicit public, advanced,
+  and internal classifications, including the existing sample-selection and
+  output-directory controls. This does not change DEG behavior or defaults.
+
 ## 0.4.0 - 2026-09-18
 
 - Added sct_mean_expression for log2-scale donor means derived from Seurat

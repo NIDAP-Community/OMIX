@@ -229,6 +229,19 @@ Run the resulting table with `--contrast_variable_columns Group`,
 See [`schemas/interface.yml`](schemas/interface.yml) for the complete
 machine-readable input, parameter, and output contract.
 
+Each command-line control in the schema has a deployment classification:
+
+- `public` controls are ordinary user-settable inputs and analysis choices;
+- `advanced` controls are still user-settable, but require more method or
+  data-contract knowledge; and
+- `internal` controls are execution details such as the output directory that
+  a deployment adapter manages rather than presenting as a scientific option.
+
+Deployment adapters must expose both public and advanced controls, preserving
+the canonical types, choices, and defaults. Platform-specific aliases or
+presets must be translated explicitly and recorded in the adapter source
+record.
+
 **Deployment repository:**
 [OMIX-DEG-Analysis](https://github.com/NIDAP-Community/OMIX-DEG-Analysis)
 
