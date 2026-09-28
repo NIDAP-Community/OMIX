@@ -112,7 +112,20 @@ Rscript "$OMIX_ROOT/modules/OMIX-L2P-Multi/scripts/run_l2p_multi.R" \
 ## Interface and deployment
 
 See [`schemas/interface.yml`](schemas/interface.yml) for the complete
-machine-readable input, parameter, and output contract.
+machine-readable input, parameter, and output contract. Every portable CLI
+control is classified there as:
+
+- `public`: a standard user-facing control that an adapter should expose;
+- `advanced`: a supported user-facing control that belongs in an advanced
+  section; or
+- `internal`: output-path plumbing, deprecated compatibility, or a low-level
+  legacy-renderer option that the current portable CLI accepts but does not
+  use for its shared `OmixPathwayPlots` figures.
+
+The schema records allowed choices, canonical defaults, and the ordered
+one-to-one relationship among `comparisons`, `t_statistic_columns`,
+`significance_columns`, and `fold_change_columns`. Deployment adapters should
+not present inactive legacy-renderer controls as current shared-plot settings.
 
 **Deployment repository:**
 [OMIX-L2P-Multi](https://github.com/NIDAP-Community/OMIX-L2P-Multi)

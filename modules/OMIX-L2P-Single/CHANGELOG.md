@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Complete the machine-readable CLI contract, classify every control as
+  public, advanced, or internal, and add regression checks for names, types,
+  defaults, choices, and ordered-list semantics. This documents existing
+  behavior without changing scientific defaults or outputs.
 - Add optional `--comparisons` for independent, ordered batched L2P Single
   runs from one wide DEG table. Each comparison receives its own output
   directory and comparison-annotated figure titles; the root run manifest
