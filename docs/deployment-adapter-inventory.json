@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "date": "2026-09-27",
+    "date": "2026-09-28",
     "canonical_repository": "NIDAP-Community/OMIX",
     "canonical_repository_url": "https://github.com/NIDAP-Community/OMIX",
-    "canonical_repository_commit": "13e3e45f360ea58b05972cb983403a54e6411b02",
+    "canonical_repository_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
     "work_item": "https://github.com/NIDAP-Community/OMIX/issues/26",
     "policy": "docs/deployment-adapter-guide.md",
-    "note": "Evidence-based inventory of adapters registered in canonical module.yml files. Pending and unknown values are not release claims."
+    "note": "Evidence-based inventory of adapters registered in canonical module.yml files, refreshed after the canonical schema-completion phase under issue #39. Pending and unknown values are not release claims; GitHub evidence is not Code Ocean validation."
   },
   "status_vocabulary": [
     "verified",
@@ -25,19 +25,20 @@
         "module_path": "modules/OMIX-DEG-Analysis",
         "module_version": "0.4.0",
         "interface_version": 2,
-        "source_commit": "13e3e45f360ea58b05972cb983403a54e6411b02",
-        "last_module_change_commit": "163e37499c3daaa2a3e924072e7b6b86288ebef5",
+        "source_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
+        "last_module_change_commit": "695113ea797a4456f6b37e18e369bca1750ca26f",
         "schema_path": "modules/OMIX-DEG-Analysis/schemas/interface.yml",
         "evidence": [
-          "https://github.com/NIDAP-Community/OMIX/blob/13e3e45f360ea58b05972cb983403a54e6411b02/modules/OMIX-DEG-Analysis/module.yml"
+          "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-DEG-Analysis/module.yml"
         ]
       },
       "schema_completeness": {
-        "status": "pending",
+        "status": "verified",
         "evidence": [
-          "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1"
+          "https://github.com/NIDAP-Community/OMIX/pull/32",
+          "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-DEG-Analysis/schemas/interface.yml"
         ],
-        "note": "The schema file exists. Completeness is under review with the interface-2 adapter work and is not yet independently certified."
+        "note": "Merged PR #32 records the complete interface-2 contract: 21 CLI controls comprising 20 public/advanced inputs and parameters plus internal output_dir."
       },
       "deployment": {
         "repository": "https://github.com/NIDAP-Community/OMIX-DEG-Analysis",
@@ -62,7 +63,7 @@
           "status": "outdated",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1",
-            "https://github.com/NIDAP-Community/OMIX/blob/13e3e45f360ea58b05972cb983403a54e6411b02/modules/OMIX-DEG-Analysis/R/OMIX_DEG_Analysis.R"
+            "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-DEG-Analysis/R/OMIX_DEG_Analysis.R"
           ],
           "note": "Default-branch adapter science matches canonical 0.1.3/interface 1, not current 0.4.0/interface 2. Draft PR #1 is the candidate update."
         },
@@ -102,9 +103,10 @@
         "coverage": {
           "status": "outdated",
           "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497/.codeocean/app-panel.json",
             "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1"
           ],
-          "note": "Default branch lacks analysis_mode and pseudobulk_manifest. Draft PR #1 has 20 parameters and is awaiting review."
+          "note": "Against the complete 20-control public/advanced contract, the default branch lacks analysis_mode and pseudobulk_manifest, uses counts_file/metadata_file/moo_file adapter aliases for canonical matrix/metadata/moo, and retains raw-count effective values instead of canonical mode-aware auto defaults. Draft PR #1 is a candidate remediation, not default-branch or Code Ocean evidence."
         }
       },
       "runtime": {
@@ -159,17 +161,20 @@
         "module_path": "modules/OMIX-GSEA-Filters-Legacy",
         "module_version": "1.0.0",
         "interface_version": 1,
-        "source_commit": "13e3e45f360ea58b05972cb983403a54e6411b02",
-        "last_module_change_commit": "b65eeb3c231eb9dfbdbc09326ab03c23bbe84c8f",
+        "source_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
+        "last_module_change_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
         "schema_path": "modules/OMIX-GSEA-Filters-Legacy/schemas/interface.yml",
         "evidence": [
-          "https://github.com/NIDAP-Community/OMIX/blob/13e3e45f360ea58b05972cb983403a54e6411b02/modules/OMIX-GSEA-Filters-Legacy/module.yml"
+          "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-GSEA-Filters-Legacy/module.yml"
         ]
       },
       "schema_completeness": {
-        "status": "pending",
-        "evidence": [],
-        "note": "The schema file exists, but a complete CLI-to-schema audit has not been recorded."
+        "status": "verified",
+        "evidence": [
+          "https://github.com/NIDAP-Community/OMIX/pull/37",
+          "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-GSEA-Filters-Legacy/schemas/interface.yml"
+        ],
+        "note": "Merged PR #37 records all 16 CLI controls: 9 public, 6 advanced, and internal output_dir, including list delimiters and allowed values."
       },
       "deployment": {
         "repository": "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy",
@@ -201,7 +206,7 @@
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/ed4f77fff67b1f7b1fa9b07edc90fb91b8b07aac/OMIX_MODULE_SOURCE.md"
           ],
-          "note": "Present and current, but per-file hashes and immutable runtime digest are not recorded."
+          "note": "Present and accurate for the recorded scientific export, but it predates the completed canonical schema and does not record per-file hashes or an immutable runtime digest."
         },
         "hash_manifest": {
           "status": "pending",
@@ -228,7 +233,7 @@
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/ed4f77fff67b1f7b1fa9b07edc90fb91b8b07aac/.codeocean/app-panel.json"
           ],
-          "note": "The panel has 15 controls but lacks named_parameters and has zero param_name bindings, so it cannot satisfy the named CLI contract."
+          "note": "The 15 visible controls numerically match the 15 public/advanced contract controls, but named_parameters is absent and every param_name binding is missing, so the panel cannot satisfy the named CLI contract."
         }
       },
       "runtime": {
@@ -271,17 +276,20 @@
         "module_path": "modules/OMIX-GSEA-Preranked-Legacy",
         "module_version": "5.2.0",
         "interface_version": 1,
-        "source_commit": "13e3e45f360ea58b05972cb983403a54e6411b02",
-        "last_module_change_commit": "b65eeb3c231eb9dfbdbc09326ab03c23bbe84c8f",
+        "source_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
+        "last_module_change_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
         "schema_path": "modules/OMIX-GSEA-Preranked-Legacy/schemas/interface.yml",
         "evidence": [
-          "https://github.com/NIDAP-Community/OMIX/blob/13e3e45f360ea58b05972cb983403a54e6411b02/modules/OMIX-GSEA-Preranked-Legacy/module.yml"
+          "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-GSEA-Preranked-Legacy/module.yml"
         ]
       },
       "schema_completeness": {
-        "status": "pending",
-        "evidence": [],
-        "note": "The schema exists but is known to require a complete public-parameter audit before App Panel coverage can be certified."
+        "status": "verified",
+        "evidence": [
+          "https://github.com/NIDAP-Community/OMIX/pull/37",
+          "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-GSEA-Preranked-Legacy/schemas/interface.yml"
+        ],
+        "note": "Merged PR #37 records all 19 CLI controls: 8 public, 10 advanced, and internal output_dir, including ordered contrast and collection delimiters."
       },
       "deployment": {
         "repository": "https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy",
@@ -313,7 +321,7 @@
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy/blob/c29a0dc019a56b236298b6e65667c2bfd55cda07/OMIX_MODULE_SOURCE.md"
           ],
-          "note": "Present and current, but per-file hashes and immutable runtime digest are not recorded."
+          "note": "Present and accurate for the recorded scientific export, but it predates the completed canonical schema and does not record per-file hashes or an immutable runtime digest."
         },
         "hash_manifest": {
           "status": "pending",
@@ -336,11 +344,12 @@
       "app_panel": {
         "parameter_count": 17,
         "coverage": {
-          "status": "pending",
+          "status": "blocked",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy/blob/c29a0dc019a56b236298b6e65667c2bfd55cda07/.codeocean/app-panel.json"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy/blob/c29a0dc019a56b236298b6e65667c2bfd55cda07/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX/issues/39"
           ],
-          "note": "The panel has 17 named parameters; exhaustive coverage is pending schema completion. The MSigDB dataset remains visible and requires a Harbor decision."
+          "note": "The panel binds 17 of 18 public/advanced controls; pathways_database is supplied only as a visible default dataset, and species defaults to the Mouse demo preset rather than the canonical Human default. The prior Code Ocean merge conflict and the request to hide the MSigDB dataset remain deferred to Harbor; this inventory does not resolve or erase them."
         }
       },
       "runtime": {
@@ -366,8 +375,13 @@
       },
       "work_tracking": {
         "issues": [],
-        "branches": ["init-syncweaver"],
+        "branches": ["gh-proejcts", "init-syncweaver"],
         "pull_requests": [
+          {
+            "number": 3,
+            "url": "https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy/pull/3",
+            "state": "open"
+          },
           {
             "number": 1,
             "url": "https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy/pull/1",
@@ -393,17 +407,20 @@
         "module_path": "modules/OMIX-GSEA-Visualization-Legacy",
         "module_version": "4.0.0",
         "interface_version": 1,
-        "source_commit": "13e3e45f360ea58b05972cb983403a54e6411b02",
-        "last_module_change_commit": "b65eeb3c231eb9dfbdbc09326ab03c23bbe84c8f",
+        "source_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
+        "last_module_change_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
         "schema_path": "modules/OMIX-GSEA-Visualization-Legacy/schemas/interface.yml",
         "evidence": [
-          "https://github.com/NIDAP-Community/OMIX/blob/13e3e45f360ea58b05972cb983403a54e6411b02/modules/OMIX-GSEA-Visualization-Legacy/module.yml"
+          "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-GSEA-Visualization-Legacy/module.yml"
         ]
       },
       "schema_completeness": {
-        "status": "pending",
-        "evidence": [],
-        "note": "The schema exists but requires a complete public-parameter audit."
+        "status": "verified",
+        "evidence": [
+          "https://github.com/NIDAP-Community/OMIX/pull/37",
+          "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-GSEA-Visualization-Legacy/schemas/interface.yml"
+        ],
+        "note": "Merged PR #37 records all 38 CLI controls: 12 public, 25 advanced, and internal output_dir, including choices and numeric bounds."
       },
       "deployment": {
         "repository": "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy",
@@ -435,7 +452,7 @@
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/blob/4aa52dbaba838735015ac3ffcb451892f9272ae6/OMIX_MODULE_SOURCE.md"
           ],
-          "note": "Present and current, but per-file hashes and immutable runtime digest are not recorded."
+          "note": "Present and accurate for the recorded scientific export, but it predates the completed canonical schema and does not record per-file hashes or an immutable runtime digest."
         },
         "hash_manifest": {
           "status": "pending",
@@ -458,11 +475,11 @@
       "app_panel": {
         "parameter_count": 35,
         "coverage": {
-          "status": "pending",
+          "status": "outdated",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/blob/4aa52dbaba838735015ac3ffcb451892f9272ae6/.codeocean/app-panel.json"
           ],
-          "note": "The panel has 35 controls; exhaustive coverage is pending canonical schema completion and parameter-level comparison."
+          "note": "The panel exposes 35 named controls while msigdb_database and gsea_filter_results are dataset-backed inputs. Several user controls drift from the complete schema, including running_score_line_color (red/blue by ES versus ES sign), add_max_deviation_line (xy-coordinate versus both), and rank_area_color capitalization/choice text."
         }
       },
       "runtime": {
@@ -505,17 +522,20 @@
         "module_path": "modules/OMIX-Gene-Boxplots",
         "module_version": "1.0.0",
         "interface_version": 1,
-        "source_commit": "13e3e45f360ea58b05972cb983403a54e6411b02",
-        "last_module_change_commit": "7da6208330c72c8e1f123ba6e9de9f5c1f745dbb",
+        "source_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
+        "last_module_change_commit": "e0a5ea0c1875b0838aecf9854f6f238a1575f285",
         "schema_path": "modules/OMIX-Gene-Boxplots/schemas/interface.yml",
         "evidence": [
-          "https://github.com/NIDAP-Community/OMIX/blob/13e3e45f360ea58b05972cb983403a54e6411b02/modules/OMIX-Gene-Boxplots/module.yml"
+          "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-Gene-Boxplots/module.yml"
         ]
       },
       "schema_completeness": {
-        "status": "pending",
-        "evidence": [],
-        "note": "The schema exists but does not yet support a certified exhaustive panel comparison."
+        "status": "verified",
+        "evidence": [
+          "https://github.com/NIDAP-Community/OMIX/pull/38",
+          "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-Gene-Boxplots/schemas/interface.yml"
+        ],
+        "note": "Merged PR #38 records 22 public/advanced CLI controls, 2 internal compatibility bindings, 4 outputs, the original aesthetics contract, and mean|sum|keep duplicate aggregation with mean as the default."
       },
       "deployment": {
         "repository": "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots",
@@ -547,7 +567,7 @@
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/blob/9a8eb2e8f8cae282c1d5e88935f497216db95d60/OMIX_MODULE_SOURCE.md"
           ],
-          "note": "Present and current, but per-file hashes and immutable runtime digest are not recorded."
+          "note": "Present and accurate for the recorded scientific export, but it predates the completed canonical schema and does not record per-file hashes or an immutable runtime digest."
         },
         "hash_manifest": {
           "status": "pending",
@@ -585,11 +605,11 @@
       "app_panel": {
         "parameter_count": 22,
         "coverage": {
-          "status": "pending",
+          "status": "outdated",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/blob/9a8eb2e8f8cae282c1d5e88935f497216db95d60/.codeocean/app-panel.json"
           ],
-          "note": "The panel has 22 parameters; exhaustive coverage is pending canonical schema completion and parameter-level comparison."
+          "note": "The panel has 22 named controls but uses expression_file/metadata_file/deg_file rather than canonical input names, exposes internal deg_gene_column, omits public output_dir, and drifts on image_width/image_height defaults (5/5.5 versus 6/5). duplicate_aggregation remains correctly exposed with mean as default."
         }
       },
       "runtime": {
@@ -632,17 +652,21 @@
         "module_path": "modules/OMIX-L2P-Multi",
         "module_version": "4.0.0",
         "interface_version": 1,
-        "source_commit": "13e3e45f360ea58b05972cb983403a54e6411b02",
-        "last_module_change_commit": "b65eeb3c231eb9dfbdbc09326ab03c23bbe84c8f",
+        "source_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
+        "last_module_change_commit": "5f090ecf0b48835b6b85d04f546c0da2446e2282",
         "schema_path": "modules/OMIX-L2P-Multi/schemas/interface.yml",
         "evidence": [
-          "https://github.com/NIDAP-Community/OMIX/blob/13e3e45f360ea58b05972cb983403a54e6411b02/modules/OMIX-L2P-Multi/module.yml"
+          "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-L2P-Multi/module.yml"
         ]
       },
       "schema_completeness": {
-        "status": "pending",
-        "evidence": ["https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/2"],
-        "note": "The schema exists but is incomplete for exhaustive UI coverage; draft PR #2 reconciles known panel aliases."
+        "status": "verified",
+        "evidence": [
+          "https://github.com/NIDAP-Community/OMIX/pull/34",
+          "https://github.com/NIDAP-Community/OMIX/pull/36",
+          "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-L2P-Multi/schemas/interface.yml"
+        ],
+        "note": "Merged PRs #34 and #36 record all 52 controls: 13 public, 16 advanced, and 23 internal/deprecated controls, with ordered multi-column mappings and complete choices/defaults."
       },
       "deployment": {
         "repository": "https://github.com/NIDAP-Community/OMIX-L2P-Multi",
@@ -668,7 +692,7 @@
         "source_record": {
           "status": "partial",
           "evidence": ["https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/0331e8efec5ac8e387d8ac96eb1b6a04bf618437/OMIX_MODULE_SOURCE.md"],
-          "note": "Present and current, but per-file hashes and immutable runtime digest are not recorded."
+          "note": "Present and accurate for the recorded scientific export, but it predates the completed canonical schema and does not record per-file hashes or an immutable runtime digest."
         },
         "hash_manifest": {
           "status": "pending",
@@ -698,8 +722,11 @@
         "parameter_count": 53,
         "coverage": {
           "status": "outdated",
-          "evidence": ["https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/2"],
-          "note": "Default branch uses stale collections and select_top_percentage aliases. Draft PR #2 uses canonical names; exhaustive coverage remains pending schema completion."
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/0331e8efec5ac8e387d8ac96eb1b6a04bf618437/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/2"
+          ],
+          "note": "Against the complete schema, the default branch uses deg_file, collections, and select_top_percentage aliases and exposes 23 internal/deprecated or adapter-output controls, including inactive legacy-renderer settings. Draft PR #2 addresses the parameter aliases and some defaults but is not default-branch or Code Ocean evidence."
         }
       },
       "runtime": {
@@ -744,15 +771,19 @@
         "module_path": "modules/OMIX-L2P-Single",
         "module_version": "3.1.0",
         "interface_version": 1,
-        "source_commit": "13e3e45f360ea58b05972cb983403a54e6411b02",
-        "last_module_change_commit": "b65eeb3c231eb9dfbdbc09326ab03c23bbe84c8f",
+        "source_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
+        "last_module_change_commit": "5f090ecf0b48835b6b85d04f546c0da2446e2282",
         "schema_path": "modules/OMIX-L2P-Single/schemas/interface.yml",
-        "evidence": ["https://github.com/NIDAP-Community/OMIX/blob/13e3e45f360ea58b05972cb983403a54e6411b02/modules/OMIX-L2P-Single/module.yml"]
+        "evidence": ["https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-L2P-Single/module.yml"]
       },
       "schema_completeness": {
-        "status": "pending",
-        "evidence": ["https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2"],
-        "note": "The schema exists but is incomplete for exhaustive UI coverage; draft PR #2 reconciles known defaults."
+        "status": "verified",
+        "evidence": [
+          "https://github.com/NIDAP-Community/OMIX/pull/34",
+          "https://github.com/NIDAP-Community/OMIX/pull/36",
+          "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-L2P-Single/schemas/interface.yml"
+        ],
+        "note": "Merged PRs #34 and #36 record all 40 CLI controls: 9 public, 30 advanced, and internal output_dir, including ordered batched comparisons, choices, and defaults."
       },
       "deployment": {
         "repository": "https://github.com/NIDAP-Community/OMIX-L2P-Single",
@@ -778,7 +809,7 @@
         "source_record": {
           "status": "partial",
           "evidence": ["https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/c3618f22125c44b49f76592a96304901bd93cb5c/OMIX_MODULE_SOURCE.md"],
-          "note": "Present and current, but per-file hashes and immutable runtime digest are not recorded."
+          "note": "Present and accurate for the recorded scientific export, but it predates the completed canonical schema and does not record per-file hashes or an immutable runtime digest."
         },
         "hash_manifest": {
           "status": "pending",
@@ -807,9 +838,12 @@
       "app_panel": {
         "parameter_count": 39,
         "coverage": {
-          "status": "pending",
-          "evidence": ["https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2"],
-          "note": "The panel has 39 parameters and draft PR #2 reconciles defaults; exhaustive coverage remains pending schema completion."
+          "status": "outdated",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/c3618f22125c44b49f76592a96304901bd93cb5c/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2"
+          ],
+          "note": "The default branch binds all 39 public/advanced slots except that deg_file aliases canonical deg_table, but multiple defaults drift: collections H versus GO,REACTOME,KEGG; minimum DEG 100 versus 50; label sizes 45/14/14/14/14 versus 50/15/20/20/15; and plot dimensions 14/16 versus 12/12. Draft PR #2 is a candidate remediation, not default-branch or Code Ocean evidence."
         }
       },
       "runtime": {
@@ -854,15 +888,18 @@
         "module_path": "modules/OMIX-Volcano-Plot",
         "module_version": "1.0.0",
         "interface_version": 1,
-        "source_commit": "13e3e45f360ea58b05972cb983403a54e6411b02",
-        "last_module_change_commit": "185625e29873fc97bd097fe06908dddbf7b60bee",
+        "source_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
+        "last_module_change_commit": "42412bd84648d917834bf276a4778018ea048859",
         "schema_path": "modules/OMIX-Volcano-Plot/schemas/interface.yml",
-        "evidence": ["https://github.com/NIDAP-Community/OMIX/blob/13e3e45f360ea58b05972cb983403a54e6411b02/modules/OMIX-Volcano-Plot/module.yml"]
+        "evidence": ["https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-Volcano-Plot/module.yml"]
       },
       "schema_completeness": {
-        "status": "pending",
-        "evidence": [],
-        "note": "The schema exists but is incomplete for exhaustive UI coverage."
+        "status": "verified",
+        "evidence": [
+          "https://github.com/NIDAP-Community/OMIX/pull/33",
+          "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-Volcano-Plot/schemas/interface.yml"
+        ],
+        "note": "Merged PR #33 records 40 public/advanced CLI controls and 3 internal bindings, explicitly distinguishing canonical resolution_dpi from the implementation-only resolution_dpi_ argument."
       },
       "deployment": {
         "repository": "https://github.com/NIDAP-Community/OMIX-Volcano-Plot",
@@ -882,7 +919,7 @@
         },
         "current_parity": {
           "status": "outdated",
-          "evidence": ["https://github.com/NIDAP-Community/OMIX/blob/13e3e45f360ea58b05972cb983403a54e6411b02/modules/OMIX-Volcano-Plot/R/Volcano_Plot_Enhanced.R"],
+          "evidence": ["https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-Volcano-Plot/R/Volcano_Plot_Enhanced.R"],
           "note": "The adapter matches its old recorded commit but differs from the current canonical file after commit 185625e."
         },
         "source_record": {
@@ -919,7 +956,7 @@
         "coverage": {
           "status": "blocked",
           "evidence": ["https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/064b36f939dd84d25c487199ee1ba13e0eb261a2/.codeocean/app-panel.json"],
-          "note": "The panel has 39 parameters but contains a resolution_dpi_ naming defect; exhaustive coverage also awaits schema completion."
+          "note": "Against the complete 40-control public/advanced contract, the panel uses deg_file instead of deg_table, omits public output_dir, exposes internal resolution_dpi_ instead of canonical resolution_dpi, and uses 999 instead of the canonical unlimited label_max_overlaps default."
         }
       },
       "runtime": {

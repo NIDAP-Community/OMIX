@@ -2,8 +2,8 @@
 
 This is Beacon's evidence-based snapshot of deployment adapters registered in canonical `module.yml` files. It is an audit index, not release authorization. `Pending` and `Unknown` are intentional when durable evidence is absent.
 
-- **Snapshot date:** 2026-09-27
-- **Canonical OMIX commit:** [`13e3e45f360e`](https://github.com/NIDAP-Community/OMIX/commit/13e3e45f360ea58b05972cb983403a54e6411b02)
+- **Snapshot date:** 2026-09-28
+- **Canonical OMIX commit:** [`9f97039f15d0`](https://github.com/NIDAP-Community/OMIX/commit/9f97039f15d0d2f1458da352be14d7ada9723436)
 - **Tracked work item:** [OMIX issue #26](https://github.com/NIDAP-Community/OMIX/issues/26)
 - **Machine-readable source:** [`deployment-adapter-inventory.json`](deployment-adapter-inventory.json)
 - **Validation/render command:** `python3 scripts/check_deployment_adapter_inventory.py --write-summary`
@@ -12,14 +12,14 @@ This is Beacon's evidence-based snapshot of deployment adapters registered in ca
 
 | Adapter | Canonical | Deployment | Recorded export | Current parity | Schema | App Panel | Runtime | Code Ocean | Syncweaver | Active work |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| [OMIX-DEG-Analysis](https://github.com/NIDAP-Community/OMIX-DEG-Analysis) | v0.4.0 / interface 2 | `main` @ `bc3b105e` | verified | outdated | pending | outdated | partial | partial | blocked | [PR #1](https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1) |
-| [OMIX-GSEA-Filters-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy) | v1.0.0 / interface 1 | `master` @ `ed4f77ff` | verified | verified | pending | blocked | partial | pending | pending | None recorded |
-| [OMIX-GSEA-Preranked-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy) | v5.2.0 / interface 1 | `master` @ `c29a0dc0` | verified | verified | pending | pending | partial | pending | blocked | [PR #1](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy/pull/1) |
-| [OMIX-GSEA-Visualization-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy) | v4.0.0 / interface 1 | `master` @ `4aa52dba` | verified | verified | pending | pending | partial | pending | pending | None recorded |
-| [OMIX-Gene-Boxplots](https://github.com/NIDAP-Community/OMIX-Gene-Boxplots) | v1.0.0 / interface 1 | `main` @ `9a8eb2e8` | verified | verified | pending | pending | partial | pending | blocked | None recorded |
-| [OMIX-L2P-Multi](https://github.com/NIDAP-Community/OMIX-L2P-Multi) | v4.0.0 / interface 1 | `main` @ `0331e8ef` | verified | verified | pending | outdated | partial | pending | blocked | [PR #2](https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/2) |
-| [OMIX-L2P-Single](https://github.com/NIDAP-Community/OMIX-L2P-Single) | v3.1.0 / interface 1 | `main` @ `c3618f22` | verified | verified | pending | pending | partial | pending | blocked | [PR #2](https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2) |
-| [OMIX-Volcano-Plot](https://github.com/NIDAP-Community/OMIX-Volcano-Plot) | v1.0.0 / interface 1 | `main` @ `064b36f9` | verified | outdated | pending | blocked | partial | pending | blocked | None recorded |
+| [OMIX-DEG-Analysis](https://github.com/NIDAP-Community/OMIX-DEG-Analysis) | v0.4.0 / interface 2 | `main` @ `bc3b105e` | verified | outdated | verified | outdated | partial | partial | blocked | [PR #1](https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1) |
+| [OMIX-GSEA-Filters-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy) | v1.0.0 / interface 1 | `master` @ `ed4f77ff` | verified | verified | verified | blocked | partial | pending | pending | None recorded |
+| [OMIX-GSEA-Preranked-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy) | v5.2.0 / interface 1 | `master` @ `c29a0dc0` | verified | verified | verified | blocked | partial | pending | blocked | [PR #3](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy/pull/3), [PR #1](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy/pull/1) |
+| [OMIX-GSEA-Visualization-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy) | v4.0.0 / interface 1 | `master` @ `4aa52dba` | verified | verified | verified | outdated | partial | pending | pending | None recorded |
+| [OMIX-Gene-Boxplots](https://github.com/NIDAP-Community/OMIX-Gene-Boxplots) | v1.0.0 / interface 1 | `main` @ `9a8eb2e8` | verified | verified | verified | outdated | partial | pending | blocked | None recorded |
+| [OMIX-L2P-Multi](https://github.com/NIDAP-Community/OMIX-L2P-Multi) | v4.0.0 / interface 1 | `main` @ `0331e8ef` | verified | verified | verified | outdated | partial | pending | blocked | [PR #2](https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/2) |
+| [OMIX-L2P-Single](https://github.com/NIDAP-Community/OMIX-L2P-Single) | v3.1.0 / interface 1 | `main` @ `c3618f22` | verified | verified | verified | outdated | partial | pending | blocked | [PR #2](https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2) |
+| [OMIX-Volcano-Plot](https://github.com/NIDAP-Community/OMIX-Volcano-Plot) | v1.0.0 / interface 1 | `main` @ `064b36f9` | verified | outdated | verified | blocked | partial | pending | blocked | None recorded |
 
 ## Priority findings
 
