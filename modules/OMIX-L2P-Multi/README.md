@@ -113,7 +113,7 @@ Rscript "$OMIX_ROOT/modules/OMIX-L2P-Multi/scripts/run_l2p_multi.R" \
 
 See [`schemas/interface.yml`](schemas/interface.yml) for the complete
 machine-readable input, parameter, and output contract. Every portable CLI
-control is classified there as:
+control has a `classification` value there:
 
 - `public`: a standard user-facing control that an adapter should expose;
 - `advanced`: a supported user-facing control that belongs in an advanced

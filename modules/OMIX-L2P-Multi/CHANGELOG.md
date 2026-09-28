@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Standardize machine-readable control metadata on the project-wide
+  `classification` key without changing CLI behavior, defaults, outputs, or
+  interface version.
 - Complete the machine-readable CLI contract, classify every control as
   public, advanced, or internal, and add regression checks for names, types,
   defaults, choices, and comparison-aligned ordering. Current shared-plot

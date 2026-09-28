@@ -1,6 +1,6 @@
 interface_version: 1
 entrypoint: scripts/run_l2p_single.R
-exposure_levels:
+control_classifications:
   public: Standard user-facing control that deployment adapters should expose.
   advanced: Supported user-facing control that deployment adapters should expose in an advanced section.
   internal: Portable CLI plumbing that deployment adapters manage rather than expose.
@@ -8,14 +8,14 @@ inputs:
   deg_table:
     required: true
     type: path
-    exposure: public
+    classification: public
     formats: [csv, tsv, txt, rds]
     description: Differential-expression table containing one comparison or a wide table with comparison-prefixed columns.
   custom_pathways:
     required: false
     type: path
     default: null
-    exposure: advanced
+    classification: advanced
     formats: [csv, tsv, txt, rds]
     description: Optional custom pathway database. Delimited tables must contain pathway-name and gene-symbol columns; RDS may contain a compatible table or L2P pathway list.
 parameters:
@@ -23,14 +23,14 @@ parameters:
     required: false
     type: string
     default: null
-    exposure: public
+    classification: public
     mutually_exclusive_with: comparisons
     description: One comparison identifier used to infer matching DEG columns when explicit columns are not supplied. Supply this or `comparisons`, not both.
   comparisons:
     required: false
     type: string
     default: null
-    exposure: public
+    classification: public
     delimiter: ","
     preserves_order: true
     mutually_exclusive_with: comparison
@@ -38,199 +38,199 @@ parameters:
   output_dir:
     type: path
     default: results
-    exposure: internal
+    classification: internal
     description: Portable result directory. Deployment adapters provide their platform-managed output location.
   species:
     type: string
     default: Human
-    exposure: public
+    classification: public
     allowed: [Human, Mouse, Macaque, Rat, Zebrafish, Rabbit, Drosophila]
   collections_to_include:
     type: string
     default: GO,REACTOME,KEGG
-    exposure: public
+    classification: public
     delimiter: ","
     item_allowed: [GO, REACTOME, KEGG, PANTH, PID, BIOCYC, WikiPathways, H, C1, C2, C3, C4, C6, C7, C8]
     description: Comma-separated built-in pathway collection codes. Custom pathways may be supplied independently.
   gene_names_column:
     type: string
     default: null
-    exposure: advanced
+    classification: advanced
     description: Optional exact gene-symbol column; common gene column names are inferred when omitted.
   t_statistic_column:
     type: string
     default: null
-    exposure: advanced
+    classification: advanced
     description: Optional signed rank column. Required for rank selection unless it can be inferred from `comparison`; not accepted as a fixed override for a batched run.
   significance_column:
     type: string
     default: null
-    exposure: advanced
+    classification: advanced
     description: Optional p-value or adjusted-p-value column. Required for threshold selection unless it can be inferred from `comparison`; not accepted as a fixed override for a batched run.
   fold_change_column:
     type: string
     default: null
-    exposure: advanced
+    classification: advanced
     description: Optional linear- or log-fold-change column. Required for threshold selection unless it can be inferred from `comparison`; not accepted as a fixed override for a batched run.
   select_by_rank:
     type: boolean
     default: false
-    exposure: public
+    classification: public
     description: Select DEG lists using the significance and fold-change thresholds. Set true to use the legacy t-statistic rank method.
   select_top_percentage_of_genes:
     type: boolean
     default: true
-    exposure: advanced
+    classification: advanced
     description: With rank selection, use the top and bottom 10 percent rather than a fixed gene count.
   select_top_genes:
     type: integer
     default: 500
-    exposure: advanced
+    classification: advanced
     minimum: 1
     description: With rank selection and percentage selection disabled, number of genes selected from each end of the ranking.
   significance_threshold:
     type: number
     default: 0.05
-    exposure: public
+    classification: public
     minimum: 0
     maximum: 1
     description: Maximum nominal p-value, or the threshold applied to an explicitly selected adjusted-p-value column, for DEG-list selection.
   fold_change_threshold:
     type: number
     default: 1.2
-    exposure: public
+    classification: public
     minimum_exclusive: 0
     description: Minimum absolute linear fold change for DEG-list selection. For a log-fold-change column, the corresponding log2 threshold is used.
   minimum_number_of_deg_genes:
     type: integer
     default: 50
-    exposure: advanced
+    classification: advanced
     minimum: 0
     description: Desired minimum selected-gene count per direction before the module reports a warning.
   minimum_pathway_hit_count:
     type: integer
     default: 5
-    exposure: advanced
+    classification: advanced
     minimum: 0
     description: Minimum number of selected genes in a pathway retained in the output.
   p_value_threshold_for_output:
     type: number
     default: 0.05
-    exposure: advanced
+    classification: advanced
     minimum: 0
     maximum: 1
     description: Maximum nominal Fisher exact p-value retained in the pathway output.
   use_built_in_gene_universe:
     type: boolean
     default: false
-    exposure: advanced
+    classification: advanced
     description: Use the L2P built-in universe instead of all genes in the DEG table.
   use_fdr_p_values:
     type: boolean
     default: false
-    exposure: advanced
+    classification: advanced
     description: Use FDR rather than nominal p-values in the legacy summary bar plot.
   custom_pathway_name_column:
     type: string
     default: gene_set_name
-    exposure: advanced
+    classification: advanced
     description: Pathway-name column in a tabular custom pathway database.
   custom_pathway_gene_column:
     type: string
     default: gene_symbol
-    exposure: advanced
+    classification: advanced
     description: Gene-symbol column in a tabular custom pathway database.
   number_of_pathways_to_plot:
     type: integer
     default: 20
-    exposure: public
+    classification: public
     minimum: 1
     description: Number of top pathways displayed per upregulated or downregulated direction in the summary plot.
   pathway_axis_label_max_length:
     type: integer
     default: 50
-    exposure: advanced
+    classification: advanced
     minimum: 1
     description: Maximum pathway-label wrap width before font-size adjustment.
   pathway_axis_label_font_size:
     type: integer
     default: 15
-    exposure: advanced
+    classification: advanced
     minimum_exclusive: 0
   x_axis_title_font_size:
     type: integer
     default: 20
-    exposure: advanced
+    classification: advanced
     minimum_exclusive: 0
   y_axis_title_font_size:
     type: integer
     default: 20
-    exposure: advanced
+    classification: advanced
     minimum_exclusive: 0
   x_axis_tick_font_size:
     type: integer
     default: 15
-    exposure: advanced
+    classification: advanced
     minimum_exclusive: 0
   plot_top_pathways_up:
     type: boolean
     default: true
-    exposure: advanced
+    classification: advanced
     description: Automatically select the most significant upregulated pathways for plotting.
   pathways_to_use_up:
     type: string
     default: null
-    exposure: advanced
+    classification: advanced
     delimiter: ","
     preserves_order: true
     description: Comma-separated upregulated pathway names used when `plot_top_pathways_up` is false.
   plot_top_pathways_down:
     type: boolean
     default: true
-    exposure: advanced
+    classification: advanced
     description: Automatically select the most significant downregulated pathways for plotting.
   pathways_to_use_down:
     type: string
     default: null
-    exposure: advanced
+    classification: advanced
     delimiter: ","
     preserves_order: true
     description: Comma-separated downregulated pathway names used when `plot_top_pathways_down` is false.
   sort_bubble_plot_by:
     type: string
     default: percent gene hits per pathway
-    exposure: advanced
+    classification: advanced
     allowed: [percent gene hits per pathway, "Fisher's Exact pval", fdr corrected pval, enrichment score, number of hits]
   plot_bubble_size:
     type: string
     default: number of hits
-    exposure: advanced
+    classification: advanced
     allowed: [number of hits, percent gene hits per pathway, enrichment score, "Fisher's Exact pval", fdr corrected pval]
   plot_bubble_color:
     type: string
     default: "Fisher's Exact pval"
-    exposure: advanced
+    classification: advanced
     allowed: ["Fisher's Exact pval", fdr corrected pval, percent gene hits per pathway, number of hits, enrichment score]
   bubble_colors:
     type: string
     default: blues
-    exposure: advanced
+    classification: advanced
     allowed: [blues, reds, blue to red]
   color_for_bar:
     type: string
     default: GreentoBlue
-    exposure: advanced
+    classification: advanced
     allowed: [Blue, Green, Orange, Grey, Red, Purple, GreentoBlue, OrangetoRed, YellowOrangeRed]
   export_plot_width:
     type: number
     default: 12
-    exposure: advanced
+    classification: advanced
     minimum_exclusive: 0
     description: Width in inches for each exported summary plot.
   export_plot_height:
     type: number
     default: 12
-    exposure: advanced
+    classification: advanced
     minimum_exclusive: 0
     description: Height in inches for each exported summary plot.
 outputs:
