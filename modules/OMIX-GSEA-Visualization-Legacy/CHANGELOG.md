@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Complete the canonical CLI contract by classifying every visualization
+  control as public, advanced, or internal with the project-wide
+  `classification` key and a deterministic schema-to-CLI contract test. This
+  does not change plotting behavior or defaults.
+
 - **Breaking change:** default pathway figures now show up to 20 pathways
   rather than 10. This applies to both `--top_n_pathways` for legacy GSEA
   panels and `--pathway_bubble_top_n` for shared bubble plots.

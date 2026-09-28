@@ -1,76 +1,201 @@
 interface_version: 1
 entrypoint: scripts/run_gsea_visualization.R
+control_classifications:
+  public: Standard user-facing control that deployment adapters should expose.
+  advanced: Supported user-facing control that deployment adapters should expose in an advanced section.
+  internal: Portable CLI plumbing that deployment adapters manage rather than expose.
 inputs:
   msigdb_database:
     required: true
+    type: path
+    classification: public
     formats: [csv, rds]
     description: MSigDB membership database from the same release used for upstream GSEA; restores pathway membership when absent from filtered results.
   gsea_filter_results:
     required: true
+    type: path
+    classification: public
     formats: [csv, rds]
     description: Filtered GSEA result table with contrast, collection, pathway, enrichment statistics, and preferably pathway and leading-edge membership.
   deg_table:
     required: true
+    type: path
+    classification: public
     formats: [csv, rds]
     description: DEG table with a feature identifier, wide contrast-specific ranking statistics, and sample-level normalized or batch-corrected expression columns.
   sample_metadata:
     required: true
+    type: path
+    classification: public
     formats: [csv, rds]
     description: Sample metadata aligned to the sample-expression columns in the DEG table.
 parameters:
+  output_dir:
+    type: path
+    default: results
+    classification: internal
+    description: Portable result directory. Deployment adapters provide their platform-managed output location.
   contrast_filter:
     type: string
     default: none
+    classification: public
     allowed: [none, keep, remove]
   contrasts:
     type: string
+    default: null
+    classification: public
+    delimiter: ","
     description: Optional comma-separated contrast names used with keep or remove mode.
   top_n_pathways:
     type: integer
     default: 20
+    classification: public
+    minimum: 0
     description: Top pathways within each contrast and collection; 0 selects all pathways.
   top_n_by_sign:
     type: boolean
     default: false
+    classification: advanced
+    description: Select the top N positive and negative enrichment scores separately within each contrast and collection.
   pathway_bubble_plots:
     type: boolean
     default: true
+    classification: public
     description: Write shared OMIX bubble plots in addition to the preserved legacy ES, RNK, and leading-edge panels.
   pathway_bubble_top_n:
     type: integer
     default: 20
+    classification: public
+    minimum: 0
     description: Top significant pathways selected independently for each shared bubble-plot scope; 0 includes all pathways after contrast filtering.
   pathway_bubble_significance_statistic:
     type: string
     default: padj
+    classification: public
     allowed: [padj, pval]
     description: Adjusted p-value/FDR (`padj`, default) or nominal p-value (`pval`) used to select shared bubble-plot pathways and encode circle-versus-X significance.
   collection_color_scale:
     type: string
     default: independent
+    classification: advanced
     allowed: [independent, shared]
     description: Whether collection-specific bubble plots use their own score range or the shared combined range.
   max_plots_in_pdf:
     type: integer
     default: 0
+    classification: advanced
+    minimum: 0
     description: Global output cap; 0 means unlimited.
   plots_to_include:
     type: string
     default: ES+RNK+LE
+    classification: public
     allowed: [ES, ES+RNK, ES+LE, ES+RNK+LE, LE]
+  running_score_line_color:
+    type: string
+    default: ES sign
+    classification: advanced
+    allowed: [ES sign, green]
+  add_max_deviation_line:
+    type: string
+    default: both
+    classification: advanced
+    allowed: [coordinate, horizontal, both, none]
+  rank_area_color:
+    type: string
+    default: red/blue by Gene score
+    classification: advanced
+    allowed: [grey, red/blue by Gene score]
+  show_es_rank_bar:
+    type: boolean
+    default: false
+    classification: advanced
+  show_rnk_peak_line:
+    type: boolean
+    default: true
+    classification: advanced
+  show_rnk_le_highlight:
+    type: boolean
+    default: true
+    classification: advanced
+  show_es_le_highlight:
+    type: boolean
+    default: true
+    classification: advanced
   heatmap_transform:
     type: string
     default: z-score
+    classification: public
     allowed: [z-score, center by row mean, center by row median, none]
+  max_le_genes_heatmap:
+    type: integer
+    default: 50
+    classification: advanced
+    minimum: 1
+  heatmap_gene_order:
+    type: string
+    default: rank
+    classification: advanced
+    allowed: [rank, cluster, input]
+  heatmap_sample_order:
+    type: string
+    default: group
+    classification: advanced
+    allowed: [group, cluster, input]
+  heatmap_gene_clustering_distance:
+    type: string
+    default: euclidean
+    classification: advanced
+    allowed: [euclidean, maximum, manhattan, canberra, binary, minkowski, pearson, spearman, kendall]
+  heatmap_gene_clustering_method:
+    type: string
+    default: complete
+    classification: advanced
+    allowed: [ward.D, ward.D2, single, complete, average, mcquitty, median, centroid]
+  heatmap_sample_clustering_distance:
+    type: string
+    default: euclidean
+    classification: advanced
+    allowed: [euclidean, maximum, manhattan, canberra, binary, minkowski, pearson, spearman, kendall]
+  heatmap_sample_clustering_method:
+    type: string
+    default: complete
+    classification: advanced
+    allowed: [ward.D, ward.D2, single, complete, average, mcquitty, median, centroid]
+  show_le_heatmap_gene_names:
+    type: boolean
+    default: true
+    classification: advanced
+  show_le_heatmap_sample_names:
+    type: boolean
+    default: false
+    classification: advanced
+  show_le_heatmap_rank_labels:
+    type: boolean
+    default: true
+    classification: advanced
   heatmap_gene_names_column:
     type: string
     default: GeneName
+    classification: advanced
   heatmap_sample_names_column:
     type: string
     default: Sample
+    classification: advanced
   heatmap_group_column:
     type: string
     default: Group
+    classification: advanced
+  pdf_width:
+    type: number
+    default: 8.5
+    classification: advanced
+    minimum_exclusive: 0
+  pdf_height:
+    type: number
+    default: 6.5
+    classification: advanced
+    minimum_exclusive: 0
 outputs:
   enrichment_plots:
     path: GSEA-Vis-Enrichment-Plots.pdf

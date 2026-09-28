@@ -62,6 +62,14 @@ Rscript "$OMIX_ROOT/modules/OMIX-GSEA-Filters-Legacy/scripts/run_gsea_filters.R"
   --output_dir results/gsea-filters
 ```
 
+The portable parameter contract assigns a `classification` value to every CLI
+control. The input, significance and score filters, top-rank filter, and
+contrast controls are standard public controls.
+Collection, pathway, gene-membership, and size filters are supported advanced
+controls. `output_dir` is internal deployment plumbing rather than a scientific
+setting. Exact names, defaults, types, and choices are recorded in
+[`schemas/interface.yml`](schemas/interface.yml).
+
 ## Outputs
 
 | File | Contents |
