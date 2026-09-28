@@ -60,15 +60,74 @@ def parse_scalar(value: str):
     return value
 
 
+def parse_deployment_adapter_repositories(text: str) -> list[str]:
+    """Return repository values from the top-level deployment adapter list.
+
+    OMIX module manifests use a small, predictable YAML fragment for this
+    registry. Parse that fragment line by line so lookup is bounded by the
+    manifest length and cannot backtrack across an arbitrary number of lines.
+    The list return type retains every repository in a future multi-adapter
+    block; callers that implement today's one-adapter inventory may select the
+    first entry explicitly.
+    """
+
+    lines = text.splitlines()
+    block_start = None
+    inline_value = ""
+    for index, line in enumerate(lines):
+        if line[:1].isspace():
+            continue
+        key, separator, value = line.partition(":")
+        if separator and key.strip() == "deployment_adapters":
+            block_start = index + 1
+            inline_value = value.strip()
+            break
+
+    if block_start is None:
+        return []
+    if inline_value:
+        # The canonical empty-list form is `deployment_adapters: []`. Other
+        # inline YAML forms were not recognized by the previous registry
+        # lookup and remain outside this deliberately small parser.
+        return []
+
+    repositories: list[str] = []
+    for line in lines[block_start:]:
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if not line[:1].isspace():
+            break
+
+        content = line.lstrip()
+        if content.startswith("- "):
+            content = content[2:].lstrip()
+        key, separator, value = content.partition(":")
+        if not separator or key.strip() != "repository":
+            continue
+
+        repository = value.strip()
+        comment_index = repository.find(" #")
+        if comment_index >= 0:
+            repository = repository[:comment_index].rstrip()
+        if (
+            len(repository) >= 2
+            and repository[0] == repository[-1]
+            and repository[0] in {"'", '"'}
+        ):
+            repository = repository[1:-1]
+        if repository:
+            repositories.append(repository)
+
+    return repositories
+
+
 def registered_adapters() -> dict[str, dict]:
     records: dict[str, dict] = {}
     for module_file in sorted((ROOT / "modules").glob("*/module.yml")):
         text = module_file.read_text(encoding="utf-8")
-        repository_match = re.search(
-            r"(?ms)^deployment_adapters:\s*\n(?:.*\n)*?\s+repository:\s*(\S+)",
-            text,
-        )
-        if not repository_match:
+        repositories = parse_deployment_adapter_repositories(text)
+        if not repositories:
             continue
         values = {}
         for key in ("display_name", "version", "interface_version"):
@@ -76,7 +135,11 @@ def registered_adapters() -> dict[str, dict]:
             if not match:
                 fail(f"{module_file}: missing {key}")
             values[key] = parse_scalar(match.group(1))
-        values["repository"] = repository_match.group(1)
+        # The current inventory has one deployment record per canonical
+        # module, matching the first repository selected by the former lookup.
+        # The parser retains later entries so a future inventory schema can
+        # represent multiple deployment targets without another parser change.
+        values["repository"] = repositories[0]
         values["module_path"] = str(module_file.parent.relative_to(ROOT))
         records[module_file.parent.name] = values
     return records
