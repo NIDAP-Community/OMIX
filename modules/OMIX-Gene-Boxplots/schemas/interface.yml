@@ -1,62 +1,158 @@
 interface_version: 1
 entrypoint: scripts/run_gene_boxplots.R
+control_classifications:
+  public: User-settable controls for ordinary Gene Boxplots runs.
+  advanced: User-settable compatibility, statistical-tuning, or export controls; deployment adapters must expose them with matching names, types, choices, and defaults.
+  internal: Implementation or compatibility bindings that are not public CLI controls.
 inputs:
   expression_table:
+    classification: public
+    cli: --expression_table
+    type: path
+    default: null
     required: true
     formats: [csv, tsv, txt, rds]
     description: Gene-by-sample expression values such as normalized CPM, voom-scale expression, or batch-corrected expression.
   metadata_table:
+    classification: public
+    cli: --metadata_table
+    type: path
+    default: null
     required: true
     formats: [csv, tsv, txt, rds]
     description: Sample metadata containing sample IDs and a grouping column.
   deg_table:
+    classification: public
+    cli: --deg_table
+    type: path
+    default: ""
     required_when: statistics_mode == precomputed_deg
     formats: [csv, tsv, txt, rds]
     description: Optional differential-expression results; it may be the same table as expression_table.
 parameters:
   genes:
+    classification: public
     type: string
+    default: null
     required: true
     description: Comma-separated feature identifiers to plot.
   gene_column:
+    classification: public
     type: string
     default: GeneName
   sample_column:
+    classification: public
     type: string
     default: Sample
   category_column:
+    classification: public
     type: string
     default: Group
+  categories:
+    classification: public
+    type: string
+    default: ""
+    description: Optional comma-separated category values to retain, in display order.
   statistics_mode:
+    classification: public
     type: string
     default: precomputed_deg
     allowed: [precomputed_deg, within_plot, none]
   pvalue_type:
+    classification: public
     type: string
     default: nominal
     allowed: [nominal, adjusted]
   statistical_method:
+    classification: public
     type: string
     default: anova
     allowed: [anova, t-test, kruskal]
+  p_adjust_method:
+    classification: advanced
+    type: string
+    default: BH
+    allowed: [BH, none, bonferroni, holm, fdr, hochberg, hommel, BY]
+    description: Multiple-testing adjustment used only for exploratory within-plot comparisons.
   duplicate_aggregation:
+    classification: advanced
     type: string
     default: mean
     allowed: [mean, sum, keep]
     description: How rows sharing a gene identifier are combined per sample. Mean is appropriate for the module's normalized log-space expression inputs; sum reproduces the legacy behavior; keep leaves rows separate.
   minimum_samples_per_category:
+    classification: public
     type: integer
     default: 3
     description: Minimum samples per displayed group, preserving the original template default.
+  plot_type:
+    classification: public
+    type: string
+    default: box
+    allowed: [box, violin]
   title:
+    classification: public
     type: string
     default: auto
   y_axis_label:
+    classification: public
     type: string
     default: auto
+  colors:
+    classification: public
+    type: string
+    default: ""
+    item_allowed:
+      - Deep Red
+      - Vivid Blue
+      - Green
+      - Purple
+      - Bright Orange
+      - Yellow
+      - Brown
+      - Pink
+      - Grey
+      - Burnt Orange
+      - Teal Green
+      - Soft Purple
+      - Hot Pink
+      - Leaf Green
+      - Mustard Yellow
+      - Bronze
+      - Dark Gray
+      - Bright Magenta
+      - Light Aqua
+      - Black
+    description: Optional comma-separated original CCBR color names in category order; blank preserves the established palette.
   output_dir:
+    classification: public
     type: path
     default: results
+  image_width:
+    classification: advanced
+    type: number
+    default: 6
+    units: inches
+  image_height:
+    classification: advanced
+    type: number
+    default: 5
+    units: inches
+  image_dpi:
+    classification: advanced
+    type: integer
+    default: 300
+    units: dots_per_inch
+internal_controls:
+  deg_gene_column:
+    classification: internal
+    derived_from: gene_column
+    function_argument: deg_gene_column
+    description: The canonical CLI uses gene_column for both expression and DEG tables; a separate deployment field is not a canonical CLI control.
+  sum_duplicates:
+    classification: internal
+    replaced_by: duplicate_aggregation
+    description: Deprecated direct-R compatibility argument; true maps to sum and false maps to keep.
 outputs:
   gene_boxplots:
     path: gene_boxplots/
@@ -70,3 +166,7 @@ outputs:
     path: gene_boxplot_expression_long.csv
     format: csv
     description: Long-form expression values used in every plot.
+  run_summary:
+    path: gene_boxplot_run_summary.csv
+    format: csv
+    description: Effective statistics mode, duplicate aggregation, plotted-gene count, sample count, and retained categories.
