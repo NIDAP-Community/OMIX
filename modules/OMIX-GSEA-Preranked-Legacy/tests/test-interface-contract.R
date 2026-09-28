@@ -41,7 +41,7 @@ find_make_options <- function(expressions) {
 
 cli_options <- find_make_options(parse(file = cli_file, keep.source = FALSE))
 stopifnot(identical(sort(names(controls)), sort(names(cli_options))))
-stopifnot(identical(names(schema$exposure_levels), c("public", "advanced", "internal")))
+stopifnot(identical(names(schema$control_classifications), c("public", "advanced", "internal")))
 
 path_controls <- c("deg_table", "pathways_database", "output_dir")
 expected_schema_type <- function(name, cli_type) {
@@ -63,7 +63,7 @@ for (name in names(cli_options)) {
   cli <- cli_options[[name]]
   contract <- controls[[name]]
   stopifnot(identical(contract$type, expected_schema_type(name, cli$cli_type)))
-  stopifnot(contract$exposure %in% names(schema$exposure_levels))
+  stopifnot(contract$classification %in% names(schema$control_classifications))
   schema_has_default <- "default" %in% names(contract)
   stopifnot(identical(schema_has_default, cli$has_default))
   if (cli$has_default) {
@@ -75,7 +75,7 @@ for (name in names(cli_options)) {
   }
 }
 
-expected_exposure <- list(
+expected_classification <- list(
   public = c(
     "deg_table", "pathways_database", "species", "gene_scores_suffix",
     "contrasts", "pathways_species", "collections", "fdr_mode"
@@ -87,13 +87,13 @@ expected_exposure <- list(
   ),
   internal = "output_dir"
 )
-for (exposure in names(expected_exposure)) {
+for (classification in names(expected_classification)) {
   observed <- names(controls)[vapply(
     controls,
-    function(control) identical(control$exposure, exposure),
+    function(control) identical(control$classification, classification),
     logical(1)
   )]
-  stopifnot(identical(sort(observed), sort(expected_exposure[[exposure]])))
+  stopifnot(identical(sort(observed), sort(expected_classification[[classification]])))
 }
 
 species_choices <- c(

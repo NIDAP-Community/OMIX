@@ -74,12 +74,13 @@ Rscript "$OMIX_ROOT/modules/OMIX-GSEA-Visualization-Legacy/scripts/run_gsea_visu
   --output_dir results/gsea-visualization
 ```
 
-The four scientific inputs, contrast selection, pathway limits, output-panel
-selection, shared bubble-plot controls, and heatmap transformation are standard
-public controls. Plot styling, clustering, label visibility, column mapping,
-and output dimensions are supported advanced controls. `output_dir` is
-internal deployment plumbing. Exact names, defaults, types, and choices are
-recorded in [`schemas/interface.yml`](schemas/interface.yml).
+The portable parameter contract assigns a `classification` value to every CLI
+control. The four scientific inputs, contrast selection, pathway limits,
+output-panel selection, shared bubble-plot controls, and heatmap transformation
+are standard public controls. Plot styling, clustering, label visibility,
+column mapping, and output dimensions are supported advanced controls.
+`output_dir` is internal deployment plumbing. Exact names, defaults, types,
+and choices are recorded in [`schemas/interface.yml`](schemas/interface.yml).
 
 By default, the module plots the top **20 pathways within each contrast ×
 collection**. Use `--contrast_filter keep --contrasts B-A` to focus a

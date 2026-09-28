@@ -2,10 +2,10 @@
 
 ## Unreleased
 
-- Complete the canonical CLI contract with explicit public, advanced, and
-  internal exposure tiers, exact defaults and choices, and a deterministic
-  schema-to-CLI contract test. This does not change filtering behavior or
-  defaults.
+- Complete the canonical CLI contract by classifying every control as public,
+  advanced, or internal with the project-wide `classification` key, exact
+  defaults and choices, and a deterministic schema-to-CLI contract test. This
+  does not change filtering behavior or defaults.
 
 ## 1.0.0
 

@@ -1,6 +1,6 @@
 interface_version: 1
 entrypoint: scripts/run_gsea_filters.R
-exposure_levels:
+control_classifications:
   public: Standard user-facing control that deployment adapters should expose.
   advanced: Supported user-facing control that deployment adapters should expose in an advanced section.
   internal: Portable CLI plumbing that deployment adapters manage rather than expose.
@@ -8,89 +8,89 @@ inputs:
   input:
     required: true
     type: path
-    exposure: public
+    classification: public
     formats: [csv, tsv, txt, rds]
     description: GSEA result table containing contrasts, pathway annotations, p-values, enrichment scores, and pathway membership columns.
 parameters:
   output_dir:
     type: path
     default: results
-    exposure: internal
+    classification: internal
     description: Portable result directory. Deployment adapters provide their platform-managed output location.
   p_value_filter:
     type: string
     default: adjusted p-value
-    exposure: public
+    classification: public
     allowed: [adjusted p-value, raw p-value]
   p_value_threshold:
     type: number
     default: 0.05
-    exposure: public
+    classification: public
     minimum: 0
     maximum: 1
   enrichment_score_filter:
     type: string
     default: NES (Normalized Enrichment Score)
-    exposure: public
+    classification: public
     allowed: [NES (Normalized Enrichment Score), ES (Enrichment Score)]
   enrichment_score_threshold:
     type: number
     default: 0
-    exposure: public
+    classification: public
     minimum: 0
     description: Minimum absolute enrichment score; its sign is controlled separately.
   enrichment_score_sign:
     type: string
     default: +/-
-    exposure: public
+    classification: public
     allowed: [+/-, +, -]
   size_filter:
     type: string
     default: Pathway size
-    exposure: advanced
+    classification: advanced
     allowed: [Pathway size, Leading Edge (LE) size]
   size_cutoff:
     type: integer
     default: 0
-    exposure: advanced
+    classification: advanced
     minimum: 0
   top_rank_filter:
     type: string
     default: all
-    exposure: public
+    classification: public
     description: Use `all` or a positive numeric rank applied within each contrast and collection.
   collections_to_include:
     type: string
     default: null
-    exposure: advanced
+    classification: advanced
     delimiter: ","
     description: Optional comma-separated collection names.
   pathways_to_include:
     type: string
     default: null
-    exposure: advanced
+    classification: advanced
     delimiter: ","
     description: Optional comma-separated pathway names.
   gene_filter_universe:
     type: string
     default: Leading Edge (LE)
-    exposure: advanced
+    classification: advanced
     allowed: [Leading Edge (LE), Pathway]
   genes_to_include:
     type: string
     default: null
-    exposure: advanced
+    classification: advanced
     delimiter: ","
     description: Optional comma-separated gene symbols.
   contrast_filter:
     type: string
     default: none
-    exposure: public
+    classification: public
     allowed: [none, keep, remove]
   contrasts:
     type: string
     default: null
-    exposure: public
+    classification: public
     delimiter: ","
     description: Optional comma-separated contrast names used with keep or remove mode.
 outputs:

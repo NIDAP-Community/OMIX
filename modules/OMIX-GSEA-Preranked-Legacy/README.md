@@ -71,7 +71,8 @@ Rscript "$OMIX_ROOT/modules/OMIX-GSEA-Preranked-Legacy/scripts/run_gsea.R" \
   --output_dir results/gsea
 ```
 
-The input tables, species, ranking suffix, ordered contrast selection,
+The portable parameter contract assigns a `classification` value to every CLI
+control. The input tables, species, ranking suffix, ordered contrast selection,
 collection selection, and FDR mode are standard public controls. Gene-column
 override, gene-set sizes, permutations, random seed, redundancy reduction,
 sorting, and image dimensions are supported advanced controls. `output_dir` is
