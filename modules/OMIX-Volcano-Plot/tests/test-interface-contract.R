@@ -21,7 +21,11 @@ schema <- yaml::read_yaml(schema_file)
 stopifnot(
   identical(schema$interface_version, 1L),
   identical(schema$entrypoint, "scripts/run_volcano_plot.R"),
+  identical(names(schema$inputs), "deg_table"),
   identical(schema$inputs$deg_table$classification, "public"),
+  identical(schema$inputs$deg_table$cli, "--deg_table"),
+  identical(schema$inputs$deg_table$type, "path"),
+  is.null(schema$inputs$deg_table$default),
   identical(schema$inputs$deg_table$required, TRUE)
 )
 
@@ -55,6 +59,10 @@ cli_options <- setNames(
 schema_parameter_names <- names(schema$parameters)
 stopifnot(
   identical(names(cli_options), c("deg_table", schema_parameter_names)),
+  identical(cli_options$deg_table@long_flag, schema$inputs$deg_table$cli),
+  identical(cli_options$deg_table@dest, names(schema$inputs)),
+  identical(cli_options$deg_table@type, "character"),
+  is.null(cli_options$deg_table@default),
   !"resolution_dpi_" %in% names(cli_options),
   "resolution_dpi" %in% schema_parameter_names
 )

@@ -7,6 +7,9 @@ control_classifications:
 inputs:
   deg_table:
     classification: public
+    cli: --deg_table
+    type: path
+    default: null
     required: true
     formats: [csv, tsv, txt, rds]
     description: Differential-expression table containing a feature identifier, significance values, and log2 fold-change values.
