@@ -8,6 +8,9 @@ Version numbers correspond to adapter release versions (integers: v1, v2, v3, et
 ## [Unreleased]
 
 ### Added
+- Complete the canonical CLI contract with explicit public, advanced, and
+  internal exposure tiers, exact defaults and choices, and a deterministic
+  schema-to-CLI contract test. This does not change GSEA behavior or defaults.
 - Add an optional `--contrasts` argument to select and order preranked GSEA
   contrasts. When it is omitted, all columns matching `--gene_scores_suffix`
   are used in source-table column order. Invalid requested contrast names now

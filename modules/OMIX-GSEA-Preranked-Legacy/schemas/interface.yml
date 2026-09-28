@@ -1,28 +1,110 @@
 interface_version: 1
 entrypoint: scripts/run_gsea.R
+exposure_levels:
+  public: Standard user-facing control that deployment adapters should expose.
+  advanced: Supported user-facing control that deployment adapters should expose in an advanced section.
+  internal: Portable CLI plumbing that deployment adapters manage rather than expose.
 inputs:
   deg_table:
     required: true
-    formats: [csv, tsv, rds]
+    type: path
+    exposure: public
+    formats: [csv, tsv, txt, rds]
     description: Differential-expression table with one gene identifier column and one or more ranking-score columns.
   pathways_database:
     required: true
-    formats: [csv, tsv, rds]
+    type: path
+    exposure: public
+    formats: [csv, tsv, txt, rds]
     description: Gene-set membership database.
 parameters:
+  output_dir:
+    type: path
+    default: results
+    exposure: internal
+    description: Portable result directory. Deployment adapters provide their platform-managed output location.
   gene_names_column:
     type: string
+    default: null
+    exposure: advanced
     description: Optional gene-symbol column. When omitted, auto-detects GeneName, then Gene Symbols and other common identifiers.
-  gene_scores_suffix:
-    type: string
-    default: _tstat
-  contrasts:
-    type: string
-    required: false
-    description: Optional comma-separated contrast names. When supplied, only these contrasts are analyzed and plotted in the given order; when omitted, every column ending in gene_scores_suffix is used in source-table column order.
   species:
     type: string
     default: Human
+    exposure: public
+    allowed: [Dog, Drosophila, Chimpanzee, Human, Macaque, Mouse, Rabbit, Rat, Zebrafish]
+  gene_scores_suffix:
+    type: string
+    default: _tstat
+    exposure: public
+    description: Exact suffix used to identify ranking-score columns and derive contrast names.
+  contrasts:
+    type: string
+    default: null
+    exposure: public
+    delimiter: ","
+    preserves_order: true
+    description: Optional comma-separated contrast names. When supplied, only these contrasts are analyzed and plotted in the given order; when omitted, every column ending in gene_scores_suffix is used in source-table column order.
+  pathways_species:
+    type: string
+    default: Human
+    exposure: public
+    allowed: [Dog, Drosophila, Chimpanzee, Human, Macaque, Mouse, Rabbit, Rat, Zebrafish]
+    description: Species label used to select gene sets from the pathways database.
+  collections:
+    type: string
+    default: "H: hallmark gene sets,C2:CP:REACTOME: Reactome gene sets"
+    exposure: public
+    delimiter: ","
+    description: Comma-separated collection names that must exactly match the selected pathways-database species.
+  min_geneset_size:
+    type: integer
+    default: 15
+    exposure: advanced
+    minimum: 1
+  max_geneset_size:
+    type: integer
+    default: 500
+    exposure: advanced
+    minimum: 1
+  n_permutations:
+    type: integer
+    default: 5000
+    exposure: advanced
+    minimum: 1
+  random_seed:
+    type: integer
+    default: 246642
+    exposure: advanced
+  fdr_mode:
+    type: string
+    default: within each collection
+    exposure: public
+    allowed: [over all collections, within each collection]
+  collapse_redundancy:
+    type: boolean
+    default: false
+    exposure: advanced
+  sort_by:
+    type: string
+    default: pval
+    exposure: advanced
+    allowed: [contrast, collection, pathway, pval, padj, ES, NES, size, nMoreExtreme]
+  image_width:
+    type: integer
+    default: 2500
+    exposure: advanced
+    minimum: 1
+  image_height:
+    type: integer
+    default: 2500
+    exposure: advanced
+    minimum: 1
+  image_resolution:
+    type: integer
+    default: 300
+    exposure: advanced
+    minimum: 1
 outputs:
   gsea_results:
     path: gsea_results.csv

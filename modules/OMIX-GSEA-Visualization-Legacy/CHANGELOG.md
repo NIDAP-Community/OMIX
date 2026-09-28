@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Complete the canonical CLI contract with explicit public, advanced, and
+  internal exposure tiers for every supported visualization control, plus a
+  deterministic schema-to-CLI contract test. This does not change plotting
+  behavior or defaults.
+
 - **Breaking change:** default pathway figures now show up to 20 pathways
   rather than 10. This applies to both `--top_n_pathways` for legacy GSEA
   panels and `--pathway_bubble_top_n` for shared bubble plots.
