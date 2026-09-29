@@ -61,6 +61,39 @@ Harbor, and independent parity review to Beacon. Atlas intervenes when work is
 blocked, scopes overlap, evidence is missing, a required check fails, or a
 cross-project decision is needed.
 
+#### Coordinator-to-owner status protocol
+
+Every Atlas progress update begins with exactly one owner-action status so the
+project owner never has to infer whether work is active or waiting:
+
+- **NO ACTION NEEDED** — assigned work, automated checks, or required reviews
+  are active. Atlas names the active owner, tracked issue or pull request, and
+  the event that will trigger the next update.
+- **ACTION REQUIRED** — progress is waiting on the project owner. Atlas states
+  one concrete action, such as merging a specifically identified reviewed pull
+  request, making a scientific choice, authorizing an external change, or
+  completing a Code Ocean operation that agents cannot perform safely.
+- **BLOCKED** — the team cannot make meaningful progress without missing
+  evidence, access, or an external-state change. Atlas states the blocker, the
+  checks already exhausted, and who can resolve it.
+
+Atlas must not describe an unassigned review or follow-up as though it is in
+progress. Once the project owner has authorized a work sequence, Atlas starts
+the already-authorized dependent reviews and read-only verification
+automatically when their prerequisites complete. Atlas monitors active agents
+and GitHub checks, records durable evidence on the issue or pull request, and
+notifies the owner when the status changes; the owner should not have to poll
+the team with status questions.
+
+Atlas stops for the owner only when a merge, release, publication, external
+write, scientific-policy choice, unresolved conflict, credential, or other
+new authority is required. A merge remains an owner action unless the owner
+has explicitly delegated merge authority for that bounded task. After the
+owner reports a merge, Atlas safely fast-forwards clean, non-divergent local
+default-branch checkouts, verifies issue closure and remote alignment, and
+starts the next already-authorized dependency without waiting for another
+prompt.
+
 ### Helix, Compass, and Canvas — scientific module agents
 
 Divide scientific work by stable domain boundary rather than by individual
