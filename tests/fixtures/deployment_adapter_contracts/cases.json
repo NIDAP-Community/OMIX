@@ -1,0 +1,49 @@
+{
+  "exact": {
+    "canonical": [
+      {"name": "mode", "cli": "mode", "type": "string", "default": "auto", "allowed": ["auto", "manual"], "classification": "public"},
+      {"name": "output_dir", "cli": "output_dir", "type": "path", "default": "results", "allowed": [], "classification": "internal"}
+    ],
+    "canonical_cli": [
+      {"name": "mode", "type": "character", "default": "auto"},
+      {"name": "output_dir", "type": "character", "default": "results"}
+    ],
+    "adapter_cli": [
+      {"name": "mode", "type": "character", "default": "auto"}
+    ],
+    "panel": [
+      {"name": "mode", "type": "list", "default": "auto", "allowed": ["auto", "manual"]}
+    ]
+  },
+  "drift": {
+    "canonical": [
+      {"name": "input", "cli": "input", "type": "path", "default": null, "allowed": [], "classification": "public"},
+      {"name": "mode", "cli": "mode", "type": "string", "default": "auto", "allowed": ["auto", "manual"], "classification": "public"}
+    ],
+    "canonical_cli": [
+      {"name": "input", "type": "character", "default": null},
+      {"name": "mode", "type": "character", "default": "auto"}
+    ],
+    "adapter_cli": [
+      {"name": "input_file", "type": "character", "default": null},
+      {"name": "mode", "type": "character", "default": "manual"},
+      {"name": "legacy_toggle", "type": "logical", "default": false}
+    ],
+    "panel": [
+      {"name": "input_file", "type": "file", "default": null, "allowed": []},
+      {"name": "mode", "type": "list", "default": "manual", "allowed": ["manual", "auto"]},
+      {"name": "legacy_toggle", "type": "list", "default": "false", "allowed": ["false", "true"]}
+    ]
+  },
+  "hidden": {
+    "canonical": [
+      {"name": "database", "cli": "database", "type": "path", "default": null, "allowed": [], "classification": "public"}
+    ],
+    "canonical_cli": [
+      {"name": "database", "type": "character", "default": null}
+    ],
+    "adapter_cli": [],
+    "panel": [],
+    "source_record": "<!-- omix-adapter-contract: {\"hidden_inputs\":[{\"canonical\":\"database\",\"binding\":\"/data/pathways\"}]} -->"
+  }
+}
