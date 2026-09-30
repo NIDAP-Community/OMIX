@@ -26,6 +26,9 @@ ranked, all-gene pathway analysis, use
 
 Choose one comparison, or an ordered batch of comparisons, from a compatible
 DEG table, then use the copyable command in [Run locally or on HPC](#run-locally-or-on-hpc).
+If the table contains exactly one complete comparison prefix using the
+canonical `_pval` and `_FC` suffixes, the comparison argument may be omitted
+and that prefix is selected automatically.
 
 ## Inputs
 
@@ -81,7 +84,12 @@ Rscript "$OMIX_ROOT/modules/OMIX-L2P-Single/scripts/run_l2p_single.R" \
   --output_dir results/l2p-single-batch
 ```
 
-Use either `--comparison` or `--comparisons`, not both. Batched runs infer
+Use either `--comparison` or `--comparisons`, not both. If both are omitted,
+the module proceeds only when it detects exactly one complete comparison
+prefix using the canonical `_pval` and `_FC` suffixes (or `_tstat` in rank
+mode). It lists the available prefixes and stops when the choice is
+ambiguous, rather than selecting a biological contrast by column order.
+Batched runs infer
 comparison-prefixed columns automatically; do not provide fixed
 `--t_statistic_column`, `--significance_column`, or `--fold_change_column`
 overrides for a batch.
@@ -100,9 +108,12 @@ same result, provenance, and plot files listed above.
 
 ## Method notes
 
-- Supply exactly one of `--comparison` or `--comparisons`. Both identify the
-  comparison-prefixed columns to use; `--comparisons` preserves the requested
-  run order but does not pool enrichment statistics across comparisons.
+- Supply `--comparison` or `--comparisons` whenever a table contains more than
+  one comparison. Both identify the comparison-prefixed columns to use;
+  `--comparisons` preserves the requested run order but does not pool
+  enrichment statistics across comparisons. With neither control, exactly one
+  complete comparison prefix must be detectable from the canonical column
+  suffixes.
 - By default, L2P selects up- and downregulated gene lists using nominal
   p-value <= 0.05 and absolute fold change >= 1.2. This uses the inferred
   `<comparison>_pval` and `<comparison>_FC` columns when they are available.

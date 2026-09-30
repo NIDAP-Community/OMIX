@@ -1,3 +1,98 @@
+# Identify comparison prefixes that have the columns required by the selected
+# L2P gene-list method. This helper is deliberately independent of optparse and
+# deployment paths so the portable CLI and deployment adapters can use the same
+# comparison-discovery rule.
+detect_l2p_comparisons <- function(column_names, select_by_rank = FALSE) {
+  column_names <- as.character(column_names)
+
+  prefixes_for_suffix <- function(suffix) {
+    matched <- column_names[endsWith(column_names, suffix)]
+    unique(substr(matched, 1L, nchar(matched) - nchar(suffix)))
+  }
+
+  if (isTRUE(select_by_rank)) {
+    return(prefixes_for_suffix("_tstat"))
+  }
+
+  significance_prefixes <- prefixes_for_suffix("_pval")
+  fold_change_prefixes <- prefixes_for_suffix("_FC")
+
+  significance_prefixes[significance_prefixes %in% fold_change_prefixes]
+}
+
+# Resolve explicit comparison controls or, when both are blank, infer exactly
+# one complete comparison prefix from the DEG-table columns. Multiple inferred
+# candidates are never ordered or selected implicitly because their biological
+# priority cannot be determined from column position alone.
+resolve_l2p_comparisons <- function(
+  comparison = NULL,
+  comparisons = NULL,
+  column_names,
+  select_by_rank = FALSE
+) {
+  as_nonempty_list <- function(value) {
+    if (is.null(value) || length(value) == 0L || is.na(value[[1L]])) {
+      return(character())
+    }
+    values <- trimws(strsplit(as.character(value[[1L]]), ",", fixed = TRUE)[[1L]])
+    values[nzchar(values)]
+  }
+
+  single_comparison <- as_nonempty_list(comparison)
+  batch_comparisons <- as_nonempty_list(comparisons)
+
+  if (length(single_comparison) > 1L) {
+    stop("ERROR: `--comparison` accepts exactly one identifier; use --comparisons for a batch")
+  }
+  if (length(single_comparison) > 0L && length(batch_comparisons) > 0L) {
+    stop("ERROR: Supply either `--comparison` or `--comparisons`, not both")
+  }
+
+  requested <- if (length(batch_comparisons) > 0L) {
+    batch_comparisons
+  } else {
+    single_comparison
+  }
+  if (length(requested) > 0L) {
+    if (anyDuplicated(requested)) {
+      stop(
+        "ERROR: Comparison identifiers must be unique: ",
+        paste(requested, collapse = ", ")
+      )
+    }
+    return(requested)
+  }
+
+  detected <- detect_l2p_comparisons(
+    column_names = column_names,
+    select_by_rank = select_by_rank
+  )
+  if (length(detected) == 1L) {
+    message("No comparison was supplied. Using the unambiguous detected comparison: ", detected)
+    return(detected)
+  }
+  if (length(detected) == 0L) {
+    required_columns <- if (isTRUE(select_by_rank)) {
+      "a comparison-prefixed t-statistic column such as `B-A_tstat`"
+    } else {
+      paste0(
+        "matching comparison-prefixed significance and fold-change columns ",
+        "such as `B-A_pval` and `B-A_FC`"
+      )
+    }
+    stop(
+      "ERROR: No comparison was supplied and none could be detected from ",
+      required_columns, ". Supply `--comparison` or `--comparisons`."
+    )
+  }
+
+  stop(
+    "ERROR: Multiple comparison prefixes were detected: ",
+    paste(detected, collapse = ", "),
+    ". Supply `--comparison` or an ordered `--comparisons` list."
+  )
+}
+
 #' L2P Analysis for Single Comparisons [CCBR] [scRNA-seq] [Bulk]
 #'
 #' @description

@@ -25,7 +25,7 @@ parameters:
     default: null
     classification: public
     mutually_exclusive_with: comparisons
-    description: One comparison identifier used to infer matching DEG columns when explicit columns are not supplied. Supply this or `comparisons`, not both.
+    description: One comparison identifier used to infer matching DEG columns when explicit columns are not supplied. Supply this or `comparisons`, not both. When both controls are blank, the module proceeds only if exactly one complete comparison prefix can be detected from canonical `_pval` and `_FC` columns, or `_tstat` in rank mode.
   comparisons:
     required: false
     type: string
@@ -34,7 +34,7 @@ parameters:
     delimiter: ","
     preserves_order: true
     mutually_exclusive_with: comparison
-    description: Comma-separated comparison identifiers for independent batched runs in the requested order. Batched runs require comparison-prefixed DEG columns and do not accept explicit t-statistic, significance, or fold-change column overrides.
+    description: Comma-separated comparison identifiers for independent batched runs in the requested order. Batched runs require comparison-prefixed DEG columns and do not accept explicit t-statistic, significance, or fold-change column overrides. When both comparison controls are blank, the module proceeds only if exactly one complete comparison prefix can be detected from canonical `_pval` and `_FC` columns, or `_tstat` in rank mode.
   output_dir:
     type: path
     default: results
