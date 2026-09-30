@@ -10,7 +10,7 @@ Canonical snapshot: `d41b2e3b1e3a0971c4a8b0341678774675a5fbeb`
 
 Issue #42 audit base: `faf9e99b7e3cd6803cb19d87350b44a877393892`
 
-Adapters: **8**; findings: **24** (1 errors, 23 warnings).
+Adapters: **8**; findings: **21** (1 errors, 20 warnings).
 
 | Adapter | Schema controls | Internal bindings | Adapter CLI | App Panel | Managed current | Runtime digest | Errors | Warnings |
 | --- | ---: | ---: | ---: | ---: | --- | --- | ---: | ---: |
@@ -19,7 +19,7 @@ Adapters: **8**; findings: **24** (1 errors, 23 warnings).
 | OMIX-GSEA-Preranked-Legacy | 19 | 0 | 18 | 17 | yes | no | 1 | 9 |
 | OMIX-GSEA-Visualization-Legacy | 38 | 0 | 38 | 35 | yes | no | 0 | 1 |
 | OMIX-Gene-Boxplots | 22 | 2 | 21 | 21 | yes | no | 0 | 1 |
-| OMIX-L2P-Multi | 52 | 0 | 54 | 29 | yes | no | 0 | 6 |
+| OMIX-L2P-Multi | 52 | 0 | 54 | 29 | yes | no | 0 | 3 |
 | OMIX-L2P-Single | 40 | 0 | 39 | 39 | yes | no | 0 | 3 |
 | OMIX-Volcano-Plot | 40 | 3 | 41 | 39 | yes | no | 0 | 1 |
 
@@ -66,9 +66,6 @@ Inventory App Panel state: **verified**; current-parity state: **verified**; run
 
 Inventory App Panel state: **partial**; current-parity state: **verified**; runtime-provenance state: **partial**.
 
-- **WARNING `adapter_cli_extra`** `collections`: Adapter-only CLI control is not classified by the canonical contract or source-record exceptions.
-- **WARNING `adapter_cli_extra`** `deg_file`: Adapter-only CLI control is not classified by the canonical contract or source-record exceptions.
-- **WARNING `adapter_cli_extra`** `select_top_percentage`: Adapter-only CLI control is not classified by the canonical contract or source-record exceptions.
 - **WARNING `app_panel_default_mismatch`** `comparisons`: App Panel default differs from the canonical contract.
 - **WARNING `app_panel_default_mismatch`** `species`: App Panel default differs from the canonical contract.
 - **WARNING `runtime_digest_missing`**: Adapter runtime is tag-addressed; no immutable digest is recorded.

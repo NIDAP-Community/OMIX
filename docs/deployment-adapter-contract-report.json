@@ -25,9 +25,9 @@
   },
   "summary": {
     "adapter_count": 8,
-    "finding_count": 24,
+    "finding_count": 21,
     "error_count": 1,
-    "warning_count": 23
+    "warning_count": 20
   },
   "adapters": [
     {
@@ -6294,24 +6294,6 @@
         }
       ],
       "findings": [
-        {
-          "code": "adapter_cli_extra",
-          "severity": "warning",
-          "message": "Adapter-only CLI control is not classified by the canonical contract or source-record exceptions.",
-          "control": "collections"
-        },
-        {
-          "code": "adapter_cli_extra",
-          "severity": "warning",
-          "message": "Adapter-only CLI control is not classified by the canonical contract or source-record exceptions.",
-          "control": "deg_file"
-        },
-        {
-          "code": "adapter_cli_extra",
-          "severity": "warning",
-          "message": "Adapter-only CLI control is not classified by the canonical contract or source-record exceptions.",
-          "control": "select_top_percentage"
-        },
         {
           "code": "app_panel_default_mismatch",
           "severity": "warning",

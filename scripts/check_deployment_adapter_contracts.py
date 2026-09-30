@@ -629,7 +629,19 @@ def compare_controls(
         if not defaults_equal(control.default, option.default):
             add_finding(findings, "adapter_cli_default_mismatch", "warning", "Adapter CLI default differs from the canonical contract.", control.cli, control.default, option.default)
 
-    alias_values = set(aliases.values())
+    # Explicit aliases remain valid compatibility controls even after an
+    # adapter also adopts the canonical CLI name. ``infer_aliases`` only
+    # activates aliases needed to fill a missing canonical flag, so its values
+    # alone are insufficient for classifying canonical+legacy coexistence.
+    # Exclude only aliases that resolve a real canonical control and a real
+    # adapter option; malformed/stale exceptions retain their error above and
+    # are not allowed to hide an otherwise unclassified extra.
+    validated_explicit_alias_values = {
+        adapter_name
+        for canonical_name, adapter_name in exceptions["aliases"].items()
+        if canonical_name in canonical_names and adapter_name in adapter_names
+    }
+    alias_values = set(aliases.values()) | validated_explicit_alias_values
     for name in sorted(adapter_names - canonical_names - alias_values - binding_names):
         add_finding(findings, "adapter_cli_extra", "warning", "Adapter-only CLI control is not classified by the canonical contract or source-record exceptions.", name)
 
