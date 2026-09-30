@@ -81,6 +81,20 @@ class ContractComparisonTests(unittest.TestCase):
         self.assertEqual("input_file", aliases["input"])
         self.assertNotIn("undocumented_alias_candidate", [item["code"] for item in findings])
 
+    def test_explicit_legacy_alias_is_not_extra_when_canonical_cli_coexists(self):
+        value = json.loads(json.dumps(self.cases["exact"]))
+        value["adapter_cli"].append(
+            {"name": "legacy_mode", "type": "character", "default": "auto"}
+        )
+        self.cases["canonical_with_legacy_alias"] = value
+        findings, aliases, candidates = self.compare(
+            "canonical_with_legacy_alias",
+            {"aliases": {"mode": "legacy_mode"}, "hidden_inputs": {}},
+        )
+        self.assertEqual({}, aliases)
+        self.assertEqual([], candidates)
+        self.assertEqual([], findings)
+
     def test_documented_hidden_input_is_not_reported_missing(self):
         value = self.cases["hidden"]
         exceptions = MODULE.parse_source_record_exceptions(value["source_record"])
