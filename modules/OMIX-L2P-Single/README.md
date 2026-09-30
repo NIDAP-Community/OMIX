@@ -26,6 +26,9 @@ ranked, all-gene pathway analysis, use
 
 Choose one comparison, or an ordered batch of comparisons, from a compatible
 DEG table, then use the copyable command in [Run locally or on HPC](#run-locally-or-on-hpc).
+If the table contains exactly one complete comparison prefix using the
+configured suffixes (by default `_pval` and `_FC`), the comparison argument
+may be omitted and that prefix is selected automatically.
 
 ## Inputs
 
@@ -44,6 +47,14 @@ Treatment-Control_adjpval, Treatment-Control_FC
 The automatic detection can be overridden with explicit gene, ranking,
 significance, and fold-change column arguments when the input uses another
 naming convention.
+
+For repeated alternative suffixes, set `--t_statistic_suffix`,
+`--significance_suffix`, or `--fold_change_suffix`. For example, a threshold
+run using `B-A_adjpval` and `B-A_logFC` can use
+`--significance_suffix _adjpval --fold_change_suffix _logFC`. The same suffix
+settings apply consistently across every comparison in a batched run. Exact
+column overrides remain available for a single comparison and take precedence
+over suffix settings.
 
 ## Run locally or on HPC
 
@@ -81,7 +92,12 @@ Rscript "$OMIX_ROOT/modules/OMIX-L2P-Single/scripts/run_l2p_single.R" \
   --output_dir results/l2p-single-batch
 ```
 
-Use either `--comparison` or `--comparisons`, not both. Batched runs infer
+Use either `--comparison` or `--comparisons`, not both. If both are omitted,
+the module proceeds only when it detects exactly one complete comparison
+prefix using the canonical `_pval` and `_FC` suffixes (or `_tstat` in rank
+mode). It lists the available prefixes and stops when the choice is
+ambiguous, rather than selecting a biological contrast by column order.
+Batched runs infer
 comparison-prefixed columns automatically; do not provide fixed
 `--t_statistic_column`, `--significance_column`, or `--fold_change_column`
 overrides for a batch.
@@ -100,9 +116,12 @@ same result, provenance, and plot files listed above.
 
 ## Method notes
 
-- Supply exactly one of `--comparison` or `--comparisons`. Both identify the
-  comparison-prefixed columns to use; `--comparisons` preserves the requested
-  run order but does not pool enrichment statistics across comparisons.
+- Supply `--comparison` or `--comparisons` whenever a table contains more than
+  one comparison. Both identify the comparison-prefixed columns to use;
+  `--comparisons` preserves the requested run order but does not pool
+  enrichment statistics across comparisons. With neither control, exactly one
+  complete comparison prefix must be detectable from the canonical column
+  suffixes.
 - By default, L2P selects up- and downregulated gene lists using nominal
   p-value <= 0.05 and absolute fold change >= 1.2. This uses the inferred
   `<comparison>_pval` and `<comparison>_FC` columns when they are available.
@@ -113,6 +132,9 @@ same result, provenance, and plot files listed above.
 - The summary plot displays up to 20 top pathways per regulated direction by
   default. Use `--number_of_pathways_to_plot` to choose another per-direction
   limit.
+- Comparison-column suffixes default to `_tstat`, `_pval`, and `_FC`.
+  Alternative suffixes are explicit settings; the module does not silently
+  substitute adjusted p-values for nominal p-values.
 - The pathway database and annotation behavior are supplied by the locked
   `r-pathway` runtime. Record the runtime lockfile, module commit, and input
   table provenance with any scientific result.

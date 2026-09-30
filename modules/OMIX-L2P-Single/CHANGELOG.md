@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Add advanced comparison-column suffix controls for ranking, significance,
+  and fold change. They support deterministic automatic detection and ordered
+  batches with nonstandard but consistent suffixes, while exact column
+  overrides retain precedence for single-comparison runs.
+- Fix blank comparison handling by automatically selecting exactly one
+  complete comparison prefix from the DEG table. Inputs with several valid
+  prefixes now stop with an actionable list rather than selecting one
+  implicitly. Explicit single and ordered batched comparison controls are
+  unchanged.
 - Standardize machine-readable control metadata on the project-wide
   `classification` key without changing CLI behavior, defaults, outputs, or
   interface version.

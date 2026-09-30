@@ -95,7 +95,8 @@ expected_classification <- list(
   ),
   advanced = c(
     "custom_pathways", "gene_names_column", "t_statistic_column",
-    "significance_column", "fold_change_column",
+    "significance_column", "fold_change_column", "t_statistic_suffix",
+    "significance_suffix", "fold_change_suffix",
     "select_top_percentage_of_genes", "select_top_genes",
     "minimum_number_of_deg_genes", "minimum_pathway_hit_count",
     "p_value_threshold_for_output", "use_built_in_gene_universe",
