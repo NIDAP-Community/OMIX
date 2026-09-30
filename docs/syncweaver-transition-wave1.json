@@ -1,0 +1,254 @@
+{
+  "schema_version": "1.0.0",
+  "contract_kind": "omix-syncweaver-transition-preparation",
+  "status": "preparation_only",
+  "work_item": "https://github.com/NIDAP-Community/OMIX/issues/44",
+  "canonical_repository": "https://github.com/NIDAP-Community/OMIX",
+  "preparation_commit": "eee4433cd74d0ce9bd1daba1571ca6312cba7ea2",
+  "policy": {
+    "scientific_flow": "canonical_to_adapter_only",
+    "scientific_authority": "canonical_commit_and_sha256",
+    "conflict_resolution": "stop_and_review",
+    "timestamp_resolution_allowed": false,
+    "all_unlisted_adapter_paths_protected": true,
+    "automation_metadata_paths": [
+      ".syncweaver-lock.json"
+    ],
+    "stop_conditions": [
+      {
+        "id": "dirty_worktree",
+        "description": "Stop before planning or writing when either checkout has tracked or untracked changes. Preserve the diff; do not stash, reset, or overwrite it automatically."
+      },
+      {
+        "id": "unexpected_head",
+        "description": "Stop when the canonical or adapter checkout is not at the exact commit declared for the proposal. Refresh the proposal from reviewed repository state."
+      },
+      {
+        "id": "divergent_history",
+        "description": "Stop when the adapter target branch is not a descendant of the recorded adapter baseline or when the canonical source is not reachable from the reviewed canonical history."
+      },
+      {
+        "id": "host_scientific_edit",
+        "description": "Stop when a managed destination hash differs from both its recorded adapter baseline and the declared canonical source hash. Report the byte diff for review; never choose a version by modification time."
+      },
+      {
+        "id": "managed_tree_mismatch",
+        "description": "Stop when the complete canonical R tree or adapter code/functions tree contains an unlisted, missing, renamed, or symlinked scientific file. The mapping must be reviewed as a complete tree before synchronization."
+      },
+      {
+        "id": "source_record_disagreement",
+        "description": "Stop when OMIX_MODULE_SOURCE.md disagrees with the declared canonical commit, module version, interface version, path mapping, or SHA-256 evidence."
+      },
+      {
+        "id": "protected_path_change",
+        "description": "Stop when a proposal changes any adapter path other than an allowlisted scientific destination or the documented automation metadata path."
+      },
+      {
+        "id": "validation_failure",
+        "description": "Stop when any required canonical, mapping, contract, adapter, or representative-fixture check fails."
+      }
+    ],
+    "required_pre_sync_checks": [
+      "clean_worktrees",
+      "exact_commits",
+      "non_divergent_history",
+      "module_and_interface_versions",
+      "complete_source_and_destination_trees",
+      "baseline_sha256_parity",
+      "source_record_consistency",
+      "canonical_module_tests",
+      "adapter_contract_and_fixture_tests"
+    ],
+    "required_post_sync_checks": [
+      "proposed_sha256_parity",
+      "managed_tree_completeness",
+      "protected_paths_unchanged",
+      "source_record_and_generated_lock_consistency",
+      "canonical_module_tests",
+      "adapter_contract_and_fixture_tests",
+      "omix_contract_checker",
+      "beacon_independent_parity_review"
+    ],
+    "external_release_gates": [
+      "code_ocean_validation",
+      "immutable_runtime_digest",
+      "explicit_release_approval"
+    ]
+  },
+  "adapters": [
+    {
+      "id": "OMIX-DEG-Analysis",
+      "canonical": {
+        "module_path": "modules/OMIX-DEG-Analysis",
+        "module_version": "0.4.0",
+        "interface_version": 2,
+        "source_commit": "018ef0e10bf29c69166b38ee6d81d4d71d18aeca",
+        "source_root": "modules/OMIX-DEG-Analysis/R",
+        "schema_path": "modules/OMIX-DEG-Analysis/schemas/interface.yml"
+      },
+      "adapter": {
+        "repository": "https://github.com/NIDAP-Community/OMIX-DEG-Analysis",
+        "default_branch": "main",
+        "baseline_commit": "3f8052a6c13d51bac9bef20b418183d801d62cac",
+        "source_record_path": "OMIX_MODULE_SOURCE.md",
+        "managed_destination_root": "code/functions",
+        "generated_lock_path": ".syncweaver-lock.json"
+      },
+      "mappings": [
+        {
+          "source_path": "modules/OMIX-DEG-Analysis/R/OMIX_DEG_Analysis.R",
+          "destination_path": "code/functions/OMIX_DEG_Analysis.R",
+          "source_sha256": "e0e64e4de04b91419c77d1d44ac607f62fa172bc1b99fd0936ebb3e6ae8eb13e",
+          "expected_destination_sha256": "e0e64e4de04b91419c77d1d44ac607f62fa172bc1b99fd0936ebb3e6ae8eb13e"
+        }
+      ],
+      "platform_owned_exclusion_paths": [
+        ".codeocean/**",
+        ".github/**",
+        ".gitignore",
+        "AGENTS.md",
+        "CHANGELOG.md",
+        "OMIX_MODULE_SOURCE.md",
+        "README.md",
+        "code/adapter/**",
+        "code/main.R",
+        "code/run",
+        "container/**",
+        "docs/**",
+        "environment/**",
+        "metadata/**",
+        "tests/**"
+      ],
+      "test_commands": {
+        "canonical": [
+          "Rscript modules/OMIX-DEG-Analysis/tests/test-omix-deg-analysis.R",
+          "Rscript modules/OMIX-DEG-Analysis/tests/test-interface-contract.R",
+          "Rscript tests/test-monorepo-layout.R"
+        ],
+        "adapter": [
+          "python3 tests/test-source-parity.py",
+          "python3 tests/test-app-panel.py",
+          "Rscript tests/test-adapter-inputs.R",
+          "Rscript tests/test-omix-deg-analysis.R",
+          "Rscript tests/test-adapter-cli.R"
+        ]
+      }
+    },
+    {
+      "id": "OMIX-Volcano-Plot",
+      "canonical": {
+        "module_path": "modules/OMIX-Volcano-Plot",
+        "module_version": "1.0.0",
+        "interface_version": 1,
+        "source_commit": "eee4433cd74d0ce9bd1daba1571ca6312cba7ea2",
+        "source_root": "modules/OMIX-Volcano-Plot/R",
+        "schema_path": "modules/OMIX-Volcano-Plot/schemas/interface.yml"
+      },
+      "adapter": {
+        "repository": "https://github.com/NIDAP-Community/OMIX-Volcano-Plot",
+        "default_branch": "main",
+        "baseline_commit": "8a54215e741565a01b2afa36808ff8558e4c7af5",
+        "source_record_path": "OMIX_MODULE_SOURCE.md",
+        "managed_destination_root": "code/functions",
+        "generated_lock_path": ".syncweaver-lock.json"
+      },
+      "mappings": [
+        {
+          "source_path": "modules/OMIX-Volcano-Plot/R/Volcano_Plot_Enhanced.R",
+          "destination_path": "code/functions/Volcano_Plot_Enhanced.R",
+          "source_sha256": "75df94195458c63130edaab5a2ee0a90c88ca9aa859591c6810d3eec5948673b",
+          "expected_destination_sha256": "75df94195458c63130edaab5a2ee0a90c88ca9aa859591c6810d3eec5948673b"
+        }
+      ],
+      "platform_owned_exclusion_paths": [
+        ".codeocean/**",
+        ".github/**",
+        ".gitignore",
+        "AGENTS.md",
+        "CHANGELOG.md",
+        "OMIX_MODULE_SOURCE.md",
+        "README.md",
+        "code/adapter/**",
+        "code/main.R",
+        "code/run",
+        "container/**",
+        "docs/**",
+        "environment/**",
+        "metadata/**",
+        "tests/**"
+      ],
+      "test_commands": {
+        "canonical": [
+          "Rscript modules/OMIX-Volcano-Plot/tests/test-interface-contract.R",
+          "Rscript modules/OMIX-Volcano-Plot/tests/test-module-layout.R",
+          "Rscript tests/test-monorepo-layout.R"
+        ],
+        "adapter": [
+          "python3 tests/test-source-parity.py",
+          "python3 tests/test-app-panel.py",
+          "Rscript tests/test-workflow-input.R",
+          "Rscript tests/test-adapter-cli.R"
+        ]
+      }
+    },
+    {
+      "id": "OMIX-GSEA-Filters-Legacy",
+      "canonical": {
+        "module_path": "modules/OMIX-GSEA-Filters-Legacy",
+        "module_version": "1.0.0",
+        "interface_version": 1,
+        "source_commit": "eee4433cd74d0ce9bd1daba1571ca6312cba7ea2",
+        "source_root": "modules/OMIX-GSEA-Filters-Legacy/R",
+        "schema_path": "modules/OMIX-GSEA-Filters-Legacy/schemas/interface.yml"
+      },
+      "adapter": {
+        "repository": "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy",
+        "default_branch": "master",
+        "baseline_commit": "01aeefbee65362f4ed35182193c8feb640b5b4f0",
+        "source_record_path": "OMIX_MODULE_SOURCE.md",
+        "managed_destination_root": "code/functions",
+        "generated_lock_path": ".syncweaver-lock.json"
+      },
+      "mappings": [
+        {
+          "source_path": "modules/OMIX-GSEA-Filters-Legacy/R/filter_gsea_function.R",
+          "destination_path": "code/functions/filter_gsea_function.R",
+          "source_sha256": "981aa772884f41931b3a64b1a67ddca455ae7b56b746b5472bc27505bfc31c2e",
+          "expected_destination_sha256": "981aa772884f41931b3a64b1a67ddca455ae7b56b746b5472bc27505bfc31c2e"
+        }
+      ],
+      "platform_owned_exclusion_paths": [
+        ".codeocean/**",
+        ".github/**",
+        ".gitignore",
+        "AGENTS.md",
+        "CHANGELOG.md",
+        "OMIX_MODULE_SOURCE.md",
+        "README.md",
+        "code/CHANGELOG.md",
+        "code/README.md",
+        "code/adapter_io.R",
+        "code/main.R",
+        "code/run",
+        "container/**",
+        "docs/**",
+        "environment/**",
+        "metadata/**",
+        "tests/**"
+      ],
+      "test_commands": {
+        "canonical": [
+          "Rscript modules/OMIX-GSEA-Filters-Legacy/tests/test-interface-contract.R",
+          "Rscript modules/OMIX-GSEA-Filters-Legacy/tests/test-module-layout.R",
+          "Rscript tests/test-monorepo-layout.R"
+        ],
+        "adapter": [
+          "python3 tests/check_adapter_contract.py",
+          "python3 -m unittest discover -s tests -p 'test_*.py'",
+          "Rscript tests/test_adapter_io.R",
+          "Rscript tests/test_scientific_fixture.R"
+        ]
+      }
+    }
+  ]
+}

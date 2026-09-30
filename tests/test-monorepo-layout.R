@@ -15,7 +15,10 @@ required_root_paths <- c(
   "docs/module-contract.md",
   "docs/versioning-and-releases.md",
   "docs/release-automation-contract.md",
+  "docs/syncweaver-transition-contract.md",
   "docs/schemas/release-request.schema.json",
+  "docs/schemas/syncweaver-transition-contract.schema.json",
+  "docs/syncweaver-transition-wave1.json",
   "templates/release-automation/release-request.json"
 )
 
