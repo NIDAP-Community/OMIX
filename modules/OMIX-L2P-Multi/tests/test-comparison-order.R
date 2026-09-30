@@ -41,7 +41,11 @@ l2p <- function(a, ...) {
   )
 }
 
-make_deg_table <- function() {
+make_deg_table <- function(
+  t_statistic_suffix = "_tstat",
+  significance_suffix = "_pval",
+  fold_change_suffix = "_FC"
+) {
   rows <- unlist(lapply(requested_comparisons, function(comparison) {
     c(
       paste0(comparison, "_UP_", seq_len(6L)),
@@ -53,17 +57,17 @@ make_deg_table <- function() {
   for (comparison in requested_comparisons) {
     is_up <- grepl(paste0("^", comparison, "_UP_"), deg$GeneName)
     is_down <- grepl(paste0("^", comparison, "_DOWN_"), deg$GeneName)
-    deg[[paste0(comparison, "_tstat")]] <- ifelse(
+    deg[[paste0(comparison, t_statistic_suffix)]] <- ifelse(
       is_up,
       10,
       ifelse(is_down, -10, 0)
     )
-    deg[[paste0(comparison, "_pval")]] <- ifelse(
+    deg[[paste0(comparison, significance_suffix)]] <- ifelse(
       is_up | is_down,
       0.001,
       1
     )
-    deg[[paste0(comparison, "_FC")]] <- ifelse(
+    deg[[paste0(comparison, fold_change_suffix)]] <- ifelse(
       is_up,
       2,
       ifelse(is_down, -2, 0)
@@ -88,7 +92,13 @@ assert_requested_order <- function(results, csv_file) {
   stopifnot(identical(serialized$pval, results$pval))
 }
 
-run_case <- function(select_by_rank) {
+run_case <- function(
+  select_by_rank,
+  t_statistic_suffix = "_tstat",
+  significance_suffix = "_pval",
+  fold_change_suffix = "_FC",
+  exact_column_overrides = FALSE
+) {
   output_file <- tempfile(fileext = ".csv")
   on.exit({
     unlink(output_file)
@@ -96,8 +106,30 @@ run_case <- function(select_by_rank) {
   }, add = TRUE)
 
   results <- suppressWarnings(l2p_multi(
-    deg_table = make_deg_table(),
+    deg_table = make_deg_table(
+      t_statistic_suffix = t_statistic_suffix,
+      significance_suffix = significance_suffix,
+      fold_change_suffix = fold_change_suffix
+    ),
     comparisons = requested_comparisons,
+    t_statistic_columns = if (exact_column_overrides) {
+      paste0(requested_comparisons, t_statistic_suffix)
+    } else {
+      NULL
+    },
+    significance_columns = if (exact_column_overrides) {
+      paste0(requested_comparisons, significance_suffix)
+    } else {
+      NULL
+    },
+    fold_change_columns = if (exact_column_overrides) {
+      paste0(requested_comparisons, fold_change_suffix)
+    } else {
+      NULL
+    },
+    t_statistic_suffix = if (exact_column_overrides) "_unused_rank" else t_statistic_suffix,
+    significance_suffix = if (exact_column_overrides) "_unused_significance" else significance_suffix,
+    fold_change_suffix = if (exact_column_overrides) "_unused_fold_change" else fold_change_suffix,
     gene_names_column = "GeneName",
     species = "Human",
     update_genes = FALSE,
@@ -118,5 +150,31 @@ run_case <- function(select_by_rank) {
 
 run_case(select_by_rank = FALSE)
 run_case(select_by_rank = TRUE)
+run_case(
+  select_by_rank = FALSE,
+  t_statistic_suffix = "_statistic",
+  significance_suffix = "_adjpval",
+  fold_change_suffix = "_logFC"
+)
+run_case(
+  select_by_rank = TRUE,
+  t_statistic_suffix = "_statistic",
+  significance_suffix = "_adjpval",
+  fold_change_suffix = "_logFC"
+)
+run_case(
+  select_by_rank = FALSE,
+  t_statistic_suffix = "_statistic",
+  significance_suffix = "_adjpval",
+  fold_change_suffix = "_logFC",
+  exact_column_overrides = TRUE
+)
+run_case(
+  select_by_rank = TRUE,
+  t_statistic_suffix = "_statistic",
+  significance_suffix = "_adjpval",
+  fold_change_suffix = "_logFC",
+  exact_column_overrides = TRUE
+)
 
 message("OMIX-L2P-Multi comparison-order checks passed")

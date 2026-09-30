@@ -40,6 +40,13 @@ The module uses the comma-separated `--comparisons` value to resolve these
 columns. Use explicit column-list arguments if a legacy or custom export does
 not follow the conventional comparison-prefix pattern.
 
+For a consistent alternative naming convention, set
+`--t_statistic_suffix`, `--significance_suffix`, or
+`--fold_change_suffix`. For example,
+`--significance_suffix _adjpval --fold_change_suffix _logFC` resolves those
+suffixes for every comparison in the requested order. Exact ordered column
+lists retain precedence over suffix settings.
+
 ## Run locally or on HPC
 
 Set `OMIX_ROOT` to the OMIX checkout, then prepare a writable runtime project:
@@ -80,6 +87,10 @@ Rscript "$OMIX_ROOT/modules/OMIX-L2P-Multi/scripts/run_l2p_multi.R" \
   the DEG column prefixes and in the desired analysis and shared bubble-plot
   and result-table order. For example, `B-A,C-A,C-B` requires matching
   `C-B_*` columns; it does not invert an available `B-C_*` result.
+- Comparison-column suffixes default to `_tstat`, `_pval`, and `_FC`.
+  Alternative suffixes are explicit settings and apply uniformly across the
+  ordered comparison list. The module does not infer comparison order from
+  column position.
 - By default, each comparison's up- and downregulated gene lists use nominal
   p-value <= 0.05 and absolute fold change >= 1.2. This uses the inferred
   `<comparison>_pval` and `<comparison>_FC` columns when they are available.

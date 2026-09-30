@@ -124,6 +124,15 @@ order_l2p_multi_results <- function(results, comparison_levels) {
 #' change, fold change threshold (below) is still applied as fold change, i.e.
 #' if selecting a 2 fold-change threshold, this will be equivalent to 1 log
 #' fold-change.
+#' @param t_statistic_suffix
+#' Character. Suffix appended to each comparison when
+#' \code{t_statistic_columns} is omitted. Default: \code{_tstat}.
+#' @param significance_suffix
+#' Character. Suffix appended to each comparison when
+#' \code{significance_columns} is omitted. Default: \code{_pval}.
+#' @param fold_change_suffix
+#' Character. Suffix appended to each comparison when
+#' \code{fold_change_columns} is omitted. Default: \code{_FC}.
 #' @param species
 #' Character. One of ['Human', 'Mouse', 'Macaque', 'Rat', 'Zebrafish',
 #' 'Rabbit', 'Drosophila']. If other organism than human is selected, gene
@@ -314,6 +323,9 @@ l2p_multi <- function(
   t_statistic_columns = NULL,
   significance_columns = NULL,
   fold_change_columns = NULL,
+  t_statistic_suffix = "_tstat",
+  significance_suffix = "_pval",
+  fold_change_suffix = "_FC",
   comparisons = NULL,
   species = "Human",
   update_genes = TRUE,
@@ -451,6 +463,30 @@ l2p_multi <- function(
     }
 
     trimws(x)
+  }
+
+  required_suffix <- function(x, arg_name) {
+    if (
+      !is.character(x) || length(x) != 1L || is.na(x) ||
+        !nzchar(trimws(x))
+    ) {
+      stop(sprintf("ERROR: `%s` must be one non-empty suffix.", arg_name))
+    }
+    trimws(x)
+  }
+
+  strip_column_suffix <- function(columns, configured_suffix, known_pattern) {
+    stripped <- vapply(columns, function(column) {
+      if (endsWith(column, configured_suffix)) {
+        return(substr(
+          column,
+          1L,
+          nchar(column) - nchar(configured_suffix)
+        ))
+      }
+      column
+    }, character(1))
+    unname(gsub(known_pattern, "", stripped))
   }
 
   is_log_fold_change_column <- function(x) {
@@ -715,6 +751,18 @@ l2p_multi <- function(
   check_gene_species_case(deg_table, gene_names_column, species)
 
   comparisons <- optional_vector(comparisons, "comparisons")
+  t_statistic_suffix <- required_suffix(
+    t_statistic_suffix,
+    "t_statistic_suffix"
+  )
+  significance_suffix <- required_suffix(
+    significance_suffix,
+    "significance_suffix"
+  )
+  fold_change_suffix <- required_suffix(
+    fold_change_suffix,
+    "fold_change_suffix"
+  )
   t_statistic_columns <- optional_vector(
     t_statistic_columns,
     "t_statistic_columns"
@@ -755,13 +803,13 @@ l2p_multi <- function(
     }
 
     if (is.null(t_statistic_columns)) {
-      t_statistic_columns <- paste0(comparisons, "_tstat")
+      t_statistic_columns <- paste0(comparisons, t_statistic_suffix)
     }
     if (is.null(significance_columns)) {
-      significance_columns <- paste0(comparisons, "_pval")
+      significance_columns <- paste0(comparisons, significance_suffix)
     }
     if (is.null(fold_change_columns)) {
-      fold_change_columns <- paste0(comparisons, "_FC")
+      fold_change_columns <- paste0(comparisons, fold_change_suffix)
     }
   }
 
@@ -782,12 +830,20 @@ l2p_multi <- function(
       ))
     }
 
-    groups_for_reporting <- gsub("_tstat", "", t_statistic_columns)
+    groups_for_reporting <- if (!is.null(comparisons)) {
+      comparisons
+    } else {
+      strip_column_suffix(
+        t_statistic_columns,
+        t_statistic_suffix,
+        "_tstat$"
+      )
+    }
     if (is.null(fold_change_columns)) {
-      fold_change_columns <- paste0(groups_for_reporting, "_FC")
+      fold_change_columns <- paste0(groups_for_reporting, fold_change_suffix)
     }
     if (is.null(significance_columns)) {
-      significance_columns <- paste0(groups_for_reporting, "_pval")
+      significance_columns <- paste0(groups_for_reporting, significance_suffix)
     }
 
     missing_companion_columns <- setdiff(
@@ -835,15 +891,15 @@ l2p_multi <- function(
       )
     }
 
-    FCgroups <- gsub(
-      "_FC|_logFC|_log2FC|avg_logFC_|avg_log2FC_",
-      "",
-      fold_change_columns
+    FCgroups <- strip_column_suffix(
+      fold_change_columns,
+      fold_change_suffix,
+      "_FC$|_logFC$|_log2FC$|avg_logFC_$|avg_log2FC_$"
     )
-    pvalgroups <- gsub(
-      "_pval|_adjpval|p_val_|p_val_adj_",
-      "",
-      significance_columns
+    pvalgroups <- strip_column_suffix(
+      significance_columns,
+      significance_suffix,
+      "_pval$|_adjpval$|p_val_$|p_val_adj_$"
     )
     if (!identical(FCgroups, pvalgroups)) {
       stop(
@@ -997,6 +1053,9 @@ l2p_multi <- function(
     analysis_rank_columns = collapse_for_provenance(t_statistic_columns),
     analysis_significance_columns = collapse_for_provenance(significance_columns),
     analysis_fold_change_columns = collapse_for_provenance(fold_change_columns),
+    analysis_t_statistic_suffix = t_statistic_suffix,
+    analysis_significance_suffix = significance_suffix,
+    analysis_fold_change_suffix = fold_change_suffix,
     analysis_collections_to_include = collapse_for_provenance(
       collections_to_include
     ),
@@ -1226,7 +1285,15 @@ l2p_multi <- function(
 
   if (select_by_rank == TRUE) {
     compnum <- length(t_statistic_columns)
-    groups <- gsub("_tstat", "", t_statistic_columns)
+    groups <- if (!is.null(comparisons)) {
+      comparisons
+    } else {
+      strip_column_suffix(
+        t_statistic_columns,
+        t_statistic_suffix,
+        "_tstat$"
+      )
+    }
     for (i in 1:compnum) {
       deg_table %>%
         dplyr::select(
@@ -1255,11 +1322,15 @@ l2p_multi <- function(
   } else {
     compnum <- length(fold_change_columns)
     if (sum(is_log_fold_change_column(fold_change_columns)) == compnum) {
-      groups <- gsub(
-        "_logFC|_log2FC|avg_logFC_|avg_log2FC_",
-        "",
-        fold_change_columns
-      )
+      groups <- if (!is.null(comparisons)) {
+        comparisons
+      } else {
+        strip_column_suffix(
+          fold_change_columns,
+          fold_change_suffix,
+          "_logFC$|_log2FC$|avg_logFC_$|avg_log2FC_$"
+        )
+      }
       for (i in 1:compnum) {
         deg_table %>%
           dplyr::select(
@@ -1287,7 +1358,11 @@ l2p_multi <- function(
         genelists[[i]] <- list(lists[[1]], lists[[2]])
       }
     } else {
-      groups <- gsub("_FC", "", fold_change_columns)
+      groups <- if (!is.null(comparisons)) {
+        comparisons
+      } else {
+        strip_column_suffix(fold_change_columns, fold_change_suffix, "_FC$")
+      }
       for (i in 1:compnum) {
         deg_table %>%
           dplyr::select(
@@ -1625,13 +1700,25 @@ l2p_multi <- function(
   pathall <- build_pathall(path.select)
 
   if (select_by_rank == TRUE) {
-    grouplevel <- gsub("_tstat", "", t_statistic_columns)
+    grouplevel <- if (!is.null(comparisons)) {
+      comparisons
+    } else {
+      strip_column_suffix(
+        t_statistic_columns,
+        t_statistic_suffix,
+        "_tstat$"
+      )
+    }
   } else {
-    grouplevel <- gsub(
-      "_FC|_logFC|_log2FC|avg_logFC_|avg_log2FC_",
-      "",
-      fold_change_columns
-    )
+    grouplevel <- if (!is.null(comparisons)) {
+      comparisons
+    } else {
+      strip_column_suffix(
+        fold_change_columns,
+        fold_change_suffix,
+        "_FC$|_logFC$|_log2FC$|avg_logFC_$|avg_log2FC_$"
+      )
+    }
   }
   pathall %>% dplyr::filter(!pathway_name %in% pathways_to_remove) -> pathall
   pathall <- order_l2p_multi_results(pathall, grouplevel)
