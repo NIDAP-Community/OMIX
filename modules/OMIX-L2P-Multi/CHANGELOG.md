@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add advanced comparison-column suffix controls for ranking, significance,
+  and fold change. They apply consistently across the required ordered
+  comparison list, while exact ordered column-list overrides retain
+  precedence.
 - Preserve the requested comparison grouping in returned and CSV-exported
   result rows while retaining the existing within-comparison p-value ranking.
 - Standardize machine-readable control metadata on the project-wide

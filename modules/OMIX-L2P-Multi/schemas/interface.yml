@@ -60,6 +60,21 @@ parameters:
     preserves_order: true
     aligned_with: comparisons
     description: Ordered linear- or log-fold-change columns corresponding one-to-one with `comparisons`; inferred when omitted.
+  t_statistic_suffix:
+    type: string
+    default: _tstat
+    classification: advanced
+    description: Suffix appended to each ordered comparison when `t_statistic_columns` is omitted. An exact ordered column list takes precedence.
+  significance_suffix:
+    type: string
+    default: _pval
+    classification: advanced
+    description: Suffix appended to each ordered comparison when `significance_columns` is omitted. An exact ordered column list takes precedence.
+  fold_change_suffix:
+    type: string
+    default: _FC
+    classification: advanced
+    description: Suffix appended to each ordered comparison when `fold_change_columns` is omitted. An exact ordered column list takes precedence.
   species:
     type: string
     default: Human
