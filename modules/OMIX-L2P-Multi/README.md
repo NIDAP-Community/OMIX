@@ -67,7 +67,7 @@ Rscript "$OMIX_ROOT/modules/OMIX-L2P-Multi/scripts/run_l2p_multi.R" \
 
 | File | Contents |
 | --- | --- |
-| `l2p_multi_results.csv` | All pathways significant in at least `--number_of_significant_events` comparisons, with their available comparison-level enrichment values. |
+| `l2p_multi_results.csv` | All pathways significant in at least `--number_of_significant_events` comparisons, grouped in the requested `--comparisons` order and ranked by p-value within each comparison. |
 | `l2p_multi_results_provenance.csv` | Resolved input columns and analysis provenance for every comparison. |
 | `L2P-Multi-Pathway-Bubble_combined_pathways.png` | Shared combined-pathway bubble plot showing the top selected pathways regardless of source collection. |
 | `L2P-Multi-Pathway-Bubble_across_collections.png` | Shared faceted bubble plot showing the top selected pathways across source collections, with one panel per collection. |
@@ -78,8 +78,8 @@ Rscript "$OMIX_ROOT/modules/OMIX-L2P-Multi/scripts/run_l2p_multi.R" \
 
 - `--comparisons` is required; list comparison names exactly as they occur in
   the DEG column prefixes and in the desired analysis and shared bubble-plot
-  order. For example, `B-A,C-A,C-B` requires matching `C-B_*` columns; it does
-  not invert an available `B-C_*` result.
+  and result-table order. For example, `B-A,C-A,C-B` requires matching
+  `C-B_*` columns; it does not invert an available `B-C_*` result.
 - By default, each comparison's up- and downregulated gene lists use nominal
   p-value <= 0.05 and absolute fold change >= 1.2. This uses the inferred
   `<comparison>_pval` and `<comparison>_FC` columns when they are available.
