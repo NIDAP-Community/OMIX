@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "work_item": "https://github.com/NIDAP-Community/OMIX/issues/42",
-  "audit_base_commit": "faf9e99cf8f3f14401d3aa8887d062d1108caf6a",
+  "audit_base_commit": "faf9e99b7e3cd6803cb19d87350b44a877393892",
   "inventory_snapshot": {
     "date": "2026-09-30",
     "canonical_repository": "NIDAP-Community/OMIX",
     "canonical_repository_url": "https://github.com/NIDAP-Community/OMIX",
-    "canonical_repository_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
+    "canonical_repository_commit": "d41b2e3b1e3a0971c4a8b0341678774675a5fbeb",
     "work_item": "https://github.com/NIDAP-Community/OMIX/issues/45",
     "policy": "docs/deployment-adapter-guide.md",
-    "note": "Evidence-based inventory of adapters registered in canonical module.yml files. This refresh records the reviewed default-branch candidates for DEG Analysis, Volcano Plot, and GSEA Filters under issue #45; the canonical schema snapshot remains unchanged. Pending and unknown values are not release claims, and GitHub evidence is not Code Ocean validation."
+    "note": "Evidence-based inventory of adapters registered in canonical module.yml files. This refresh records six reviewed deployment default branches (DEG Analysis, Volcano Plot, GSEA Filters, L2P Single, GSEA Visualization, and Gene Boxplots) against the current canonical snapshot. L2P Multi remains pinned to its reviewed 4.0.0 export while canonical 4.0.1 awaits deployment re-export; GSEA Preranked remains deferred. Pending and unknown values are not release claims, and a published GHCR digest is not Code Ocean runtime identity."
   },
   "policy": {
     "status_vocabulary": [
@@ -25,31 +25,31 @@
   },
   "summary": {
     "adapter_count": 8,
-    "finding_count": 82,
-    "error_count": 15,
-    "warning_count": 67
+    "finding_count": 35,
+    "error_count": 5,
+    "warning_count": 30
   },
   "adapters": [
     {
       "id": "OMIX-DEG-Analysis",
       "repository": "https://github.com/NIDAP-Community/OMIX-DEG-Analysis",
-      "canonical_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
-      "adapter_commit": "3f8052a6c13d51bac9bef20b418183d801d62cac",
+      "canonical_commit": "d41b2e3b1e3a0971c4a8b0341678774675a5fbeb",
+      "adapter_commit": "015b5c292b4c8cca454ffab63c1b012291881fda",
       "inventory_states": {
         "schema_completeness": {
           "status": "verified",
           "note": "Merged PR #32 records the complete interface-2 contract: 21 CLI controls comprising 20 public/advanced inputs and parameters plus internal output_dir.",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX/pull/32",
-            "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-DEG-Analysis/schemas/interface.yml"
+            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-DEG-Analysis/schemas/interface.yml"
           ]
         },
         "scientific_export.recorded_parity": {
           "status": "verified",
           "note": "Independent review of PR #1 confirms the complete managed export is byte-identical to canonical module 0.4.0/interface 2 at the recorded source commit.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/OMIX_MODULE_SOURCE.md",
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/code/functions/OMIX_DEG_Analysis.R",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/015b5c292b4c8cca454ffab63c1b012291881fda/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/015b5c292b4c8cca454ffab63c1b012291881fda/code/functions/OMIX_DEG_Analysis.R",
             "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1"
           ]
         },
@@ -58,15 +58,15 @@
           "note": "The merged default-branch export matches both its recorded source and the current canonical scientific file.",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1",
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/code/functions/OMIX_DEG_Analysis.R",
-            "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-DEG-Analysis/R/OMIX_DEG_Analysis.R"
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/015b5c292b4c8cca454ffab63c1b012291881fda/code/functions/OMIX_DEG_Analysis.R",
+            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-DEG-Analysis/R/OMIX_DEG_Analysis.R"
           ]
         },
         "scientific_export.source_record": {
           "status": "verified",
           "note": "The source record identifies canonical module 0.4.0/interface 2, the immutable source commit, exact file mapping and hashes, and explicitly pending runtime, platform, Syncweaver, and release evidence.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/015b5c292b4c8cca454ffab63c1b012291881fda/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1"
           ]
         },
@@ -74,23 +74,25 @@
           "status": "verified",
           "note": "The source record lists canonical and adapter SHA-256 values for every managed scientific file.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/015b5c292b4c8cca454ffab63c1b012291881fda/OMIX_MODULE_SOURCE.md"
           ]
         },
         "app_panel.coverage": {
           "status": "verified",
           "note": "The named App Panel exposes all 20 canonical public and advanced controls with canonical names, types, choices, order, and mode-aware defaults; internal output_dir remains platform-managed and documented.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/.codeocean/app-panel.json",
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/015b5c292b4c8cca454ffab63c1b012291881fda/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/015b5c292b4c8cca454ffab63c1b012291881fda/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1"
           ]
         },
         "runtime.provenance": {
           "status": "partial",
-          "note": "A tagged base image is selected, but no resolved immutable image digest is recorded.",
+          "note": "The source record verifies the published r-statistics GHCR image at sha256:1325722877fec5167d171aa766ddf7bbfd056e4999bf40fd8c1eabee495da667 and records the adapter-selected readable Code Ocean tag. The Code Ocean environment digest remains unresolved and is not inferred from the public GHCR digest.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/.codeocean/environment.json",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/015b5c292b4c8cca454ffab63c1b012291881fda/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/015b5c292b4c8cca454ffab63c1b012291881fda/.codeocean/environment.json",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/3",
             "https://github.com/NIDAP-Community/OMIX/issues/43"
           ]
         },
@@ -105,14 +107,14 @@
           "status": "partial",
           "note": "The source record reports a successful 2026-09-04 validation for adapter v0.1.3, but no immutable platform release ID was recorded and it does not validate current interface 2.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/015b5c292b4c8cca454ffab63c1b012291881fda/OMIX_MODULE_SOURCE.md"
           ]
         },
         "syncweaver.readiness": {
           "status": "pending",
           "note": "The managed directory now contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/tree/3f8052a6c13d51bac9bef20b418183d801d62cac/code/functions",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/tree/015b5c292b4c8cca454ffab63c1b012291881fda/code/functions",
             "https://github.com/NIDAP-Community/OMIX/issues/44"
           ]
         }
@@ -871,22 +873,22 @@
     {
       "id": "OMIX-GSEA-Filters-Legacy",
       "repository": "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy",
-      "canonical_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
-      "adapter_commit": "01aeefbee65362f4ed35182193c8feb640b5b4f0",
+      "canonical_commit": "d41b2e3b1e3a0971c4a8b0341678774675a5fbeb",
+      "adapter_commit": "baab86f386af95308dea586137d57dc239fc3657",
       "inventory_states": {
         "schema_completeness": {
           "status": "verified",
           "note": "Merged PR #37 records all 16 CLI controls: 9 public, 6 advanced, and internal output_dir, including list delimiters and allowed values.",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX/pull/37",
-            "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-GSEA-Filters-Legacy/schemas/interface.yml"
+            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-GSEA-Filters-Legacy/schemas/interface.yml"
           ]
         },
         "scientific_export.recorded_parity": {
           "status": "verified",
           "note": "Independent Compass and Beacon reviews of PR #2 confirm the managed export is byte-identical to the recorded canonical source.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/baab86f386af95308dea586137d57dc239fc3657/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ]
         },
@@ -894,7 +896,7 @@
           "status": "verified",
           "note": "The merged default-branch export matches both its recorded source and the current canonical scientific file.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/code/functions/filter_gsea_function.R",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/baab86f386af95308dea586137d57dc239fc3657/code/functions/filter_gsea_function.R",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ]
         },
@@ -902,7 +904,7 @@
           "status": "verified",
           "note": "The source record identifies canonical module 1.0.0/interface 1, the immutable source commit, exact file mapping and hash, platform translations, and explicitly pending runtime, platform, Syncweaver, and release evidence.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/baab86f386af95308dea586137d57dc239fc3657/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ]
         },
@@ -910,23 +912,25 @@
           "status": "verified",
           "note": "The source record lists the SHA-256 value for every managed scientific file.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/baab86f386af95308dea586137d57dc239fc3657/OMIX_MODULE_SOURCE.md"
           ]
         },
         "app_panel.coverage": {
           "status": "verified",
           "note": "The named App Panel exposes all 15 canonical public and advanced controls with canonical names, types, choices, order, and defaults; internal output_dir remains platform-managed and documented.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/.codeocean/app-panel.json",
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/baab86f386af95308dea586137d57dc239fc3657/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/baab86f386af95308dea586137d57dc239fc3657/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ]
         },
         "runtime.provenance": {
           "status": "partial",
-          "note": "A tagged historical r-pathway image and overlay packages are recorded, but its immutable digest and reconciliation with canonical r-visualization remain pending.",
+          "note": "The source record verifies the published r-visualization GHCR image at sha256:1d9f453b49412aa05e9d3420cd4b1b4ea0beac4923cb40572af38b0ae2a46830. The adapter still selects the historical Code Ocean r-pathway tag; its digest and runtime-profile reconciliation remain unresolved and are not inferred from GHCR.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/.codeocean/environment.json",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/baab86f386af95308dea586137d57dc239fc3657/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/baab86f386af95308dea586137d57dc239fc3657/.codeocean/environment.json",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/3",
             "https://github.com/NIDAP-Community/OMIX/issues/43"
           ]
         },
@@ -947,7 +951,7 @@
           "status": "pending",
           "note": "The managed directory contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/tree/01aeefbee65362f4ed35182193c8feb640b5b4f0/code/functions",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/tree/baab86f386af95308dea586137d57dc239fc3657/code/functions",
             "https://github.com/NIDAP-Community/OMIX/issues/44"
           ]
         }
@@ -1512,7 +1516,7 @@
     {
       "id": "OMIX-GSEA-Preranked-Legacy",
       "repository": "https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy",
-      "canonical_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
+      "canonical_commit": "d41b2e3b1e3a0971c4a8b0341678774675a5fbeb",
       "adapter_commit": "c29a0dc019a56b236298b6e65667c2bfd55cda07",
       "inventory_states": {
         "schema_completeness": {
@@ -1520,7 +1524,7 @@
           "note": "Merged PR #37 records all 19 CLI controls: 8 public, 10 advanced, and internal output_dir, including ordered contrast and collection delimiters.",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX/pull/37",
-            "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-GSEA-Preranked-Legacy/schemas/interface.yml"
+            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-GSEA-Preranked-Legacy/schemas/interface.yml"
           ]
         },
         "scientific_export.recorded_parity": {
@@ -2371,61 +2375,71 @@
     {
       "id": "OMIX-GSEA-Visualization-Legacy",
       "repository": "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy",
-      "canonical_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
-      "adapter_commit": "4aa52dbaba838735015ac3ffcb451892f9272ae6",
+      "canonical_commit": "d41b2e3b1e3a0971c4a8b0341678774675a5fbeb",
+      "adapter_commit": "f8a10972e6566941f35720b2c23356a1028e6513",
       "inventory_states": {
         "schema_completeness": {
           "status": "verified",
           "note": "Merged PR #37 records all 38 CLI controls: 12 public, 25 advanced, and internal output_dir, including choices and numeric bounds.",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX/pull/37",
-            "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-GSEA-Visualization-Legacy/schemas/interface.yml"
+            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-GSEA-Visualization-Legacy/schemas/interface.yml"
           ]
         },
         "scientific_export.recorded_parity": {
           "status": "verified",
-          "note": "Independent byte comparison confirms the export matches its recorded source.",
+          "note": "Independent review of PR #2 confirms the managed export is byte-identical to canonical module 4.0.0/interface 1 at the recorded source commit.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/blob/4aa52dbaba838735015ac3ffcb451892f9272ae6/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/blob/f8a10972e6566941f35720b2c23356a1028e6513/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/pull/2"
           ]
         },
         "scientific_export.current_parity": {
           "status": "verified",
-          "note": "The exported scientific file matches the canonical snapshot.",
+          "note": "The merged default-branch export matches both its recorded source and the current canonical scientific file.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/blob/4aa52dbaba838735015ac3ffcb451892f9272ae6/code/functions/gsea_enrichment_plot.R"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/blob/f8a10972e6566941f35720b2c23356a1028e6513/code/functions/gsea_enrichment_plot.R",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/pull/2"
           ]
         },
         "scientific_export.source_record": {
-          "status": "partial",
-          "note": "Present and accurate for the recorded scientific export, but it predates the completed canonical schema and does not record per-file hashes or an immutable runtime digest.",
+          "status": "verified",
+          "note": "The source record identifies canonical module 4.0.0/interface 1, its immutable source commit, exact managed mapping and hash, platform translations, and explicitly pending runtime, platform, Syncweaver, and release evidence.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/blob/4aa52dbaba838735015ac3ffcb451892f9272ae6/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/blob/f8a10972e6566941f35720b2c23356a1028e6513/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/pull/2"
           ]
         },
         "scientific_export.hash_manifest": {
-          "status": "pending",
-          "note": "Per-file SHA-256 values are absent from the adapter source record.",
-          "evidence": []
+          "status": "verified",
+          "note": "The source record lists matching canonical and adapter SHA-256 values for every managed scientific file.",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/blob/f8a10972e6566941f35720b2c23356a1028e6513/OMIX_MODULE_SOURCE.md"
+          ]
         },
         "app_panel.coverage": {
-          "status": "outdated",
-          "note": "The panel exposes 35 named controls while msigdb_database and gsea_filter_results are dataset-backed inputs. Several user controls drift from the complete schema, including running_score_line_color (red/blue by ES versus ES sign), add_max_deviation_line (xy-coordinate versus both), and rank_area_color capitalization/choice text.",
+          "status": "verified",
+          "note": "The named App Panel exposes all 35 public and advanced controls; msigdb_database and gsea_filter_results are documented dataset-backed inputs and internal output_dir is platform-managed.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/blob/4aa52dbaba838735015ac3ffcb451892f9272ae6/.codeocean/app-panel.json"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/blob/f8a10972e6566941f35720b2c23356a1028e6513/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/blob/f8a10972e6566941f35720b2c23356a1028e6513/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/pull/2"
           ]
         },
         "runtime.provenance": {
           "status": "partial",
           "note": "A tagged base image and ComplexHeatmap overlay are recorded, but no immutable digest is recorded.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/blob/4aa52dbaba838735015ac3ffcb451892f9272ae6/.codeocean/environment.json"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/blob/f8a10972e6566941f35720b2c23356a1028e6513/.codeocean/environment.json"
           ]
         },
         "local_tests": {
-          "status": "unknown",
-          "note": "No commit-specific local adapter test result was recorded in this snapshot.",
-          "evidence": []
+          "status": "verified",
+          "note": "PR #2 records passing source-parity, panel, CLI, adapter-I/O, scientific-fixture, launcher, and layout checks; the adapter contract CI check passed.",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/pull/2",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/actions/runs/36666802667"
+          ]
         },
         "code_ocean_validation": {
           "status": "pending",
@@ -2434,9 +2448,10 @@
         },
         "syncweaver.readiness": {
           "status": "pending",
-          "note": "The target directory contains only the canonical export, but no lockfile or reviewed mapping exists.",
+          "note": "The managed directory contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/tree/4aa52dbaba838735015ac3ffcb451892f9272ae6/code/functions"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/tree/f8a10972e6566941f35720b2c23356a1028e6513/code/functions",
+            "https://github.com/NIDAP-Community/OMIX/issues/44"
           ]
         }
       },
@@ -3188,21 +3203,21 @@
             "order": 1
           },
           {
-            "name": "deg_analysis_results",
+            "name": "deg_table",
             "type": "character",
             "default": null,
             "order": 2
           },
           {
-            "name": "deg_table",
+            "name": "sample_metadata",
             "type": "character",
             "default": null,
             "order": 3
           },
           {
-            "name": "sample_metadata",
+            "name": "output_dir",
             "type": "character",
-            "default": null,
+            "default": "/results",
             "order": 4
           },
           {
@@ -3214,7 +3229,7 @@
           {
             "name": "contrasts",
             "type": "character",
-            "default": "",
+            "default": null,
             "order": 6
           },
           {
@@ -3274,7 +3289,7 @@
           {
             "name": "add_max_deviation_line",
             "type": "character",
-            "default": "xy-coordinate",
+            "default": "both",
             "order": 16
           },
           {
@@ -3402,12 +3417,6 @@
             "type": "numeric",
             "default": 6.5,
             "order": 37
-          },
-          {
-            "name": "output_dir",
-            "type": "character",
-            "default": "/results",
-            "order": 38
           }
         ],
         "app_panel_named_parameters": true,
@@ -3427,40 +3436,6 @@
             "order": 1
           },
           {
-            "name": "heatmap_gene_names_column",
-            "type": "text",
-            "default": "GeneName",
-            "allowed": [],
-            "order": 2
-          },
-          {
-            "name": "heatmap_sample_names_column",
-            "type": "text",
-            "default": "Sample",
-            "allowed": [],
-            "order": 3
-          },
-          {
-            "name": "heatmap_group_column",
-            "type": "text",
-            "default": "Group",
-            "allowed": [],
-            "order": 4
-          },
-          {
-            "name": "plots_to_include",
-            "type": "list",
-            "default": "ES+RNK+LE",
-            "allowed": [
-              "ES+RNK+LE",
-              "ES+RNK",
-              "ES+LE",
-              "ES",
-              "LE"
-            ],
-            "order": 5
-          },
-          {
             "name": "contrast_filter",
             "type": "list",
             "default": "none",
@@ -3469,58 +3444,21 @@
               "keep",
               "remove"
             ],
-            "order": 6
+            "order": 2
           },
           {
             "name": "contrasts",
             "type": "text",
             "default": null,
             "allowed": [],
-            "order": 7
+            "order": 3
           },
           {
             "name": "top_n_pathways",
             "type": "text",
             "default": "20",
             "allowed": [],
-            "order": 8
-          },
-          {
-            "name": "pathway_bubble_plots",
-            "type": "list",
-            "default": "TRUE",
-            "allowed": [
-              "TRUE",
-              "FALSE"
-            ],
-            "order": 9
-          },
-          {
-            "name": "pathway_bubble_top_n",
-            "type": "text",
-            "default": "20",
-            "allowed": [],
-            "order": 10
-          },
-          {
-            "name": "pathway_bubble_significance_statistic",
-            "type": "list",
-            "default": "padj",
-            "allowed": [
-              "padj",
-              "pval"
-            ],
-            "order": 11
-          },
-          {
-            "name": "collection_color_scale",
-            "type": "list",
-            "default": "independent",
-            "allowed": [
-              "independent",
-              "shared"
-            ],
-            "order": 12
+            "order": 4
           },
           {
             "name": "top_n_by_sign",
@@ -3530,38 +3468,96 @@
               "FALSE",
               "TRUE"
             ],
-            "order": 13
+            "order": 5
+          },
+          {
+            "name": "pathway_bubble_plots",
+            "type": "list",
+            "default": "TRUE",
+            "allowed": [
+              "TRUE",
+              "FALSE"
+            ],
+            "order": 6
+          },
+          {
+            "name": "pathway_bubble_top_n",
+            "type": "text",
+            "default": "20",
+            "allowed": [],
+            "order": 7
+          },
+          {
+            "name": "pathway_bubble_significance_statistic",
+            "type": "list",
+            "default": "padj",
+            "allowed": [
+              "padj",
+              "pval"
+            ],
+            "order": 8
+          },
+          {
+            "name": "collection_color_scale",
+            "type": "list",
+            "default": "independent",
+            "allowed": [
+              "independent",
+              "shared"
+            ],
+            "order": 9
           },
           {
             "name": "max_plots_in_pdf",
             "type": "text",
             "default": "0",
             "allowed": [],
-            "order": 14
+            "order": 10
           },
           {
-            "name": "pdf_width",
-            "type": "text",
-            "default": "8.5",
-            "allowed": [],
-            "order": 15
-          },
-          {
-            "name": "pdf_height",
-            "type": "text",
-            "default": "6.5",
-            "allowed": [],
-            "order": 16
+            "name": "plots_to_include",
+            "type": "list",
+            "default": "ES+RNK+LE",
+            "allowed": [
+              "ES",
+              "ES+RNK",
+              "ES+LE",
+              "ES+RNK+LE",
+              "LE"
+            ],
+            "order": 11
           },
           {
             "name": "running_score_line_color",
             "type": "list",
-            "default": "red/blue by ES",
+            "default": "ES sign",
             "allowed": [
-              "red/blue by ES",
+              "ES sign",
               "green"
             ],
-            "order": 17
+            "order": 12
+          },
+          {
+            "name": "add_max_deviation_line",
+            "type": "list",
+            "default": "both",
+            "allowed": [
+              "coordinate",
+              "horizontal",
+              "both",
+              "none"
+            ],
+            "order": 13
+          },
+          {
+            "name": "rank_area_color",
+            "type": "list",
+            "default": "red/blue by Gene score",
+            "allowed": [
+              "grey",
+              "red/blue by Gene score"
+            ],
+            "order": 14
           },
           {
             "name": "show_es_rank_bar",
@@ -3571,39 +3567,7 @@
               "FALSE",
               "TRUE"
             ],
-            "order": 18
-          },
-          {
-            "name": "add_max_deviation_line",
-            "type": "list",
-            "default": "xy-coordinate",
-            "allowed": [
-              "x-coordinate",
-              "y-coordinate",
-              "xy-coordinate",
-              "none"
-            ],
-            "order": 19
-          },
-          {
-            "name": "show_es_le_highlight",
-            "type": "list",
-            "default": "TRUE",
-            "allowed": [
-              "TRUE",
-              "FALSE"
-            ],
-            "order": 20
-          },
-          {
-            "name": "rank_area_color",
-            "type": "list",
-            "default": "red/blue by gene score",
-            "allowed": [
-              "grey",
-              "red/blue by gene score"
-            ],
-            "order": 21
+            "order": 15
           },
           {
             "name": "show_rnk_peak_line",
@@ -3613,7 +3577,7 @@
               "TRUE",
               "FALSE"
             ],
-            "order": 22
+            "order": 16
           },
           {
             "name": "show_rnk_le_highlight",
@@ -3623,7 +3587,17 @@
               "TRUE",
               "FALSE"
             ],
-            "order": 23
+            "order": 17
+          },
+          {
+            "name": "show_es_le_highlight",
+            "type": "list",
+            "default": "TRUE",
+            "allowed": [
+              "TRUE",
+              "FALSE"
+            ],
+            "order": 18
           },
           {
             "name": "heatmap_transform",
@@ -3635,27 +3609,105 @@
               "center by row median",
               "none"
             ],
-            "order": 24
+            "order": 19
           },
           {
             "name": "max_le_genes_heatmap",
             "type": "text",
             "default": "50",
             "allowed": [],
+            "order": 20
+          },
+          {
+            "name": "heatmap_gene_order",
+            "type": "list",
+            "default": "rank",
+            "allowed": [
+              "rank",
+              "cluster",
+              "input"
+            ],
+            "order": 21
+          },
+          {
+            "name": "heatmap_sample_order",
+            "type": "list",
+            "default": "group",
+            "allowed": [
+              "group",
+              "cluster",
+              "input"
+            ],
+            "order": 22
+          },
+          {
+            "name": "heatmap_gene_clustering_distance",
+            "type": "list",
+            "default": "euclidean",
+            "allowed": [
+              "euclidean",
+              "maximum",
+              "manhattan",
+              "canberra",
+              "binary",
+              "minkowski",
+              "pearson",
+              "spearman",
+              "kendall"
+            ],
+            "order": 23
+          },
+          {
+            "name": "heatmap_gene_clustering_method",
+            "type": "list",
+            "default": "complete",
+            "allowed": [
+              "ward.D",
+              "ward.D2",
+              "single",
+              "complete",
+              "average",
+              "mcquitty",
+              "median",
+              "centroid"
+            ],
+            "order": 24
+          },
+          {
+            "name": "heatmap_sample_clustering_distance",
+            "type": "list",
+            "default": "euclidean",
+            "allowed": [
+              "euclidean",
+              "maximum",
+              "manhattan",
+              "canberra",
+              "binary",
+              "minkowski",
+              "pearson",
+              "spearman",
+              "kendall"
+            ],
             "order": 25
           },
           {
-            "name": "show_le_heatmap_gene_names",
+            "name": "heatmap_sample_clustering_method",
             "type": "list",
-            "default": "TRUE",
+            "default": "complete",
             "allowed": [
-              "TRUE",
-              "FALSE"
+              "ward.D",
+              "ward.D2",
+              "single",
+              "complete",
+              "average",
+              "mcquitty",
+              "median",
+              "centroid"
             ],
             "order": 26
           },
           {
-            "name": "show_le_heatmap_rank_labels",
+            "name": "show_le_heatmap_gene_names",
             "type": "list",
             "default": "TRUE",
             "allowed": [
@@ -3675,81 +3727,67 @@
             "order": 28
           },
           {
-            "name": "heatmap_gene_order",
+            "name": "show_le_heatmap_rank_labels",
             "type": "list",
-            "default": "rank",
+            "default": "TRUE",
             "allowed": [
-              "rank",
-              "cluster",
-              "input"
+              "TRUE",
+              "FALSE"
             ],
             "order": 29
           },
           {
-            "name": "heatmap_sample_order",
-            "type": "list",
-            "default": "group",
-            "allowed": [
-              "group",
-              "cluster",
-              "input"
-            ],
+            "name": "heatmap_gene_names_column",
+            "type": "text",
+            "default": "GeneName",
+            "allowed": [],
             "order": 30
           },
           {
-            "name": "heatmap_gene_clustering_distance",
-            "type": "list",
-            "default": "euclidean",
-            "allowed": [
-              "euclidean",
-              "manhattan",
-              "pearson",
-              "spearman"
-            ],
+            "name": "heatmap_sample_names_column",
+            "type": "text",
+            "default": "Sample",
+            "allowed": [],
             "order": 31
           },
           {
-            "name": "heatmap_sample_clustering_distance",
-            "type": "list",
-            "default": "euclidean",
-            "allowed": [
-              "euclidean",
-              "manhattan",
-              "pearson",
-              "spearman"
-            ],
+            "name": "heatmap_group_column",
+            "type": "text",
+            "default": "Group",
+            "allowed": [],
             "order": 32
           },
           {
-            "name": "heatmap_gene_clustering_method",
-            "type": "list",
-            "default": "complete",
-            "allowed": [
-              "complete",
-              "average",
-              "ward.D2"
-            ],
+            "name": "pdf_width",
+            "type": "text",
+            "default": "8.5",
+            "allowed": [],
             "order": 33
           },
           {
-            "name": "heatmap_sample_clustering_method",
-            "type": "list",
-            "default": "complete",
-            "allowed": [
-              "complete",
-              "average",
-              "ward.D2"
-            ],
+            "name": "pdf_height",
+            "type": "text",
+            "default": "6.5",
+            "allowed": [],
             "order": 34
           }
         ],
         "documented_aliases": {},
-        "documented_hidden_inputs": {},
+        "documented_hidden_inputs": {
+          "msigdb_database": {
+            "canonical": "msigdb_database",
+            "binding": "dataset:eb51e72e-bcb9-400d-bf94-fc8cad85c7f1 mount=msigdb"
+          },
+          "gsea_filter_results": {
+            "canonical": "gsea_filter_results",
+            "binding": "dataset:e5c4e095-f2e5-48ac-8148-d7fdb8673e05 mount=gsea_filter_results"
+          }
+        },
         "source_record_metadata": {
-          "canonical_source_commit": "b65eeb3c231eb9dfbdbc09326ab03c23bbe84c8f",
+          "canonical_source_commit": "eee4433cd74d0ce9bd1daba1571ca6312cba7ea2",
           "module_version": "4.0.0",
           "interface_version": 1,
-          "has_per_file_sha256": false
+          "has_per_file_sha256": true
         },
         "inferred_aliases": {},
         "alias_candidates": [],
@@ -3771,359 +3809,81 @@
       ],
       "findings": [
         {
-          "code": "app_panel_missing",
-          "severity": "error",
-          "message": "Public or advanced canonical control is absent from the App Panel and has no documented hidden binding.",
-          "control": "gsea_filter_results"
-        },
-        {
-          "code": "app_panel_missing",
-          "severity": "error",
-          "message": "Public or advanced canonical control is absent from the App Panel and has no documented hidden binding.",
-          "control": "msigdb_database"
-        },
-        {
-          "code": "adapter_cli_default_mismatch",
-          "severity": "warning",
-          "message": "Adapter CLI default differs from the canonical contract.",
-          "control": "add_max_deviation_line",
-          "expected": "both",
-          "observed": "xy-coordinate"
-        },
-        {
-          "code": "adapter_cli_extra",
-          "severity": "warning",
-          "message": "Adapter-only CLI control is not classified by the canonical contract or source-record exceptions.",
-          "control": "deg_analysis_results"
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "add_max_deviation_line",
-          "expected": [
-            "coordinate",
-            "horizontal",
-            "both",
-            "none"
-          ],
-          "observed": [
-            "x-coordinate",
-            "y-coordinate",
-            "xy-coordinate",
-            "none"
-          ]
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "heatmap_gene_clustering_distance",
-          "expected": [
-            "euclidean",
-            "maximum",
-            "manhattan",
-            "canberra",
-            "binary",
-            "minkowski",
-            "pearson",
-            "spearman",
-            "kendall"
-          ],
-          "observed": [
-            "euclidean",
-            "manhattan",
-            "pearson",
-            "spearman"
-          ]
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "heatmap_gene_clustering_method",
-          "expected": [
-            "ward.D",
-            "ward.D2",
-            "single",
-            "complete",
-            "average",
-            "mcquitty",
-            "median",
-            "centroid"
-          ],
-          "observed": [
-            "complete",
-            "average",
-            "ward.D2"
-          ]
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "heatmap_sample_clustering_distance",
-          "expected": [
-            "euclidean",
-            "maximum",
-            "manhattan",
-            "canberra",
-            "binary",
-            "minkowski",
-            "pearson",
-            "spearman",
-            "kendall"
-          ],
-          "observed": [
-            "euclidean",
-            "manhattan",
-            "pearson",
-            "spearman"
-          ]
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "heatmap_sample_clustering_method",
-          "expected": [
-            "ward.D",
-            "ward.D2",
-            "single",
-            "complete",
-            "average",
-            "mcquitty",
-            "median",
-            "centroid"
-          ],
-          "observed": [
-            "complete",
-            "average",
-            "ward.D2"
-          ]
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "plots_to_include",
-          "expected": [
-            "ES",
-            "ES+RNK",
-            "ES+LE",
-            "ES+RNK+LE",
-            "LE"
-          ],
-          "observed": [
-            "ES+RNK+LE",
-            "ES+RNK",
-            "ES+LE",
-            "ES",
-            "LE"
-          ]
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "rank_area_color",
-          "expected": [
-            "grey",
-            "red/blue by Gene score"
-          ],
-          "observed": [
-            "grey",
-            "red/blue by gene score"
-          ]
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "running_score_line_color",
-          "expected": [
-            "ES sign",
-            "green"
-          ],
-          "observed": [
-            "red/blue by ES",
-            "green"
-          ]
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "add_max_deviation_line",
-          "expected": "both",
-          "observed": "xy-coordinate"
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "rank_area_color",
-          "expected": "red/blue by Gene score",
-          "observed": "red/blue by gene score"
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "running_score_line_color",
-          "expected": "ES sign",
-          "observed": "red/blue by ES"
-        },
-        {
-          "code": "app_panel_order_mismatch",
-          "severity": "warning",
-          "message": "App Panel control order differs from canonical schema order after documented/inferred alias mapping.",
-          "expected": [
-            "deg_table",
-            "sample_metadata",
-            "contrast_filter",
-            "contrasts",
-            "top_n_pathways",
-            "top_n_by_sign",
-            "pathway_bubble_plots",
-            "pathway_bubble_top_n",
-            "pathway_bubble_significance_statistic",
-            "collection_color_scale",
-            "max_plots_in_pdf",
-            "plots_to_include",
-            "running_score_line_color",
-            "add_max_deviation_line",
-            "rank_area_color",
-            "show_es_rank_bar",
-            "show_rnk_peak_line",
-            "show_rnk_le_highlight",
-            "show_es_le_highlight",
-            "heatmap_transform",
-            "max_le_genes_heatmap",
-            "heatmap_gene_order",
-            "heatmap_sample_order",
-            "heatmap_gene_clustering_distance",
-            "heatmap_gene_clustering_method",
-            "heatmap_sample_clustering_distance",
-            "heatmap_sample_clustering_method",
-            "show_le_heatmap_gene_names",
-            "show_le_heatmap_sample_names",
-            "show_le_heatmap_rank_labels",
-            "heatmap_gene_names_column",
-            "heatmap_sample_names_column",
-            "heatmap_group_column",
-            "pdf_width",
-            "pdf_height"
-          ],
-          "observed": [
-            "deg_table",
-            "sample_metadata",
-            "heatmap_gene_names_column",
-            "heatmap_sample_names_column",
-            "heatmap_group_column",
-            "plots_to_include",
-            "contrast_filter",
-            "contrasts",
-            "top_n_pathways",
-            "pathway_bubble_plots",
-            "pathway_bubble_top_n",
-            "pathway_bubble_significance_statistic",
-            "collection_color_scale",
-            "top_n_by_sign",
-            "max_plots_in_pdf",
-            "pdf_width",
-            "pdf_height",
-            "running_score_line_color",
-            "show_es_rank_bar",
-            "add_max_deviation_line",
-            "show_es_le_highlight",
-            "rank_area_color",
-            "show_rnk_peak_line",
-            "show_rnk_le_highlight",
-            "heatmap_transform",
-            "max_le_genes_heatmap",
-            "show_le_heatmap_gene_names",
-            "show_le_heatmap_rank_labels",
-            "show_le_heatmap_sample_names",
-            "heatmap_gene_order",
-            "heatmap_sample_order",
-            "heatmap_gene_clustering_distance",
-            "heatmap_sample_clustering_distance",
-            "heatmap_gene_clustering_method",
-            "heatmap_sample_clustering_method"
-          ]
-        },
-        {
           "code": "runtime_digest_missing",
           "severity": "warning",
           "message": "Adapter runtime is tag-addressed; no immutable digest is recorded.",
           "observed": "codeocean/omix-r-pathway:r4.4.3-bioconductor3.20-v1"
-        },
-        {
-          "code": "source_record_hash_manifest_missing",
-          "severity": "warning",
-          "message": "OMIX_MODULE_SOURCE.md does not record per-file SHA-256 values."
         }
       ]
     },
     {
       "id": "OMIX-Gene-Boxplots",
       "repository": "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots",
-      "canonical_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
-      "adapter_commit": "9a8eb2e8f8cae282c1d5e88935f497216db95d60",
+      "canonical_commit": "d41b2e3b1e3a0971c4a8b0341678774675a5fbeb",
+      "adapter_commit": "35ad616857080cc6ee250c3217598c4bf3653e7f",
       "inventory_states": {
         "schema_completeness": {
           "status": "verified",
           "note": "Merged PR #38 records 22 public/advanced CLI controls, 2 internal compatibility bindings, 4 outputs, the original aesthetics contract, and mean|sum|keep duplicate aggregation with mean as the default.",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX/pull/38",
-            "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-Gene-Boxplots/schemas/interface.yml"
+            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-Gene-Boxplots/schemas/interface.yml"
           ]
         },
         "scientific_export.recorded_parity": {
           "status": "verified",
-          "note": "Independent byte comparison confirms both listed exports match the recorded source.",
+          "note": "Independent review of PR #3 confirms both managed exports are byte-identical to canonical module 1.0.0/interface 1 at the recorded source commit.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/blob/9a8eb2e8f8cae282c1d5e88935f497216db95d60/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/blob/35ad616857080cc6ee250c3217598c4bf3653e7f/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/pull/3"
           ]
         },
         "scientific_export.current_parity": {
           "status": "verified",
-          "note": "Both exported scientific files match the canonical snapshot.",
+          "note": "Both merged default-branch exports match their recorded source and the current canonical scientific files.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/tree/9a8eb2e8f8cae282c1d5e88935f497216db95d60/code/functions"
+            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/tree/35ad616857080cc6ee250c3217598c4bf3653e7f/code/functions",
+            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/pull/3"
           ]
         },
         "scientific_export.source_record": {
-          "status": "partial",
-          "note": "Present and accurate for the recorded scientific export, but it predates the completed canonical schema and does not record per-file hashes or an immutable runtime digest.",
+          "status": "verified",
+          "note": "The source record identifies canonical module 1.0.0/interface 1, its immutable source commit, both managed mappings and hashes, platform translations, and explicitly pending runtime, platform, Syncweaver, and release evidence.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/blob/9a8eb2e8f8cae282c1d5e88935f497216db95d60/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/blob/35ad616857080cc6ee250c3217598c4bf3653e7f/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/pull/3"
           ]
         },
         "scientific_export.hash_manifest": {
-          "status": "pending",
-          "note": "Per-file SHA-256 values are absent from the adapter source record.",
-          "evidence": []
+          "status": "verified",
+          "note": "The source record lists matching canonical and adapter SHA-256 values for every managed scientific file.",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/blob/35ad616857080cc6ee250c3217598c4bf3653e7f/OMIX_MODULE_SOURCE.md"
+          ]
         },
         "app_panel.coverage": {
-          "status": "outdated",
-          "note": "The panel has 22 named controls but uses expression_file/metadata_file/deg_file rather than canonical input names, exposes internal deg_gene_column, omits public output_dir, and drifts on image_width/image_height defaults (5/5.5 versus 6/5). duplicate_aggregation remains correctly exposed with mean as default.",
+          "status": "verified",
+          "note": "The named App Panel exposes the canonical public and advanced inputs with canonical names and defaults; internal output_dir remains hidden and platform-managed.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/blob/9a8eb2e8f8cae282c1d5e88935f497216db95d60/.codeocean/app-panel.json"
+            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/blob/35ad616857080cc6ee250c3217598c4bf3653e7f/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/blob/35ad616857080cc6ee250c3217598c4bf3653e7f/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/pull/3"
           ]
         },
         "runtime.provenance": {
           "status": "partial",
           "note": "A tagged base image is recorded, but no immutable digest is recorded.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/blob/9a8eb2e8f8cae282c1d5e88935f497216db95d60/.codeocean/environment.json"
+            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/blob/35ad616857080cc6ee250c3217598c4bf3653e7f/.codeocean/environment.json"
           ]
         },
         "local_tests": {
-          "status": "unknown",
-          "note": "No commit-specific local adapter test result was recorded in this snapshot.",
-          "evidence": []
+          "status": "verified",
+          "note": "PR #3 records passing source-parity, panel, CLI, adapter-input, wrapper, aesthetics, launcher, and layout checks; the adapter contract CI check passed.",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/pull/3",
+            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/actions/runs/36723400254"
+          ]
         },
         "code_ocean_validation": {
           "status": "pending",
@@ -4131,10 +3891,11 @@
           "evidence": []
         },
         "syncweaver.readiness": {
-          "status": "blocked",
-          "note": "No lockfile, and adapter-only workflow_input.R is co-located in the proposed managed directory.",
+          "status": "pending",
+          "note": "The managed directory contains only the two verified canonical exports, but the generated Syncweaver lock and production onboarding remain pending under issue #44.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/tree/9a8eb2e8f8cae282c1d5e88935f497216db95d60/code/functions"
+            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/tree/35ad616857080cc6ee250c3217598c4bf3653e7f/code/functions",
+            "https://github.com/NIDAP-Community/OMIX/issues/44"
           ]
         }
       },
@@ -4584,19 +4345,19 @@
       "adapter_contract": {
         "cli_controls": [
           {
-            "name": "expression_file",
+            "name": "expression_table",
             "type": "character",
-            "default": "",
+            "default": null,
             "order": 0
           },
           {
-            "name": "metadata_file",
+            "name": "metadata_table",
             "type": "character",
-            "default": "",
+            "default": null,
             "order": 1
           },
           {
-            "name": "deg_file",
+            "name": "deg_table",
             "type": "character",
             "default": "",
             "order": 2
@@ -4604,7 +4365,7 @@
           {
             "name": "genes",
             "type": "character",
-            "default": "",
+            "default": null,
             "order": 3
           },
           {
@@ -4614,126 +4375,120 @@
             "order": 4
           },
           {
-            "name": "deg_gene_column",
-            "type": "character",
-            "default": "GeneName",
-            "order": 5
-          },
-          {
             "name": "sample_column",
             "type": "character",
             "default": "Sample",
-            "order": 6
+            "order": 5
           },
           {
             "name": "category_column",
             "type": "character",
             "default": "Group",
-            "order": 7
+            "order": 6
           },
           {
             "name": "categories",
             "type": "character",
             "default": "",
-            "order": 8
+            "order": 7
           },
           {
             "name": "statistics_mode",
             "type": "character",
             "default": "precomputed_deg",
-            "order": 9
+            "order": 8
           },
           {
             "name": "pvalue_type",
             "type": "character",
             "default": "nominal",
-            "order": 10
+            "order": 9
           },
           {
             "name": "statistical_method",
             "type": "character",
             "default": "anova",
-            "order": 11
+            "order": 10
           },
           {
             "name": "p_adjust_method",
             "type": "character",
             "default": "BH",
-            "order": 12
+            "order": 11
           },
           {
             "name": "duplicate_aggregation",
             "type": "character",
             "default": "mean",
-            "order": 13
+            "order": 12
           },
           {
             "name": "minimum_samples_per_category",
             "type": "integer",
             "default": 3,
-            "order": 14
+            "order": 13
           },
           {
             "name": "plot_type",
             "type": "character",
             "default": "box",
-            "order": 15
+            "order": 14
           },
           {
             "name": "title",
             "type": "character",
             "default": "auto",
-            "order": 16
+            "order": 15
           },
           {
             "name": "y_axis_label",
             "type": "character",
             "default": "auto",
-            "order": 17
+            "order": 16
           },
           {
             "name": "colors",
             "type": "character",
             "default": "",
-            "order": 18
+            "order": 17
           },
           {
             "name": "image_width",
             "type": "double",
             "default": 6,
-            "order": 19
+            "order": 18
           },
           {
             "name": "image_height",
             "type": "double",
             "default": 5,
-            "order": 20
+            "order": 19
           },
           {
             "name": "image_dpi",
             "type": "integer",
             "default": 300,
-            "order": 21
+            "order": 20
           }
         ],
         "app_panel_named_parameters": true,
         "app_panel_controls": [
           {
-            "name": "expression_file",
+            "name": "expression_table",
             "type": "file",
             "default": null,
             "allowed": [],
             "order": 0
           },
           {
-            "name": "metadata_file",
+            "name": "metadata_table",
             "type": "file",
             "default": null,
             "allowed": [],
             "order": 1
           },
           {
-            "name": "deg_file",
+            "name": "deg_table",
             "type": "file",
             "default": null,
             "allowed": [],
@@ -4754,32 +4509,25 @@
             "order": 4
           },
           {
-            "name": "deg_gene_column",
-            "type": "text",
-            "default": "GeneName",
-            "allowed": [],
-            "order": 5
-          },
-          {
             "name": "sample_column",
             "type": "text",
             "default": "Sample",
             "allowed": [],
-            "order": 6
+            "order": 5
           },
           {
             "name": "category_column",
             "type": "text",
             "default": "Group",
             "allowed": [],
-            "order": 7
+            "order": 6
           },
           {
             "name": "categories",
             "type": "text",
             "default": null,
             "allowed": [],
-            "order": 8
+            "order": 7
           },
           {
             "name": "statistics_mode",
@@ -4790,7 +4538,7 @@
               "within_plot",
               "none"
             ],
-            "order": 9
+            "order": 8
           },
           {
             "name": "pvalue_type",
@@ -4800,7 +4548,7 @@
               "nominal",
               "adjusted"
             ],
-            "order": 10
+            "order": 9
           },
           {
             "name": "statistical_method",
@@ -4811,21 +4559,23 @@
               "t-test",
               "kruskal"
             ],
-            "order": 11
+            "order": 10
           },
           {
             "name": "p_adjust_method",
-            "type": "text",
+            "type": "list",
             "default": "BH",
-            "allowed": [],
-            "order": 12
-          },
-          {
-            "name": "minimum_samples_per_category",
-            "type": "text",
-            "default": "3",
-            "allowed": [],
-            "order": 13
+            "allowed": [
+              "BH",
+              "none",
+              "bonferroni",
+              "holm",
+              "fdr",
+              "hochberg",
+              "hommel",
+              "BY"
+            ],
+            "order": 11
           },
           {
             "name": "duplicate_aggregation",
@@ -4836,7 +4586,14 @@
               "sum",
               "keep"
             ],
-            "order": 14
+            "order": 12
+          },
+          {
+            "name": "minimum_samples_per_category",
+            "type": "text",
+            "default": "3",
+            "allowed": [],
+            "order": 13
           },
           {
             "name": "plot_type",
@@ -4846,81 +4603,67 @@
               "box",
               "violin"
             ],
-            "order": 15
+            "order": 14
           },
           {
             "name": "title",
             "type": "text",
             "default": "auto",
             "allowed": [],
-            "order": 16
+            "order": 15
           },
           {
             "name": "y_axis_label",
             "type": "text",
             "default": "auto",
             "allowed": [],
-            "order": 17
+            "order": 16
           },
           {
             "name": "colors",
             "type": "text",
             "default": null,
             "allowed": [],
-            "order": 18
+            "order": 17
           },
           {
             "name": "image_width",
+            "type": "text",
+            "default": "6",
+            "allowed": [],
+            "order": 18
+          },
+          {
+            "name": "image_height",
             "type": "text",
             "default": "5",
             "allowed": [],
             "order": 19
           },
           {
-            "name": "image_height",
-            "type": "text",
-            "default": "5.5",
-            "allowed": [],
-            "order": 20
-          },
-          {
             "name": "image_dpi",
             "type": "text",
             "default": "300",
             "allowed": [],
-            "order": 21
+            "order": 20
           }
         ],
         "documented_aliases": {},
-        "documented_hidden_inputs": {},
+        "documented_hidden_inputs": {
+          "output_dir": {
+            "canonical": "output_dir",
+            "binding": "/results (repository results/ fallback outside Code Ocean)",
+            "reason": "Code Ocean owns the capsule result mount"
+          }
+        },
         "source_record_metadata": {
-          "canonical_source_commit": "7da6208330c72c8e1f123ba6e9de9f5c1f745dbb",
+          "canonical_source_commit": "eee4433cd74d0ce9bd1daba1571ca6312cba7ea2",
           "module_version": "1.0.0",
           "interface_version": 1,
-          "has_per_file_sha256": false
+          "has_per_file_sha256": true
         },
-        "inferred_aliases": {
-          "deg_table": "deg_file",
-          "expression_table": "expression_file",
-          "metadata_table": "metadata_file"
-        },
-        "alias_candidates": [
-          {
-            "canonical": "deg_table",
-            "adapter": "deg_file",
-            "score": 1.0
-          },
-          {
-            "canonical": "expression_table",
-            "adapter": "expression_file",
-            "score": 1.0
-          },
-          {
-            "canonical": "metadata_table",
-            "adapter": "metadata_file",
-            "score": 1.0
-          }
-        ],
+        "inferred_aliases": {},
+        "alias_candidates": [],
         "runtime": {
           "base_image": "codeocean/omix-r-visualization:r4.4.3-v2",
           "digest": null
@@ -4948,148 +4691,17 @@
       ],
       "findings": [
         {
-          "code": "adapter_cli_missing",
-          "severity": "error",
-          "message": "Canonical control is absent from the adapter CLI and has no documented hidden binding.",
-          "control": "output_dir"
-        },
-        {
-          "code": "app_panel_internal_exposed",
-          "severity": "error",
-          "message": "App Panel exposes a canonical internal binding as a user control.",
-          "control": "deg_gene_column"
-        },
-        {
-          "code": "app_panel_missing",
-          "severity": "error",
-          "message": "Public or advanced canonical control is absent from the App Panel and has no documented hidden binding.",
-          "control": "output_dir"
-        },
-        {
-          "code": "undocumented_alias_candidate",
-          "severity": "error",
-          "message": "A deterministic name match suggests an adapter alias, but the source record does not explicitly authorize it.",
-          "control": "deg_table",
-          "expected": "deg_table",
-          "observed": "deg_file"
-        },
-        {
-          "code": "undocumented_alias_candidate",
-          "severity": "error",
-          "message": "A deterministic name match suggests an adapter alias, but the source record does not explicitly authorize it.",
-          "control": "expression_table",
-          "expected": "expression_table",
-          "observed": "expression_file"
-        },
-        {
-          "code": "undocumented_alias_candidate",
-          "severity": "error",
-          "message": "A deterministic name match suggests an adapter alias, but the source record does not explicitly authorize it.",
-          "control": "metadata_table",
-          "expected": "metadata_table",
-          "observed": "metadata_file"
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "p_adjust_method",
-          "expected": [
-            "BH",
-            "none",
-            "bonferroni",
-            "holm",
-            "fdr",
-            "hochberg",
-            "hommel",
-            "BY"
-          ],
-          "observed": []
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "image_height",
-          "expected": 5,
-          "observed": "5.5"
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "image_width",
-          "expected": 6,
-          "observed": "5"
-        },
-        {
-          "code": "app_panel_order_mismatch",
-          "severity": "warning",
-          "message": "App Panel control order differs from canonical schema order after documented/inferred alias mapping.",
-          "expected": [
-            "expression_file",
-            "metadata_file",
-            "deg_file",
-            "genes",
-            "gene_column",
-            "sample_column",
-            "category_column",
-            "categories",
-            "statistics_mode",
-            "pvalue_type",
-            "statistical_method",
-            "p_adjust_method",
-            "duplicate_aggregation",
-            "minimum_samples_per_category",
-            "plot_type",
-            "title",
-            "y_axis_label",
-            "colors",
-            "image_width",
-            "image_height",
-            "image_dpi"
-          ],
-          "observed": [
-            "expression_file",
-            "metadata_file",
-            "deg_file",
-            "genes",
-            "gene_column",
-            "sample_column",
-            "category_column",
-            "categories",
-            "statistics_mode",
-            "pvalue_type",
-            "statistical_method",
-            "p_adjust_method",
-            "minimum_samples_per_category",
-            "duplicate_aggregation",
-            "plot_type",
-            "title",
-            "y_axis_label",
-            "colors",
-            "image_width",
-            "image_height",
-            "image_dpi"
-          ]
-        },
-        {
           "code": "runtime_digest_missing",
           "severity": "warning",
           "message": "Adapter runtime is tag-addressed; no immutable digest is recorded.",
           "observed": "codeocean/omix-r-visualization:r4.4.3-v2"
-        },
-        {
-          "code": "source_record_hash_manifest_missing",
-          "severity": "warning",
-          "message": "OMIX_MODULE_SOURCE.md does not record per-file SHA-256 values."
         }
       ]
     },
     {
       "id": "OMIX-L2P-Multi",
       "repository": "https://github.com/NIDAP-Community/OMIX-L2P-Multi",
-      "canonical_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
+      "canonical_commit": "d41b2e3b1e3a0971c4a8b0341678774675a5fbeb",
       "adapter_commit": "0331e8efec5ac8e387d8ac96eb1b6a04bf618437",
       "inventory_states": {
         "schema_completeness": {
@@ -5098,7 +4710,7 @@
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX/pull/34",
             "https://github.com/NIDAP-Community/OMIX/pull/36",
-            "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-L2P-Multi/schemas/interface.yml"
+            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-L2P-Multi/schemas/interface.yml"
           ]
         },
         "scientific_export.recorded_parity": {
@@ -5109,10 +4721,11 @@
           ]
         },
         "scientific_export.current_parity": {
-          "status": "verified",
-          "note": "The exported scientific file matches the canonical snapshot.",
+          "status": "outdated",
+          "note": "The deployment remains intentionally pinned to its reviewed canonical 4.0.0 export. Canonical 4.0.1 adds comparison-order behavior and awaits a reviewed deployment re-export before the pin can move.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/0331e8efec5ac8e387d8ac96eb1b6a04bf618437/code/functions/analysis_functions.R"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/0331e8efec5ac8e387d8ac96eb1b6a04bf618437/code/functions/analysis_functions.R",
+            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-L2P-Multi/R/analysis_functions.R"
           ]
         },
         "scientific_export.source_record": {
@@ -6853,9 +6466,9 @@
           "adapter_path": "code/functions/analysis_functions.R",
           "recorded_source_sha256": "7624817aaba08d7fa64e9253453fdbf6b45c2a56e83cfb16dc8444445659586c",
           "adapter_sha256": "7624817aaba08d7fa64e9253453fdbf6b45c2a56e83cfb16dc8444445659586c",
-          "current_source_sha256": "7624817aaba08d7fa64e9253453fdbf6b45c2a56e83cfb16dc8444445659586c",
+          "current_source_sha256": "ff986b4ba0e25abd79388ecc1e79f8771381acd0ffb8461ead646b2a3a9e303a",
           "matches_recorded": true,
-          "matches_current": true
+          "matches_current": false
         }
       ],
       "findings": [
@@ -7039,6 +6652,12 @@
           ]
         },
         {
+          "code": "managed_source_current_drift",
+          "severity": "warning",
+          "message": "Managed adapter file does not match the current canonical source.",
+          "control": "code/functions/analysis_functions.R"
+        },
+        {
           "code": "runtime_digest_missing",
           "severity": "warning",
           "message": "Adapter runtime is tag-addressed; no immutable digest is recorded.",
@@ -7054,8 +6673,8 @@
     {
       "id": "OMIX-L2P-Single",
       "repository": "https://github.com/NIDAP-Community/OMIX-L2P-Single",
-      "canonical_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
-      "adapter_commit": "c3618f22125c44b49f76592a96304901bd93cb5c",
+      "canonical_commit": "d41b2e3b1e3a0971c4a8b0341678774675a5fbeb",
+      "adapter_commit": "838ae38501746a735b3dde77b375f21a4e92834c",
       "inventory_states": {
         "schema_completeness": {
           "status": "verified",
@@ -7063,40 +6682,46 @@
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX/pull/34",
             "https://github.com/NIDAP-Community/OMIX/pull/36",
-            "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-L2P-Single/schemas/interface.yml"
+            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-L2P-Single/schemas/interface.yml"
           ]
         },
         "scientific_export.recorded_parity": {
           "status": "verified",
-          "note": "Independent byte comparison confirms the export matches its recorded source.",
+          "note": "Independent review of PR #2 confirms the managed export is byte-identical to canonical module 3.1.0/interface 1 at the recorded source commit.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/c3618f22125c44b49f76592a96304901bd93cb5c/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/838ae38501746a735b3dde77b375f21a4e92834c/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2"
           ]
         },
         "scientific_export.current_parity": {
           "status": "verified",
-          "note": "The exported scientific file matches the canonical snapshot.",
+          "note": "The merged default-branch export matches both its recorded source and the current canonical scientific file.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/c3618f22125c44b49f76592a96304901bd93cb5c/code/functions/L2P_Analysis.R"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/838ae38501746a735b3dde77b375f21a4e92834c/code/functions/L2P_Analysis.R",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2"
           ]
         },
         "scientific_export.source_record": {
-          "status": "partial",
-          "note": "Present and accurate for the recorded scientific export, but it predates the completed canonical schema and does not record per-file hashes or an immutable runtime digest.",
+          "status": "verified",
+          "note": "The source record identifies canonical module 3.1.0/interface 1, its immutable source commit, exact managed mapping and hash, platform translations, and explicitly pending runtime, platform, Syncweaver, and release evidence.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/c3618f22125c44b49f76592a96304901bd93cb5c/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/838ae38501746a735b3dde77b375f21a4e92834c/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2"
           ]
         },
         "scientific_export.hash_manifest": {
-          "status": "pending",
-          "note": "Per-file SHA-256 values are absent from the adapter source record.",
-          "evidence": []
+          "status": "verified",
+          "note": "The source record lists matching canonical and adapter SHA-256 values for every managed scientific file.",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/838ae38501746a735b3dde77b375f21a4e92834c/OMIX_MODULE_SOURCE.md"
+          ]
         },
         "app_panel.coverage": {
-          "status": "outdated",
-          "note": "The default branch binds all 39 public/advanced slots except that deg_file aliases canonical deg_table, but multiple defaults drift: collections H versus GO,REACTOME,KEGG; minimum DEG 100 versus 50; label sizes 45/14/14/14/14 versus 50/15/20/20/15; and plot dimensions 14/16 versus 12/12. Draft PR #2 is a candidate remediation, not default-branch or Code Ocean evidence.",
+          "status": "partial",
+          "note": "The named App Panel exposes all 39 public and advanced controls. Canonical species=Human is intentionally translated to the documented Mouse demo preset, so the panel is structurally complete but does not claim exact canonical-default parity; internal output_dir remains platform-managed.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/c3618f22125c44b49f76592a96304901bd93cb5c/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/838ae38501746a735b3dde77b375f21a4e92834c/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/838ae38501746a735b3dde77b375f21a4e92834c/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2"
           ]
         },
@@ -7104,13 +6729,15 @@
           "status": "partial",
           "note": "A tagged base image and RCurl overlay are recorded, but no immutable digest is recorded.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/c3618f22125c44b49f76592a96304901bd93cb5c/.codeocean/environment.json"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/838ae38501746a735b3dde77b375f21a4e92834c/.codeocean/environment.json"
           ]
         },
         "local_tests": {
-          "status": "unknown",
-          "note": "No commit-specific local adapter test result was recorded in this snapshot.",
-          "evidence": []
+          "status": "verified",
+          "note": "PR #2 records passing source-parity, canonical-contract, App Panel, adapter CLI, testthat, and layout checks with independent review.",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2"
+          ]
         },
         "code_ocean_validation": {
           "status": "pending",
@@ -7118,10 +6745,11 @@
           "evidence": []
         },
         "syncweaver.readiness": {
-          "status": "blocked",
-          "note": "No lockfile, and adapter-only workflow_input.R is co-located in the proposed managed directory.",
+          "status": "pending",
+          "note": "The managed directory contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/tree/c3618f22125c44b49f76592a96304901bd93cb5c/code/functions"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/tree/838ae38501746a735b3dde77b375f21a4e92834c/code/functions",
+            "https://github.com/NIDAP-Community/OMIX/issues/44"
           ]
         }
       },
@@ -7873,123 +7501,123 @@
       "adapter_contract": {
         "cli_controls": [
           {
-            "name": "deg_file",
+            "name": "deg_table",
             "type": "character",
             "default": null,
             "order": 0
           },
           {
-            "name": "comparison",
+            "name": "custom_pathways",
             "type": "character",
             "default": null,
             "order": 1
           },
           {
-            "name": "comparisons",
+            "name": "comparison",
             "type": "character",
             "default": null,
             "order": 2
           },
           {
+            "name": "comparisons",
+            "type": "character",
+            "default": null,
+            "order": 3
+          },
+          {
             "name": "species",
             "type": "character",
             "default": "Mouse",
-            "order": 3
+            "order": 4
           },
           {
             "name": "collections_to_include",
             "type": "character",
             "default": "GO,REACTOME,KEGG",
-            "order": 4
+            "order": 5
           },
           {
             "name": "gene_names_column",
             "type": "character",
             "default": null,
-            "order": 5
+            "order": 6
           },
           {
             "name": "t_statistic_column",
             "type": "character",
             "default": null,
-            "order": 6
+            "order": 7
           },
           {
             "name": "significance_column",
             "type": "character",
             "default": null,
-            "order": 7
+            "order": 8
           },
           {
             "name": "fold_change_column",
             "type": "character",
             "default": null,
-            "order": 8
+            "order": 9
           },
           {
             "name": "select_by_rank",
             "type": "character",
             "default": "FALSE",
-            "order": 9
+            "order": 10
           },
           {
             "name": "select_top_percentage_of_genes",
             "type": "character",
             "default": "TRUE",
-            "order": 10
+            "order": 11
           },
           {
             "name": "select_top_genes",
             "type": "integer",
             "default": 500,
-            "order": 11
+            "order": 12
           },
           {
             "name": "significance_threshold",
             "type": "double",
             "default": 0.05,
-            "order": 12
+            "order": 13
           },
           {
             "name": "fold_change_threshold",
             "type": "double",
             "default": 1.2,
-            "order": 13
+            "order": 14
           },
           {
             "name": "minimum_number_of_deg_genes",
             "type": "integer",
             "default": 50,
-            "order": 14
+            "order": 15
           },
           {
             "name": "minimum_pathway_hit_count",
             "type": "integer",
             "default": 5,
-            "order": 15
+            "order": 16
           },
           {
             "name": "p_value_threshold_for_output",
             "type": "double",
             "default": 0.05,
-            "order": 16
+            "order": 17
           },
           {
             "name": "use_built_in_gene_universe",
             "type": "character",
             "default": "FALSE",
-            "order": 17
+            "order": 18
           },
           {
             "name": "use_fdr_p_values",
             "type": "character",
             "default": "FALSE",
-            "order": 18
-          },
-          {
-            "name": "custom_pathways",
-            "type": "character",
-            "default": null,
             "order": 19
           },
           {
@@ -8110,30 +7738,32 @@
         "app_panel_named_parameters": true,
         "app_panel_controls": [
           {
-            "name": "deg_file",
-            "type": "list",
-            "default": "All DEG",
-            "allowed": [
-              "",
-              "Table",
-              "Filtered DEG",
-              "All DEG"
-            ],
+            "name": "deg_table",
+            "type": "file",
+            "default": null,
+            "allowed": [],
             "order": 0
+          },
+          {
+            "name": "custom_pathways",
+            "type": "file",
+            "default": null,
+            "allowed": [],
+            "order": 1
           },
           {
             "name": "comparison",
             "type": "text",
             "default": "",
             "allowed": [],
-            "order": 1
+            "order": 2
           },
           {
             "name": "comparisons",
             "type": "text",
             "default": "",
             "allowed": [],
-            "order": 2
+            "order": 3
           },
           {
             "name": "species",
@@ -8142,123 +7772,116 @@
             "allowed": [
               "Human",
               "Mouse",
-              "Rat",
               "Macaque",
+              "Rat",
               "Zebrafish",
               "Rabbit",
               "Drosophila"
             ],
-            "order": 3
+            "order": 4
           },
           {
             "name": "collections_to_include",
             "type": "text",
-            "default": "H",
+            "default": "GO,REACTOME,KEGG",
             "allowed": [],
-            "order": 4
+            "order": 5
           },
           {
             "name": "gene_names_column",
             "type": "text",
             "default": "",
             "allowed": [],
-            "order": 5
+            "order": 6
           },
           {
             "name": "t_statistic_column",
             "type": "text",
             "default": "",
             "allowed": [],
-            "order": 6
+            "order": 7
           },
           {
             "name": "significance_column",
             "type": "text",
             "default": "",
             "allowed": [],
-            "order": 7
+            "order": 8
           },
           {
             "name": "fold_change_column",
             "type": "text",
             "default": "",
             "allowed": [],
-            "order": 8
+            "order": 9
           },
           {
             "name": "select_by_rank",
             "type": "text",
             "default": "FALSE",
             "allowed": [],
-            "order": 9
+            "order": 10
           },
           {
             "name": "select_top_percentage_of_genes",
             "type": "text",
             "default": "TRUE",
             "allowed": [],
-            "order": 10
+            "order": 11
           },
           {
             "name": "select_top_genes",
             "type": "text",
             "default": "500",
             "allowed": [],
-            "order": 11
+            "order": 12
           },
           {
             "name": "significance_threshold",
             "type": "text",
             "default": "0.05",
             "allowed": [],
-            "order": 12
+            "order": 13
           },
           {
             "name": "fold_change_threshold",
             "type": "text",
             "default": "1.2",
             "allowed": [],
-            "order": 13
+            "order": 14
           },
           {
             "name": "minimum_number_of_deg_genes",
             "type": "text",
-            "default": "100",
+            "default": "50",
             "allowed": [],
-            "order": 14
+            "order": 15
           },
           {
             "name": "minimum_pathway_hit_count",
             "type": "text",
             "default": "5",
             "allowed": [],
-            "order": 15
+            "order": 16
           },
           {
             "name": "p_value_threshold_for_output",
             "type": "text",
             "default": "0.05",
             "allowed": [],
-            "order": 16
+            "order": 17
           },
           {
             "name": "use_built_in_gene_universe",
             "type": "text",
             "default": "FALSE",
             "allowed": [],
-            "order": 17
+            "order": 18
           },
           {
             "name": "use_fdr_p_values",
             "type": "text",
             "default": "FALSE",
-            "allowed": [],
-            "order": 18
-          },
-          {
-            "name": "custom_pathways",
-            "type": "file",
-            "default": null,
             "allowed": [],
             "order": 19
           },
@@ -8286,35 +7909,35 @@
           {
             "name": "pathway_axis_label_max_length",
             "type": "text",
-            "default": "45",
+            "default": "50",
             "allowed": [],
             "order": 23
           },
           {
             "name": "pathway_axis_label_font_size",
             "type": "text",
-            "default": "14",
+            "default": "15",
             "allowed": [],
             "order": 24
           },
           {
             "name": "x_axis_title_font_size",
             "type": "text",
-            "default": "14",
+            "default": "20",
             "allowed": [],
             "order": 25
           },
           {
             "name": "y_axis_title_font_size",
             "type": "text",
-            "default": "14",
+            "default": "20",
             "allowed": [],
             "order": 26
           },
           {
             "name": "x_axis_tick_font_size",
             "type": "text",
-            "default": "14",
+            "default": "15",
             "allowed": [],
             "order": 27
           },
@@ -8352,8 +7975,10 @@
             "default": "percent gene hits per pathway",
             "allowed": [
               "percent gene hits per pathway",
-              "number of hits",
-              "Fisher's Exact pval"
+              "Fisher's Exact pval",
+              "fdr corrected pval",
+              "enrichment score",
+              "number of hits"
             ],
             "order": 32
           },
@@ -8364,7 +7989,9 @@
             "allowed": [
               "number of hits",
               "percent gene hits per pathway",
-              "Fisher's Exact pval"
+              "enrichment score",
+              "Fisher's Exact pval",
+              "fdr corrected pval"
             ],
             "order": 33
           },
@@ -8374,8 +8001,10 @@
             "default": "Fisher's Exact pval",
             "allowed": [
               "Fisher's Exact pval",
+              "fdr corrected pval",
+              "percent gene hits per pathway",
               "number of hits",
-              "percent gene hits per pathway"
+              "enrichment score"
             ],
             "order": 34
           },
@@ -8386,8 +8015,7 @@
             "allowed": [
               "blues",
               "reds",
-              "greens",
-              "purples"
+              "blue to red"
             ],
             "order": 35
           },
@@ -8396,23 +8024,29 @@
             "type": "list",
             "default": "GreentoBlue",
             "allowed": [
+              "Blue",
+              "Green",
+              "Orange",
+              "Grey",
+              "Red",
+              "Purple",
               "GreentoBlue",
-              "RedtoBlue",
-              "YellowtoRed"
+              "OrangetoRed",
+              "YellowOrangeRed"
             ],
             "order": 36
           },
           {
             "name": "export_plot_width",
             "type": "text",
-            "default": "14",
+            "default": "12",
             "allowed": [],
             "order": 37
           },
           {
             "name": "export_plot_height",
             "type": "text",
-            "default": "16",
+            "default": "12",
             "allowed": [],
             "order": 38
           }
@@ -8420,21 +8054,13 @@
         "documented_aliases": {},
         "documented_hidden_inputs": {},
         "source_record_metadata": {
-          "canonical_source_commit": "b65eeb3c231eb9dfbdbc09326ab03c23bbe84c8f",
+          "canonical_source_commit": "eee4433cd74d0ce9bd1daba1571ca6312cba7ea2",
           "module_version": "3.1.0",
           "interface_version": 1,
-          "has_per_file_sha256": false
+          "has_per_file_sha256": true
         },
-        "inferred_aliases": {
-          "deg_table": "deg_file"
-        },
-        "alias_candidates": [
-          {
-            "canonical": "deg_table",
-            "adapter": "deg_file",
-            "score": 1.0
-          }
-        ],
+        "inferred_aliases": {},
+        "alias_candidates": [],
         "runtime": {
           "base_image": "codeocean/omix-r-pathway:r4.4.3-bioconductor3.20-v1",
           "digest": null
@@ -8453,24 +8079,6 @@
       ],
       "findings": [
         {
-          "code": "app_panel_type_mismatch",
-          "severity": "error",
-          "message": "App Panel control type is incompatible with the canonical schema.",
-          "control": "deg_table",
-          "expected": [
-            "file"
-          ],
-          "observed": "list"
-        },
-        {
-          "code": "undocumented_alias_candidate",
-          "severity": "error",
-          "message": "A deterministic name match suggests an adapter alias, but the source record does not explicitly authorize it.",
-          "control": "deg_table",
-          "expected": "deg_table",
-          "observed": "deg_file"
-        },
-        {
           "code": "adapter_cli_default_mismatch",
           "severity": "warning",
           "message": "Adapter CLI default differs from the canonical contract.",
@@ -8479,178 +8087,6 @@
           "observed": "Mouse"
         },
         {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "bubble_colors",
-          "expected": [
-            "blues",
-            "reds",
-            "blue to red"
-          ],
-          "observed": [
-            "blues",
-            "reds",
-            "greens",
-            "purples"
-          ]
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "color_for_bar",
-          "expected": [
-            "Blue",
-            "Green",
-            "Orange",
-            "Grey",
-            "Red",
-            "Purple",
-            "GreentoBlue",
-            "OrangetoRed",
-            "YellowOrangeRed"
-          ],
-          "observed": [
-            "GreentoBlue",
-            "RedtoBlue",
-            "YellowtoRed"
-          ]
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "plot_bubble_color",
-          "expected": [
-            "Fisher's Exact pval",
-            "fdr corrected pval",
-            "percent gene hits per pathway",
-            "number of hits",
-            "enrichment score"
-          ],
-          "observed": [
-            "Fisher's Exact pval",
-            "number of hits",
-            "percent gene hits per pathway"
-          ]
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "plot_bubble_size",
-          "expected": [
-            "number of hits",
-            "percent gene hits per pathway",
-            "enrichment score",
-            "Fisher's Exact pval",
-            "fdr corrected pval"
-          ],
-          "observed": [
-            "number of hits",
-            "percent gene hits per pathway",
-            "Fisher's Exact pval"
-          ]
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "sort_bubble_plot_by",
-          "expected": [
-            "percent gene hits per pathway",
-            "Fisher's Exact pval",
-            "fdr corrected pval",
-            "enrichment score",
-            "number of hits"
-          ],
-          "observed": [
-            "percent gene hits per pathway",
-            "number of hits",
-            "Fisher's Exact pval"
-          ]
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "species",
-          "expected": [
-            "Human",
-            "Mouse",
-            "Macaque",
-            "Rat",
-            "Zebrafish",
-            "Rabbit",
-            "Drosophila"
-          ],
-          "observed": [
-            "Human",
-            "Mouse",
-            "Rat",
-            "Macaque",
-            "Zebrafish",
-            "Rabbit",
-            "Drosophila"
-          ]
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "collections_to_include",
-          "expected": "GO,REACTOME,KEGG",
-          "observed": "H"
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "deg_table",
-          "observed": "All DEG"
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "export_plot_height",
-          "expected": 12,
-          "observed": "16"
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "export_plot_width",
-          "expected": 12,
-          "observed": "14"
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "minimum_number_of_deg_genes",
-          "expected": 50,
-          "observed": "100"
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "pathway_axis_label_font_size",
-          "expected": 15,
-          "observed": "14"
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "pathway_axis_label_max_length",
-          "expected": 50,
-          "observed": "45"
-        },
-        {
           "code": "app_panel_default_mismatch",
           "severity": "warning",
           "message": "App Panel default differs from the canonical contract.",
@@ -8659,148 +8095,32 @@
           "observed": "Mouse"
         },
         {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "x_axis_tick_font_size",
-          "expected": 15,
-          "observed": "14"
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "x_axis_title_font_size",
-          "expected": 20,
-          "observed": "14"
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "y_axis_title_font_size",
-          "expected": 20,
-          "observed": "14"
-        },
-        {
-          "code": "app_panel_order_mismatch",
-          "severity": "warning",
-          "message": "App Panel control order differs from canonical schema order after documented/inferred alias mapping.",
-          "expected": [
-            "deg_file",
-            "custom_pathways",
-            "comparison",
-            "comparisons",
-            "species",
-            "collections_to_include",
-            "gene_names_column",
-            "t_statistic_column",
-            "significance_column",
-            "fold_change_column",
-            "select_by_rank",
-            "select_top_percentage_of_genes",
-            "select_top_genes",
-            "significance_threshold",
-            "fold_change_threshold",
-            "minimum_number_of_deg_genes",
-            "minimum_pathway_hit_count",
-            "p_value_threshold_for_output",
-            "use_built_in_gene_universe",
-            "use_fdr_p_values",
-            "custom_pathway_name_column",
-            "custom_pathway_gene_column",
-            "number_of_pathways_to_plot",
-            "pathway_axis_label_max_length",
-            "pathway_axis_label_font_size",
-            "x_axis_title_font_size",
-            "y_axis_title_font_size",
-            "x_axis_tick_font_size",
-            "plot_top_pathways_up",
-            "pathways_to_use_up",
-            "plot_top_pathways_down",
-            "pathways_to_use_down",
-            "sort_bubble_plot_by",
-            "plot_bubble_size",
-            "plot_bubble_color",
-            "bubble_colors",
-            "color_for_bar",
-            "export_plot_width",
-            "export_plot_height"
-          ],
-          "observed": [
-            "deg_file",
-            "comparison",
-            "comparisons",
-            "species",
-            "collections_to_include",
-            "gene_names_column",
-            "t_statistic_column",
-            "significance_column",
-            "fold_change_column",
-            "select_by_rank",
-            "select_top_percentage_of_genes",
-            "select_top_genes",
-            "significance_threshold",
-            "fold_change_threshold",
-            "minimum_number_of_deg_genes",
-            "minimum_pathway_hit_count",
-            "p_value_threshold_for_output",
-            "use_built_in_gene_universe",
-            "use_fdr_p_values",
-            "custom_pathways",
-            "custom_pathway_name_column",
-            "custom_pathway_gene_column",
-            "number_of_pathways_to_plot",
-            "pathway_axis_label_max_length",
-            "pathway_axis_label_font_size",
-            "x_axis_title_font_size",
-            "y_axis_title_font_size",
-            "x_axis_tick_font_size",
-            "plot_top_pathways_up",
-            "pathways_to_use_up",
-            "plot_top_pathways_down",
-            "pathways_to_use_down",
-            "sort_bubble_plot_by",
-            "plot_bubble_size",
-            "plot_bubble_color",
-            "bubble_colors",
-            "color_for_bar",
-            "export_plot_width",
-            "export_plot_height"
-          ]
-        },
-        {
           "code": "runtime_digest_missing",
           "severity": "warning",
           "message": "Adapter runtime is tag-addressed; no immutable digest is recorded.",
           "observed": "codeocean/omix-r-pathway:r4.4.3-bioconductor3.20-v1"
-        },
-        {
-          "code": "source_record_hash_manifest_missing",
-          "severity": "warning",
-          "message": "OMIX_MODULE_SOURCE.md does not record per-file SHA-256 values."
         }
       ]
     },
     {
       "id": "OMIX-Volcano-Plot",
       "repository": "https://github.com/NIDAP-Community/OMIX-Volcano-Plot",
-      "canonical_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
-      "adapter_commit": "8a54215e741565a01b2afa36808ff8558e4c7af5",
+      "canonical_commit": "d41b2e3b1e3a0971c4a8b0341678774675a5fbeb",
+      "adapter_commit": "2a30686f93830ca55e92dc9512c34028d4db4b20",
       "inventory_states": {
         "schema_completeness": {
           "status": "verified",
           "note": "Merged PR #33 records 40 public/advanced CLI controls and 3 internal bindings, explicitly distinguishing canonical resolution_dpi from the implementation-only resolution_dpi_ argument.",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX/pull/33",
-            "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-Volcano-Plot/schemas/interface.yml"
+            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-Volcano-Plot/schemas/interface.yml"
           ]
         },
         "scientific_export.recorded_parity": {
           "status": "verified",
           "note": "Independent Canvas and Beacon reviews of PR #2 confirm the complete managed export is byte-identical to the recorded canonical source.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/2a30686f93830ca55e92dc9512c34028d4db4b20/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2"
           ]
         },
@@ -8808,16 +8128,16 @@
           "status": "verified",
           "note": "The merged default-branch export matches both its recorded source and the current canonical scientific file.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/code/functions/Volcano_Plot_Enhanced.R",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/2a30686f93830ca55e92dc9512c34028d4db4b20/code/functions/Volcano_Plot_Enhanced.R",
             "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2",
-            "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-Volcano-Plot/R/Volcano_Plot_Enhanced.R"
+            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-Volcano-Plot/R/Volcano_Plot_Enhanced.R"
           ]
         },
         "scientific_export.source_record": {
           "status": "verified",
           "note": "The source record identifies canonical module 1.0.0/interface 1, the immutable source commit, exact file mapping and hash, hidden output binding, deprecated compatibility alias, and explicitly pending runtime, platform, Syncweaver, and release evidence.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/2a30686f93830ca55e92dc9512c34028d4db4b20/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2"
           ]
         },
@@ -8825,23 +8145,25 @@
           "status": "verified",
           "note": "The source record lists the shared canonical and adapter SHA-256 value for every managed scientific file.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/2a30686f93830ca55e92dc9512c34028d4db4b20/OMIX_MODULE_SOURCE.md"
           ]
         },
         "app_panel.coverage": {
           "status": "verified",
           "note": "The named App Panel exposes 39 canonical public and advanced controls with canonical names, types, choices, order, and defaults; output_dir is the sole documented platform-managed hidden control.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/.codeocean/app-panel.json",
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/2a30686f93830ca55e92dc9512c34028d4db4b20/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/2a30686f93830ca55e92dc9512c34028d4db4b20/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2"
           ]
         },
         "runtime.provenance": {
           "status": "partial",
-          "note": "A tagged legacy py-r image and package overlay are recorded, but no immutable digest is recorded; compatibility with canonical r-visualization remains unverified.",
+          "note": "The source record verifies the published r-visualization GHCR image at sha256:1d9f453b49412aa05e9d3420cd4b1b4ea0beac4923cb40572af38b0ae2a46830. The adapter still selects the legacy Code Ocean py-r image; its digest and runtime-profile reconciliation remain unresolved and are not inferred from GHCR.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/.codeocean/environment.json",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/2a30686f93830ca55e92dc9512c34028d4db4b20/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/2a30686f93830ca55e92dc9512c34028d4db4b20/.codeocean/environment.json",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/3",
             "https://github.com/NIDAP-Community/OMIX/issues/43"
           ]
         },
@@ -8861,7 +8183,7 @@
           "status": "pending",
           "note": "The managed directory now contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/tree/8a54215e741565a01b2afa36808ff8558e4c7af5/code/functions",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/tree/2a30686f93830ca55e92dc9512c34028d4db4b20/code/functions",
             "https://github.com/NIDAP-Community/OMIX/issues/44"
           ]
         }
