@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Preserve the requested comparison grouping in returned and CSV-exported
+  result rows while retaining the existing within-comparison p-value ranking.
 - Standardize machine-readable control metadata on the project-wide
   `classification` key without changing CLI behavior, defaults, outputs, or
   interface version.

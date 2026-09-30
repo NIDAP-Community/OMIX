@@ -16,6 +16,9 @@ on:
           - r-pathway
           - r-seurat-conversion
 
+permissions:
+  contents: read
+
 jobs:
   select-targets:
     runs-on: ubuntu-latest

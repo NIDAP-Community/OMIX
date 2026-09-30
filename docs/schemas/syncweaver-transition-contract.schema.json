@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/NIDAP-Community/OMIX/docs/schemas/syncweaver-transition-contract.schema.json",
+  "title": "OMIX Syncweaver transition preparation contract",
+  "description": "Tool-agnostic, reviewable evidence for onboarding verified deployment-adapter scientific exports. This is not a Syncweaver API or generated lockfile.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_kind",
+    "status",
+    "work_item",
+    "canonical_repository",
+    "preparation_commit",
+    "policy",
+    "adapters"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "contract_kind": {"const": "omix-syncweaver-transition-preparation"},
+    "status": {"const": "preparation_only"},
+    "work_item": {"type": "string", "format": "uri"},
+    "canonical_repository": {"type": "string", "format": "uri"},
+    "preparation_commit": {"$ref": "#/$defs/git_sha"},
+    "policy": {"$ref": "#/$defs/policy"},
+    "adapters": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/adapter_contract"}
+    }
+  },
+  "$defs": {
+    "git_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "relative_path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+    },
+    "nonempty_string_array": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "stop_condition": {
+      "type": "object",
+      "required": ["id", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "description": {"type": "string", "minLength": 1}
+      }
+    },
+    "policy": {
+      "type": "object",
+      "required": [
+        "scientific_flow",
+        "scientific_authority",
+        "conflict_resolution",
+        "timestamp_resolution_allowed",
+        "all_unlisted_adapter_paths_protected",
+        "automation_metadata_paths",
+        "stop_conditions",
+        "required_pre_sync_checks",
+        "required_post_sync_checks",
+        "external_release_gates"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "scientific_flow": {"const": "canonical_to_adapter_only"},
+        "scientific_authority": {"const": "canonical_commit_and_sha256"},
+        "conflict_resolution": {"const": "stop_and_review"},
+        "timestamp_resolution_allowed": {"const": false},
+        "all_unlisted_adapter_paths_protected": {"const": true},
+        "automation_metadata_paths": {
+          "type": "array",
+          "const": [".syncweaver-lock.json"]
+        },
+        "stop_conditions": {
+          "type": "array",
+          "minItems": 8,
+          "items": {"$ref": "#/$defs/stop_condition"}
+        },
+        "required_pre_sync_checks": {"$ref": "#/$defs/nonempty_string_array"},
+        "required_post_sync_checks": {"$ref": "#/$defs/nonempty_string_array"},
+        "external_release_gates": {"$ref": "#/$defs/nonempty_string_array"}
+      }
+    },
+    "canonical": {
+      "type": "object",
+      "required": [
+        "module_path",
+        "module_version",
+        "interface_version",
+        "source_commit",
+        "source_root",
+        "schema_path"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "module_path": {"$ref": "#/$defs/relative_path"},
+        "module_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "interface_version": {"type": "integer", "minimum": 1},
+        "source_commit": {"$ref": "#/$defs/git_sha"},
+        "source_root": {"$ref": "#/$defs/relative_path"},
+        "schema_path": {"$ref": "#/$defs/relative_path"}
+      }
+    },
+    "adapter": {
+      "type": "object",
+      "required": [
+        "repository",
+        "default_branch",
+        "baseline_commit",
+        "source_record_path",
+        "managed_destination_root",
+        "generated_lock_path"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "repository": {"type": "string", "format": "uri"},
+        "default_branch": {"type": "string", "minLength": 1},
+        "baseline_commit": {"$ref": "#/$defs/git_sha"},
+        "source_record_path": {"$ref": "#/$defs/relative_path"},
+        "managed_destination_root": {"$ref": "#/$defs/relative_path"},
+        "generated_lock_path": {"const": ".syncweaver-lock.json"}
+      }
+    },
+    "mapping": {
+      "type": "object",
+      "required": [
+        "source_path",
+        "destination_path",
+        "source_sha256",
+        "expected_destination_sha256"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "source_path": {"$ref": "#/$defs/relative_path"},
+        "destination_path": {"$ref": "#/$defs/relative_path"},
+        "source_sha256": {"$ref": "#/$defs/sha256"},
+        "expected_destination_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "test_commands": {
+      "type": "object",
+      "required": ["canonical", "adapter"],
+      "additionalProperties": false,
+      "properties": {
+        "canonical": {"$ref": "#/$defs/nonempty_string_array"},
+        "adapter": {"$ref": "#/$defs/nonempty_string_array"}
+      }
+    },
+    "adapter_contract": {
+      "type": "object",
+      "required": [
+        "id",
+        "canonical",
+        "adapter",
+        "mappings",
+        "platform_owned_exclusion_paths",
+        "test_commands"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^OMIX-[A-Za-z0-9-]+$"},
+        "canonical": {"$ref": "#/$defs/canonical"},
+        "adapter": {"$ref": "#/$defs/adapter"},
+        "mappings": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/mapping"}
+        },
+        "platform_owned_exclusion_paths": {"$ref": "#/$defs/nonempty_string_array"},
+        "test_commands": {"$ref": "#/$defs/test_commands"}
+      }
+    }
+  }
+}
