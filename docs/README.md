@@ -10,6 +10,7 @@ module locally, in a container, or on HPC.
 | Changing portable scientific code, a module interface, or documentation | [Module contract](module-contract.md), then [Contributor guide](contributor-guide.md) |
 | Creating or maintaining a deployment adapter | [Deployment adapter guide](deployment-adapter-guide.md) after the two documents above |
 | Reviewing deployment parity, provenance, or readiness | [Deployment adapter inventory](deployment-adapter-inventory.md), then the adapter guide's audit checklist |
+| Preparing a parity-reviewed adapter for controlled Syncweaver maintenance | [Syncweaver transition contract](syncweaver-transition-contract.md) after the deployment adapter guide |
 | Changing a shared R/container environment or reproducing a result | [Runtime guide](runtime-guide.md) |
 | Exporting a portable pathway catalog for L2P, GSEA, or GSVA | [Pathway data export contract](pathway-data-export-contract.md) |
 | Preparing a human-reviewed release | [Versioning and releases](versioning-and-releases.md) |

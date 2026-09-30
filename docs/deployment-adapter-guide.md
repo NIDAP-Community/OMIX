@@ -179,6 +179,11 @@ source, Harbor must stop, preserve the diff, and report the drift. Timestamps do
 not determine which version is current. When Syncweaver is ready, onboard the
 same mapping and pinned source without creating a second scientific-code path.
 
+Use the [Syncweaver transition contract](syncweaver-transition-contract.md)
+for the reviewed mapping, protected-path, stop-condition, and pre/post-test
+evidence required before onboarding. The transition record is policy and
+evidence, not a hand-authored Syncweaver lockfile or an invented automation API.
+
 ## Standard adapter README
 
 Use this order in every user-facing adapter README:
