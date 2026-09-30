@@ -72,6 +72,21 @@ select_l2p_multi_export_pathways <- function(
   sort(names(pathway_counts[pathway_counts >= number_of_significant_events]))
 }
 
+#' Order multi-comparison L2P results for return and export
+#'
+#' Keep comparison blocks in the order requested by the caller while retaining
+#' the established ascending p-value ranking within each comparison. This
+#' ordering is applied to the returned table before either CSV export path.
+#'
+#' @param results Combined L2P result table containing `group` and `pval`.
+#' @param comparison_levels Ordered comparison labels requested by the caller.
+#' @return `results` with an ordered `group` factor and deterministically
+#'   grouped rows.
+order_l2p_multi_results <- function(results, comparison_levels) {
+  results$group <- factor(results$group, levels = comparison_levels)
+  dplyr::arrange(results, .data$group, .data$pval)
+}
+
 #' L2P Analysis for Multiple Comparisons [CCBR] [scRNA-seq] [Bulk]
 #'
 #' @description
@@ -1618,8 +1633,8 @@ l2p_multi <- function(
       fold_change_columns
     )
   }
-  pathall$group <- factor(pathall$group, levels = grouplevel)
   pathall %>% dplyr::filter(!pathway_name %in% pathways_to_remove) -> pathall
+  pathall <- order_l2p_multi_results(pathall, grouplevel)
 
   pathall_output <- pathall
   # The portable CLI now uses OmixPathwayPlots as its sole figure renderer.
