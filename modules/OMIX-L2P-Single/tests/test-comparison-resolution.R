@@ -26,6 +26,50 @@ stopifnot(identical(
   "Treatment-Control"
 ))
 
+alternative_columns <- c(
+  "GeneName", "B-A_statistic", "B-A_adjpval", "B-A_logFC"
+)
+stopifnot(identical(
+  detect_l2p_comparisons(
+    alternative_columns,
+    select_by_rank = FALSE,
+    significance_suffix = "_adjpval",
+    fold_change_suffix = "_logFC"
+  ),
+  "B-A"
+))
+stopifnot(identical(
+  detect_l2p_comparisons(
+    alternative_columns,
+    select_by_rank = TRUE,
+    t_statistic_suffix = "_statistic"
+  ),
+  "B-A"
+))
+alternative_resolution <- resolve_l2p_comparison_columns(
+  comparison = "B-A",
+  t_statistic_suffix = "_statistic",
+  significance_suffix = "_adjpval",
+  fold_change_suffix = "_logFC"
+)
+stopifnot(identical(
+  alternative_resolution,
+  list(
+    t_statistic_column = "B-A_statistic",
+    significance_column = "B-A_adjpval",
+    fold_change_column = "B-A_logFC"
+  )
+))
+override_resolution <- resolve_l2p_comparison_columns(
+  comparison = "B-A",
+  significance_column = "nominal_probability",
+  fold_change_column = "effect_size"
+)
+stopifnot(
+  identical(override_resolution$significance_column, "nominal_probability"),
+  identical(override_resolution$fold_change_column, "effect_size")
+)
+
 explicit_order <- resolve_l2p_comparisons(
   comparisons = "B-A,C-A,C-B",
   column_names = threshold_columns

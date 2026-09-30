@@ -2,20 +2,49 @@
 # L2P gene-list method. This helper is deliberately independent of optparse and
 # deployment paths so the portable CLI and deployment adapters can use the same
 # comparison-discovery rule.
-detect_l2p_comparisons <- function(column_names, select_by_rank = FALSE) {
+detect_l2p_comparisons <- function(
+  column_names,
+  select_by_rank = FALSE,
+  t_statistic_suffix = "_tstat",
+  significance_suffix = "_pval",
+  fold_change_suffix = "_FC"
+) {
   column_names <- as.character(column_names)
+
+  validate_suffix <- function(value, name) {
+    if (
+      length(value) != 1L || is.na(value) ||
+        !nzchar(as.character(value))
+    ) {
+      stop("ERROR: `", name, "` must be one non-empty suffix.")
+    }
+    trimws(as.character(value))
+  }
+  t_statistic_suffix <- validate_suffix(
+    t_statistic_suffix,
+    "t_statistic_suffix"
+  )
+  significance_suffix <- validate_suffix(
+    significance_suffix,
+    "significance_suffix"
+  )
+  fold_change_suffix <- validate_suffix(
+    fold_change_suffix,
+    "fold_change_suffix"
+  )
 
   prefixes_for_suffix <- function(suffix) {
     matched <- column_names[endsWith(column_names, suffix)]
-    unique(substr(matched, 1L, nchar(matched) - nchar(suffix)))
+    prefixes <- unique(substr(matched, 1L, nchar(matched) - nchar(suffix)))
+    prefixes[nzchar(prefixes)]
   }
 
   if (isTRUE(select_by_rank)) {
-    return(prefixes_for_suffix("_tstat"))
+    return(prefixes_for_suffix(t_statistic_suffix))
   }
 
-  significance_prefixes <- prefixes_for_suffix("_pval")
-  fold_change_prefixes <- prefixes_for_suffix("_FC")
+  significance_prefixes <- prefixes_for_suffix(significance_suffix)
+  fold_change_prefixes <- prefixes_for_suffix(fold_change_suffix)
 
   significance_prefixes[significance_prefixes %in% fold_change_prefixes]
 }
@@ -28,7 +57,10 @@ resolve_l2p_comparisons <- function(
   comparison = NULL,
   comparisons = NULL,
   column_names,
-  select_by_rank = FALSE
+  select_by_rank = FALSE,
+  t_statistic_suffix = "_tstat",
+  significance_suffix = "_pval",
+  fold_change_suffix = "_FC"
 ) {
   as_nonempty_list <- function(value) {
     if (is.null(value) || length(value) == 0L || is.na(value[[1L]])) {
@@ -65,7 +97,10 @@ resolve_l2p_comparisons <- function(
 
   detected <- detect_l2p_comparisons(
     column_names = column_names,
-    select_by_rank = select_by_rank
+    select_by_rank = select_by_rank,
+    t_statistic_suffix = t_statistic_suffix,
+    significance_suffix = significance_suffix,
+    fold_change_suffix = fold_change_suffix
   )
   if (length(detected) == 1L) {
     message("No comparison was supplied. Using the unambiguous detected comparison: ", detected)
@@ -73,11 +108,15 @@ resolve_l2p_comparisons <- function(
   }
   if (length(detected) == 0L) {
     required_columns <- if (isTRUE(select_by_rank)) {
-      "a comparison-prefixed t-statistic column such as `B-A_tstat`"
+      paste0(
+        "a comparison-prefixed t-statistic column ending in `",
+        t_statistic_suffix,
+        "`"
+      )
     } else {
       paste0(
         "matching comparison-prefixed significance and fold-change columns ",
-        "such as `B-A_pval` and `B-A_FC`"
+        "ending in `", significance_suffix, "` and `", fold_change_suffix, "`"
       )
     }
     stop(
@@ -90,6 +129,57 @@ resolve_l2p_comparisons <- function(
     "ERROR: Multiple comparison prefixes were detected: ",
     paste(detected, collapse = ", "),
     ". Supply `--comparison` or an ordered `--comparisons` list."
+  )
+}
+
+# Resolve the exact columns for one comparison. Exact single-comparison column
+# overrides win; otherwise the configured suffixes are appended to the
+# comparison. Deployment adapters can use this helper without reimplementing
+# scientific column-selection precedence.
+resolve_l2p_comparison_columns <- function(
+  comparison,
+  t_statistic_column = NULL,
+  significance_column = NULL,
+  fold_change_column = NULL,
+  t_statistic_suffix = "_tstat",
+  significance_suffix = "_pval",
+  fold_change_suffix = "_FC"
+) {
+  nonempty_scalar <- function(value) {
+    !is.null(value) && length(value) == 1L && !is.na(value) &&
+      nzchar(trimws(as.character(value)))
+  }
+  value_or_suffix <- function(value, suffix, name) {
+    if (nonempty_scalar(value)) {
+      return(trimws(as.character(value)))
+    }
+    if (!nonempty_scalar(suffix)) {
+      stop("ERROR: `", name, "` must be one non-empty suffix.")
+    }
+    paste0(comparison, as.character(suffix))
+  }
+
+  if (!nonempty_scalar(comparison)) {
+    stop("ERROR: `comparison` must be one non-empty identifier.")
+  }
+  comparison <- trimws(as.character(comparison))
+
+  list(
+    t_statistic_column = value_or_suffix(
+      t_statistic_column,
+      t_statistic_suffix,
+      "t_statistic_suffix"
+    ),
+    significance_column = value_or_suffix(
+      significance_column,
+      significance_suffix,
+      "significance_suffix"
+    ),
+    fold_change_column = value_or_suffix(
+      fold_change_column,
+      fold_change_suffix,
+      "fold_change_suffix"
+    )
   )
 }
 

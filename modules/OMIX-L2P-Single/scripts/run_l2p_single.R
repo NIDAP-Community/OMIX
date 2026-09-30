@@ -32,6 +32,9 @@ option_list <- list(
   make_option("--t_statistic_column", type = "character", default = NULL),
   make_option("--significance_column", type = "character", default = NULL),
   make_option("--fold_change_column", type = "character", default = NULL),
+  make_option("--t_statistic_suffix", type = "character", default = "_tstat"),
+  make_option("--significance_suffix", type = "character", default = "_pval"),
+  make_option("--fold_change_suffix", type = "character", default = "_FC"),
   make_option("--select_by_rank", type = "character", default = "false"),
   make_option("--select_top_percentage_of_genes", type = "character", default = "true"),
   make_option("--select_top_genes", type = "integer", default = 500L),
@@ -121,7 +124,10 @@ comparisons <- resolve_l2p_comparisons(
   comparison = opt[["comparison"]],
   comparisons = opt[["comparisons"]],
   column_names = colnames(deg_table),
-  select_by_rank = select_by_rank
+  select_by_rank = select_by_rank,
+  t_statistic_suffix = opt$t_statistic_suffix,
+  significance_suffix = opt$significance_suffix,
+  fold_change_suffix = opt$fold_change_suffix
 )
 
 is_batched_run <- length(comparisons) > 1L
@@ -156,13 +162,22 @@ run_manifest <- lapply(seq_along(comparisons), function(index) {
   run_dir <- if (is_batched_run) file.path(opt$output_dir, comparison_slugs[[index]]) else opt$output_dir
   dir.create(run_dir, recursive = TRUE, showWarnings = FALSE)
   results_file <- file.path(run_dir, "l2p_results.csv")
+  comparison_columns <- resolve_l2p_comparison_columns(
+    comparison = comparison,
+    t_statistic_column = if (is_batched_run) NULL else opt$t_statistic_column,
+    significance_column = if (is_batched_run) NULL else opt$significance_column,
+    fold_change_column = if (is_batched_run) NULL else opt$fold_change_column,
+    t_statistic_suffix = opt$t_statistic_suffix,
+    significance_suffix = opt$significance_suffix,
+    fold_change_suffix = opt$fold_change_suffix
+  )
 
   results <- l2p_single(
     deg_table = deg_table,
     gene_names_column = opt$gene_names_column,
-    t_statistic_column = opt$t_statistic_column,
-    significance_column = opt$significance_column,
-    fold_change_column = opt$fold_change_column,
+    t_statistic_column = comparison_columns$t_statistic_column,
+    significance_column = comparison_columns$significance_column,
+    fold_change_column = comparison_columns$fold_change_column,
     comparison = comparison,
     plot_title_prefix = if (is_batched_run) comparison else NULL,
     species = opt$species,
