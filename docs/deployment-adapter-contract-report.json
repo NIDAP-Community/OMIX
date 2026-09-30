@@ -3,13 +3,13 @@
   "work_item": "https://github.com/NIDAP-Community/OMIX/issues/42",
   "audit_base_commit": "faf9e99cf8f3f14401d3aa8887d062d1108caf6a",
   "inventory_snapshot": {
-    "date": "2026-09-28",
+    "date": "2026-09-30",
     "canonical_repository": "NIDAP-Community/OMIX",
     "canonical_repository_url": "https://github.com/NIDAP-Community/OMIX",
     "canonical_repository_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
-    "work_item": "https://github.com/NIDAP-Community/OMIX/issues/39",
+    "work_item": "https://github.com/NIDAP-Community/OMIX/issues/45",
     "policy": "docs/deployment-adapter-guide.md",
-    "note": "Evidence-based inventory of adapters registered in canonical module.yml files, refreshed after the canonical schema-completion phase under issue #39. Pending and unknown values are not release claims; GitHub evidence is not Code Ocean validation."
+    "note": "Evidence-based inventory of adapters registered in canonical module.yml files. This refresh records the reviewed default-branch candidates for DEG Analysis, Volcano Plot, and GSEA Filters under issue #45; the canonical schema snapshot remains unchanged. Pending and unknown values are not release claims, and GitHub evidence is not Code Ocean validation."
   },
   "policy": {
     "status_vocabulary": [
@@ -25,16 +25,16 @@
   },
   "summary": {
     "adapter_count": 8,
-    "finding_count": 129,
-    "error_count": 30,
-    "warning_count": 99
+    "finding_count": 82,
+    "error_count": 15,
+    "warning_count": 67
   },
   "adapters": [
     {
       "id": "OMIX-DEG-Analysis",
       "repository": "https://github.com/NIDAP-Community/OMIX-DEG-Analysis",
       "canonical_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
-      "adapter_commit": "bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497",
+      "adapter_commit": "3f8052a6c13d51bac9bef20b418183d801d62cac",
       "inventory_states": {
         "schema_completeness": {
           "status": "verified",
@@ -46,37 +46,43 @@
         },
         "scientific_export.recorded_parity": {
           "status": "verified",
-          "note": "Independent byte comparison confirms the listed export matches the source record's pinned canonical commit.",
+          "note": "Independent review of PR #1 confirms the complete managed export is byte-identical to canonical module 0.4.0/interface 2 at the recorded source commit.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497/OMIX_MODULE_SOURCE.md",
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497/code/functions/OMIX_DEG_Analysis.R"
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/code/functions/OMIX_DEG_Analysis.R",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1"
           ]
         },
         "scientific_export.current_parity": {
-          "status": "outdated",
-          "note": "Default-branch adapter science matches canonical 0.1.3/interface 1, not current 0.4.0/interface 2. Draft PR #1 is the candidate update.",
+          "status": "verified",
+          "note": "The merged default-branch export matches both its recorded source and the current canonical scientific file.",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/code/functions/OMIX_DEG_Analysis.R",
             "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-DEG-Analysis/R/OMIX_DEG_Analysis.R"
           ]
         },
         "scientific_export.source_record": {
-          "status": "partial",
-          "note": "Present and accurate for its recorded source, but behind current canonical and lacking the required per-file hash table and immutable runtime digest.",
+          "status": "verified",
+          "note": "The source record identifies canonical module 0.4.0/interface 2, the immutable source commit, exact file mapping and hashes, and explicitly pending runtime, platform, Syncweaver, and release evidence.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1"
           ]
         },
         "scientific_export.hash_manifest": {
-          "status": "pending",
-          "note": "The source record does not record per-file SHA-256 values; this inventory records audit hashes without replacing the adapter source record.",
-          "evidence": []
+          "status": "verified",
+          "note": "The source record lists canonical and adapter SHA-256 values for every managed scientific file.",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/OMIX_MODULE_SOURCE.md"
+          ]
         },
         "app_panel.coverage": {
-          "status": "outdated",
-          "note": "Against the complete 20-control public/advanced contract, the default branch lacks analysis_mode and pseudobulk_manifest, uses counts_file/metadata_file/moo_file adapter aliases for canonical matrix/metadata/moo, and retains raw-count effective values instead of canonical mode-aware auto defaults. Draft PR #1 is a candidate remediation, not default-branch or Code Ocean evidence.",
+          "status": "verified",
+          "note": "The named App Panel exposes all 20 canonical public and advanced controls with canonical names, types, choices, order, and mode-aware defaults; internal output_dir remains platform-managed and documented.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1"
           ]
         },
@@ -84,26 +90,30 @@
           "status": "partial",
           "note": "A tagged base image is selected, but no resolved immutable image digest is recorded.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497/.codeocean/environment.json"
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/.codeocean/environment.json",
+            "https://github.com/NIDAP-Community/OMIX/issues/43"
           ]
         },
         "local_tests": {
-          "status": "unknown",
-          "note": "No commit-specific local adapter test result was recorded in this inventory snapshot.",
-          "evidence": []
+          "status": "verified",
+          "note": "PR #1 records passing contract, source-parity, adapter-input, three-mode CLI, direct scientific, and legacy-equivalence tests with independent Helix and Beacon review.",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1"
+          ]
         },
         "code_ocean_validation": {
           "status": "partial",
           "note": "The source record reports a successful 2026-09-04 validation for adapter v0.1.3, but no immutable platform release ID was recorded and it does not validate current interface 2.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/OMIX_MODULE_SOURCE.md"
           ]
         },
         "syncweaver.readiness": {
-          "status": "blocked",
-          "note": "No default-branch lockfile; current science is outdated and a legacy reference is co-located in the proposed managed directory.",
+          "status": "pending",
+          "note": "The managed directory now contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/tree/bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497/code/functions"
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/tree/3f8052a6c13d51bac9bef20b418183d801d62cac/code/functions",
+            "https://github.com/NIDAP-Community/OMIX/issues/44"
           ]
         }
       },
@@ -515,255 +525,257 @@
       "adapter_contract": {
         "cli_controls": [
           {
-            "name": "input_type",
+            "name": "counts",
             "type": "character",
-            "default": "auto",
+            "default": "",
             "order": 0
           },
           {
-            "name": "counts_file",
+            "name": "metadata",
             "type": "character",
             "default": "",
             "order": 1
           },
           {
-            "name": "metadata_file",
+            "name": "pseudobulk_manifest",
             "type": "character",
             "default": "",
             "order": 2
           },
           {
-            "name": "moo_file",
+            "name": "moo",
             "type": "character",
             "default": "",
             "order": 3
           },
           {
+            "name": "input_type",
+            "type": "character",
+            "default": "table",
+            "order": 4
+          },
+          {
+            "name": "analysis_mode",
+            "type": "character",
+            "default": "raw_counts",
+            "order": 5
+          },
+          {
             "name": "gene_names_column",
             "type": "character",
             "default": "GeneName",
-            "order": 4
+            "order": 6
           },
           {
             "name": "sample_names_column",
             "type": "character",
             "default": "Sample",
-            "order": 5
+            "order": 7
           },
           {
             "name": "samples_to_include",
             "type": "character",
             "default": "",
-            "order": 6
+            "order": 8
           },
           {
             "name": "contrast_variable_columns",
             "type": "character",
             "default": "Group",
-            "order": 7
+            "order": 9
           },
           {
             "name": "contrasts",
             "type": "character",
             "default": "B-A",
-            "order": 8
+            "order": 10
           },
           {
             "name": "covariate_columns",
             "type": "character",
             "default": "",
-            "order": 9
+            "order": 11
           },
           {
             "name": "batch_effect_columns",
             "type": "character",
-            "default": "Batch",
-            "order": 10
+            "default": "auto",
+            "order": 12
           },
           {
             "name": "donor_variable_column",
             "type": "character",
             "default": "",
-            "order": 11
+            "order": 13
           },
           {
             "name": "filter_low_expression",
             "type": "character",
-            "default": "true",
-            "order": 12
+            "default": "auto",
+            "order": 14
           },
           {
             "name": "return_batch_corrected_values",
             "type": "character",
-            "default": "true",
-            "order": 13
+            "default": "auto",
+            "order": 15
           },
           {
             "name": "remove_donor_effect_for_downstream",
             "type": "character",
-            "default": "true",
-            "order": 14
+            "default": "auto",
+            "order": 16
           },
           {
             "name": "normalization_method",
             "type": "character",
-            "default": "TMM",
-            "order": 15
+            "default": "auto",
+            "order": 17
           },
           {
             "name": "write_normalization_diagnostics",
             "type": "character",
-            "default": "true",
-            "order": 16
+            "default": "auto",
+            "order": 18
           },
           {
             "name": "summarization_method",
             "type": "character",
-            "default": "sum",
-            "order": 17
+            "default": "auto",
+            "order": 19
           },
           {
             "name": "output_dir",
             "type": "character",
             "default": "",
-            "order": 18
+            "order": 20
           }
         ],
         "app_panel_named_parameters": true,
         "app_panel_controls": [
           {
-            "name": "input_type",
-            "type": "list",
-            "default": "auto",
-            "allowed": [
-              "auto",
-              "table",
-              "moo"
-            ],
+            "name": "counts",
+            "type": "file",
+            "default": null,
+            "allowed": [],
             "order": 0
           },
           {
-            "name": "counts_file",
+            "name": "metadata",
             "type": "file",
             "default": null,
             "allowed": [],
             "order": 1
           },
           {
-            "name": "metadata_file",
+            "name": "pseudobulk_manifest",
             "type": "file",
             "default": null,
             "allowed": [],
             "order": 2
           },
           {
-            "name": "moo_file",
+            "name": "moo",
             "type": "file",
             "default": null,
             "allowed": [],
             "order": 3
           },
           {
+            "name": "input_type",
+            "type": "list",
+            "default": "table",
+            "allowed": [
+              "table",
+              "moo"
+            ],
+            "order": 4
+          },
+          {
+            "name": "analysis_mode",
+            "type": "list",
+            "default": "raw_counts",
+            "allowed": [
+              "raw_counts",
+              "harmony_mean_expression",
+              "sct_mean_expression"
+            ],
+            "order": 5
+          },
+          {
             "name": "gene_names_column",
             "type": "text",
             "default": "GeneName",
             "allowed": [],
-            "order": 4
+            "order": 6
           },
           {
             "name": "sample_names_column",
             "type": "text",
             "default": "Sample",
             "allowed": [],
-            "order": 5
+            "order": 7
           },
           {
             "name": "samples_to_include",
             "type": "text",
             "default": null,
             "allowed": [],
-            "order": 6
+            "order": 8
           },
           {
             "name": "contrast_variable_columns",
             "type": "text",
             "default": "Group",
             "allowed": [],
-            "order": 7
+            "order": 9
           },
           {
             "name": "contrasts",
             "type": "text",
             "default": "B-A",
             "allowed": [],
-            "order": 8
+            "order": 10
           },
           {
             "name": "covariate_columns",
             "type": "text",
             "default": null,
             "allowed": [],
-            "order": 9
+            "order": 11
           },
           {
             "name": "batch_effect_columns",
             "type": "text",
-            "default": "Batch",
+            "default": "auto",
             "allowed": [],
-            "order": 10
+            "order": 12
           },
           {
             "name": "donor_variable_column",
             "type": "text",
             "default": null,
             "allowed": [],
-            "order": 11
+            "order": 13
           },
           {
             "name": "filter_low_expression",
             "type": "list",
-            "default": "true",
+            "default": "auto",
             "allowed": [
-              "true",
-              "false"
-            ],
-            "order": 12
-          },
-          {
-            "name": "return_batch_corrected_values",
-            "type": "list",
-            "default": "true",
-            "allowed": [
-              "true",
-              "false"
-            ],
-            "order": 13
-          },
-          {
-            "name": "remove_donor_effect_for_downstream",
-            "type": "list",
-            "default": "true",
-            "allowed": [
+              "auto",
               "true",
               "false"
             ],
             "order": 14
           },
           {
-            "name": "write_normalization_diagnostics",
-            "type": "list",
-            "default": "true",
-            "allowed": [
-              "true",
-              "false"
-            ],
-            "order": 15
-          },
-          {
             "name": "normalization_method",
             "type": "list",
-            "default": "TMM",
+            "default": "auto",
             "allowed": [
+              "auto",
+              "None",
               "TMM",
               "Quantile",
               "TMM + Quantile",
@@ -773,50 +785,64 @@
               "RLE",
               "Upper Quartile"
             ],
+            "order": 15
+          },
+          {
+            "name": "return_batch_corrected_values",
+            "type": "list",
+            "default": "auto",
+            "allowed": [
+              "auto",
+              "true",
+              "false"
+            ],
             "order": 16
+          },
+          {
+            "name": "remove_donor_effect_for_downstream",
+            "type": "list",
+            "default": "auto",
+            "allowed": [
+              "auto",
+              "true",
+              "false"
+            ],
+            "order": 17
           },
           {
             "name": "summarization_method",
             "type": "list",
-            "default": "sum",
+            "default": "auto",
             "allowed": [
+              "auto",
               "sum",
               "mean",
               "max"
             ],
-            "order": 17
+            "order": 18
+          },
+          {
+            "name": "write_normalization_diagnostics",
+            "type": "list",
+            "default": "auto",
+            "allowed": [
+              "auto",
+              "true",
+              "false"
+            ],
+            "order": 19
           }
         ],
         "documented_aliases": {},
         "documented_hidden_inputs": {},
         "source_record_metadata": {
-          "canonical_source_commit": "2987296a45a2a11e6c4b3454c813a63ae6db6ac0",
-          "module_version": "0.1.3",
-          "interface_version": 1,
-          "has_per_file_sha256": false
+          "canonical_source_commit": "018ef0e10bf29c69166b38ee6d81d4d71d18aeca",
+          "module_version": "0.4.0",
+          "interface_version": 2,
+          "has_per_file_sha256": true
         },
-        "inferred_aliases": {
-          "counts": "counts_file",
-          "metadata": "metadata_file",
-          "moo": "moo_file"
-        },
-        "alias_candidates": [
-          {
-            "canonical": "counts",
-            "adapter": "counts_file",
-            "score": 1.0
-          },
-          {
-            "canonical": "metadata",
-            "adapter": "metadata_file",
-            "score": 1.0
-          },
-          {
-            "canonical": "moo",
-            "adapter": "moo_file",
-            "score": 1.0
-          }
-        ],
+        "inferred_aliases": {},
+        "alias_candidates": [],
         "runtime": {
           "base_image": "codeocean/omix-r-statistics:r4.4.3-bioconductor3.20-v1",
           "digest": null
@@ -826,371 +852,19 @@
         {
           "canonical_path": "modules/OMIX-DEG-Analysis/R/OMIX_DEG_Analysis.R",
           "adapter_path": "code/functions/OMIX_DEG_Analysis.R",
-          "recorded_source_sha256": "24cc2541d0f01bc6063c1271a65e2022aa22bfacb16826230cf87fc328d6e28b",
-          "adapter_sha256": "24cc2541d0f01bc6063c1271a65e2022aa22bfacb16826230cf87fc328d6e28b",
+          "recorded_source_sha256": "e0e64e4de04b91419c77d1d44ac607f62fa172bc1b99fd0936ebb3e6ae8eb13e",
+          "adapter_sha256": "e0e64e4de04b91419c77d1d44ac607f62fa172bc1b99fd0936ebb3e6ae8eb13e",
           "current_source_sha256": "e0e64e4de04b91419c77d1d44ac607f62fa172bc1b99fd0936ebb3e6ae8eb13e",
           "matches_recorded": true,
-          "matches_current": false
+          "matches_current": true
         }
       ],
       "findings": [
-        {
-          "code": "adapter_cli_missing",
-          "severity": "error",
-          "message": "Canonical control is absent from the adapter CLI and has no documented hidden binding.",
-          "control": "analysis_mode"
-        },
-        {
-          "code": "adapter_cli_missing",
-          "severity": "error",
-          "message": "Canonical control is absent from the adapter CLI and has no documented hidden binding.",
-          "control": "pseudobulk_manifest"
-        },
-        {
-          "code": "app_panel_missing",
-          "severity": "error",
-          "message": "Public or advanced canonical control is absent from the App Panel and has no documented hidden binding.",
-          "control": "analysis_mode"
-        },
-        {
-          "code": "app_panel_missing",
-          "severity": "error",
-          "message": "Public or advanced canonical control is absent from the App Panel and has no documented hidden binding.",
-          "control": "pseudobulk_manifest"
-        },
-        {
-          "code": "undocumented_alias_candidate",
-          "severity": "error",
-          "message": "A deterministic name match suggests an adapter alias, but the source record does not explicitly authorize it.",
-          "control": "counts",
-          "expected": "counts",
-          "observed": "counts_file"
-        },
-        {
-          "code": "undocumented_alias_candidate",
-          "severity": "error",
-          "message": "A deterministic name match suggests an adapter alias, but the source record does not explicitly authorize it.",
-          "control": "metadata",
-          "expected": "metadata",
-          "observed": "metadata_file"
-        },
-        {
-          "code": "undocumented_alias_candidate",
-          "severity": "error",
-          "message": "A deterministic name match suggests an adapter alias, but the source record does not explicitly authorize it.",
-          "control": "moo",
-          "expected": "moo",
-          "observed": "moo_file"
-        },
-        {
-          "code": "adapter_cli_default_mismatch",
-          "severity": "warning",
-          "message": "Adapter CLI default differs from the canonical contract.",
-          "control": "batch_effect_columns",
-          "expected": "auto",
-          "observed": "Batch"
-        },
-        {
-          "code": "adapter_cli_default_mismatch",
-          "severity": "warning",
-          "message": "Adapter CLI default differs from the canonical contract.",
-          "control": "filter_low_expression",
-          "expected": "auto",
-          "observed": "true"
-        },
-        {
-          "code": "adapter_cli_default_mismatch",
-          "severity": "warning",
-          "message": "Adapter CLI default differs from the canonical contract.",
-          "control": "input_type",
-          "expected": "table",
-          "observed": "auto"
-        },
-        {
-          "code": "adapter_cli_default_mismatch",
-          "severity": "warning",
-          "message": "Adapter CLI default differs from the canonical contract.",
-          "control": "normalization_method",
-          "expected": "auto",
-          "observed": "TMM"
-        },
-        {
-          "code": "adapter_cli_default_mismatch",
-          "severity": "warning",
-          "message": "Adapter CLI default differs from the canonical contract.",
-          "control": "remove_donor_effect_for_downstream",
-          "expected": "auto",
-          "observed": "true"
-        },
-        {
-          "code": "adapter_cli_default_mismatch",
-          "severity": "warning",
-          "message": "Adapter CLI default differs from the canonical contract.",
-          "control": "return_batch_corrected_values",
-          "expected": "auto",
-          "observed": "true"
-        },
-        {
-          "code": "adapter_cli_default_mismatch",
-          "severity": "warning",
-          "message": "Adapter CLI default differs from the canonical contract.",
-          "control": "summarization_method",
-          "expected": "auto",
-          "observed": "sum"
-        },
-        {
-          "code": "adapter_cli_default_mismatch",
-          "severity": "warning",
-          "message": "Adapter CLI default differs from the canonical contract.",
-          "control": "write_normalization_diagnostics",
-          "expected": "auto",
-          "observed": "true"
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "filter_low_expression",
-          "expected": [
-            "auto",
-            "true",
-            "false"
-          ],
-          "observed": [
-            "true",
-            "false"
-          ]
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "input_type",
-          "expected": [
-            "table",
-            "moo"
-          ],
-          "observed": [
-            "auto",
-            "table",
-            "moo"
-          ]
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "normalization_method",
-          "expected": [
-            "auto",
-            "None",
-            "TMM",
-            "Quantile",
-            "TMM + Quantile",
-            "TMM + Scale",
-            "TMM + Cyclic Loess",
-            "TMMwsp",
-            "RLE",
-            "Upper Quartile"
-          ],
-          "observed": [
-            "TMM",
-            "Quantile",
-            "TMM + Quantile",
-            "TMM + Scale",
-            "TMM + Cyclic Loess",
-            "TMMwsp",
-            "RLE",
-            "Upper Quartile"
-          ]
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "remove_donor_effect_for_downstream",
-          "expected": [
-            "auto",
-            "true",
-            "false"
-          ],
-          "observed": [
-            "true",
-            "false"
-          ]
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "return_batch_corrected_values",
-          "expected": [
-            "auto",
-            "true",
-            "false"
-          ],
-          "observed": [
-            "true",
-            "false"
-          ]
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "summarization_method",
-          "expected": [
-            "auto",
-            "sum",
-            "mean",
-            "max"
-          ],
-          "observed": [
-            "sum",
-            "mean",
-            "max"
-          ]
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "write_normalization_diagnostics",
-          "expected": [
-            "auto",
-            "true",
-            "false"
-          ],
-          "observed": [
-            "true",
-            "false"
-          ]
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "batch_effect_columns",
-          "expected": "auto",
-          "observed": "Batch"
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "filter_low_expression",
-          "expected": "auto",
-          "observed": "true"
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "input_type",
-          "expected": "table",
-          "observed": "auto"
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "normalization_method",
-          "expected": "auto",
-          "observed": "TMM"
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "remove_donor_effect_for_downstream",
-          "expected": "auto",
-          "observed": "true"
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "return_batch_corrected_values",
-          "expected": "auto",
-          "observed": "true"
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "summarization_method",
-          "expected": "auto",
-          "observed": "sum"
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "write_normalization_diagnostics",
-          "expected": "auto",
-          "observed": "true"
-        },
-        {
-          "code": "app_panel_order_mismatch",
-          "severity": "warning",
-          "message": "App Panel control order differs from canonical schema order after documented/inferred alias mapping.",
-          "expected": [
-            "counts_file",
-            "metadata_file",
-            "moo_file",
-            "input_type",
-            "gene_names_column",
-            "sample_names_column",
-            "samples_to_include",
-            "contrast_variable_columns",
-            "contrasts",
-            "covariate_columns",
-            "batch_effect_columns",
-            "donor_variable_column",
-            "filter_low_expression",
-            "normalization_method",
-            "return_batch_corrected_values",
-            "remove_donor_effect_for_downstream",
-            "summarization_method",
-            "write_normalization_diagnostics"
-          ],
-          "observed": [
-            "input_type",
-            "counts_file",
-            "metadata_file",
-            "moo_file",
-            "gene_names_column",
-            "sample_names_column",
-            "samples_to_include",
-            "contrast_variable_columns",
-            "contrasts",
-            "covariate_columns",
-            "batch_effect_columns",
-            "donor_variable_column",
-            "filter_low_expression",
-            "return_batch_corrected_values",
-            "remove_donor_effect_for_downstream",
-            "write_normalization_diagnostics",
-            "normalization_method",
-            "summarization_method"
-          ]
-        },
-        {
-          "code": "managed_source_current_drift",
-          "severity": "warning",
-          "message": "Managed adapter file does not match the current canonical source.",
-          "control": "code/functions/OMIX_DEG_Analysis.R"
-        },
         {
           "code": "runtime_digest_missing",
           "severity": "warning",
           "message": "Adapter runtime is tag-addressed; no immutable digest is recorded.",
           "observed": "codeocean/omix-r-statistics:r4.4.3-bioconductor3.20-v1"
-        },
-        {
-          "code": "source_record_hash_manifest_missing",
-          "severity": "warning",
-          "message": "OMIX_MODULE_SOURCE.md does not record per-file SHA-256 values."
         }
       ]
     },
@@ -1198,7 +872,7 @@
       "id": "OMIX-GSEA-Filters-Legacy",
       "repository": "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy",
       "canonical_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
-      "adapter_commit": "ed4f77fff67b1f7b1fa9b07edc90fb91b8b07aac",
+      "adapter_commit": "01aeefbee65362f4ed35182193c8feb640b5b4f0",
       "inventory_states": {
         "schema_completeness": {
           "status": "verified",
@@ -1210,48 +884,59 @@
         },
         "scientific_export.recorded_parity": {
           "status": "verified",
-          "note": "Independent byte comparison confirms the export matches its recorded source.",
+          "note": "Independent Compass and Beacon reviews of PR #2 confirm the managed export is byte-identical to the recorded canonical source.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/ed4f77fff67b1f7b1fa9b07edc90fb91b8b07aac/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ]
         },
         "scientific_export.current_parity": {
           "status": "verified",
-          "note": "The exported scientific file matches the canonical snapshot.",
+          "note": "The merged default-branch export matches both its recorded source and the current canonical scientific file.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/ed4f77fff67b1f7b1fa9b07edc90fb91b8b07aac/code/functions/filter_gsea_function.R"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/code/functions/filter_gsea_function.R",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ]
         },
         "scientific_export.source_record": {
-          "status": "partial",
-          "note": "Present and accurate for the recorded scientific export, but it predates the completed canonical schema and does not record per-file hashes or an immutable runtime digest.",
+          "status": "verified",
+          "note": "The source record identifies canonical module 1.0.0/interface 1, the immutable source commit, exact file mapping and hash, platform translations, and explicitly pending runtime, platform, Syncweaver, and release evidence.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/ed4f77fff67b1f7b1fa9b07edc90fb91b8b07aac/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ]
         },
         "scientific_export.hash_manifest": {
-          "status": "pending",
-          "note": "Per-file SHA-256 values are absent from the adapter source record.",
-          "evidence": []
+          "status": "verified",
+          "note": "The source record lists the SHA-256 value for every managed scientific file.",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/OMIX_MODULE_SOURCE.md"
+          ]
         },
         "app_panel.coverage": {
-          "status": "blocked",
-          "note": "The 15 visible controls numerically match the 15 public/advanced contract controls, but named_parameters is absent and every param_name binding is missing, so the panel cannot satisfy the named CLI contract.",
+          "status": "verified",
+          "note": "The named App Panel exposes all 15 canonical public and advanced controls with canonical names, types, choices, order, and defaults; internal output_dir remains platform-managed and documented.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/ed4f77fff67b1f7b1fa9b07edc90fb91b8b07aac/.codeocean/app-panel.json"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ]
         },
         "runtime.provenance": {
           "status": "partial",
-          "note": "A tagged base image and overlay packages are recorded, but no immutable digest is recorded.",
+          "note": "A tagged historical r-pathway image and overlay packages are recorded, but its immutable digest and reconciliation with canonical r-visualization remain pending.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/ed4f77fff67b1f7b1fa9b07edc90fb91b8b07aac/.codeocean/environment.json"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/.codeocean/environment.json",
+            "https://github.com/NIDAP-Community/OMIX/issues/43"
           ]
         },
         "local_tests": {
-          "status": "unknown",
-          "note": "No commit-specific local adapter test result was recorded in this snapshot.",
-          "evidence": []
+          "status": "verified",
+          "note": "PR #2 records passing panel, CLI, source-parity, adapter-I/O, scientific-fixture, launcher, and layout checks with independent Compass and Beacon review; the adapter contract CI check passed.",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/actions/runs/36662108756"
+          ]
         },
         "code_ocean_validation": {
           "status": "pending",
@@ -1260,9 +945,10 @@
         },
         "syncweaver.readiness": {
           "status": "pending",
-          "note": "The target directory contains only the canonical export, but no lockfile or reviewed mapping exists.",
+          "note": "The managed directory contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/tree/ed4f77fff67b1f7b1fa9b07edc90fb91b8b07aac/code/functions"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/tree/01aeefbee65362f4ed35182193c8feb640b5b4f0/code/functions",
+            "https://github.com/NIDAP-Community/OMIX/issues/44"
           ]
         }
       },
@@ -1570,7 +1256,7 @@
       "adapter_contract": {
         "cli_controls": [
           {
-            "name": "input_file",
+            "name": "input",
             "type": "character",
             "default": null,
             "order": 0
@@ -1660,69 +1346,51 @@
             "order": 14
           }
         ],
-        "app_panel_named_parameters": false,
+        "app_panel_named_parameters": true,
         "app_panel_controls": [
           {
-            "name": null,
+            "name": "input",
             "type": "file",
             "default": null,
             "allowed": [],
             "order": 0
           },
           {
-            "name": null,
-            "type": "list",
-            "default": "none",
-            "allowed": [
-              "none",
-              "keep",
-              "remove"
-            ],
-            "order": 1
-          },
-          {
-            "name": null,
-            "type": "text",
-            "default": null,
-            "allowed": [],
-            "order": 2
-          },
-          {
-            "name": null,
+            "name": "p_value_filter",
             "type": "list",
             "default": "adjusted p-value",
             "allowed": [
               "adjusted p-value",
               "raw p-value"
             ],
-            "order": 3
+            "order": 1
           },
           {
-            "name": null,
+            "name": "p_value_threshold",
             "type": "text",
             "default": "0.05",
             "allowed": [],
-            "order": 4
+            "order": 2
           },
           {
-            "name": null,
+            "name": "enrichment_score_filter",
             "type": "list",
             "default": "NES (Normalized Enrichment Score)",
             "allowed": [
               "NES (Normalized Enrichment Score)",
               "ES (Enrichment Score)"
             ],
-            "order": 5
+            "order": 3
           },
           {
-            "name": null,
+            "name": "enrichment_score_threshold",
             "type": "text",
             "default": "0",
             "allowed": [],
-            "order": 6
+            "order": 4
           },
           {
-            "name": null,
+            "name": "enrichment_score_sign",
             "type": "list",
             "default": "+/-",
             "allowed": [
@@ -1730,58 +1398,76 @@
               "+",
               "-"
             ],
-            "order": 7
+            "order": 5
           },
           {
-            "name": null,
+            "name": "size_filter",
             "type": "list",
             "default": "Pathway size",
             "allowed": [
               "Pathway size",
               "Leading Edge (LE) size"
             ],
+            "order": 6
+          },
+          {
+            "name": "size_cutoff",
+            "type": "text",
+            "default": "0",
+            "allowed": [],
+            "order": 7
+          },
+          {
+            "name": "top_rank_filter",
+            "type": "text",
+            "default": "all",
+            "allowed": [],
             "order": 8
           },
           {
-            "name": null,
+            "name": "collections_to_include",
             "type": "text",
-            "default": "0",
+            "default": null,
             "allowed": [],
             "order": 9
           },
           {
-            "name": null,
+            "name": "pathways_to_include",
             "type": "text",
-            "default": "all",
+            "default": null,
             "allowed": [],
             "order": 10
           },
           {
-            "name": null,
-            "type": "text",
-            "default": null,
-            "allowed": [],
-            "order": 11
-          },
-          {
-            "name": null,
-            "type": "text",
-            "default": null,
-            "allowed": [],
-            "order": 12
-          },
-          {
-            "name": null,
+            "name": "gene_filter_universe",
             "type": "list",
             "default": "Leading Edge (LE)",
             "allowed": [
               "Leading Edge (LE)",
               "Pathway"
             ],
+            "order": 11
+          },
+          {
+            "name": "genes_to_include",
+            "type": "text",
+            "default": null,
+            "allowed": [],
+            "order": 12
+          },
+          {
+            "name": "contrast_filter",
+            "type": "list",
+            "default": "none",
+            "allowed": [
+              "none",
+              "keep",
+              "remove"
+            ],
             "order": 13
           },
           {
-            "name": null,
+            "name": "contrasts",
             "type": "text",
             "default": null,
             "allowed": [],
@@ -1791,21 +1477,13 @@
         "documented_aliases": {},
         "documented_hidden_inputs": {},
         "source_record_metadata": {
-          "canonical_source_commit": "b65eeb3c231eb9dfbdbc09326ab03c23bbe84c8f",
+          "canonical_source_commit": "eee4433cd74d0ce9bd1daba1571ca6312cba7ea2",
           "module_version": "1.0.0",
           "interface_version": 1,
-          "has_per_file_sha256": false
+          "has_per_file_sha256": true
         },
-        "inferred_aliases": {
-          "input": "input_file"
-        },
-        "alias_candidates": [
-          {
-            "canonical": "input",
-            "adapter": "input_file",
-            "score": 1.0
-          }
-        ],
+        "inferred_aliases": {},
+        "alias_candidates": [],
         "runtime": {
           "base_image": "codeocean/omix-r-pathway:r4.4.3-bioconductor3.20-v1",
           "digest": null
@@ -1824,28 +1502,10 @@
       ],
       "findings": [
         {
-          "code": "app_panel_unnamed",
-          "severity": "error",
-          "message": "App Panel does not enable named parameters; name-level parity cannot be verified."
-        },
-        {
-          "code": "undocumented_alias_candidate",
-          "severity": "error",
-          "message": "A deterministic name match suggests an adapter alias, but the source record does not explicitly authorize it.",
-          "control": "input",
-          "expected": "input",
-          "observed": "input_file"
-        },
-        {
           "code": "runtime_digest_missing",
           "severity": "warning",
           "message": "Adapter runtime is tag-addressed; no immutable digest is recorded.",
           "observed": "codeocean/omix-r-pathway:r4.4.3-bioconductor3.20-v1"
-        },
-        {
-          "code": "source_record_hash_manifest_missing",
-          "severity": "warning",
-          "message": "OMIX_MODULE_SOURCE.md does not record per-file SHA-256 values."
         }
       ]
     },
@@ -9126,7 +8786,7 @@
       "id": "OMIX-Volcano-Plot",
       "repository": "https://github.com/NIDAP-Community/OMIX-Volcano-Plot",
       "canonical_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
-      "adapter_commit": "064b36f939dd84d25c487199ee1ba13e0eb261a2",
+      "adapter_commit": "8a54215e741565a01b2afa36808ff8558e4c7af5",
       "inventory_states": {
         "schema_completeness": {
           "status": "verified",
@@ -9138,48 +8798,59 @@
         },
         "scientific_export.recorded_parity": {
           "status": "verified",
-          "note": "Independent byte comparison confirms the export matches its recorded source.",
+          "note": "Independent Canvas and Beacon reviews of PR #2 confirm the complete managed export is byte-identical to the recorded canonical source.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/064b36f939dd84d25c487199ee1ba13e0eb261a2/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2"
           ]
         },
         "scientific_export.current_parity": {
-          "status": "outdated",
-          "note": "The adapter matches its old recorded commit but differs from the current canonical file after commit 185625e.",
+          "status": "verified",
+          "note": "The merged default-branch export matches both its recorded source and the current canonical scientific file.",
           "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/code/functions/Volcano_Plot_Enhanced.R",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2",
             "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-Volcano-Plot/R/Volcano_Plot_Enhanced.R"
           ]
         },
         "scientific_export.source_record": {
-          "status": "partial",
-          "note": "Present and accurate for its recorded source, but behind current canonical and lacking per-file hashes and immutable runtime digest.",
+          "status": "verified",
+          "note": "The source record identifies canonical module 1.0.0/interface 1, the immutable source commit, exact file mapping and hash, hidden output binding, deprecated compatibility alias, and explicitly pending runtime, platform, Syncweaver, and release evidence.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/064b36f939dd84d25c487199ee1ba13e0eb261a2/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2"
           ]
         },
         "scientific_export.hash_manifest": {
-          "status": "pending",
-          "note": "Per-file SHA-256 values are absent from the adapter source record.",
-          "evidence": []
+          "status": "verified",
+          "note": "The source record lists the shared canonical and adapter SHA-256 value for every managed scientific file.",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/OMIX_MODULE_SOURCE.md"
+          ]
         },
         "app_panel.coverage": {
-          "status": "blocked",
-          "note": "Against the complete 40-control public/advanced contract, the panel uses deg_file instead of deg_table, omits public output_dir, exposes internal resolution_dpi_ instead of canonical resolution_dpi, and uses 999 instead of the canonical unlimited label_max_overlaps default.",
+          "status": "verified",
+          "note": "The named App Panel exposes 39 canonical public and advanced controls with canonical names, types, choices, order, and defaults; output_dir is the sole documented platform-managed hidden control.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/064b36f939dd84d25c487199ee1ba13e0eb261a2/.codeocean/app-panel.json"
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2"
           ]
         },
         "runtime.provenance": {
           "status": "partial",
           "note": "A tagged legacy py-r image and package overlay are recorded, but no immutable digest is recorded; compatibility with canonical r-visualization remains unverified.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/064b36f939dd84d25c487199ee1ba13e0eb261a2/.codeocean/environment.json"
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/.codeocean/environment.json",
+            "https://github.com/NIDAP-Community/OMIX/issues/43"
           ]
         },
         "local_tests": {
-          "status": "unknown",
-          "note": "No commit-specific local adapter test result was recorded in this snapshot.",
-          "evidence": []
+          "status": "verified",
+          "note": "PR #2 records passing source-parity, App Panel, input-discovery, adapter CLI, canonical-interface, visual-equivalence, and missing-value serialization checks with independent Canvas and Beacon review.",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2"
+          ]
         },
         "code_ocean_validation": {
           "status": "pending",
@@ -9187,10 +8858,11 @@
           "evidence": []
         },
         "syncweaver.readiness": {
-          "status": "blocked",
-          "note": "No lockfile; canonical science is outdated and adapter-only workflow_input.R is co-located in the proposed managed directory.",
+          "status": "pending",
+          "note": "The managed directory now contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/tree/064b36f939dd84d25c487199ee1ba13e0eb261a2/code/functions"
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/tree/8a54215e741565a01b2afa36808ff8558e4c7af5/code/functions",
+            "https://github.com/NIDAP-Community/OMIX/issues/44"
           ]
         }
       },
@@ -9911,244 +9583,256 @@
       "adapter_contract": {
         "cli_controls": [
           {
-            "name": "deg_file",
+            "name": "deg_table",
             "type": "character",
             "default": null,
             "order": 0
           },
           {
+            "name": "output_dir",
+            "type": "character",
+            "default": "results",
+            "order": 1
+          },
+          {
             "name": "pvalue_type",
             "type": "character",
             "default": "nominal",
-            "order": 1
+            "order": 2
           },
           {
             "name": "column_with_feature_id",
             "type": "character",
             "default": null,
-            "order": 2
+            "order": 3
           },
           {
             "name": "significance_column",
             "type": "character",
             "default": null,
-            "order": 3
+            "order": 4
           },
           {
             "name": "log2_fold_change_column",
             "type": "character",
             "default": null,
-            "order": 4
+            "order": 5
           },
           {
             "name": "p_value_threshold",
             "type": "double",
             "default": 0.05,
-            "order": 5
+            "order": 6
           },
           {
             "name": "log2_fold_change_threshold",
             "type": "double",
             "default": 1,
-            "order": 6
+            "order": 7
           },
           {
             "name": "choose_feature_to_label_by",
             "type": "character",
             "default": "p-value",
-            "order": 7
+            "order": 8
           },
           {
             "name": "number_of_features_to_label",
             "type": "integer",
             "default": 30,
-            "order": 8
+            "order": 9
           },
           {
             "name": "label_only_my_feature_list",
             "type": "character",
             "default": "false",
-            "order": 9
+            "order": 10
           },
           {
             "name": "my_feature_list",
             "type": "character",
             "default": "",
-            "order": 10
+            "order": 11
           },
           {
             "name": "top_genes_labeled_only_if_passing_thresholds",
             "type": "character",
             "default": "true",
-            "order": 11
+            "order": 12
           },
           {
             "name": "label_size",
             "type": "double",
             "default": 4,
-            "order": 12
+            "order": 13
           },
           {
             "name": "label_box_padding",
             "type": "double",
             "default": 1,
-            "order": 13
+            "order": 14
           },
           {
             "name": "label_force",
             "type": "double",
             "default": 1,
-            "order": 14
+            "order": 15
           },
           {
             "name": "label_max_overlaps",
             "type": "double",
             "default": "Inf",
-            "order": 15
+            "order": 16
           },
           {
             "name": "use_custom_axis_label",
             "type": "character",
             "default": "false",
-            "order": 16
+            "order": 17
           },
           {
             "name": "custom_significance_label",
             "type": "character",
             "default": "p-value",
-            "order": 17
+            "order": 18
           },
           {
             "name": "custom_log_fold_change_label",
             "type": "character",
             "default": "log2FC",
-            "order": 18
+            "order": 19
           },
           {
             "name": "plot_title",
             "type": "character",
             "default": "Volcano Plot",
-            "order": 19
+            "order": 20
           },
           {
             "name": "plot_subtitle",
             "type": "character",
             "default": "",
-            "order": 20
+            "order": 21
           },
           {
             "name": "y_limit",
             "type": "double",
             "default": 0,
-            "order": 21
+            "order": 22
           },
           {
             "name": "use_auto_axis_capping",
             "type": "character",
             "default": "true",
-            "order": 22
+            "order": 23
           },
           {
             "name": "auto_axis_capping_quantile",
             "type": "double",
             "default": 0.9999,
-            "order": 23
+            "order": 24
           },
           {
             "name": "auto_axis_capping_symmetric_x",
             "type": "character",
             "default": "true",
-            "order": 24
+            "order": 25
           },
           {
             "name": "custom_x_axis_limits",
             "type": "character",
             "default": "",
-            "order": 25
+            "order": 26
           },
           {
             "name": "x_limit_padding",
             "type": "double",
             "default": 0,
-            "order": 26
+            "order": 27
           },
           {
             "name": "y_limit_padding",
             "type": "double",
             "default": 0,
-            "order": 27
+            "order": 28
           },
           {
             "name": "plot_title_size",
             "type": "double",
             "default": 16,
-            "order": 28
+            "order": 29
           },
           {
             "name": "axis_title_size",
             "type": "double",
             "default": 14,
-            "order": 29
+            "order": 30
           },
           {
             "name": "axis_text_size",
             "type": "double",
             "default": 12,
-            "order": 30
+            "order": 31
           },
           {
             "name": "point_size",
             "type": "double",
             "default": 2,
-            "order": 31
+            "order": 32
           },
           {
             "name": "image_width",
             "type": "integer",
             "default": 3000,
-            "order": 32
+            "order": 33
           },
           {
             "name": "image_height",
             "type": "integer",
             "default": 3000,
-            "order": 33
+            "order": 34
           },
           {
-            "name": "resolution_dpi_",
+            "name": "resolution_dpi",
             "type": "integer",
             "default": 300,
-            "order": 34
+            "order": 35
           },
           {
             "name": "color_not_significant",
             "type": "character",
             "default": "gray",
-            "order": 35
+            "order": 36
           },
           {
             "name": "color_fold_change_only",
             "type": "character",
             "default": "orange",
-            "order": 36
+            "order": 37
           },
           {
             "name": "color_significant_only",
             "type": "character",
             "default": "green4",
-            "order": 37
+            "order": 38
           },
           {
             "name": "color_significant_and_fold_change",
             "type": "character",
             "default": "red3",
-            "order": 38
+            "order": 39
+          },
+          {
+            "name": "resolution_dpi_",
+            "type": "integer",
+            "default": null,
+            "order": 40
           }
         ],
         "app_panel_named_parameters": true,
         "app_panel_controls": [
           {
-            "name": "deg_file",
+            "name": "deg_table",
             "type": "file",
             "default": null,
             "allowed": [],
@@ -10159,8 +9843,8 @@
             "type": "list",
             "default": "nominal",
             "allowed": [
-              "adjusted",
-              "nominal"
+              "nominal",
+              "adjusted"
             ],
             "order": 1
           },
@@ -10200,13 +9884,6 @@
             "order": 6
           },
           {
-            "name": "number_of_features_to_label",
-            "type": "text",
-            "default": "30",
-            "allowed": [],
-            "order": 7
-          },
-          {
             "name": "choose_feature_to_label_by",
             "type": "list",
             "default": "p-value",
@@ -10214,15 +9891,22 @@
               "p-value",
               "fold-change"
             ],
+            "order": 7
+          },
+          {
+            "name": "number_of_features_to_label",
+            "type": "text",
+            "default": "30",
+            "allowed": [],
             "order": 8
           },
           {
-            "name": "top_genes_labeled_only_if_passing_thresholds",
+            "name": "label_only_my_feature_list",
             "type": "list",
-            "default": "true",
+            "default": "false",
             "allowed": [
-              "true",
-              "false"
+              "false",
+              "true"
             ],
             "order": 9
           },
@@ -10234,161 +9918,42 @@
             "order": 10
           },
           {
-            "name": "label_only_my_feature_list",
+            "name": "top_genes_labeled_only_if_passing_thresholds",
             "type": "list",
-            "default": "false",
+            "default": "true",
             "allowed": [
-              "false",
-              "true"
+              "true",
+              "false"
             ],
             "order": 11
-          },
-          {
-            "name": "label_box_padding",
-            "type": "text",
-            "default": "1",
-            "allowed": [],
-            "order": 12
-          },
-          {
-            "name": "label_force",
-            "type": "text",
-            "default": "1",
-            "allowed": [],
-            "order": 13
-          },
-          {
-            "name": "label_max_overlaps",
-            "type": "text",
-            "default": "999",
-            "allowed": [],
-            "order": 14
-          },
-          {
-            "name": "plot_title",
-            "type": "text",
-            "default": "Volcano Plot",
-            "allowed": [],
-            "order": 15
-          },
-          {
-            "name": "plot_subtitle",
-            "type": "text",
-            "default": null,
-            "allowed": [],
-            "order": 16
-          },
-          {
-            "name": "plot_title_size",
-            "type": "text",
-            "default": "16",
-            "allowed": [],
-            "order": 17
-          },
-          {
-            "name": "axis_title_size",
-            "type": "text",
-            "default": "14",
-            "allowed": [],
-            "order": 18
-          },
-          {
-            "name": "axis_text_size",
-            "type": "text",
-            "default": "12",
-            "allowed": [],
-            "order": 19
           },
           {
             "name": "label_size",
             "type": "text",
             "default": "4",
             "allowed": [],
-            "order": 20
+            "order": 12
           },
           {
-            "name": "point_size",
+            "name": "label_box_padding",
             "type": "text",
-            "default": "2",
+            "default": "1",
             "allowed": [],
-            "order": 21
+            "order": 13
           },
           {
-            "name": "image_width",
+            "name": "label_force",
             "type": "text",
-            "default": "3000",
+            "default": "1",
             "allowed": [],
-            "order": 22
+            "order": 14
           },
           {
-            "name": "image_height",
+            "name": "label_max_overlaps",
             "type": "text",
-            "default": "3000",
+            "default": "Inf",
             "allowed": [],
-            "order": 23
-          },
-          {
-            "name": "resolution_dpi_",
-            "type": "text",
-            "default": "300",
-            "allowed": [],
-            "order": 24
-          },
-          {
-            "name": "color_not_significant",
-            "type": "list",
-            "default": "gray",
-            "allowed": [
-              "lightgray",
-              "gray",
-              "slategray",
-              "darkgray",
-              "grey50",
-              "dimgray"
-            ],
-            "order": 25
-          },
-          {
-            "name": "color_fold_change_only",
-            "type": "list",
-            "default": "orange",
-            "allowed": [
-              "gold",
-              "orange",
-              "goldenrod",
-              "darkorange",
-              "orange2",
-              "orange3"
-            ],
-            "order": 26
-          },
-          {
-            "name": "color_significant_only",
-            "type": "list",
-            "default": "green4",
-            "allowed": [
-              "seagreen",
-              "forestgreen",
-              "green3",
-              "darkgreen",
-              "green4",
-              "springgreen4"
-            ],
-            "order": 27
-          },
-          {
-            "name": "color_significant_and_fold_change",
-            "type": "list",
-            "default": "red3",
-            "allowed": [
-              "red",
-              "red2",
-              "firebrick",
-              "red3",
-              "darkred",
-              "red4"
-            ],
-            "order": 28
+            "order": 15
           },
           {
             "name": "use_custom_axis_label",
@@ -10398,28 +9963,42 @@
               "false",
               "true"
             ],
-            "order": 29
+            "order": 16
           },
           {
             "name": "custom_significance_label",
             "type": "text",
             "default": "p-value",
             "allowed": [],
-            "order": 30
+            "order": 17
           },
           {
             "name": "custom_log_fold_change_label",
             "type": "text",
             "default": "log2FC",
             "allowed": [],
-            "order": 31
+            "order": 18
+          },
+          {
+            "name": "plot_title",
+            "type": "text",
+            "default": "Volcano Plot",
+            "allowed": [],
+            "order": 19
+          },
+          {
+            "name": "plot_subtitle",
+            "type": "text",
+            "default": null,
+            "allowed": [],
+            "order": 20
           },
           {
             "name": "y_limit",
             "type": "text",
             "default": "0",
             "allowed": [],
-            "order": 32
+            "order": 21
           },
           {
             "name": "use_auto_axis_capping",
@@ -10429,14 +10008,14 @@
               "true",
               "false"
             ],
-            "order": 33
+            "order": 22
           },
           {
             "name": "auto_axis_capping_quantile",
             "type": "text",
             "default": "0.9999",
             "allowed": [],
-            "order": 34
+            "order": 23
           },
           {
             "name": "auto_axis_capping_symmetric_x",
@@ -10446,48 +10025,122 @@
               "true",
               "false"
             ],
-            "order": 35
+            "order": 24
           },
           {
             "name": "custom_x_axis_limits",
             "type": "text",
             "default": null,
             "allowed": [],
-            "order": 36
+            "order": 25
           },
           {
             "name": "x_limit_padding",
             "type": "text",
             "default": "0",
             "allowed": [],
-            "order": 37
+            "order": 26
           },
           {
             "name": "y_limit_padding",
             "type": "text",
             "default": "0",
             "allowed": [],
+            "order": 27
+          },
+          {
+            "name": "plot_title_size",
+            "type": "text",
+            "default": "16",
+            "allowed": [],
+            "order": 28
+          },
+          {
+            "name": "axis_title_size",
+            "type": "text",
+            "default": "14",
+            "allowed": [],
+            "order": 29
+          },
+          {
+            "name": "axis_text_size",
+            "type": "text",
+            "default": "12",
+            "allowed": [],
+            "order": 30
+          },
+          {
+            "name": "point_size",
+            "type": "text",
+            "default": "2",
+            "allowed": [],
+            "order": 31
+          },
+          {
+            "name": "image_width",
+            "type": "text",
+            "default": "3000",
+            "allowed": [],
+            "order": 32
+          },
+          {
+            "name": "image_height",
+            "type": "text",
+            "default": "3000",
+            "allowed": [],
+            "order": 33
+          },
+          {
+            "name": "resolution_dpi",
+            "type": "text",
+            "default": "300",
+            "allowed": [],
+            "order": 34
+          },
+          {
+            "name": "color_not_significant",
+            "type": "text",
+            "default": "gray",
+            "allowed": [],
+            "order": 35
+          },
+          {
+            "name": "color_fold_change_only",
+            "type": "text",
+            "default": "orange",
+            "allowed": [],
+            "order": 36
+          },
+          {
+            "name": "color_significant_only",
+            "type": "text",
+            "default": "green4",
+            "allowed": [],
+            "order": 37
+          },
+          {
+            "name": "color_significant_and_fold_change",
+            "type": "text",
+            "default": "red3",
+            "allowed": [],
             "order": 38
           }
         ],
         "documented_aliases": {},
-        "documented_hidden_inputs": {},
+        "documented_hidden_inputs": {
+          "output_dir": {
+            "canonical": "output_dir",
+            "binding": "Code Ocean /results; code/main.R maps the canonical default results to /results when the managed mount exists"
+          }
+        },
         "source_record_metadata": {
-          "canonical_source_commit": "2987296a45a2a11e6c4b3454c813a63ae6db6ac0",
+          "canonical_source_commit": "eee4433cd74d0ce9bd1daba1571ca6312cba7ea2",
           "module_version": "1.0.0",
           "interface_version": 1,
-          "has_per_file_sha256": false
+          "has_per_file_sha256": true
         },
-        "inferred_aliases": {
-          "deg_table": "deg_file"
-        },
-        "alias_candidates": [
-          {
-            "canonical": "deg_table",
-            "adapter": "deg_file",
-            "score": 1.0
-          }
-        ],
+        "inferred_aliases": {},
+        "alias_candidates": [],
         "runtime": {
           "base_image": "codeocean/py-r:python3.10.12-R4.2.3-IRkernel-ubuntu22.04",
           "digest": null
@@ -10497,175 +10150,19 @@
         {
           "canonical_path": "modules/OMIX-Volcano-Plot/R/Volcano_Plot_Enhanced.R",
           "adapter_path": "code/functions/Volcano_Plot_Enhanced.R",
-          "recorded_source_sha256": "2a78f027a09b7d313b2cb81f35e379475ab59020bc0b8d803c89f905e411c27a",
-          "adapter_sha256": "2a78f027a09b7d313b2cb81f35e379475ab59020bc0b8d803c89f905e411c27a",
+          "recorded_source_sha256": "75df94195458c63130edaab5a2ee0a90c88ca9aa859591c6810d3eec5948673b",
+          "adapter_sha256": "75df94195458c63130edaab5a2ee0a90c88ca9aa859591c6810d3eec5948673b",
           "current_source_sha256": "75df94195458c63130edaab5a2ee0a90c88ca9aa859591c6810d3eec5948673b",
           "matches_recorded": true,
-          "matches_current": false
+          "matches_current": true
         }
       ],
       "findings": [
-        {
-          "code": "adapter_cli_missing",
-          "severity": "error",
-          "message": "Canonical control is absent from the adapter CLI and has no documented hidden binding.",
-          "control": "output_dir"
-        },
-        {
-          "code": "adapter_cli_missing",
-          "severity": "error",
-          "message": "Canonical control is absent from the adapter CLI and has no documented hidden binding.",
-          "control": "resolution_dpi"
-        },
-        {
-          "code": "app_panel_internal_exposed",
-          "severity": "error",
-          "message": "App Panel exposes a canonical internal binding as a user control.",
-          "control": "resolution_dpi_"
-        },
-        {
-          "code": "app_panel_missing",
-          "severity": "error",
-          "message": "Public or advanced canonical control is absent from the App Panel and has no documented hidden binding.",
-          "control": "output_dir"
-        },
-        {
-          "code": "app_panel_missing",
-          "severity": "error",
-          "message": "Public or advanced canonical control is absent from the App Panel and has no documented hidden binding.",
-          "control": "resolution_dpi"
-        },
-        {
-          "code": "undocumented_alias_candidate",
-          "severity": "error",
-          "message": "A deterministic name match suggests an adapter alias, but the source record does not explicitly authorize it.",
-          "control": "deg_table",
-          "expected": "deg_table",
-          "observed": "deg_file"
-        },
-        {
-          "code": "app_panel_choices_mismatch",
-          "severity": "warning",
-          "message": "App Panel choices or their order differ from the canonical contract.",
-          "control": "pvalue_type",
-          "expected": [
-            "nominal",
-            "adjusted"
-          ],
-          "observed": [
-            "adjusted",
-            "nominal"
-          ]
-        },
-        {
-          "code": "app_panel_default_mismatch",
-          "severity": "warning",
-          "message": "App Panel default differs from the canonical contract.",
-          "control": "label_max_overlaps",
-          "expected": "Inf",
-          "observed": "999"
-        },
-        {
-          "code": "app_panel_order_mismatch",
-          "severity": "warning",
-          "message": "App Panel control order differs from canonical schema order after documented/inferred alias mapping.",
-          "expected": [
-            "deg_file",
-            "pvalue_type",
-            "column_with_feature_id",
-            "significance_column",
-            "log2_fold_change_column",
-            "p_value_threshold",
-            "log2_fold_change_threshold",
-            "choose_feature_to_label_by",
-            "number_of_features_to_label",
-            "label_only_my_feature_list",
-            "my_feature_list",
-            "top_genes_labeled_only_if_passing_thresholds",
-            "label_size",
-            "label_box_padding",
-            "label_force",
-            "label_max_overlaps",
-            "use_custom_axis_label",
-            "custom_significance_label",
-            "custom_log_fold_change_label",
-            "plot_title",
-            "plot_subtitle",
-            "y_limit",
-            "use_auto_axis_capping",
-            "auto_axis_capping_quantile",
-            "auto_axis_capping_symmetric_x",
-            "custom_x_axis_limits",
-            "x_limit_padding",
-            "y_limit_padding",
-            "plot_title_size",
-            "axis_title_size",
-            "axis_text_size",
-            "point_size",
-            "image_width",
-            "image_height",
-            "color_not_significant",
-            "color_fold_change_only",
-            "color_significant_only",
-            "color_significant_and_fold_change"
-          ],
-          "observed": [
-            "deg_file",
-            "pvalue_type",
-            "column_with_feature_id",
-            "significance_column",
-            "log2_fold_change_column",
-            "p_value_threshold",
-            "log2_fold_change_threshold",
-            "number_of_features_to_label",
-            "choose_feature_to_label_by",
-            "top_genes_labeled_only_if_passing_thresholds",
-            "my_feature_list",
-            "label_only_my_feature_list",
-            "label_box_padding",
-            "label_force",
-            "label_max_overlaps",
-            "plot_title",
-            "plot_subtitle",
-            "plot_title_size",
-            "axis_title_size",
-            "axis_text_size",
-            "label_size",
-            "point_size",
-            "image_width",
-            "image_height",
-            "color_not_significant",
-            "color_fold_change_only",
-            "color_significant_only",
-            "color_significant_and_fold_change",
-            "use_custom_axis_label",
-            "custom_significance_label",
-            "custom_log_fold_change_label",
-            "y_limit",
-            "use_auto_axis_capping",
-            "auto_axis_capping_quantile",
-            "auto_axis_capping_symmetric_x",
-            "custom_x_axis_limits",
-            "x_limit_padding",
-            "y_limit_padding"
-          ]
-        },
-        {
-          "code": "managed_source_current_drift",
-          "severity": "warning",
-          "message": "Managed adapter file does not match the current canonical source.",
-          "control": "code/functions/Volcano_Plot_Enhanced.R"
-        },
         {
           "code": "runtime_digest_missing",
           "severity": "warning",
           "message": "Adapter runtime is tag-addressed; no immutable digest is recorded.",
           "observed": "codeocean/py-r:python3.10.12-R4.2.3-IRkernel-ubuntu22.04"
-        },
-        {
-          "code": "source_record_hash_manifest_missing",
-          "severity": "warning",
-          "message": "OMIX_MODULE_SOURCE.md does not record per-file SHA-256 values."
         }
       ]
     }

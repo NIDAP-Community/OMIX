@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "date": "2026-09-28",
+    "date": "2026-09-30",
     "canonical_repository": "NIDAP-Community/OMIX",
     "canonical_repository_url": "https://github.com/NIDAP-Community/OMIX",
     "canonical_repository_commit": "9f97039f15d0d2f1458da352be14d7ada9723436",
-    "work_item": "https://github.com/NIDAP-Community/OMIX/issues/39",
+    "work_item": "https://github.com/NIDAP-Community/OMIX/issues/45",
     "policy": "docs/deployment-adapter-guide.md",
-    "note": "Evidence-based inventory of adapters registered in canonical module.yml files, refreshed after the canonical schema-completion phase under issue #39. Pending and unknown values are not release claims; GitHub evidence is not Code Ocean validation."
+    "note": "Evidence-based inventory of adapters registered in canonical module.yml files. This refresh records the reviewed default-branch candidates for DEG Analysis, Volcano Plot, and GSEA Filters under issue #45; the canonical schema snapshot remains unchanged. Pending and unknown values are not release claims, and GitHub evidence is not Code Ocean validation."
   },
   "status_vocabulary": [
     "verified",
@@ -43,70 +43,70 @@
       "deployment": {
         "repository": "https://github.com/NIDAP-Community/OMIX-DEG-Analysis",
         "default_branch": "main",
-        "default_branch_commit": "bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497",
-        "source_record_url": "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497/OMIX_MODULE_SOURCE.md",
-        "app_panel_url": "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497/.codeocean/app-panel.json"
+        "default_branch_commit": "3f8052a6c13d51bac9bef20b418183d801d62cac",
+        "source_record_url": "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/OMIX_MODULE_SOURCE.md",
+        "app_panel_url": "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/.codeocean/app-panel.json"
       },
       "scientific_export": {
-        "recorded_source_commit": "2987296a45a2a11e6c4b3454c813a63ae6db6ac0",
-        "recorded_module_version": "0.1.3",
-        "recorded_interface_version": 1,
+        "recorded_source_commit": "018ef0e10bf29c69166b38ee6d81d4d71d18aeca",
+        "recorded_module_version": "0.4.0",
+        "recorded_interface_version": 2,
         "recorded_parity": {
           "status": "verified",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497/OMIX_MODULE_SOURCE.md",
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497/code/functions/OMIX_DEG_Analysis.R"
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/code/functions/OMIX_DEG_Analysis.R",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1"
           ],
-          "note": "Independent byte comparison confirms the listed export matches the source record's pinned canonical commit."
+          "note": "Independent review of PR #1 confirms the complete managed export is byte-identical to canonical module 0.4.0/interface 2 at the recorded source commit."
         },
         "current_parity": {
-          "status": "outdated",
+          "status": "verified",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/code/functions/OMIX_DEG_Analysis.R",
             "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-DEG-Analysis/R/OMIX_DEG_Analysis.R"
           ],
-          "note": "Default-branch adapter science matches canonical 0.1.3/interface 1, not current 0.4.0/interface 2. Draft PR #1 is the candidate update."
+          "note": "The merged default-branch export matches both its recorded source and the current canonical scientific file."
         },
         "source_record": {
-          "status": "partial",
+          "status": "verified",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1"
           ],
-          "note": "Present and accurate for its recorded source, but behind current canonical and lacking the required per-file hash table and immutable runtime digest."
+          "note": "The source record identifies canonical module 0.4.0/interface 2, the immutable source commit, exact file mapping and hashes, and explicitly pending runtime, platform, Syncweaver, and release evidence."
         },
         "hash_manifest": {
-          "status": "pending",
-          "evidence": [],
-          "note": "The source record does not record per-file SHA-256 values; this inventory records audit hashes without replacing the adapter source record."
+          "status": "verified",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/OMIX_MODULE_SOURCE.md"
+          ],
+          "note": "The source record lists canonical and adapter SHA-256 values for every managed scientific file."
         },
         "managed_files": [
           {
             "canonical_path": "modules/OMIX-DEG-Analysis/R/OMIX_DEG_Analysis.R",
             "adapter_path": "code/functions/OMIX_DEG_Analysis.R",
-            "recorded_source_sha256": "24cc2541d0f01bc6063c1271a65e2022aa22bfacb16826230cf87fc328d6e28b",
-            "adapter_sha256": "24cc2541d0f01bc6063c1271a65e2022aa22bfacb16826230cf87fc328d6e28b",
+            "recorded_source_sha256": "e0e64e4de04b91419c77d1d44ac607f62fa172bc1b99fd0936ebb3e6ae8eb13e",
+            "adapter_sha256": "e0e64e4de04b91419c77d1d44ac607f62fa172bc1b99fd0936ebb3e6ae8eb13e",
             "current_source_sha256": "e0e64e4de04b91419c77d1d44ac607f62fa172bc1b99fd0936ebb3e6ae8eb13e",
             "matches_recorded": true,
-            "matches_current": false
+            "matches_current": true
           }
         ],
-        "extra_files_in_code_functions": [
-          {
-            "path": "code/functions/DEG_Paired_v53.R",
-            "classification": "legacy_reference",
-            "note": "Documented as a legacy validation reference, but must be moved or excluded before Syncweaver owns the complete directory."
-          }
-        ]
+        "extra_files_in_code_functions": []
       },
       "app_panel": {
-        "parameter_count": 18,
+        "parameter_count": 20,
         "coverage": {
-          "status": "outdated",
+          "status": "verified",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1"
           ],
-          "note": "Against the complete 20-control public/advanced contract, the default branch lacks analysis_mode and pseudobulk_manifest, uses counts_file/metadata_file/moo_file adapter aliases for canonical matrix/metadata/moo, and retains raw-count effective values instead of canonical mode-aware auto defaults. Draft PR #1 is a candidate remediation, not default-branch or Code Ocean evidence."
+          "note": "The named App Panel exposes all 20 canonical public and advanced controls with canonical names, types, choices, order, and mode-aware defaults; internal output_dir remains platform-managed and documented."
         }
       },
       "runtime": {
@@ -115,31 +115,36 @@
         "provenance": {
           "status": "partial",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497/.codeocean/environment.json"
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/.codeocean/environment.json",
+            "https://github.com/NIDAP-Community/OMIX/issues/43"
           ],
           "note": "A tagged base image is selected, but no resolved immutable image digest is recorded."
         }
       },
       "local_tests": {
-        "status": "unknown",
-        "evidence": [],
-        "note": "No commit-specific local adapter test result was recorded in this inventory snapshot."
+        "status": "verified",
+        "evidence": [
+          "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1"
+        ],
+        "note": "PR #1 records passing contract, source-parity, adapter-input, three-mode CLI, direct scientific, and legacy-equivalence tests with independent Helix and Beacon review."
       },
       "code_ocean_validation": {
         "status": "partial",
         "evidence": [
-          "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497/OMIX_MODULE_SOURCE.md"
+          "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/3f8052a6c13d51bac9bef20b418183d801d62cac/OMIX_MODULE_SOURCE.md"
         ],
         "note": "The source record reports a successful 2026-09-04 validation for adapter v0.1.3, but no immutable platform release ID was recorded and it does not validate current interface 2."
       },
       "work_tracking": {
-        "issues": [],
-        "branches": ["feature/interface2-adapter"],
+        "issues": [
+          "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/issues/2"
+        ],
+        "branches": [],
         "pull_requests": [
           {
             "number": 1,
             "url": "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1",
-            "state": "draft"
+            "state": "merged"
           }
         ]
       },
@@ -147,11 +152,12 @@
         "lockfile_on_default_branch": false,
         "mapping": null,
         "readiness": {
-          "status": "blocked",
+          "status": "pending",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/tree/bc3b105e3ead4a8db92f7a2a24d71c63ccaf4497/code/functions"
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/tree/3f8052a6c13d51bac9bef20b418183d801d62cac/code/functions",
+            "https://github.com/NIDAP-Community/OMIX/issues/44"
           ],
-          "note": "No default-branch lockfile; current science is outdated and a legacy reference is co-located in the proposed managed directory."
+          "note": "The managed directory now contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44."
         }
       }
     },
@@ -179,39 +185,44 @@
       "deployment": {
         "repository": "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy",
         "default_branch": "master",
-        "default_branch_commit": "ed4f77fff67b1f7b1fa9b07edc90fb91b8b07aac",
-        "source_record_url": "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/ed4f77fff67b1f7b1fa9b07edc90fb91b8b07aac/OMIX_MODULE_SOURCE.md",
-        "app_panel_url": "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/ed4f77fff67b1f7b1fa9b07edc90fb91b8b07aac/.codeocean/app-panel.json"
+        "default_branch_commit": "01aeefbee65362f4ed35182193c8feb640b5b4f0",
+        "source_record_url": "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/OMIX_MODULE_SOURCE.md",
+        "app_panel_url": "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/.codeocean/app-panel.json"
       },
       "scientific_export": {
-        "recorded_source_commit": "b65eeb3c231eb9dfbdbc09326ab03c23bbe84c8f",
+        "recorded_source_commit": "eee4433cd74d0ce9bd1daba1571ca6312cba7ea2",
         "recorded_module_version": "1.0.0",
         "recorded_interface_version": 1,
         "recorded_parity": {
           "status": "verified",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/ed4f77fff67b1f7b1fa9b07edc90fb91b8b07aac/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ],
-          "note": "Independent byte comparison confirms the export matches its recorded source."
+          "note": "Independent Compass and Beacon reviews of PR #2 confirm the managed export is byte-identical to the recorded canonical source."
         },
         "current_parity": {
           "status": "verified",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/ed4f77fff67b1f7b1fa9b07edc90fb91b8b07aac/code/functions/filter_gsea_function.R"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/code/functions/filter_gsea_function.R",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ],
-          "note": "The exported scientific file matches the canonical snapshot."
+          "note": "The merged default-branch export matches both its recorded source and the current canonical scientific file."
         },
         "source_record": {
-          "status": "partial",
+          "status": "verified",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/ed4f77fff67b1f7b1fa9b07edc90fb91b8b07aac/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ],
-          "note": "Present and accurate for the recorded scientific export, but it predates the completed canonical schema and does not record per-file hashes or an immutable runtime digest."
+          "note": "The source record identifies canonical module 1.0.0/interface 1, the immutable source commit, exact file mapping and hash, platform translations, and explicitly pending runtime, platform, Syncweaver, and release evidence."
         },
         "hash_manifest": {
-          "status": "pending",
-          "evidence": [],
-          "note": "Per-file SHA-256 values are absent from the adapter source record."
+          "status": "verified",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/OMIX_MODULE_SOURCE.md"
+          ],
+          "note": "The source record lists the SHA-256 value for every managed scientific file."
         },
         "managed_files": [
           {
@@ -229,11 +240,13 @@
       "app_panel": {
         "parameter_count": 15,
         "coverage": {
-          "status": "blocked",
+          "status": "verified",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/ed4f77fff67b1f7b1fa9b07edc90fb91b8b07aac/.codeocean/app-panel.json"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ],
-          "note": "The 15 visible controls numerically match the 15 public/advanced contract controls, but named_parameters is absent and every param_name binding is missing, so the panel cannot satisfy the named CLI contract."
+          "note": "The named App Panel exposes all 15 canonical public and advanced controls with canonical names, types, choices, order, and defaults; internal output_dir remains platform-managed and documented."
         }
       },
       "runtime": {
@@ -242,31 +255,48 @@
         "provenance": {
           "status": "partial",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/ed4f77fff67b1f7b1fa9b07edc90fb91b8b07aac/.codeocean/environment.json"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/01aeefbee65362f4ed35182193c8feb640b5b4f0/.codeocean/environment.json",
+            "https://github.com/NIDAP-Community/OMIX/issues/43"
           ],
-          "note": "A tagged base image and overlay packages are recorded, but no immutable digest is recorded."
+          "note": "A tagged historical r-pathway image and overlay packages are recorded, but its immutable digest and reconciliation with canonical r-visualization remain pending."
         }
       },
       "local_tests": {
-        "status": "unknown",
-        "evidence": [],
-        "note": "No commit-specific local adapter test result was recorded in this snapshot."
+        "status": "verified",
+        "evidence": [
+          "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2",
+          "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/actions/runs/36662108756"
+        ],
+        "note": "PR #2 records passing panel, CLI, source-parity, adapter-I/O, scientific-fixture, launcher, and layout checks with independent Compass and Beacon review; the adapter contract CI check passed."
       },
       "code_ocean_validation": {
         "status": "pending",
         "evidence": [],
         "note": "No durable Code Ocean validation record was found."
       },
-      "work_tracking": {"issues": [], "branches": [], "pull_requests": []},
+      "work_tracking": {
+        "issues": [
+          "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/issues/1"
+        ],
+        "branches": [],
+        "pull_requests": [
+          {
+            "number": 2,
+            "url": "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2",
+            "state": "merged"
+          }
+        ]
+      },
       "syncweaver": {
         "lockfile_on_default_branch": false,
         "mapping": null,
         "readiness": {
           "status": "pending",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/tree/ed4f77fff67b1f7b1fa9b07edc90fb91b8b07aac/code/functions"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/tree/01aeefbee65362f4ed35182193c8feb640b5b4f0/code/functions",
+            "https://github.com/NIDAP-Community/OMIX/issues/44"
           ],
-          "note": "The target directory contains only the canonical export, but no lockfile or reviewed mapping exists."
+          "note": "The managed directory contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44."
         }
       }
     },
@@ -904,59 +934,69 @@
       "deployment": {
         "repository": "https://github.com/NIDAP-Community/OMIX-Volcano-Plot",
         "default_branch": "main",
-        "default_branch_commit": "064b36f939dd84d25c487199ee1ba13e0eb261a2",
-        "source_record_url": "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/064b36f939dd84d25c487199ee1ba13e0eb261a2/OMIX_MODULE_SOURCE.md",
-        "app_panel_url": "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/064b36f939dd84d25c487199ee1ba13e0eb261a2/.codeocean/app-panel.json"
+        "default_branch_commit": "8a54215e741565a01b2afa36808ff8558e4c7af5",
+        "source_record_url": "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/OMIX_MODULE_SOURCE.md",
+        "app_panel_url": "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/.codeocean/app-panel.json"
       },
       "scientific_export": {
-        "recorded_source_commit": "2987296a45a2a11e6c4b3454c813a63ae6db6ac0",
+        "recorded_source_commit": "eee4433cd74d0ce9bd1daba1571ca6312cba7ea2",
         "recorded_module_version": "1.0.0",
         "recorded_interface_version": 1,
         "recorded_parity": {
           "status": "verified",
-          "evidence": ["https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/064b36f939dd84d25c487199ee1ba13e0eb261a2/OMIX_MODULE_SOURCE.md"],
-          "note": "Independent byte comparison confirms the export matches its recorded source."
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2"
+          ],
+          "note": "Independent Canvas and Beacon reviews of PR #2 confirm the complete managed export is byte-identical to the recorded canonical source."
         },
         "current_parity": {
-          "status": "outdated",
-          "evidence": ["https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-Volcano-Plot/R/Volcano_Plot_Enhanced.R"],
-          "note": "The adapter matches its old recorded commit but differs from the current canonical file after commit 185625e."
+          "status": "verified",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/code/functions/Volcano_Plot_Enhanced.R",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2",
+            "https://github.com/NIDAP-Community/OMIX/blob/9f97039f15d0d2f1458da352be14d7ada9723436/modules/OMIX-Volcano-Plot/R/Volcano_Plot_Enhanced.R"
+          ],
+          "note": "The merged default-branch export matches both its recorded source and the current canonical scientific file."
         },
         "source_record": {
-          "status": "partial",
-          "evidence": ["https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/064b36f939dd84d25c487199ee1ba13e0eb261a2/OMIX_MODULE_SOURCE.md"],
-          "note": "Present and accurate for its recorded source, but behind current canonical and lacking per-file hashes and immutable runtime digest."
+          "status": "verified",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2"
+          ],
+          "note": "The source record identifies canonical module 1.0.0/interface 1, the immutable source commit, exact file mapping and hash, hidden output binding, deprecated compatibility alias, and explicitly pending runtime, platform, Syncweaver, and release evidence."
         },
         "hash_manifest": {
-          "status": "pending",
-          "evidence": [],
-          "note": "Per-file SHA-256 values are absent from the adapter source record."
+          "status": "verified",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/OMIX_MODULE_SOURCE.md"
+          ],
+          "note": "The source record lists the shared canonical and adapter SHA-256 value for every managed scientific file."
         },
         "managed_files": [
           {
             "canonical_path": "modules/OMIX-Volcano-Plot/R/Volcano_Plot_Enhanced.R",
             "adapter_path": "code/functions/Volcano_Plot_Enhanced.R",
-            "recorded_source_sha256": "2a78f027a09b7d313b2cb81f35e379475ab59020bc0b8d803c89f905e411c27a",
-            "adapter_sha256": "2a78f027a09b7d313b2cb81f35e379475ab59020bc0b8d803c89f905e411c27a",
+            "recorded_source_sha256": "75df94195458c63130edaab5a2ee0a90c88ca9aa859591c6810d3eec5948673b",
+            "adapter_sha256": "75df94195458c63130edaab5a2ee0a90c88ca9aa859591c6810d3eec5948673b",
             "current_source_sha256": "75df94195458c63130edaab5a2ee0a90c88ca9aa859591c6810d3eec5948673b",
             "matches_recorded": true,
-            "matches_current": false
+            "matches_current": true
           }
         ],
-        "extra_files_in_code_functions": [
-          {
-            "path": "code/functions/workflow_input.R",
-            "classification": "adapter_support",
-            "note": "Adapter input-discovery code must move outside the managed directory or be explicitly excluded."
-          }
-        ]
+        "extra_files_in_code_functions": []
       },
       "app_panel": {
         "parameter_count": 39,
         "coverage": {
-          "status": "blocked",
-          "evidence": ["https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/064b36f939dd84d25c487199ee1ba13e0eb261a2/.codeocean/app-panel.json"],
-          "note": "Against the complete 40-control public/advanced contract, the panel uses deg_file instead of deg_table, omits public output_dir, exposes internal resolution_dpi_ instead of canonical resolution_dpi, and uses 999 instead of the canonical unlimited label_max_overlaps default."
+          "status": "verified",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2"
+          ],
+          "note": "The named App Panel exposes 39 canonical public and advanced controls with canonical names, types, choices, order, and defaults; output_dir is the sole documented platform-managed hidden control."
         }
       },
       "runtime": {
@@ -964,28 +1004,48 @@
         "digest": null,
         "provenance": {
           "status": "partial",
-          "evidence": ["https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/064b36f939dd84d25c487199ee1ba13e0eb261a2/.codeocean/environment.json"],
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/8a54215e741565a01b2afa36808ff8558e4c7af5/.codeocean/environment.json",
+            "https://github.com/NIDAP-Community/OMIX/issues/43"
+          ],
           "note": "A tagged legacy py-r image and package overlay are recorded, but no immutable digest is recorded; compatibility with canonical r-visualization remains unverified."
         }
       },
       "local_tests": {
-        "status": "unknown",
-        "evidence": [],
-        "note": "No commit-specific local adapter test result was recorded in this snapshot."
+        "status": "verified",
+        "evidence": [
+          "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2"
+        ],
+        "note": "PR #2 records passing source-parity, App Panel, input-discovery, adapter CLI, canonical-interface, visual-equivalence, and missing-value serialization checks with independent Canvas and Beacon review."
       },
       "code_ocean_validation": {
         "status": "pending",
         "evidence": [],
         "note": "No durable Code Ocean validation record was found."
       },
-      "work_tracking": {"issues": [], "branches": [], "pull_requests": []},
+      "work_tracking": {
+        "issues": [
+          "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/issues/1"
+        ],
+        "branches": [],
+        "pull_requests": [
+          {
+            "number": 2,
+            "url": "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2",
+            "state": "merged"
+          }
+        ]
+      },
       "syncweaver": {
         "lockfile_on_default_branch": false,
         "mapping": null,
         "readiness": {
-          "status": "blocked",
-          "evidence": ["https://github.com/NIDAP-Community/OMIX-Volcano-Plot/tree/064b36f939dd84d25c487199ee1ba13e0eb261a2/code/functions"],
-          "note": "No lockfile; canonical science is outdated and adapter-only workflow_input.R is co-located in the proposed managed directory."
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/tree/8a54215e741565a01b2afa36808ff8558e4c7af5/code/functions",
+            "https://github.com/NIDAP-Community/OMIX/issues/44"
+          ],
+          "note": "The managed directory now contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44."
         }
       }
     }

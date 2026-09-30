@@ -10,66 +10,30 @@ Canonical snapshot: `9f97039f15d0d2f1458da352be14d7ada9723436`
 
 Issue #42 audit base: `faf9e99cf8f3f14401d3aa8887d062d1108caf6a`
 
-Adapters: **8**; findings: **129** (30 errors, 99 warnings).
+Adapters: **8**; findings: **82** (15 errors, 67 warnings).
 
 | Adapter | Schema controls | Internal bindings | Adapter CLI | App Panel | Managed current | Runtime digest | Errors | Warnings |
 | --- | ---: | ---: | ---: | ---: | --- | --- | ---: | ---: |
-| OMIX-DEG-Analysis | 21 | 0 | 19 | 18 | no | no | 7 | 27 |
-| OMIX-GSEA-Filters-Legacy | 16 | 0 | 15 | 15 | yes | no | 2 | 2 |
+| OMIX-DEG-Analysis | 21 | 0 | 21 | 20 | yes | no | 0 | 1 |
+| OMIX-GSEA-Filters-Legacy | 16 | 0 | 15 | 15 | yes | no | 0 | 1 |
 | OMIX-GSEA-Preranked-Legacy | 19 | 0 | 18 | 17 | yes | no | 1 | 9 |
 | OMIX-GSEA-Visualization-Legacy | 38 | 0 | 39 | 35 | yes | no | 2 | 16 |
 | OMIX-Gene-Boxplots | 22 | 2 | 22 | 22 | yes | no | 6 | 6 |
 | OMIX-L2P-Multi | 52 | 0 | 53 | 53 | yes | no | 4 | 12 |
 | OMIX-L2P-Single | 40 | 0 | 39 | 39 | yes | no | 2 | 21 |
-| OMIX-Volcano-Plot | 40 | 3 | 39 | 39 | no | no | 6 | 6 |
+| OMIX-Volcano-Plot | 40 | 3 | 41 | 39 | yes | no | 0 | 1 |
 
 ## OMIX-DEG-Analysis
 
-Inventory App Panel state: **outdated**; current-parity state: **outdated**; runtime-provenance state: **partial**.
+Inventory App Panel state: **verified**; current-parity state: **verified**; runtime-provenance state: **partial**.
 
-- **ERROR `adapter_cli_missing`** `analysis_mode`: Canonical control is absent from the adapter CLI and has no documented hidden binding.
-- **ERROR `adapter_cli_missing`** `pseudobulk_manifest`: Canonical control is absent from the adapter CLI and has no documented hidden binding.
-- **ERROR `app_panel_missing`** `analysis_mode`: Public or advanced canonical control is absent from the App Panel and has no documented hidden binding.
-- **ERROR `app_panel_missing`** `pseudobulk_manifest`: Public or advanced canonical control is absent from the App Panel and has no documented hidden binding.
-- **ERROR `undocumented_alias_candidate`** `counts`: A deterministic name match suggests an adapter alias, but the source record does not explicitly authorize it.
-- **ERROR `undocumented_alias_candidate`** `metadata`: A deterministic name match suggests an adapter alias, but the source record does not explicitly authorize it.
-- **ERROR `undocumented_alias_candidate`** `moo`: A deterministic name match suggests an adapter alias, but the source record does not explicitly authorize it.
-- **WARNING `adapter_cli_default_mismatch`** `batch_effect_columns`: Adapter CLI default differs from the canonical contract.
-- **WARNING `adapter_cli_default_mismatch`** `filter_low_expression`: Adapter CLI default differs from the canonical contract.
-- **WARNING `adapter_cli_default_mismatch`** `input_type`: Adapter CLI default differs from the canonical contract.
-- **WARNING `adapter_cli_default_mismatch`** `normalization_method`: Adapter CLI default differs from the canonical contract.
-- **WARNING `adapter_cli_default_mismatch`** `remove_donor_effect_for_downstream`: Adapter CLI default differs from the canonical contract.
-- **WARNING `adapter_cli_default_mismatch`** `return_batch_corrected_values`: Adapter CLI default differs from the canonical contract.
-- **WARNING `adapter_cli_default_mismatch`** `summarization_method`: Adapter CLI default differs from the canonical contract.
-- **WARNING `adapter_cli_default_mismatch`** `write_normalization_diagnostics`: Adapter CLI default differs from the canonical contract.
-- **WARNING `app_panel_choices_mismatch`** `filter_low_expression`: App Panel choices or their order differ from the canonical contract.
-- **WARNING `app_panel_choices_mismatch`** `input_type`: App Panel choices or their order differ from the canonical contract.
-- **WARNING `app_panel_choices_mismatch`** `normalization_method`: App Panel choices or their order differ from the canonical contract.
-- **WARNING `app_panel_choices_mismatch`** `remove_donor_effect_for_downstream`: App Panel choices or their order differ from the canonical contract.
-- **WARNING `app_panel_choices_mismatch`** `return_batch_corrected_values`: App Panel choices or their order differ from the canonical contract.
-- **WARNING `app_panel_choices_mismatch`** `summarization_method`: App Panel choices or their order differ from the canonical contract.
-- **WARNING `app_panel_choices_mismatch`** `write_normalization_diagnostics`: App Panel choices or their order differ from the canonical contract.
-- **WARNING `app_panel_default_mismatch`** `batch_effect_columns`: App Panel default differs from the canonical contract.
-- **WARNING `app_panel_default_mismatch`** `filter_low_expression`: App Panel default differs from the canonical contract.
-- **WARNING `app_panel_default_mismatch`** `input_type`: App Panel default differs from the canonical contract.
-- **WARNING `app_panel_default_mismatch`** `normalization_method`: App Panel default differs from the canonical contract.
-- **WARNING `app_panel_default_mismatch`** `remove_donor_effect_for_downstream`: App Panel default differs from the canonical contract.
-- **WARNING `app_panel_default_mismatch`** `return_batch_corrected_values`: App Panel default differs from the canonical contract.
-- **WARNING `app_panel_default_mismatch`** `summarization_method`: App Panel default differs from the canonical contract.
-- **WARNING `app_panel_default_mismatch`** `write_normalization_diagnostics`: App Panel default differs from the canonical contract.
-- **WARNING `app_panel_order_mismatch`**: App Panel control order differs from canonical schema order after documented/inferred alias mapping.
-- **WARNING `managed_source_current_drift`** `code/functions/OMIX_DEG_Analysis.R`: Managed adapter file does not match the current canonical source.
 - **WARNING `runtime_digest_missing`**: Adapter runtime is tag-addressed; no immutable digest is recorded.
-- **WARNING `source_record_hash_manifest_missing`**: OMIX_MODULE_SOURCE.md does not record per-file SHA-256 values.
 
 ## OMIX-GSEA-Filters-Legacy
 
-Inventory App Panel state: **blocked**; current-parity state: **verified**; runtime-provenance state: **partial**.
+Inventory App Panel state: **verified**; current-parity state: **verified**; runtime-provenance state: **partial**.
 
-- **ERROR `app_panel_unnamed`**: App Panel does not enable named parameters; name-level parity cannot be verified.
-- **ERROR `undocumented_alias_candidate`** `input`: A deterministic name match suggests an adapter alias, but the source record does not explicitly authorize it.
 - **WARNING `runtime_digest_missing`**: Adapter runtime is tag-addressed; no immutable digest is recorded.
-- **WARNING `source_record_hash_manifest_missing`**: OMIX_MODULE_SOURCE.md does not record per-file SHA-256 values.
 
 ## OMIX-GSEA-Preranked-Legacy
 
@@ -177,20 +141,9 @@ Inventory App Panel state: **outdated**; current-parity state: **verified**; run
 
 ## OMIX-Volcano-Plot
 
-Inventory App Panel state: **blocked**; current-parity state: **outdated**; runtime-provenance state: **partial**.
+Inventory App Panel state: **verified**; current-parity state: **verified**; runtime-provenance state: **partial**.
 
-- **ERROR `adapter_cli_missing`** `output_dir`: Canonical control is absent from the adapter CLI and has no documented hidden binding.
-- **ERROR `adapter_cli_missing`** `resolution_dpi`: Canonical control is absent from the adapter CLI and has no documented hidden binding.
-- **ERROR `app_panel_internal_exposed`** `resolution_dpi_`: App Panel exposes a canonical internal binding as a user control.
-- **ERROR `app_panel_missing`** `output_dir`: Public or advanced canonical control is absent from the App Panel and has no documented hidden binding.
-- **ERROR `app_panel_missing`** `resolution_dpi`: Public or advanced canonical control is absent from the App Panel and has no documented hidden binding.
-- **ERROR `undocumented_alias_candidate`** `deg_table`: A deterministic name match suggests an adapter alias, but the source record does not explicitly authorize it.
-- **WARNING `app_panel_choices_mismatch`** `pvalue_type`: App Panel choices or their order differ from the canonical contract.
-- **WARNING `app_panel_default_mismatch`** `label_max_overlaps`: App Panel default differs from the canonical contract.
-- **WARNING `app_panel_order_mismatch`**: App Panel control order differs from canonical schema order after documented/inferred alias mapping.
-- **WARNING `managed_source_current_drift`** `code/functions/Volcano_Plot_Enhanced.R`: Managed adapter file does not match the current canonical source.
 - **WARNING `runtime_digest_missing`**: Adapter runtime is tag-addressed; no immutable digest is recorded.
-- **WARNING `source_record_hash_manifest_missing`**: OMIX_MODULE_SOURCE.md does not record per-file SHA-256 values.
 
 ## Reproduce or refresh
 
