@@ -17,17 +17,17 @@ This is Beacon's evidence-based snapshot of deployment adapters registered in ca
 | [OMIX-GSEA-Preranked-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy) | v5.2.0 / interface 1 | `master` @ `c29a0dc0` | verified | verified | verified | blocked | partial | pending | blocked | [PR #3](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy/pull/3), [PR #1](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy/pull/1) |
 | [OMIX-GSEA-Visualization-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy) | v4.0.0 / interface 1 | `master` @ `f8a10972` | verified | verified | verified | verified | partial | pending | pending | [PR #2](https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/pull/2) |
 | [OMIX-Gene-Boxplots](https://github.com/NIDAP-Community/OMIX-Gene-Boxplots) | v1.0.0 / interface 1 | `main` @ `35ad6168` | verified | verified | verified | verified | partial | pending | pending | [PR #3](https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/pull/3) |
-| [OMIX-L2P-Multi](https://github.com/NIDAP-Community/OMIX-L2P-Multi) | v4.0.1 / interface 1 | `main` @ `0331e8ef` | verified | outdated | verified | outdated | partial | pending | blocked | [PR #2](https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/2) |
+| [OMIX-L2P-Multi](https://github.com/NIDAP-Community/OMIX-L2P-Multi) | v4.0.1 / interface 1 | `main` @ `12ba45ba` | verified | verified | verified | partial | partial | pending | blocked | [PR #2](https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/2) |
 | [OMIX-L2P-Single](https://github.com/NIDAP-Community/OMIX-L2P-Single) | v3.1.0 / interface 1 | `main` @ `838ae385` | verified | verified | verified | partial | partial | pending | pending | [PR #2](https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2) |
 | [OMIX-Volcano-Plot](https://github.com/NIDAP-Community/OMIX-Volcano-Plot) | v1.0.0 / interface 1 | `main` @ `2a30686f` | verified | verified | verified | verified | partial | pending | pending | [PR #2](https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2), [PR #3](https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/3) |
 
 ## Priority findings
 
-- **Adapters behind current canonical science:** OMIX-L2P-Multi.
+- **Adapters behind current canonical science:** None.
 - **Adapters with adapter-only or legacy files co-located in `code/functions/`:** OMIX-L2P-Multi.
 - **Adapters without a Syncweaver lockfile on the default branch:** OMIX-DEG-Analysis, OMIX-GSEA-Filters-Legacy, OMIX-GSEA-Preranked-Legacy, OMIX-GSEA-Visualization-Legacy, OMIX-Gene-Boxplots, OMIX-L2P-Multi, OMIX-L2P-Single, OMIX-Volcano-Plot.
 - **Canonical schema completeness:** verified for all 8 registered adapters.
-- **App Panels needing remediation:** OMIX-GSEA-Preranked-Legacy (blocked), OMIX-L2P-Multi (outdated), OMIX-L2P-Single (partial).
+- **App Panels needing remediation:** OMIX-GSEA-Preranked-Legacy (blocked), OMIX-L2P-Multi (partial), OMIX-L2P-Single (partial).
 - **Runtime provenance:** no adapter source record in this snapshot supplies both a pinned runtime tag and immutable digest.
 
 ## Reading the statuses

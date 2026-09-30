@@ -10,7 +10,7 @@ Canonical snapshot: `d41b2e3b1e3a0971c4a8b0341678774675a5fbeb`
 
 Issue #42 audit base: `faf9e99b7e3cd6803cb19d87350b44a877393892`
 
-Adapters: **8**; findings: **35** (5 errors, 30 warnings).
+Adapters: **8**; findings: **24** (1 errors, 23 warnings).
 
 | Adapter | Schema controls | Internal bindings | Adapter CLI | App Panel | Managed current | Runtime digest | Errors | Warnings |
 | --- | ---: | ---: | ---: | ---: | --- | --- | ---: | ---: |
@@ -19,7 +19,7 @@ Adapters: **8**; findings: **35** (5 errors, 30 warnings).
 | OMIX-GSEA-Preranked-Legacy | 19 | 0 | 18 | 17 | yes | no | 1 | 9 |
 | OMIX-GSEA-Visualization-Legacy | 38 | 0 | 38 | 35 | yes | no | 0 | 1 |
 | OMIX-Gene-Boxplots | 22 | 2 | 21 | 21 | yes | no | 0 | 1 |
-| OMIX-L2P-Multi | 52 | 0 | 53 | 53 | no | no | 4 | 13 |
+| OMIX-L2P-Multi | 52 | 0 | 54 | 29 | yes | no | 0 | 6 |
 | OMIX-L2P-Single | 40 | 0 | 39 | 39 | yes | no | 0 | 3 |
 | OMIX-Volcano-Plot | 40 | 3 | 41 | 39 | yes | no | 0 | 1 |
 
@@ -64,25 +64,14 @@ Inventory App Panel state: **verified**; current-parity state: **verified**; run
 
 ## OMIX-L2P-Multi
 
-Inventory App Panel state: **outdated**; current-parity state: **outdated**; runtime-provenance state: **partial**.
+Inventory App Panel state: **partial**; current-parity state: **verified**; runtime-provenance state: **partial**.
 
-- **ERROR `app_panel_type_mismatch`** `deg_table`: App Panel control type is incompatible with the canonical schema.
-- **ERROR `undocumented_alias_candidate`** `collections_to_include`: A deterministic name match suggests an adapter alias, but the source record does not explicitly authorize it.
-- **ERROR `undocumented_alias_candidate`** `deg_table`: A deterministic name match suggests an adapter alias, but the source record does not explicitly authorize it.
-- **ERROR `undocumented_alias_candidate`** `select_top_percentage_of_genes`: A deterministic name match suggests an adapter alias, but the source record does not explicitly authorize it.
-- **WARNING `adapter_cli_default_mismatch`** `species`: Adapter CLI default differs from the canonical contract.
-- **WARNING `adapter_cli_extra`** `output_plot`: Adapter-only CLI control is not classified by the canonical contract or source-record exceptions.
-- **WARNING `adapter_cli_extra`** `output_results`: Adapter-only CLI control is not classified by the canonical contract or source-record exceptions.
-- **WARNING `app_panel_choices_mismatch`** `species`: App Panel choices or their order differ from the canonical contract.
+- **WARNING `adapter_cli_extra`** `collections`: Adapter-only CLI control is not classified by the canonical contract or source-record exceptions.
+- **WARNING `adapter_cli_extra`** `deg_file`: Adapter-only CLI control is not classified by the canonical contract or source-record exceptions.
+- **WARNING `adapter_cli_extra`** `select_top_percentage`: Adapter-only CLI control is not classified by the canonical contract or source-record exceptions.
 - **WARNING `app_panel_default_mismatch`** `comparisons`: App Panel default differs from the canonical contract.
-- **WARNING `app_panel_default_mismatch`** `deg_table`: App Panel default differs from the canonical contract.
 - **WARNING `app_panel_default_mismatch`** `species`: App Panel default differs from the canonical contract.
-- **WARNING `app_panel_extra`** `output_plot`: App Panel exposes a control outside the canonical public/advanced contract.
-- **WARNING `app_panel_extra`** `output_results`: App Panel exposes a control outside the canonical public/advanced contract.
-- **WARNING `app_panel_order_mismatch`**: App Panel control order differs from canonical schema order after documented/inferred alias mapping.
-- **WARNING `managed_source_current_drift`** `code/functions/analysis_functions.R`: Managed adapter file does not match the current canonical source.
 - **WARNING `runtime_digest_missing`**: Adapter runtime is tag-addressed; no immutable digest is recorded.
-- **WARNING `source_record_hash_manifest_missing`**: OMIX_MODULE_SOURCE.md does not record per-file SHA-256 values.
 
 ## OMIX-L2P-Single
 
