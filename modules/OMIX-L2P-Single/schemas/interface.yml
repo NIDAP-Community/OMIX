@@ -10,7 +10,7 @@ inputs:
     type: path
     classification: public
     formats: [csv, tsv, txt, rds]
-    description: Differential-expression table containing one comparison or a wide table with comparison-prefixed columns.
+    description: Differential-expression table containing one comparison or a wide table with comparison-prefixed columns. Recognized Seurat FindMarkers wide and native profiles are normalized by the shared OmixPathwayInputs package.
   custom_pathways:
     required: false
     type: path
@@ -25,7 +25,7 @@ parameters:
     default: null
     classification: public
     mutually_exclusive_with: comparisons
-    description: One comparison identifier used to infer matching DEG columns when explicit columns are not supplied. Supply this or `comparisons`, not both. When both controls are blank, the module proceeds only if exactly one complete comparison prefix can be detected using the configured suffixes, which default to `_pval` and `_FC`, or `_tstat` in rank mode.
+    description: One comparison identifier used to infer matching DEG columns when explicit columns are not supplied. Supply this or `comparisons`, not both. Native unprefixed FindMarkers tables require this label (or one label in `comparisons`). For other inputs with both controls blank, the module proceeds only if exactly one conventional comparison is unambiguous; a recognized wide FindMarkers table instead runs every complete family in source-column order.
   comparisons:
     required: false
     type: string
@@ -34,7 +34,7 @@ parameters:
     delimiter: ","
     preserves_order: true
     mutually_exclusive_with: comparison
-    description: Comma-separated comparison identifiers for independent batched runs in the requested order. Batched runs require comparison-prefixed DEG columns and do not accept explicit t-statistic, significance, or fold-change column overrides. When both comparison controls are blank, the module proceeds only if exactly one complete comparison prefix can be detected using the configured suffixes, which default to `_pval` and `_FC`, or `_tstat` in rank mode.
+    description: Comma-separated comparison identifiers for independent batched runs in the requested order. Batched runs require comparison-prefixed DEG columns and do not accept explicit t-statistic, significance, or fold-change column overrides. When omitted for a recognized wide FindMarkers table, every complete family runs in source-column order.
   output_dir:
     type: path
     default: results

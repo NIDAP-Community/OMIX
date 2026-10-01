@@ -1,0 +1,18 @@
+Package: OmixPathwayInputs
+Type: Package
+Title: Shared Pathway Input Compatibility for OMIX
+Version: 0.1.0
+Authors@R: c(
+    person("Margaret", "Cam", email = "maggie.cam@nih.gov", role = c("aut", "cre")),
+    person("OMIX", "Team", role = "ctb"))
+Description: Normalizes documented differential-expression table profiles for
+    OMIX pathway modules. The initial contract recognizes Seurat FindMarkers
+    wide and native exports without changing downstream statistical methods.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.2
+Depends: R (>= 4.1.0)
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

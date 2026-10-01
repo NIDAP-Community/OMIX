@@ -18,10 +18,17 @@ script_file <- sub("^--file=", "", script_argument[grepl("^--file=", script_argu
 if (length(script_file) != 1L) stop("ERROR: Could not determine the location of scripts/run_l2p_multi.R")
 module_root <- normalizePath(file.path(dirname(script_file), ".."))
 source(file.path(module_root, "R", "analysis_functions.R"))
+if (!requireNamespace("OmixPathwayInputs", quietly = TRUE)) {
+  stop(
+    "ERROR: OmixPathwayInputs is required for pathway DEG-table compatibility. ",
+    "Install packages/OmixPathwayInputs from the same OMIX checkout.",
+    call. = FALSE
+  )
+}
 
 option_list <- list(
   make_option("--deg_table", type = "character", help = "Path to the DEG table (CSV, TSV, TXT, or RDS)"),
-  make_option("--comparisons", type = "character", help = "Comma-separated comparison identifiers"),
+  make_option("--comparisons", type = "character", default = NULL, help = "Optional ordered comparison identifiers; recognized wide FindMarkers tables use source-column order when omitted"),
   make_option("--output_dir", type = "character", default = "results", help = "Directory for result files [default: %default]"),
   make_option("--gene_names_column", type = "character", default = NULL),
   make_option("--t_statistic_columns", type = "character", default = NULL),
@@ -78,12 +85,12 @@ option_list <- list(
 )
 
 parser <- OptionParser(
-  usage = "Usage: %prog --deg_table PATH --comparisons A-B,C-B [options]",
+  usage = "Usage: %prog --deg_table PATH [--comparisons A-B,C-B] [options]",
   option_list = option_list,
   description = "Run multi-comparison L2P over-representation analysis"
 )
 opt <- parse_args(parser)
-for (required_option in c("deg_table", "comparisons")) {
+for (required_option in "deg_table") {
   if (is.null(opt[[required_option]]) || !nzchar(opt[[required_option]])) stop("ERROR: `--", required_option, "` is required")
 }
 if (!file.exists(opt$deg_table)) stop("ERROR: DEG table was not found: ", opt$deg_table)
@@ -159,17 +166,59 @@ load_custom_pathways <- function(path) {
   read.delim(path, stringsAsFactors = FALSE, check.names = FALSE)
 }
 
-comparisons <- as_list(opt$comparisons)
 deg_table <- read_table(opt$deg_table)
 if (!is.data.frame(deg_table)) stop("ERROR: Loaded DEG table is not a data frame")
+comparisons <- as_list(opt$comparisons)
+findmarkers_profile <- OmixPathwayInputs::normalize_findmarkers_deg_input(
+  deg_table,
+  gene_column = opt$gene_names_column,
+  comparison_labels = comparisons
+)
+if (!is.null(findmarkers_profile)) {
+  deg_table <- findmarkers_profile$data
+  opt$gene_names_column <- findmarkers_profile$gene_column
+  comparisons <- findmarkers_profile$comparisons
+  message(
+    "Using ", findmarkers_profile$format, " input profile for comparison(s): ",
+    paste(comparisons, collapse = ", ")
+  )
+} else if (is.null(comparisons)) {
+  stop(
+    "ERROR: `--comparisons` is required unless the DEG table has a recognized ",
+    "wide Seurat FindMarkers profile. Native unprefixed FindMarkers tables ",
+    "require exactly one supplied comparison label.",
+    call. = FALSE
+  )
+}
+
+raw_cli_arguments <- commandArgs(trailingOnly = TRUE)
+option_was_supplied <- function(name) {
+  flag <- paste0("--", name)
+  any(raw_cli_arguments == flag | startsWith(raw_cli_arguments, paste0(flag, "=")))
+}
+select_by_rank <- as_logical(opt$select_by_rank, "select_by_rank")
+t_statistic_columns <- as_list(opt$t_statistic_columns)
+significance_columns <- as_list(opt$significance_columns)
+fold_change_columns <- as_list(opt$fold_change_columns)
+if (!is.null(findmarkers_profile) && !select_by_rank) {
+  if (is.null(significance_columns) && !option_was_supplied("significance_suffix")) {
+    mapped <- findmarkers_profile$analysis_columns$nominal[comparisons]
+    if (all(!is.na(mapped))) significance_columns <- unname(mapped)
+  }
+  if (is.null(fold_change_columns) && !option_was_supplied("fold_change_suffix")) {
+    fold_change_columns <- unname(
+      findmarkers_profile$analysis_columns$fold_change[comparisons]
+    )
+  }
+}
 dir.create(opt$output_dir, recursive = TRUE, showWarnings = FALSE)
 
 results <- l2p_multi(
   deg_table = deg_table,
   gene_names_column = opt$gene_names_column,
-  t_statistic_columns = as_list(opt$t_statistic_columns),
-  significance_columns = as_list(opt$significance_columns),
-  fold_change_columns = as_list(opt$fold_change_columns),
+  t_statistic_columns = t_statistic_columns,
+  significance_columns = significance_columns,
+  fold_change_columns = fold_change_columns,
   t_statistic_suffix = opt$t_statistic_suffix,
   significance_suffix = opt$significance_suffix,
   fold_change_suffix = opt$fold_change_suffix,
@@ -180,7 +229,7 @@ results <- l2p_multi(
   custom_pathways = load_custom_pathways(opt$custom_pathways),
   custom_pathway_name_column = opt$custom_pathway_name_column,
   custom_pathway_gene_column = opt$custom_pathway_gene_column,
-  select_by_rank = as_logical(opt$select_by_rank, "select_by_rank"),
+  select_by_rank = select_by_rank,
   top_pathways = opt$top_pathways,
   number_of_significant_events = opt$number_of_significant_events,
   select_top_percentage_of_genes = as_logical(opt$select_top_percentage_of_genes, "select_top_percentage_of_genes"),

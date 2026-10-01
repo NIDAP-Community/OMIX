@@ -160,7 +160,8 @@ for (name in names(expected_allowed)) {
 
 stopifnot(
   isTRUE(schema$inputs$deg_table$required),
-  isTRUE(schema$parameters$comparisons$required),
+  identical(schema$parameters$comparisons$required, FALSE),
+  is.null(schema$parameters$comparisons$default),
   identical(schema$parameters$t_statistic_columns$aligned_with, "comparisons"),
   identical(schema$parameters$significance_columns$aligned_with, "comparisons"),
   identical(schema$parameters$fold_change_columns$aligned_with, "comparisons"),

@@ -13,6 +13,13 @@ if (length(script_file) != 1L) {
 }
 module_root <- normalizePath(file.path(dirname(script_file), ".."))
 source(file.path(module_root, "R", "GSEA_Preranked.R"))
+if (!requireNamespace("OmixPathwayInputs", quietly = TRUE)) {
+  stop(
+    "ERROR: OmixPathwayInputs is required for pathway DEG-table compatibility. ",
+    "Install packages/OmixPathwayInputs from the same OMIX checkout.",
+    call. = FALSE
+  )
+}
 
 option_list <- list(
   make_option("--deg_table", type = "character", help = "Path to the DEG table (CSV, TSV, or RDS)"),
@@ -20,8 +27,8 @@ option_list <- list(
   make_option("--output_dir", type = "character", default = "results", help = "Directory for result files [default: %default]"),
   make_option("--gene_names_column", type = "character", default = NULL, help = "Gene-symbol column; auto-detects GeneName, then Gene Symbols when omitted"),
   make_option("--species", type = "character", default = "Human", help = "Species in the DEG table [default: %default]"),
-  make_option("--gene_scores_suffix", type = "character", default = "_tstat", help = "Suffix for ranking-score columns [default: %default]"),
-  make_option("--contrasts", type = "character", default = NULL, help = "Optional comma-separated contrast names. When supplied, only these contrasts are analyzed and plotted in this order; when omitted, every matching score column is used in table-column order."),
+  make_option("--gene_scores_suffix", type = "character", default = "_tstat", help = "Suffix for ranking-score columns [default: %default]. Recognized FindMarkers input uses _logFC when this option is not explicitly supplied."),
+  make_option("--contrasts", type = "character", default = NULL, help = "Optional ordered contrast names. Recognized wide FindMarkers tables use source order when omitted; native unprefixed FindMarkers input requires exactly one label."),
   make_option("--pathways_species", type = "character", default = "Human", help = "Species in the pathways database [default: %default]"),
   make_option("--collections", type = "character", default = "H: hallmark gene sets,C2:CP:REACTOME: Reactome gene sets", help = "Comma-separated collections [default: %default]"),
   make_option("--min_geneset_size", type = "integer", default = 15L, help = "Minimum geneset size [default: %default]"),
@@ -56,32 +63,43 @@ if (!file.exists(opt$pathways_database)) {
   stop("ERROR: Pathways database was not found: ", opt$pathways_database)
 }
 
-resolve_gene_names_column <- function(path, requested) {
-  if (!is.null(requested) && nzchar(requested) && tolower(requested) != "auto") {
-    return(requested)
-  }
-
+read_deg_table <- function(path) {
   extension <- tolower(tools::file_ext(path))
-  available_columns <- if (extension == "rds") {
+  if (extension == "rds") {
     object <- readRDS(path)
-    if (is.data.frame(object)) {
-      names(object)
-    } else if (is.list(object)) {
+    if (is.list(object) && !is.data.frame(object)) {
       data_frames <- Filter(is.data.frame, object)
       if (length(data_frames) == 0L) {
         stop("ERROR: DEG RDS does not contain a data frame: ", path)
       }
-      names(data_frames[[1L]])
-    } else {
+      object <- data_frames[[1L]]
+    }
+    if (!is.data.frame(object)) {
       stop("ERROR: DEG RDS does not contain a data frame: ", path)
     }
-  } else if (extension == "csv") {
-    names(read.csv(path, nrows = 0L, check.names = FALSE))
-  } else if (extension %in% c("tsv", "txt")) {
-    names(read.delim(path, nrows = 0L, check.names = FALSE))
-  } else {
-    stop("ERROR: Unsupported DEG table format: ", path)
+    return(object)
   }
+  if (extension == "csv") {
+    return(read.csv(path, stringsAsFactors = FALSE, check.names = FALSE))
+  }
+  if (extension %in% c("tsv", "txt")) {
+    return(read.delim(path, stringsAsFactors = FALSE, check.names = FALSE))
+  }
+  stop("ERROR: Unsupported DEG table format: ", path)
+}
+
+resolve_gene_names_column <- function(data, requested) {
+  if (!is.null(requested) && nzchar(requested) && tolower(requested) != "auto") {
+    if (!requested %in% names(data)) {
+      stop(
+        "ERROR: Requested gene-name column was not found: ", requested,
+        ". Available columns: ", paste(names(data), collapse = ", ")
+      )
+    }
+    return(requested)
+  }
+
+  available_columns <- names(data)
 
   candidates <- c("GeneName", "Gene Symbols", "Gene", "gene_name", "GeneSymbol", "gene_symbol")
   detected <- candidates[candidates %in% available_columns]
@@ -97,19 +115,43 @@ resolve_gene_names_column <- function(path, requested) {
   detected[[1L]]
 }
 
-opt$gene_names_column <- resolve_gene_names_column(opt$deg_table, opt$gene_names_column)
-
 collections <- trimws(strsplit(opt$collections, ",", fixed = TRUE)[[1]])
 contrasts <- if (is.null(opt$contrasts) || !nzchar(trimws(opt$contrasts))) {
   character()
 } else {
   trimws(strsplit(opt$contrasts, ",", fixed = TRUE)[[1]])
 }
+deg_table <- read_deg_table(opt$deg_table)
+findmarkers_profile <- OmixPathwayInputs::normalize_findmarkers_deg_input(
+  deg_table,
+  gene_column = opt$gene_names_column,
+  comparison_labels = contrasts
+)
+raw_cli_arguments <- commandArgs(trailingOnly = TRUE)
+score_suffix_was_supplied <- any(
+  raw_cli_arguments == "--gene_scores_suffix" |
+    startsWith(raw_cli_arguments, "--gene_scores_suffix=")
+)
+if (!is.null(findmarkers_profile)) {
+  deg_table <- findmarkers_profile$data
+  opt$gene_names_column <- findmarkers_profile$gene_column
+  contrasts <- findmarkers_profile$comparisons
+  if (!score_suffix_was_supplied) {
+    opt$gene_scores_suffix <- "_logFC"
+  }
+  message(
+    "Using ", findmarkers_profile$format, " input profile for contrast(s): ",
+    paste(contrasts, collapse = ", "),
+    "; ranking suffix: ", opt$gene_scores_suffix
+  )
+} else {
+  opt$gene_names_column <- resolve_gene_names_column(deg_table, opt$gene_names_column)
+}
 collapse_redundancy <- tolower(opt$collapse_redundancy) == "true"
 dir.create(opt$output_dir, showWarnings = FALSE, recursive = TRUE)
 
 results <- GSEA_Preranked(
-  DEG_Table = opt$deg_table,
+  DEG_Table = deg_table,
   Pathways_Database = opt$pathways_database,
   Gene_Names_Column = opt$gene_names_column,
   species = opt$species,

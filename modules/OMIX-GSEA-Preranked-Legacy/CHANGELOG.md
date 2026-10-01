@@ -8,6 +8,12 @@ Version numbers correspond to adapter release versions (integers: v1, v2, v3, et
 ## [Unreleased]
 
 ### Added
+- Add shared Seurat `FindMarkers()` input compatibility through
+  `OmixPathwayInputs` 0.1.0. Recognized wide profiles preserve source or
+  explicit contrast order; native unprefixed profiles require one explicit
+  label. Signed log fold change becomes the automatic ranking only for this
+  profile when `--gene_scores_suffix` was not explicitly supplied. Module
+  version becomes 5.3.0; interface 1 remains compatible.
 - Complete the canonical CLI contract by classifying every control as public,
   advanced, or internal with the project-wide `classification` key, exact
   defaults and choices, and a deterministic schema-to-CLI contract test. This

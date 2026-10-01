@@ -35,5 +35,6 @@ function_text <- paste(readLines(function_file, warn = FALSE), collapse = "\n")
 stopifnot(grepl("Output_Directory", function_text, fixed = TRUE))
 stopifnot(!grepl('file.path("/results"', function_text, fixed = TRUE))
 stopifnot(grepl("--contrasts", paste(readLines(cli_file, warn = FALSE), collapse = "\n"), fixed = TRUE))
+stopifnot(grepl("OmixPathwayInputs::normalize_findmarkers_deg_input", paste(readLines(cli_file, warn = FALSE), collapse = "\n"), fixed = TRUE))
 
 message("OMIX-GSEA-Preranked-Legacy module layout checks passed")

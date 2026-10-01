@@ -20,11 +20,18 @@ if (length(script_file) != 1L) {
 }
 module_root <- normalizePath(file.path(dirname(script_file), ".."))
 source(file.path(module_root, "R", "L2P_Analysis.R"))
+if (!requireNamespace("OmixPathwayInputs", quietly = TRUE)) {
+  stop(
+    "ERROR: OmixPathwayInputs is required for pathway DEG-table compatibility. ",
+    "Install packages/OmixPathwayInputs from the same OMIX checkout.",
+    call. = FALSE
+  )
+}
 
 option_list <- list(
   make_option("--deg_table", type = "character", help = "Path to the DEG table (CSV, TSV, TXT, or RDS)"),
-  make_option("--comparison", type = "character", default = NULL, help = "One comparison identifier to analyze; mutually exclusive with --comparisons"),
-  make_option("--comparisons", type = "character", default = NULL, help = "Comma-separated comparison identifiers for independent batched runs; mutually exclusive with --comparison"),
+  make_option("--comparison", type = "character", default = NULL, help = "One comparison identifier; required as an output label for native unprefixed FindMarkers input and mutually exclusive with --comparisons"),
+  make_option("--comparisons", type = "character", default = NULL, help = "Ordered comparison identifiers for independent runs. Recognized wide FindMarkers tables use source order when both comparison controls are blank"),
   make_option("--output_dir", type = "character", default = "results", help = "Directory for result files [default: %default]"),
   make_option("--species", type = "character", default = "Human"),
   make_option("--collections_to_include", type = "character", default = "GO,REACTOME,KEGG"),
@@ -111,24 +118,60 @@ as_list <- function(value) {
   values[nzchar(values)]
 }
 
-# Read the table before resolving comparison controls. When both controls are
-# blank, the canonical resolver may select exactly one complete comparison
-# prefix from the table. It never chooses among multiple biological contrasts.
+# Read the table before resolving comparison controls. A recognized wide
+# FindMarkers table may safely become an ordered batch because every complete
+# source family is analyzed independently. Other DEG layouts retain the
+# existing exactly-one automatic comparison rule.
 deg_table <- read_deg_table(opt$deg_table)
 if (!is.data.frame(deg_table)) stop("ERROR: Loaded DEG table is not a data frame")
 select_by_rank <- as_logical(opt$select_by_rank, "select_by_rank")
 
+single_requested <- as_list(opt[["comparison"]])
+batch_requested <- as_list(opt[["comparisons"]])
+if (!is.null(single_requested) && !is.null(batch_requested)) {
+  stop("ERROR: Supply either `--comparison` or `--comparisons`, not both")
+}
+requested_comparisons <- if (!is.null(batch_requested)) batch_requested else single_requested
+
+findmarkers_profile <- OmixPathwayInputs::normalize_findmarkers_deg_input(
+  deg_table,
+  gene_column = opt$gene_names_column,
+  comparison_labels = requested_comparisons
+)
+if (!is.null(findmarkers_profile)) {
+  deg_table <- findmarkers_profile$data
+  opt$gene_names_column <- findmarkers_profile$gene_column
+  message(
+    "Using ", findmarkers_profile$format, " input profile for comparison(s): ",
+    paste(findmarkers_profile$comparisons, collapse = ", ")
+  )
+}
+
 # Use exact list indexing: `$comparison` would partially match the plural
 # option when `--comparison` is omitted.
-comparisons <- resolve_l2p_comparisons(
-  comparison = opt[["comparison"]],
-  comparisons = opt[["comparisons"]],
-  column_names = colnames(deg_table),
-  select_by_rank = select_by_rank,
-  t_statistic_suffix = opt$t_statistic_suffix,
-  significance_suffix = opt$significance_suffix,
-  fold_change_suffix = opt$fold_change_suffix
-)
+comparisons <- if (!is.null(findmarkers_profile)) {
+  findmarkers_profile$comparisons
+} else {
+  resolve_l2p_comparisons(
+    comparison = opt[["comparison"]],
+    comparisons = opt[["comparisons"]],
+    column_names = colnames(deg_table),
+    select_by_rank = select_by_rank,
+    t_statistic_suffix = opt$t_statistic_suffix,
+    significance_suffix = opt$significance_suffix,
+    fold_change_suffix = opt$fold_change_suffix
+  )
+}
+
+raw_cli_arguments <- commandArgs(trailingOnly = TRUE)
+option_was_supplied <- function(name) {
+  flag <- paste0("--", name)
+  any(raw_cli_arguments == flag | startsWith(raw_cli_arguments, paste0(flag, "=")))
+}
+nonempty_scalar <- function(value) {
+  !is.null(value) && length(value) == 1L && !is.na(value) &&
+    nzchar(trimws(as.character(value)))
+}
 
 is_batched_run <- length(comparisons) > 1L
 comparison_specific_overrides <- c(
@@ -162,11 +205,38 @@ run_manifest <- lapply(seq_along(comparisons), function(index) {
   run_dir <- if (is_batched_run) file.path(opt$output_dir, comparison_slugs[[index]]) else opt$output_dir
   dir.create(run_dir, recursive = TRUE, showWarnings = FALSE)
   results_file <- file.path(run_dir, "l2p_results.csv")
+  automatic_significance <- NULL
+  automatic_fold_change <- NULL
+  if (!is.null(findmarkers_profile) && !select_by_rank) {
+    if (!option_was_supplied("significance_suffix")) {
+      mapped <- findmarkers_profile$analysis_columns$nominal[[comparison]]
+      if (!is.na(mapped)) automatic_significance <- mapped
+    }
+    if (!option_was_supplied("fold_change_suffix")) {
+      automatic_fold_change <- findmarkers_profile$analysis_columns$fold_change[[comparison]]
+    }
+  }
   comparison_columns <- resolve_l2p_comparison_columns(
     comparison = comparison,
     t_statistic_column = if (is_batched_run) NULL else opt$t_statistic_column,
-    significance_column = if (is_batched_run) NULL else opt$significance_column,
-    fold_change_column = if (is_batched_run) NULL else opt$fold_change_column,
+    significance_column = if (!is_batched_run && nonempty_scalar(opt$significance_column)) {
+      opt$significance_column
+    } else if (!is.null(automatic_significance)) {
+      automatic_significance
+    } else if (is_batched_run) {
+      NULL
+    } else {
+      opt$significance_column
+    },
+    fold_change_column = if (!is_batched_run && nonempty_scalar(opt$fold_change_column)) {
+      opt$fold_change_column
+    } else if (!is.null(automatic_fold_change)) {
+      automatic_fold_change
+    } else if (is_batched_run) {
+      NULL
+    } else {
+      opt$fold_change_column
+    },
     t_statistic_suffix = opt$t_statistic_suffix,
     significance_suffix = opt$significance_suffix,
     fold_change_suffix = opt$fold_change_suffix

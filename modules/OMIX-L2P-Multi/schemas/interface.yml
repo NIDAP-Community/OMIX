@@ -10,7 +10,7 @@ inputs:
     type: path
     classification: public
     formats: [csv, tsv, txt, rds]
-    description: Wide differential-expression table containing one or more comparison-specific statistics.
+    description: Wide differential-expression table containing one or more comparison-specific statistics. Recognized Seurat FindMarkers wide and native profiles are normalized by the shared OmixPathwayInputs package.
   custom_pathways:
     required: false
     type: path
@@ -20,12 +20,13 @@ inputs:
     description: Optional custom pathway database. Delimited tables must contain pathway-name and gene-symbol columns; RDS may contain a compatible table or L2P pathway list.
 parameters:
   comparisons:
-    required: true
+    required: false
     type: string
+    default: null
     classification: public
     delimiter: ","
     preserves_order: true
-    description: Comma-separated comparison identifiers in the desired analysis and shared bubble-plot order. These identifiers infer matching DEG columns when explicit columns are not supplied.
+    description: Optional comma-separated comparison identifiers in the desired analysis and shared bubble-plot order. Recognized wide FindMarkers tables use complete families in source-column order when omitted; native unprefixed FindMarkers tables require exactly one supplied label. Other DEG layouts still require this control.
   output_dir:
     type: path
     default: results

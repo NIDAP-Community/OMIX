@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add shared Seurat `FindMarkers()` input compatibility through
+  `OmixPathwayInputs` 0.1.0. `--comparisons` may be omitted only for a
+  recognized wide profile, which preserves source order; native unprefixed
+  input requires one explicit label. Existing enrichment behavior is
+  unchanged. Module version becomes 4.2.0; interface 1 remains compatible.
 - Add advanced comparison-column suffix controls for ranking, significance,
   and fold change. They apply consistently across the required ordered
   comparison list, while exact ordered column-list overrides retain
