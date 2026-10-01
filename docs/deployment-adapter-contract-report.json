@@ -9,7 +9,7 @@
     "canonical_repository_commit": "53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f",
     "work_item": "https://github.com/NIDAP-Community/OMIX/issues/45",
     "policy": "docs/deployment-adapter-guide.md",
-    "note": "Evidence-based inventory of adapters registered in canonical module.yml files. This refresh records seven reviewed deployment default branches (DEG Analysis, Volcano Plot, GSEA Filters, L2P Single, L2P Multi, GSEA Visualization, and Gene Boxplots) against the current canonical snapshot, including the merged 2026-10-01 L2P evidence and successful GSEA Filters and Volcano Plot Code Ocean runs. GSEA Preranked remains deferred. Pending and unknown values are not release claims, and a published GHCR digest is not Code Ocean runtime identity."
+    "note": "Evidence-based inventory of adapters registered in canonical module.yml files. This refresh records seven reviewed deployment default branches (DEG Analysis, Volcano Plot, GSEA Filters, L2P Single, L2P Multi, GSEA Visualization, and Gene Boxplots) against the current canonical snapshot, including the synchronized 2026-10-01 L2P Multi, GSEA Filters, and Volcano Plot Code Ocean runs. GSEA Preranked remains deferred. Pending and unknown values are not release claims, and a published GHCR digest is not Code Ocean runtime identity."
   },
   "policy": {
     "status_vocabulary": [
@@ -4710,7 +4710,7 @@
       "id": "OMIX-L2P-Multi",
       "repository": "https://github.com/NIDAP-Community/OMIX-L2P-Multi",
       "canonical_commit": "53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f",
-      "adapter_commit": "743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb",
+      "adapter_commit": "a28113cba70451dee9e85c3f665648962cf68617",
       "inventory_states": {
         "schema_completeness": {
           "status": "verified",
@@ -4725,7 +4725,7 @@
           "status": "verified",
           "note": "Independent Compass and Beacon review of PR #5 confirms the complete managed export is byte-identical to canonical module 4.1.0/interface 1 at the recorded source commit.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/a28113cba70451dee9e85c3f665648962cf68617/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/5"
           ]
         },
@@ -4733,41 +4733,44 @@
           "status": "verified",
           "note": "The merged default-branch scientific export matches both its recorded source and the current canonical 4.1.0 scientific file.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/code/functions/analysis_functions.R",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/a28113cba70451dee9e85c3f665648962cf68617/code/functions/analysis_functions.R",
             "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/5",
             "https://github.com/NIDAP-Community/OMIX/blob/53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f/modules/OMIX-L2P-Multi/R/analysis_functions.R"
           ]
         },
         "scientific_export.source_record": {
           "status": "verified",
-          "note": "The source record identifies canonical module 4.1.0/interface 1, immutable source commit, exact managed mapping and hash, three compatibility aliases, demo presets, adapter-only support files, and explicitly pending runtime, platform-release, Syncweaver, and immutable-digest evidence.",
+          "note": "The source record identifies canonical module 4.1.0/interface 1, immutable source commit, exact managed mapping and hash, three compatibility aliases, demo presets, adapter-only support files, and the successful synchronized platform computation. The immutable runtime digest, artifact-content assertions, remaining platform cases, adapter tag and release, and Syncweaver lock remain pending or blocked as recorded.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/OMIX_MODULE_SOURCE.md",
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/5"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/a28113cba70451dee9e85c3f665648962cf68617/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/5",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/8"
           ]
         },
         "scientific_export.hash_manifest": {
           "status": "verified",
           "note": "The source record lists the matching canonical and adapter SHA-256 for the complete managed scientific export.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/a28113cba70451dee9e85c3f665648962cf68617/OMIX_MODULE_SOURCE.md"
           ]
         },
         "app_panel.coverage": {
           "status": "partial",
           "note": "The named App Panel exposes all 32 canonical public and advanced controls in schema order, including the three suffix controls. Canonical species=Human and null comparisons are intentionally translated to documented Mouse demo presets; internal, deprecated, and output controls remain hidden.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/.codeocean/app-panel.json",
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/a28113cba70451dee9e85c3f665648962cf68617/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/a28113cba70451dee9e85c3f665648962cf68617/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/5"
           ]
         },
         "runtime.provenance": {
           "status": "partial",
-          "note": "The OMIX Pathways v2 runtime tag used by the successful platform computation is recorded, but its immutable Code Ocean digest remains pending and is not inferred.",
+          "note": "Capsule 5721592 computation 868130 completed successfully using OMIX Pathways (2) and the recorded readable runtime tag. The immutable Code Ocean digest remains pending and is not inferred from the similarly named public runtime.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/.codeocean/environment.json",
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/a28113cba70451dee9e85c3f665648962cf68617/.codeocean/environment.json",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/a28113cba70451dee9e85c3f665648962cf68617/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/a28113cba70451dee9e85c3f665648962cf68617/docs/code-ocean-validation.md",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/8"
           ]
         },
         "local_tests": {
@@ -4779,17 +4782,19 @@
         },
         "code_ocean_validation": {
           "status": "partial",
-          "note": "Code Ocean computation 814585 completed successfully on 2026-09-30 against merged adapter f47e569 using OMIX Pathways v2. PR #7 records the observation and explicitly leaves the immutable runtime digest, platform release identifier, and durable comparison/result/bubble-plot checklist pending.",
+          "note": "Code Ocean capsule 5721592 computation 868130 completed successfully on 2026-10-01 against exact execution-bearing adapter commit 743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb using OMIX Pathways (2). The stable output set was present, but artifact-content and ordering assertions, the remaining explicit-table, workflow, ambiguity, suffix-override, advanced-plot, and custom-pathway cases, immutable runtime digest, adapter tag, and platform release remain pending.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/7"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/a28113cba70451dee9e85c3f665648962cf68617/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/a28113cba70451dee9e85c3f665648962cf68617/docs/code-ocean-validation.md",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/8"
           ]
         },
         "syncweaver.readiness": {
           "status": "blocked",
           "note": "The scientific export is verified, but workflow_input.R and cli_compatibility.R remain co-located in code/functions. A reviewed generated mapping must exclude or relocate adapter-only support files before Syncweaver onboarding.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/tree/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/code/functions",
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/tree/a28113cba70451dee9e85c3f665648962cf68617/code/functions",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/a28113cba70451dee9e85c3f665648962cf68617/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX/issues/44"
           ]
         }
