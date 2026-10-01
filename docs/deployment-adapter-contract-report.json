@@ -874,7 +874,7 @@
       "id": "OMIX-GSEA-Filters-Legacy",
       "repository": "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy",
       "canonical_commit": "53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f",
-      "adapter_commit": "40e31185a6f2c66818b1ef22e4f0982b74aa33d7",
+      "adapter_commit": "5df1e9db1bb8a20f5fb0a35c28ea41d6f24838fb",
       "inventory_states": {
         "schema_completeness": {
           "status": "verified",
@@ -888,7 +888,7 @@
           "status": "verified",
           "note": "Independent Compass and Beacon reviews of PR #2 confirm the managed export is byte-identical to the recorded canonical source.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/40e31185a6f2c66818b1ef22e4f0982b74aa33d7/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/5df1e9db1bb8a20f5fb0a35c28ea41d6f24838fb/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ]
         },
@@ -896,7 +896,7 @@
           "status": "verified",
           "note": "The merged default-branch export matches both its recorded source and the current canonical scientific file.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/40e31185a6f2c66818b1ef22e4f0982b74aa33d7/code/functions/filter_gsea_function.R",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/5df1e9db1bb8a20f5fb0a35c28ea41d6f24838fb/code/functions/filter_gsea_function.R",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ]
         },
@@ -904,7 +904,7 @@
           "status": "verified",
           "note": "The source record identifies canonical module 1.0.0/interface 1, the immutable source commit, exact file mapping and hash, platform translations, and the successful representative platform run; the imported runtime digest, platform release, Syncweaver lock, and adapter release remain pending.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/40e31185a6f2c66818b1ef22e4f0982b74aa33d7/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/5df1e9db1bb8a20f5fb0a35c28ea41d6f24838fb/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ]
         },
@@ -912,54 +912,57 @@
           "status": "verified",
           "note": "The source record lists the SHA-256 value for every managed scientific file.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/40e31185a6f2c66818b1ef22e4f0982b74aa33d7/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/5df1e9db1bb8a20f5fb0a35c28ea41d6f24838fb/OMIX_MODULE_SOURCE.md"
           ]
         },
         "app_panel.coverage": {
           "status": "verified",
           "note": "The named App Panel exposes all 15 canonical public and advanced controls with canonical names, types, choices, order, and defaults; internal output_dir remains platform-managed and documented.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/40e31185a6f2c66818b1ef22e4f0982b74aa33d7/.codeocean/app-panel.json",
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/40e31185a6f2c66818b1ef22e4f0982b74aa33d7/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/5df1e9db1bb8a20f5fb0a35c28ea41d6f24838fb/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/5df1e9db1bb8a20f5fb0a35c28ea41d6f24838fb/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ]
         },
         "runtime.provenance": {
           "status": "partial",
-          "note": "Merged PR #5 records a successful representative run in capsule 8822105 using OMIX Visualization 2 (2), the matching readable base tag, and only the DT and Pandoc overlays. The imported immutable Code Ocean digest remains pending and is not inferred from the published GHCR digest.",
+          "note": "Merged PR #6 records current validation run 874117 in capsule 8822105 using OMIX Visualization 2 (2), the matching readable base tag, and only the DT and Pandoc overlays. The imported immutable Code Ocean digest remains pending and is not inferred from the published GHCR digest.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/40e31185a6f2c66818b1ef22e4f0982b74aa33d7/OMIX_MODULE_SOURCE.md",
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/40e31185a6f2c66818b1ef22e4f0982b74aa33d7/.codeocean/environment.json",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/5df1e9db1bb8a20f5fb0a35c28ea41d6f24838fb/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/5df1e9db1bb8a20f5fb0a35c28ea41d6f24838fb/.codeocean/environment.json",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/3",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/4",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/5",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/6",
             "https://github.com/NIDAP-Community/OMIX/issues/43"
           ]
         },
         "local_tests": {
           "status": "verified",
-          "note": "PR #2 records passing panel, CLI, source-parity, adapter-I/O, scientific-fixture, launcher, and layout checks. PR #4 records the Visualization v2 configuration and passing contract CI. PR #5 adds evidence-only documentation after the adapter, parity, provenance, and scientific fixture checks passed and Beacon independently reviewed the exact head.",
+          "note": "PR #2 records passing panel, CLI, source-parity, adapter-I/O, scientific-fixture, launcher, and layout checks. PR #4 records the Visualization v2 configuration and passing contract CI. PRs #5 and #6 add reviewed Code Ocean evidence; the PR #6 adapter contract check passed at the merged head.",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/4",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/5",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/6",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/actions/runs/36662108756",
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/actions/runs/36815119343"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/actions/runs/36815119343",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/actions/runs/36896847705"
           ]
         },
         "code_ocean_validation": {
           "status": "partial",
-          "note": "Capsule 8822105 run 859970 completed successfully on 2026-10-01 from exact tested adapter commit 3391b904123421a6fa9719996951af8d766716e5. All four expected outputs were nonempty and the summary plot and interactive table rendered successfully. The imported environment digest, platform release, and adapter tag remain pending.",
+          "note": "Capsule 8822105 run 874117 completed successfully on 2026-10-01 from tracked adapter commit 40e31185a6f2c66818b1ef22e4f0982b74aa33d7, with only a newline-at-EOF worktree difference in environment.json. All four expected outputs were nonempty and the summary plot and interactive table rendered successfully. The imported environment digest, platform release, and adapter tag remain pending.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/40e31185a6f2c66818b1ef22e4f0982b74aa33d7/OMIX_MODULE_SOURCE.md",
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/5"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/5df1e9db1bb8a20f5fb0a35c28ea41d6f24838fb/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/6"
           ]
         },
         "syncweaver.readiness": {
           "status": "pending",
           "note": "The managed directory contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/tree/40e31185a6f2c66818b1ef22e4f0982b74aa33d7/code/functions",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/tree/5df1e9db1bb8a20f5fb0a35c28ea41d6f24838fb/code/functions",
             "https://github.com/NIDAP-Community/OMIX/issues/44"
           ]
         }
