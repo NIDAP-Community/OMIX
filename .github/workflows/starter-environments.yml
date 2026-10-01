@@ -266,15 +266,38 @@ jobs:
               as.character(utils::packageVersion(package))
             }, character(1))
             stopifnot(identical(observed, expected))
+            legacy <- data.frame(
+              Gene = c("GeneA", "GeneB"),
+              legacy_p_val = c(0.01, 0.20),
+              legacy_avg_logFC = c(0.8, -0.4),
+              legacy_pct.1 = c(0.7, 0.2),
+              legacy_pct.2 = c(0.3, 0.5),
+              legacy_p_val_adj = c(0.03, 0.40),
+              check.names = FALSE
+            )
+            profile <- OmixPathwayInputs::normalize_findmarkers_deg_input(legacy)
+            stopifnot(
+              identical(profile$comparisons, "legacy"),
+              identical(
+                unname(profile$source_columns$fold_change),
+                "legacy_avg_logFC"
+              )
+            )
             writeLines(sprintf("%s %s", names(observed), observed))
           '
 
-          docker run --rm \
-            --volume "${{ github.workspace }}:/omix:ro" \
-            --workdir /omix \
-            --entrypoint Rscript \
-            omix-r-pathway:ci \
-            -e 'testthat::test_local("packages/OmixPathwayInputs")'
+          for cli in \
+            modules/OMIX-L2P-Single/scripts/run_l2p_single.R \
+            modules/OMIX-L2P-Multi/scripts/run_l2p_multi.R \
+            modules/OMIX-GSEA-Preranked-Legacy/scripts/run_gsea.R
+          do
+            docker run --rm \
+              --volume "${{ github.workspace }}:/omix:ro" \
+              --workdir /omix \
+              --entrypoint Rscript \
+              omix-r-pathway:ci \
+              "$cli" --help
+          done
 
       - name: Build r-seurat-conversion
         if: steps.targets.outputs.conversion == 'true'
