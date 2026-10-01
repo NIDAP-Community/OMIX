@@ -3,13 +3,13 @@
   "work_item": "https://github.com/NIDAP-Community/OMIX/issues/42",
   "audit_base_commit": "faf9e99b7e3cd6803cb19d87350b44a877393892",
   "inventory_snapshot": {
-    "date": "2026-09-30",
+    "date": "2026-10-01",
     "canonical_repository": "NIDAP-Community/OMIX",
     "canonical_repository_url": "https://github.com/NIDAP-Community/OMIX",
-    "canonical_repository_commit": "d41b2e3b1e3a0971c4a8b0341678774675a5fbeb",
+    "canonical_repository_commit": "53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f",
     "work_item": "https://github.com/NIDAP-Community/OMIX/issues/45",
     "policy": "docs/deployment-adapter-guide.md",
-    "note": "Evidence-based inventory of adapters registered in canonical module.yml files. This refresh records seven reviewed deployment default branches (DEG Analysis, Volcano Plot, GSEA Filters, L2P Single, L2P Multi, GSEA Visualization, and Gene Boxplots) against the current canonical snapshot. GSEA Preranked remains deferred. Pending and unknown values are not release claims, and a published GHCR digest is not Code Ocean runtime identity."
+    "note": "Evidence-based inventory of adapters registered in canonical module.yml files. This refresh records seven reviewed deployment default branches (DEG Analysis, Volcano Plot, GSEA Filters, L2P Single, L2P Multi, GSEA Visualization, and Gene Boxplots) against the current canonical snapshot, including the merged 2026-10-01 L2P evidence and Visualization v2 configuration updates. GSEA Preranked remains deferred. Pending and unknown values are not release claims, and a published GHCR digest is not Code Ocean runtime identity."
   },
   "policy": {
     "status_vocabulary": [
@@ -25,15 +25,15 @@
   },
   "summary": {
     "adapter_count": 8,
-    "finding_count": 21,
+    "finding_count": 22,
     "error_count": 1,
-    "warning_count": 20
+    "warning_count": 21
   },
   "adapters": [
     {
       "id": "OMIX-DEG-Analysis",
       "repository": "https://github.com/NIDAP-Community/OMIX-DEG-Analysis",
-      "canonical_commit": "d41b2e3b1e3a0971c4a8b0341678774675a5fbeb",
+      "canonical_commit": "53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f",
       "adapter_commit": "015b5c292b4c8cca454ffab63c1b012291881fda",
       "inventory_states": {
         "schema_completeness": {
@@ -41,7 +41,7 @@
           "note": "Merged PR #32 records the complete interface-2 contract: 21 CLI controls comprising 20 public/advanced inputs and parameters plus internal output_dir.",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX/pull/32",
-            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-DEG-Analysis/schemas/interface.yml"
+            "https://github.com/NIDAP-Community/OMIX/blob/53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f/modules/OMIX-DEG-Analysis/schemas/interface.yml"
           ]
         },
         "scientific_export.recorded_parity": {
@@ -59,7 +59,7 @@
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/pull/1",
             "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/015b5c292b4c8cca454ffab63c1b012291881fda/code/functions/OMIX_DEG_Analysis.R",
-            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-DEG-Analysis/R/OMIX_DEG_Analysis.R"
+            "https://github.com/NIDAP-Community/OMIX/blob/53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f/modules/OMIX-DEG-Analysis/R/OMIX_DEG_Analysis.R"
           ]
         },
         "scientific_export.source_record": {
@@ -873,22 +873,22 @@
     {
       "id": "OMIX-GSEA-Filters-Legacy",
       "repository": "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy",
-      "canonical_commit": "d41b2e3b1e3a0971c4a8b0341678774675a5fbeb",
-      "adapter_commit": "baab86f386af95308dea586137d57dc239fc3657",
+      "canonical_commit": "53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f",
+      "adapter_commit": "3391b904123421a6fa9719996951af8d766716e5",
       "inventory_states": {
         "schema_completeness": {
           "status": "verified",
           "note": "Merged PR #37 records all 16 CLI controls: 9 public, 6 advanced, and internal output_dir, including list delimiters and allowed values.",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX/pull/37",
-            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-GSEA-Filters-Legacy/schemas/interface.yml"
+            "https://github.com/NIDAP-Community/OMIX/blob/53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f/modules/OMIX-GSEA-Filters-Legacy/schemas/interface.yml"
           ]
         },
         "scientific_export.recorded_parity": {
           "status": "verified",
           "note": "Independent Compass and Beacon reviews of PR #2 confirm the managed export is byte-identical to the recorded canonical source.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/baab86f386af95308dea586137d57dc239fc3657/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/3391b904123421a6fa9719996951af8d766716e5/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ]
         },
@@ -896,7 +896,7 @@
           "status": "verified",
           "note": "The merged default-branch export matches both its recorded source and the current canonical scientific file.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/baab86f386af95308dea586137d57dc239fc3657/code/functions/filter_gsea_function.R",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/3391b904123421a6fa9719996951af8d766716e5/code/functions/filter_gsea_function.R",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ]
         },
@@ -904,7 +904,7 @@
           "status": "verified",
           "note": "The source record identifies canonical module 1.0.0/interface 1, the immutable source commit, exact file mapping and hash, platform translations, and explicitly pending runtime, platform, Syncweaver, and release evidence.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/baab86f386af95308dea586137d57dc239fc3657/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/3391b904123421a6fa9719996951af8d766716e5/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ]
         },
@@ -912,34 +912,37 @@
           "status": "verified",
           "note": "The source record lists the SHA-256 value for every managed scientific file.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/baab86f386af95308dea586137d57dc239fc3657/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/3391b904123421a6fa9719996951af8d766716e5/OMIX_MODULE_SOURCE.md"
           ]
         },
         "app_panel.coverage": {
           "status": "verified",
           "note": "The named App Panel exposes all 15 canonical public and advanced controls with canonical names, types, choices, order, and defaults; internal output_dir remains platform-managed and documented.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/baab86f386af95308dea586137d57dc239fc3657/.codeocean/app-panel.json",
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/baab86f386af95308dea586137d57dc239fc3657/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/3391b904123421a6fa9719996951af8d766716e5/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/3391b904123421a6fa9719996951af8d766716e5/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2"
           ]
         },
         "runtime.provenance": {
           "status": "partial",
-          "note": "The source record verifies the published r-visualization GHCR image at sha256:1d9f453b49412aa05e9d3420cd4b1b4ea0beac4923cb40572af38b0ae2a46830. The adapter still selects the historical Code Ocean r-pathway tag; its digest and runtime-profile reconciliation remain unresolved and are not inferred from GHCR.",
+          "note": "Merged PR #4 configures the adapter for Code Ocean OMIX Visualization v2 and retains only the DT and Pandoc overlays. The imported immutable digest, live capsule environment selection, and representative platform run remain pending and are not inferred from the published GHCR digest.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/baab86f386af95308dea586137d57dc239fc3657/OMIX_MODULE_SOURCE.md",
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/baab86f386af95308dea586137d57dc239fc3657/.codeocean/environment.json",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/3391b904123421a6fa9719996951af8d766716e5/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/3391b904123421a6fa9719996951af8d766716e5/.codeocean/environment.json",
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/3",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/4",
             "https://github.com/NIDAP-Community/OMIX/issues/43"
           ]
         },
         "local_tests": {
           "status": "verified",
-          "note": "PR #2 records passing panel, CLI, source-parity, adapter-I/O, scientific-fixture, launcher, and layout checks with independent Compass and Beacon review; the adapter contract CI check passed.",
+          "note": "PR #2 records passing panel, CLI, source-parity, adapter-I/O, scientific-fixture, launcher, and layout checks. PR #4 records the Visualization v2 configuration, passing contract CI, Dockerfile self-hash, and independent Beacon review without changing scientific source.",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/2",
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/actions/runs/36662108756"
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/pull/4",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/actions/runs/36662108756",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/actions/runs/36815119343"
           ]
         },
         "code_ocean_validation": {
@@ -951,7 +954,7 @@
           "status": "pending",
           "note": "The managed directory contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/tree/baab86f386af95308dea586137d57dc239fc3657/code/functions",
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/tree/3391b904123421a6fa9719996951af8d766716e5/code/functions",
             "https://github.com/NIDAP-Community/OMIX/issues/44"
           ]
         }
@@ -1489,7 +1492,7 @@
         "inferred_aliases": {},
         "alias_candidates": [],
         "runtime": {
-          "base_image": "codeocean/omix-r-pathway:r4.4.3-bioconductor3.20-v1",
+          "base_image": "codeocean/omix-r-visualization:r4.4.3-v2",
           "digest": null
         }
       },
@@ -1509,14 +1512,14 @@
           "code": "runtime_digest_missing",
           "severity": "warning",
           "message": "Adapter runtime is tag-addressed; no immutable digest is recorded.",
-          "observed": "codeocean/omix-r-pathway:r4.4.3-bioconductor3.20-v1"
+          "observed": "codeocean/omix-r-visualization:r4.4.3-v2"
         }
       ]
     },
     {
       "id": "OMIX-GSEA-Preranked-Legacy",
       "repository": "https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy",
-      "canonical_commit": "d41b2e3b1e3a0971c4a8b0341678774675a5fbeb",
+      "canonical_commit": "53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f",
       "adapter_commit": "c29a0dc019a56b236298b6e65667c2bfd55cda07",
       "inventory_states": {
         "schema_completeness": {
@@ -1524,7 +1527,7 @@
           "note": "Merged PR #37 records all 19 CLI controls: 8 public, 10 advanced, and internal output_dir, including ordered contrast and collection delimiters.",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX/pull/37",
-            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-GSEA-Preranked-Legacy/schemas/interface.yml"
+            "https://github.com/NIDAP-Community/OMIX/blob/53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f/modules/OMIX-GSEA-Preranked-Legacy/schemas/interface.yml"
           ]
         },
         "scientific_export.recorded_parity": {
@@ -2375,7 +2378,7 @@
     {
       "id": "OMIX-GSEA-Visualization-Legacy",
       "repository": "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy",
-      "canonical_commit": "d41b2e3b1e3a0971c4a8b0341678774675a5fbeb",
+      "canonical_commit": "53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f",
       "adapter_commit": "f8a10972e6566941f35720b2c23356a1028e6513",
       "inventory_states": {
         "schema_completeness": {
@@ -2383,7 +2386,7 @@
           "note": "Merged PR #37 records all 38 CLI controls: 12 public, 25 advanced, and internal output_dir, including choices and numeric bounds.",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX/pull/37",
-            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-GSEA-Visualization-Legacy/schemas/interface.yml"
+            "https://github.com/NIDAP-Community/OMIX/blob/53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f/modules/OMIX-GSEA-Visualization-Legacy/schemas/interface.yml"
           ]
         },
         "scientific_export.recorded_parity": {
@@ -3819,7 +3822,7 @@
     {
       "id": "OMIX-Gene-Boxplots",
       "repository": "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots",
-      "canonical_commit": "d41b2e3b1e3a0971c4a8b0341678774675a5fbeb",
+      "canonical_commit": "53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f",
       "adapter_commit": "35ad616857080cc6ee250c3217598c4bf3653e7f",
       "inventory_states": {
         "schema_completeness": {
@@ -3827,7 +3830,7 @@
           "note": "Merged PR #38 records 22 public/advanced CLI controls, 2 internal compatibility bindings, 4 outputs, the original aesthetics contract, and mean|sum|keep duplicate aggregation with mean as the default.",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX/pull/38",
-            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-Gene-Boxplots/schemas/interface.yml"
+            "https://github.com/NIDAP-Community/OMIX/blob/53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f/modules/OMIX-Gene-Boxplots/schemas/interface.yml"
           ]
         },
         "scientific_export.recorded_parity": {
@@ -4701,86 +4704,87 @@
     {
       "id": "OMIX-L2P-Multi",
       "repository": "https://github.com/NIDAP-Community/OMIX-L2P-Multi",
-      "canonical_commit": "d41b2e3b1e3a0971c4a8b0341678774675a5fbeb",
-      "adapter_commit": "12ba45baafdf21494a46b177cf9f7a08aeff3348",
+      "canonical_commit": "53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f",
+      "adapter_commit": "743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb",
       "inventory_states": {
         "schema_completeness": {
           "status": "verified",
-          "note": "Merged PRs #34 and #36 record all 52 controls: 13 public, 16 advanced, and 23 internal/deprecated controls, with ordered multi-column mappings and complete choices/defaults.",
+          "note": "The current interface records all 55 controls: 13 public, 19 advanced, and 23 internal/deprecated controls. OMIX PR #57 added configurable t-statistic, significance, and fold-change suffixes while preserving ordered multi-column mappings and complete choices/defaults.",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX/pull/34",
             "https://github.com/NIDAP-Community/OMIX/pull/36",
-            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-L2P-Multi/schemas/interface.yml"
+            "https://github.com/NIDAP-Community/OMIX/blob/53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f/modules/OMIX-L2P-Multi/schemas/interface.yml"
           ]
         },
         "scientific_export.recorded_parity": {
           "status": "verified",
-          "note": "Independent Compass and Beacon review of PR #2 confirms the complete managed export is byte-identical to canonical module 4.0.1/interface 1 at the recorded source commit.",
+          "note": "Independent Compass and Beacon review of PR #5 confirms the complete managed export is byte-identical to canonical module 4.1.0/interface 1 at the recorded source commit.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/12ba45baafdf21494a46b177cf9f7a08aeff3348/OMIX_MODULE_SOURCE.md",
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/2"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/5"
           ]
         },
         "scientific_export.current_parity": {
           "status": "verified",
-          "note": "The merged default-branch scientific export matches both its recorded source and the current canonical 4.0.1 scientific file.",
+          "note": "The merged default-branch scientific export matches both its recorded source and the current canonical 4.1.0 scientific file.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/12ba45baafdf21494a46b177cf9f7a08aeff3348/code/functions/analysis_functions.R",
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/2",
-            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-L2P-Multi/R/analysis_functions.R"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/code/functions/analysis_functions.R",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/5",
+            "https://github.com/NIDAP-Community/OMIX/blob/53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f/modules/OMIX-L2P-Multi/R/analysis_functions.R"
           ]
         },
         "scientific_export.source_record": {
           "status": "verified",
-          "note": "The source record identifies canonical module 4.0.1/interface 1, immutable source commit, exact managed mapping and hash, three compatibility aliases, two demo presets, adapter-only support files, and explicitly pending runtime, platform, Syncweaver, and release evidence.",
+          "note": "The source record identifies canonical module 4.1.0/interface 1, immutable source commit, exact managed mapping and hash, three compatibility aliases, demo presets, adapter-only support files, and explicitly pending runtime, platform-release, Syncweaver, and immutable-digest evidence.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/12ba45baafdf21494a46b177cf9f7a08aeff3348/OMIX_MODULE_SOURCE.md",
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/2"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/5"
           ]
         },
         "scientific_export.hash_manifest": {
           "status": "verified",
           "note": "The source record lists the matching canonical and adapter SHA-256 for the complete managed scientific export.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/12ba45baafdf21494a46b177cf9f7a08aeff3348/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/OMIX_MODULE_SOURCE.md"
           ]
         },
         "app_panel.coverage": {
           "status": "partial",
-          "note": "The named App Panel exposes exactly the 29 canonical public and advanced controls in schema order. Canonical species=Human and null comparisons are intentionally translated to documented Mouse demo presets, so the panel does not claim exact canonical-default parity; internal, deprecated, and output controls remain hidden.",
+          "note": "The named App Panel exposes all 32 canonical public and advanced controls in schema order, including the three suffix controls. Canonical species=Human and null comparisons are intentionally translated to documented Mouse demo presets; internal, deprecated, and output controls remain hidden.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/12ba45baafdf21494a46b177cf9f7a08aeff3348/.codeocean/app-panel.json",
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/12ba45baafdf21494a46b177cf9f7a08aeff3348/OMIX_MODULE_SOURCE.md",
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/2"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/5"
           ]
         },
         "runtime.provenance": {
           "status": "partial",
-          "note": "The historical r-pathway runtime tag is recorded, but its immutable Code Ocean digest remains pending and is not inferred.",
+          "note": "The OMIX Pathways v2 runtime tag used by the successful platform computation is recorded, but its immutable Code Ocean digest remains pending and is not inferred.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/12ba45baafdf21494a46b177cf9f7a08aeff3348/.codeocean/environment.json",
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/12ba45baafdf21494a46b177cf9f7a08aeff3348/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/.codeocean/environment.json",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/OMIX_MODULE_SOURCE.md"
           ]
         },
         "local_tests": {
           "status": "verified",
-          "note": "PR #2 records passing contract, mutation, CLI compatibility, custom-only, comparison-order, source-parity, canonical module, OmixPathwayPlots, representative threshold/rank/custom execution, visual inspection, and CI checks at reviewed head bbe669b6.",
+          "note": "PR #5 and independent Beacon review record passing adapter contracts, CLI compatibility, comparison ordering, workflow input, source parity, suffix override, and representative default and alternative-suffix executions at reviewed head 27ce4b4.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/2",
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/actions/runs/36741073921"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/5"
           ]
         },
         "code_ocean_validation": {
-          "status": "pending",
-          "note": "No durable Code Ocean named-parameter validation record exists for the merged 4.0.1 adapter.",
-          "evidence": []
+          "status": "partial",
+          "note": "Code Ocean computation 814585 completed successfully on 2026-09-30 against merged adapter f47e569 using OMIX Pathways v2. PR #7 records the observation and explicitly leaves the immutable runtime digest, platform release identifier, and durable comparison/result/bubble-plot checklist pending.",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/pull/7"
+          ]
         },
         "syncweaver.readiness": {
           "status": "blocked",
           "note": "The scientific export is verified, but workflow_input.R and cli_compatibility.R remain co-located in code/functions. A reviewed generated mapping must exclude or relocate adapter-only support files before Syncweaver onboarding.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/tree/12ba45baafdf21494a46b177cf9f7a08aeff3348/code/functions",
-            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/12ba45baafdf21494a46b177cf9f7a08aeff3348/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/tree/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/code/functions",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/743acb2ebae0ca4325bf801bb8ef1f59a71ab3cb/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX/issues/44"
           ]
         }
@@ -4876,6 +4880,39 @@
             "classification": "advanced",
             "delimiter": ",",
             "preserves_order": true
+          },
+          {
+            "name": "t_statistic_suffix",
+            "cli": "t_statistic_suffix",
+            "type": "string",
+            "default": "_tstat",
+            "allowed": [],
+            "item_allowed": [],
+            "classification": "advanced",
+            "delimiter": null,
+            "preserves_order": false
+          },
+          {
+            "name": "significance_suffix",
+            "cli": "significance_suffix",
+            "type": "string",
+            "default": "_pval",
+            "allowed": [],
+            "item_allowed": [],
+            "classification": "advanced",
+            "delimiter": null,
+            "preserves_order": false
+          },
+          {
+            "name": "fold_change_suffix",
+            "cli": "fold_change_suffix",
+            "type": "string",
+            "default": "_FC",
+            "allowed": [],
+            "item_allowed": [],
+            "classification": "advanced",
+            "delimiter": null,
+            "preserves_order": false
           },
           {
             "name": "species",
@@ -5445,274 +5482,292 @@
             "order": 6
           },
           {
+            "name": "t_statistic_suffix",
+            "type": "character",
+            "default": "_tstat",
+            "order": 7
+          },
+          {
+            "name": "significance_suffix",
+            "type": "character",
+            "default": "_pval",
+            "order": 8
+          },
+          {
+            "name": "fold_change_suffix",
+            "type": "character",
+            "default": "_FC",
+            "order": 9
+          },
+          {
             "name": "species",
             "type": "character",
             "default": "Human",
-            "order": 7
+            "order": 10
           },
           {
             "name": "update_genes",
             "type": "character",
             "default": "true",
-            "order": 8
+            "order": 11
           },
           {
             "name": "collections_to_include",
             "type": "character",
             "default": "H",
-            "order": 9
+            "order": 12
           },
           {
             "name": "select_by_rank",
             "type": "character",
             "default": "false",
-            "order": 10
+            "order": 13
           },
           {
             "name": "select_top_percentage_of_genes",
             "type": "character",
             "default": "true",
-            "order": 11
+            "order": 14
           },
           {
             "name": "select_top_genes",
             "type": "integer",
             "default": 500,
-            "order": 12
+            "order": 15
           },
           {
             "name": "significance_threshold",
             "type": "double",
             "default": 0.05,
-            "order": 13
+            "order": 16
           },
           {
             "name": "fold_change_threshold",
             "type": "double",
             "default": 1.2,
-            "order": 14
+            "order": 17
           },
           {
             "name": "minimum_number_of_deg_genes",
             "type": "integer",
             "default": 100,
-            "order": 15
+            "order": 18
           },
           {
             "name": "top_pathways",
             "type": "integer",
             "default": 10,
-            "order": 16
+            "order": 19
           },
           {
             "name": "number_of_significant_events",
             "type": "integer",
             "default": 1,
-            "order": 17
+            "order": 20
           },
           {
             "name": "maximum_pathways_to_plot",
             "type": "integer",
             "default": 20,
-            "order": 18
+            "order": 21
           },
           {
             "name": "pathway_bubble_plots",
             "type": "character",
             "default": "true",
-            "order": 19
+            "order": 22
           },
           {
             "name": "pathway_bubble_top_n",
             "type": "integer",
             "default": 20,
-            "order": 20
+            "order": 23
           },
           {
             "name": "pathway_bubble_significance_statistic",
             "type": "character",
             "default": "padj",
-            "order": 21
+            "order": 24
           },
           {
             "name": "collection_color_scale",
             "type": "character",
             "default": "independent",
-            "order": 22
+            "order": 25
           },
           {
             "name": "plot_bubble_size",
             "type": "character",
             "default": "pval",
-            "order": 23
+            "order": 26
           },
           {
             "name": "plot_bubble_color",
             "type": "character",
             "default": "enrichment_score",
-            "order": 24
+            "order": 27
           },
           {
             "name": "plot_bubble_max_color",
             "type": "double",
             "default": 1,
-            "order": 25
+            "order": 28
           },
           {
             "name": "pathway_axis_label_max_length",
             "type": "integer",
             "default": 45,
-            "order": 26
+            "order": 29
           },
           {
             "name": "pathway_axis_label_font_size",
             "type": "double",
             "default": 5,
-            "order": 27
+            "order": 30
           },
           {
             "name": "use_built_in_gene_universe",
             "type": "character",
             "default": "false",
-            "order": 28
+            "order": 31
           },
           {
             "name": "minimum_pathway_hit_count",
             "type": "integer",
             "default": 5,
-            "order": 29
+            "order": 32
           },
           {
             "name": "pathway_size_limit",
             "type": "integer",
             "default": 500,
-            "order": 30
+            "order": 33
           },
           {
             "name": "p_value_limit",
             "type": "double",
             "default": 0.05,
-            "order": 31
+            "order": 34
           },
           {
             "name": "use_fdr_for_significance",
             "type": "character",
             "default": "false",
-            "order": 32
+            "order": 35
           },
           {
             "name": "custom_pathways",
             "type": "character",
             "default": null,
-            "order": 33
+            "order": 36
           },
           {
             "name": "custom_pathway_name_column",
             "type": "character",
             "default": "gene_set_name",
-            "order": 34
+            "order": 37
           },
           {
             "name": "custom_pathway_gene_column",
             "type": "character",
             "default": "gene_symbol",
-            "order": 35
+            "order": 38
           },
           {
             "name": "pathways_to_remove",
             "type": "character",
             "default": null,
-            "order": 36
+            "order": 39
           },
           {
             "name": "rename_groups",
             "type": "character",
             "default": null,
-            "order": 37
+            "order": 40
           },
           {
             "name": "vertical_line_placement",
             "type": "character",
             "default": null,
-            "order": 38
+            "order": 41
           },
           {
             "name": "use_panel_plot",
             "type": "character",
             "default": "false",
-            "order": 39
+            "order": 42
           },
           {
             "name": "use_dynamic_pathway_font_size",
             "type": "character",
             "default": "true",
-            "order": 40
+            "order": 43
           },
           {
             "name": "custom_pathway_order",
             "type": "character",
             "default": null,
-            "order": 41
+            "order": 44
           },
           {
             "name": "x_axis_title",
             "type": "character",
             "default": null,
-            "order": 42
+            "order": 45
           },
           {
             "name": "y_axis_title",
             "type": "character",
             "default": null,
-            "order": 43
+            "order": 46
           },
           {
             "name": "x_axis_title_font_size",
             "type": "double",
             "default": 14,
-            "order": 44
+            "order": 47
           },
           {
             "name": "y_axis_title_font_size",
             "type": "double",
             "default": 14,
-            "order": 45
+            "order": 48
           },
           {
             "name": "x_axis_tick_font_size",
             "type": "double",
             "default": 14,
-            "order": 46
+            "order": 49
           },
           {
             "name": "x_axis_tick_labels",
             "type": "character",
             "default": null,
-            "order": 47
+            "order": 50
           },
           {
             "name": "y_axis_tick_labels",
             "type": "character",
             "default": null,
-            "order": 48
+            "order": 51
           },
           {
             "name": "plot_width",
             "type": "double",
             "default": 14,
-            "order": 49
+            "order": 52
           },
           {
             "name": "plot_height",
             "type": "double",
             "default": 16,
-            "order": 50
+            "order": 53
           },
           {
             "name": "column_spacing",
             "type": "double",
             "default": 0.5,
-            "order": 51
+            "order": 54
           }
         ]
       },
@@ -5761,286 +5816,304 @@
             "order": 6
           },
           {
+            "name": "t_statistic_suffix",
+            "type": "character",
+            "default": "_tstat",
+            "order": 7
+          },
+          {
+            "name": "significance_suffix",
+            "type": "character",
+            "default": "_pval",
+            "order": 8
+          },
+          {
+            "name": "fold_change_suffix",
+            "type": "character",
+            "default": "_FC",
+            "order": 9
+          },
+          {
             "name": "species",
             "type": "character",
             "default": "Human",
-            "order": 7
+            "order": 10
           },
           {
             "name": "update_genes",
             "type": "logical",
             "default": true,
-            "order": 8
+            "order": 11
           },
           {
             "name": "collections_to_include",
             "type": "character",
             "default": "H",
-            "order": 9
+            "order": 12
           },
           {
             "name": "collections",
             "type": "character",
             "default": null,
-            "order": 10
+            "order": 13
           },
           {
             "name": "select_by_rank",
             "type": "logical",
             "default": false,
-            "order": 11
+            "order": 14
           },
           {
             "name": "select_top_percentage_of_genes",
             "type": "logical",
             "default": true,
-            "order": 12
+            "order": 15
           },
           {
             "name": "select_top_percentage",
             "type": "logical",
             "default": null,
-            "order": 13
+            "order": 16
           },
           {
             "name": "select_top_genes",
             "type": "integer",
             "default": 500,
-            "order": 14
+            "order": 17
           },
           {
             "name": "significance_threshold",
             "type": "double",
             "default": 0.05,
-            "order": 15
+            "order": 18
           },
           {
             "name": "fold_change_threshold",
             "type": "double",
             "default": 1.2,
-            "order": 16
+            "order": 19
           },
           {
             "name": "minimum_number_of_deg_genes",
             "type": "integer",
             "default": 100,
-            "order": 17
+            "order": 20
           },
           {
             "name": "top_pathways",
             "type": "integer",
             "default": 10,
-            "order": 18
+            "order": 21
           },
           {
             "name": "number_of_significant_events",
             "type": "integer",
             "default": 1,
-            "order": 19
+            "order": 22
           },
           {
             "name": "maximum_pathways_to_plot",
             "type": "integer",
             "default": 20,
-            "order": 20
+            "order": 23
           },
           {
             "name": "pathway_bubble_plots",
             "type": "logical",
             "default": true,
-            "order": 21
+            "order": 24
           },
           {
             "name": "pathway_bubble_top_n",
             "type": "integer",
             "default": 20,
-            "order": 22
+            "order": 25
           },
           {
             "name": "pathway_bubble_significance_statistic",
             "type": "character",
             "default": "padj",
-            "order": 23
+            "order": 26
           },
           {
             "name": "collection_color_scale",
             "type": "character",
             "default": "independent",
-            "order": 24
+            "order": 27
           },
           {
             "name": "plot_bubble_size",
             "type": "character",
             "default": "pval",
-            "order": 25
+            "order": 28
           },
           {
             "name": "plot_bubble_color",
             "type": "character",
             "default": "enrichment_score",
-            "order": 26
+            "order": 29
           },
           {
             "name": "pathway_axis_label_max_length",
             "type": "integer",
             "default": 45,
-            "order": 27
+            "order": 30
           },
           {
             "name": "pathway_axis_label_font_size",
             "type": "integer",
             "default": 5,
-            "order": 28
+            "order": 31
           },
           {
             "name": "plot_width",
             "type": "integer",
             "default": 14,
-            "order": 29
+            "order": 32
           },
           {
             "name": "plot_height",
             "type": "integer",
             "default": 16,
-            "order": 30
+            "order": 33
           },
           {
             "name": "custom_pathways",
             "type": "character",
             "default": null,
-            "order": 31
+            "order": 34
           },
           {
             "name": "custom_pathway_name_column",
             "type": "character",
             "default": "gene_set_name",
-            "order": 32
+            "order": 35
           },
           {
             "name": "custom_pathway_gene_column",
             "type": "character",
             "default": "gene_symbol",
-            "order": 33
+            "order": 36
           },
           {
             "name": "plot_bubble_max_color",
             "type": "double",
             "default": 1,
-            "order": 34
+            "order": 37
           },
           {
             "name": "use_built_in_gene_universe",
             "type": "logical",
             "default": false,
-            "order": 35
+            "order": 38
           },
           {
             "name": "minimum_pathway_hit_count",
             "type": "integer",
             "default": 5,
-            "order": 36
+            "order": 39
           },
           {
             "name": "pathway_size_limit",
             "type": "integer",
             "default": 500,
-            "order": 37
+            "order": 40
           },
           {
             "name": "p_value_limit",
             "type": "double",
             "default": 0.05,
-            "order": 38
+            "order": 41
           },
           {
             "name": "use_fdr_for_significance",
             "type": "logical",
             "default": false,
-            "order": 39
+            "order": 42
           },
           {
             "name": "pathways_to_remove",
             "type": "character",
             "default": null,
-            "order": 40
+            "order": 43
           },
           {
             "name": "rename_groups",
             "type": "character",
             "default": null,
-            "order": 41
+            "order": 44
           },
           {
             "name": "vertical_line_placement",
             "type": "character",
             "default": null,
-            "order": 42
+            "order": 45
           },
           {
             "name": "use_panel_plot",
             "type": "logical",
             "default": false,
-            "order": 43
+            "order": 46
           },
           {
             "name": "use_dynamic_pathway_font_size",
             "type": "logical",
             "default": true,
-            "order": 44
+            "order": 47
           },
           {
             "name": "custom_pathway_order",
             "type": "character",
             "default": null,
-            "order": 45
+            "order": 48
           },
           {
             "name": "column_spacing",
             "type": "double",
             "default": 0.5,
-            "order": 46
+            "order": 49
           },
           {
             "name": "x_axis_title",
             "type": "character",
             "default": null,
-            "order": 47
+            "order": 50
           },
           {
             "name": "y_axis_title",
             "type": "character",
             "default": null,
-            "order": 48
+            "order": 51
           },
           {
             "name": "x_axis_title_font_size",
             "type": "integer",
             "default": 14,
-            "order": 49
+            "order": 52
           },
           {
             "name": "y_axis_title_font_size",
             "type": "integer",
             "default": 14,
-            "order": 50
+            "order": 53
           },
           {
             "name": "x_axis_tick_font_size",
             "type": "integer",
             "default": 14,
-            "order": 51
+            "order": 54
           },
           {
             "name": "x_axis_tick_labels",
             "type": "character",
             "default": null,
-            "order": 52
+            "order": 55
           },
           {
             "name": "y_axis_tick_labels",
             "type": "character",
             "default": null,
-            "order": 53
+            "order": 56
           }
         ],
         "app_panel_named_parameters": true,
@@ -6095,6 +6168,27 @@
             "order": 6
           },
           {
+            "name": "t_statistic_suffix",
+            "type": "text",
+            "default": "_tstat",
+            "allowed": [],
+            "order": 7
+          },
+          {
+            "name": "significance_suffix",
+            "type": "text",
+            "default": "_pval",
+            "allowed": [],
+            "order": 8
+          },
+          {
+            "name": "fold_change_suffix",
+            "type": "text",
+            "default": "_FC",
+            "allowed": [],
+            "order": 9
+          },
+          {
             "name": "species",
             "type": "list",
             "default": "Mouse",
@@ -6107,84 +6201,84 @@
               "Rabbit",
               "Drosophila"
             ],
-            "order": 7
+            "order": 10
           },
           {
             "name": "update_genes",
             "type": "list",
             "default": "True",
             "allowed": [],
-            "order": 8
+            "order": 11
           },
           {
             "name": "collections_to_include",
             "type": "text",
             "default": "H",
             "allowed": [],
-            "order": 9
+            "order": 12
           },
           {
             "name": "select_by_rank",
             "type": "list",
             "default": "False",
             "allowed": [],
-            "order": 10
+            "order": 13
           },
           {
             "name": "select_top_percentage_of_genes",
             "type": "list",
             "default": "True",
             "allowed": [],
-            "order": 11
+            "order": 14
           },
           {
             "name": "select_top_genes",
             "type": "text",
             "default": "500",
             "allowed": [],
-            "order": 12
+            "order": 15
           },
           {
             "name": "significance_threshold",
             "type": "text",
             "default": "0.05",
             "allowed": [],
-            "order": 13
+            "order": 16
           },
           {
             "name": "fold_change_threshold",
             "type": "text",
             "default": "1.2",
             "allowed": [],
-            "order": 14
+            "order": 17
           },
           {
             "name": "minimum_number_of_deg_genes",
             "type": "text",
             "default": "100",
             "allowed": [],
-            "order": 15
+            "order": 18
           },
           {
             "name": "number_of_significant_events",
             "type": "text",
             "default": "1",
             "allowed": [],
-            "order": 16
+            "order": 19
           },
           {
             "name": "pathway_bubble_plots",
             "type": "list",
             "default": "True",
             "allowed": [],
-            "order": 17
+            "order": 20
           },
           {
             "name": "pathway_bubble_top_n",
             "type": "text",
             "default": "20",
             "allowed": [],
-            "order": 18
+            "order": 21
           },
           {
             "name": "pathway_bubble_significance_statistic",
@@ -6194,7 +6288,7 @@
               "padj",
               "pval"
             ],
-            "order": 19
+            "order": 22
           },
           {
             "name": "collection_color_scale",
@@ -6204,63 +6298,63 @@
               "independent",
               "shared"
             ],
-            "order": 20
+            "order": 23
           },
           {
             "name": "use_built_in_gene_universe",
             "type": "list",
             "default": "False",
             "allowed": [],
-            "order": 21
+            "order": 24
           },
           {
             "name": "minimum_pathway_hit_count",
             "type": "text",
             "default": "5",
             "allowed": [],
-            "order": 22
+            "order": 25
           },
           {
             "name": "pathway_size_limit",
             "type": "text",
             "default": "500",
             "allowed": [],
-            "order": 23
+            "order": 26
           },
           {
             "name": "p_value_limit",
             "type": "text",
             "default": "0.05",
             "allowed": [],
-            "order": 24
+            "order": 27
           },
           {
             "name": "use_fdr_for_significance",
             "type": "list",
             "default": "False",
             "allowed": [],
-            "order": 25
+            "order": 28
           },
           {
             "name": "custom_pathway_name_column",
             "type": "text",
             "default": "gene_set_name",
             "allowed": [],
-            "order": 26
+            "order": 29
           },
           {
             "name": "custom_pathway_gene_column",
             "type": "text",
             "default": "gene_symbol",
             "allowed": [],
-            "order": 27
+            "order": 30
           },
           {
             "name": "pathways_to_remove",
             "type": "text",
             "default": null,
             "allowed": [],
-            "order": 28
+            "order": 31
           }
         ],
         "documented_aliases": {
@@ -6270,15 +6364,15 @@
         },
         "documented_hidden_inputs": {},
         "source_record_metadata": {
-          "canonical_source_commit": "258639195c8fd249364c0b65bdcc2ae6603ca64b",
-          "module_version": "4.0.1",
+          "canonical_source_commit": "53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f",
+          "module_version": "4.1.0",
           "interface_version": 1,
           "has_per_file_sha256": true
         },
         "inferred_aliases": {},
         "alias_candidates": [],
         "runtime": {
-          "base_image": "codeocean/omix-r-pathway:r4.4.3-bioconductor3.20-v1",
+          "base_image": "codeocean/omix-r-pathway:r4.4.3-bioconductor3.20-v2",
           "digest": null
         }
       },
@@ -6286,9 +6380,9 @@
         {
           "canonical_path": "modules/OMIX-L2P-Multi/R/analysis_functions.R",
           "adapter_path": "code/functions/analysis_functions.R",
-          "recorded_source_sha256": "ff986b4ba0e25abd79388ecc1e79f8771381acd0ffb8461ead646b2a3a9e303a",
-          "adapter_sha256": "ff986b4ba0e25abd79388ecc1e79f8771381acd0ffb8461ead646b2a3a9e303a",
-          "current_source_sha256": "ff986b4ba0e25abd79388ecc1e79f8771381acd0ffb8461ead646b2a3a9e303a",
+          "recorded_source_sha256": "3e646757f19f0beaae78e6983f77545af25a38dc25b057612b350c7ac3251f45",
+          "adapter_sha256": "3e646757f19f0beaae78e6983f77545af25a38dc25b057612b350c7ac3251f45",
+          "current_source_sha256": "3e646757f19f0beaae78e6983f77545af25a38dc25b057612b350c7ac3251f45",
           "matches_recorded": true,
           "matches_current": true
         }
@@ -6313,89 +6407,91 @@
           "code": "runtime_digest_missing",
           "severity": "warning",
           "message": "Adapter runtime is tag-addressed; no immutable digest is recorded.",
-          "observed": "codeocean/omix-r-pathway:r4.4.3-bioconductor3.20-v1"
+          "observed": "codeocean/omix-r-pathway:r4.4.3-bioconductor3.20-v2"
         }
       ]
     },
     {
       "id": "OMIX-L2P-Single",
       "repository": "https://github.com/NIDAP-Community/OMIX-L2P-Single",
-      "canonical_commit": "d41b2e3b1e3a0971c4a8b0341678774675a5fbeb",
-      "adapter_commit": "838ae38501746a735b3dde77b375f21a4e92834c",
+      "canonical_commit": "53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f",
+      "adapter_commit": "ba32e3a90dcbb5b95856e712a484b441a061a947",
       "inventory_states": {
         "schema_completeness": {
           "status": "verified",
-          "note": "Merged PRs #34 and #36 record all 40 CLI controls: 9 public, 30 advanced, and internal output_dir, including ordered batched comparisons, choices, and defaults.",
+          "note": "The current interface records all 43 controls: 9 public, 33 advanced, and internal output_dir. OMIX PR #55 added configurable suffix controls and deterministic blank-comparison behavior while retaining ordered batched comparisons, choices, and defaults.",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX/pull/34",
             "https://github.com/NIDAP-Community/OMIX/pull/36",
-            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-L2P-Single/schemas/interface.yml"
+            "https://github.com/NIDAP-Community/OMIX/blob/53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f/modules/OMIX-L2P-Single/schemas/interface.yml"
           ]
         },
         "scientific_export.recorded_parity": {
           "status": "verified",
-          "note": "Independent review of PR #2 confirms the managed export is byte-identical to canonical module 3.1.0/interface 1 at the recorded source commit.",
+          "note": "Independent Beacon review of PR #5 confirms the managed export is byte-identical to canonical module 3.2.0/interface 1 at the recorded source commit.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/838ae38501746a735b3dde77b375f21a4e92834c/OMIX_MODULE_SOURCE.md",
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/ba32e3a90dcbb5b95856e712a484b441a061a947/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/5"
           ]
         },
         "scientific_export.current_parity": {
           "status": "verified",
-          "note": "The merged default-branch export matches both its recorded source and the current canonical scientific file.",
+          "note": "The merged default-branch export matches both its recorded source and the current canonical 3.2.0 scientific file.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/838ae38501746a735b3dde77b375f21a4e92834c/code/functions/L2P_Analysis.R",
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/ba32e3a90dcbb5b95856e712a484b441a061a947/code/functions/L2P_Analysis.R",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/5"
           ]
         },
         "scientific_export.source_record": {
           "status": "verified",
-          "note": "The source record identifies canonical module 3.1.0/interface 1, its immutable source commit, exact managed mapping and hash, platform translations, and explicitly pending runtime, platform, Syncweaver, and release evidence.",
+          "note": "The source record identifies canonical module 3.2.0/interface 1, its immutable source commit, exact managed mapping and hash, platform translations, and explicitly pending platform-release, Syncweaver, and immutable-digest evidence.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/838ae38501746a735b3dde77b375f21a4e92834c/OMIX_MODULE_SOURCE.md",
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/ba32e3a90dcbb5b95856e712a484b441a061a947/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/5"
           ]
         },
         "scientific_export.hash_manifest": {
           "status": "verified",
           "note": "The source record lists matching canonical and adapter SHA-256 values for every managed scientific file.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/838ae38501746a735b3dde77b375f21a4e92834c/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/ba32e3a90dcbb5b95856e712a484b441a061a947/OMIX_MODULE_SOURCE.md"
           ]
         },
         "app_panel.coverage": {
           "status": "partial",
-          "note": "The named App Panel exposes all 39 public and advanced controls. Canonical species=Human is intentionally translated to the documented Mouse demo preset, so the panel is structurally complete but does not claim exact canonical-default parity; internal output_dir remains platform-managed.",
+          "note": "The named App Panel exposes all 42 public and advanced controls, including the three suffix controls. Canonical species=Human and blank comparison defaults are intentionally translated to documented Mouse/B-A demo presets; internal output_dir remains platform-managed.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/838ae38501746a735b3dde77b375f21a4e92834c/.codeocean/app-panel.json",
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/838ae38501746a735b3dde77b375f21a4e92834c/OMIX_MODULE_SOURCE.md",
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/ba32e3a90dcbb5b95856e712a484b441a061a947/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/ba32e3a90dcbb5b95856e712a484b441a061a947/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/5"
           ]
         },
         "runtime.provenance": {
           "status": "partial",
-          "note": "A tagged base image and RCurl overlay are recorded, but no immutable digest is recorded.",
+          "note": "The OMIX Pathways v2 runtime tag used by the successful platform computation and its RCurl overlay are recorded, but no immutable Code Ocean digest is recorded.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/838ae38501746a735b3dde77b375f21a4e92834c/.codeocean/environment.json"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/ba32e3a90dcbb5b95856e712a484b441a061a947/.codeocean/environment.json"
           ]
         },
         "local_tests": {
           "status": "verified",
-          "note": "PR #2 records passing source-parity, canonical-contract, App Panel, adapter CLI, testthat, and layout checks with independent review.",
+          "note": "PR #5 and independent Beacon review record passing source-parity, canonical-contract, App Panel, adapter CLI, comparison resolution, suffix override, workflow-input, and representative L2P checks at reviewed head 153463d.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/2"
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/5"
           ]
         },
         "code_ocean_validation": {
-          "status": "pending",
-          "note": "No durable Code Ocean validation record was found.",
-          "evidence": []
+          "status": "partial",
+          "note": "Code Ocean computation 814293 completed successfully on 2026-09-30 against merged adapter b668381 using OMIX Pathways v2. PR #7 records the observation and explicitly leaves the immutable runtime digest, platform release identifier, and durable input/output/scientific-sanity checklist pending.",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/pull/7"
+          ]
         },
         "syncweaver.readiness": {
           "status": "pending",
           "note": "The managed directory contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-L2P-Single/tree/838ae38501746a735b3dde77b375f21a4e92834c/code/functions",
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/tree/ba32e3a90dcbb5b95856e712a484b441a061a947/code/functions",
             "https://github.com/NIDAP-Community/OMIX/issues/44"
           ]
         }
@@ -6543,6 +6639,39 @@
             "cli": "fold_change_column",
             "type": "string",
             "default": null,
+            "allowed": [],
+            "item_allowed": [],
+            "classification": "advanced",
+            "delimiter": null,
+            "preserves_order": false
+          },
+          {
+            "name": "t_statistic_suffix",
+            "cli": "t_statistic_suffix",
+            "type": "string",
+            "default": "_tstat",
+            "allowed": [],
+            "item_allowed": [],
+            "classification": "advanced",
+            "delimiter": null,
+            "preserves_order": false
+          },
+          {
+            "name": "significance_suffix",
+            "cli": "significance_suffix",
+            "type": "string",
+            "default": "_pval",
+            "allowed": [],
+            "item_allowed": [],
+            "classification": "advanced",
+            "delimiter": null,
+            "preserves_order": false
+          },
+          {
+            "name": "fold_change_suffix",
+            "cli": "fold_change_suffix",
+            "type": "string",
+            "default": "_FC",
             "allowed": [],
             "item_allowed": [],
             "classification": "advanced",
@@ -6964,184 +7093,202 @@
             "order": 9
           },
           {
+            "name": "t_statistic_suffix",
+            "type": "character",
+            "default": "_tstat",
+            "order": 10
+          },
+          {
+            "name": "significance_suffix",
+            "type": "character",
+            "default": "_pval",
+            "order": 11
+          },
+          {
+            "name": "fold_change_suffix",
+            "type": "character",
+            "default": "_FC",
+            "order": 12
+          },
+          {
             "name": "select_by_rank",
             "type": "character",
             "default": "false",
-            "order": 10
+            "order": 13
           },
           {
             "name": "select_top_percentage_of_genes",
             "type": "character",
             "default": "true",
-            "order": 11
+            "order": 14
           },
           {
             "name": "select_top_genes",
             "type": "integer",
             "default": 500,
-            "order": 12
+            "order": 15
           },
           {
             "name": "significance_threshold",
             "type": "double",
             "default": 0.05,
-            "order": 13
+            "order": 16
           },
           {
             "name": "fold_change_threshold",
             "type": "double",
             "default": 1.2,
-            "order": 14
+            "order": 17
           },
           {
             "name": "minimum_number_of_deg_genes",
             "type": "integer",
             "default": 50,
-            "order": 15
+            "order": 18
           },
           {
             "name": "minimum_pathway_hit_count",
             "type": "integer",
             "default": 5,
-            "order": 16
+            "order": 19
           },
           {
             "name": "p_value_threshold_for_output",
             "type": "double",
             "default": 0.05,
-            "order": 17
+            "order": 20
           },
           {
             "name": "use_built_in_gene_universe",
             "type": "character",
             "default": "false",
-            "order": 18
+            "order": 21
           },
           {
             "name": "use_fdr_p_values",
             "type": "character",
             "default": "false",
-            "order": 19
+            "order": 22
           },
           {
             "name": "custom_pathways",
             "type": "character",
             "default": null,
-            "order": 20
+            "order": 23
           },
           {
             "name": "custom_pathway_name_column",
             "type": "character",
             "default": "gene_set_name",
-            "order": 21
+            "order": 24
           },
           {
             "name": "custom_pathway_gene_column",
             "type": "character",
             "default": "gene_symbol",
-            "order": 22
+            "order": 25
           },
           {
             "name": "number_of_pathways_to_plot",
             "type": "integer",
             "default": 20,
-            "order": 23
+            "order": 26
           },
           {
             "name": "pathway_axis_label_max_length",
             "type": "integer",
             "default": 50,
-            "order": 24
+            "order": 27
           },
           {
             "name": "pathway_axis_label_font_size",
             "type": "integer",
             "default": 15,
-            "order": 25
+            "order": 28
           },
           {
             "name": "x_axis_title_font_size",
             "type": "integer",
             "default": 20,
-            "order": 26
+            "order": 29
           },
           {
             "name": "y_axis_title_font_size",
             "type": "integer",
             "default": 20,
-            "order": 27
+            "order": 30
           },
           {
             "name": "x_axis_tick_font_size",
             "type": "integer",
             "default": 15,
-            "order": 28
+            "order": 31
           },
           {
             "name": "plot_top_pathways_up",
             "type": "character",
             "default": "true",
-            "order": 29
+            "order": 32
           },
           {
             "name": "pathways_to_use_up",
             "type": "character",
             "default": null,
-            "order": 30
+            "order": 33
           },
           {
             "name": "plot_top_pathways_down",
             "type": "character",
             "default": "true",
-            "order": 31
+            "order": 34
           },
           {
             "name": "pathways_to_use_down",
             "type": "character",
             "default": null,
-            "order": 32
+            "order": 35
           },
           {
             "name": "sort_bubble_plot_by",
             "type": "character",
             "default": "percent gene hits per pathway",
-            "order": 33
+            "order": 36
           },
           {
             "name": "plot_bubble_size",
             "type": "character",
             "default": "number of hits",
-            "order": 34
+            "order": 37
           },
           {
             "name": "plot_bubble_color",
             "type": "character",
             "default": "Fisher's Exact pval",
-            "order": 35
+            "order": 38
           },
           {
             "name": "bubble_colors",
             "type": "character",
             "default": "blues",
-            "order": 36
+            "order": 39
           },
           {
             "name": "color_for_bar",
             "type": "character",
             "default": "GreentoBlue",
-            "order": 37
+            "order": 40
           },
           {
             "name": "export_plot_width",
             "type": "double",
             "default": 12,
-            "order": 38
+            "order": 41
           },
           {
             "name": "export_plot_height",
             "type": "double",
             "default": 12,
-            "order": 39
+            "order": 42
           }
         ]
       },
@@ -7208,178 +7355,196 @@
             "order": 9
           },
           {
+            "name": "t_statistic_suffix",
+            "type": "character",
+            "default": "_tstat",
+            "order": 10
+          },
+          {
+            "name": "significance_suffix",
+            "type": "character",
+            "default": "_pval",
+            "order": 11
+          },
+          {
+            "name": "fold_change_suffix",
+            "type": "character",
+            "default": "_FC",
+            "order": 12
+          },
+          {
             "name": "select_by_rank",
             "type": "character",
             "default": "FALSE",
-            "order": 10
+            "order": 13
           },
           {
             "name": "select_top_percentage_of_genes",
             "type": "character",
             "default": "TRUE",
-            "order": 11
+            "order": 14
           },
           {
             "name": "select_top_genes",
             "type": "integer",
             "default": 500,
-            "order": 12
+            "order": 15
           },
           {
             "name": "significance_threshold",
             "type": "double",
             "default": 0.05,
-            "order": 13
+            "order": 16
           },
           {
             "name": "fold_change_threshold",
             "type": "double",
             "default": 1.2,
-            "order": 14
+            "order": 17
           },
           {
             "name": "minimum_number_of_deg_genes",
             "type": "integer",
             "default": 50,
-            "order": 15
+            "order": 18
           },
           {
             "name": "minimum_pathway_hit_count",
             "type": "integer",
             "default": 5,
-            "order": 16
+            "order": 19
           },
           {
             "name": "p_value_threshold_for_output",
             "type": "double",
             "default": 0.05,
-            "order": 17
+            "order": 20
           },
           {
             "name": "use_built_in_gene_universe",
             "type": "character",
             "default": "FALSE",
-            "order": 18
+            "order": 21
           },
           {
             "name": "use_fdr_p_values",
             "type": "character",
             "default": "FALSE",
-            "order": 19
+            "order": 22
           },
           {
             "name": "custom_pathway_name_column",
             "type": "character",
             "default": "gene_set_name",
-            "order": 20
+            "order": 23
           },
           {
             "name": "custom_pathway_gene_column",
             "type": "character",
             "default": "gene_symbol",
-            "order": 21
+            "order": 24
           },
           {
             "name": "number_of_pathways_to_plot",
             "type": "integer",
             "default": 20,
-            "order": 22
+            "order": 25
           },
           {
             "name": "pathway_axis_label_max_length",
             "type": "integer",
             "default": 50,
-            "order": 23
+            "order": 26
           },
           {
             "name": "pathway_axis_label_font_size",
             "type": "integer",
             "default": 15,
-            "order": 24
+            "order": 27
           },
           {
             "name": "x_axis_title_font_size",
             "type": "integer",
             "default": 20,
-            "order": 25
+            "order": 28
           },
           {
             "name": "y_axis_title_font_size",
             "type": "integer",
             "default": 20,
-            "order": 26
+            "order": 29
           },
           {
             "name": "x_axis_tick_font_size",
             "type": "integer",
             "default": 15,
-            "order": 27
+            "order": 30
           },
           {
             "name": "plot_top_pathways_up",
             "type": "character",
             "default": "TRUE",
-            "order": 28
+            "order": 31
           },
           {
             "name": "pathways_to_use_up",
             "type": "character",
             "default": null,
-            "order": 29
+            "order": 32
           },
           {
             "name": "plot_top_pathways_down",
             "type": "character",
             "default": "TRUE",
-            "order": 30
+            "order": 33
           },
           {
             "name": "pathways_to_use_down",
             "type": "character",
             "default": null,
-            "order": 31
+            "order": 34
           },
           {
             "name": "sort_bubble_plot_by",
             "type": "character",
             "default": "percent gene hits per pathway",
-            "order": 32
+            "order": 35
           },
           {
             "name": "plot_bubble_size",
             "type": "character",
             "default": "number of hits",
-            "order": 33
+            "order": 36
           },
           {
             "name": "plot_bubble_color",
             "type": "character",
             "default": "Fisher's Exact pval",
-            "order": 34
+            "order": 37
           },
           {
             "name": "bubble_colors",
             "type": "character",
             "default": "blues",
-            "order": 35
+            "order": 38
           },
           {
             "name": "color_for_bar",
             "type": "character",
             "default": "GreentoBlue",
-            "order": 36
+            "order": 39
           },
           {
             "name": "export_plot_width",
             "type": "double",
             "default": 12,
-            "order": 37
+            "order": 40
           },
           {
             "name": "export_plot_height",
             "type": "double",
             "default": 12,
-            "order": 38
+            "order": 41
           }
         ],
         "app_panel_named_parameters": true,
@@ -7401,7 +7566,7 @@
           {
             "name": "comparison",
             "type": "text",
-            "default": "",
+            "default": "B-A",
             "allowed": [],
             "order": 2
           },
@@ -7463,158 +7628,179 @@
             "order": 9
           },
           {
+            "name": "t_statistic_suffix",
+            "type": "text",
+            "default": "_tstat",
+            "allowed": [],
+            "order": 10
+          },
+          {
+            "name": "significance_suffix",
+            "type": "text",
+            "default": "_pval",
+            "allowed": [],
+            "order": 11
+          },
+          {
+            "name": "fold_change_suffix",
+            "type": "text",
+            "default": "_FC",
+            "allowed": [],
+            "order": 12
+          },
+          {
             "name": "select_by_rank",
             "type": "text",
             "default": "FALSE",
             "allowed": [],
-            "order": 10
+            "order": 13
           },
           {
             "name": "select_top_percentage_of_genes",
             "type": "text",
             "default": "TRUE",
             "allowed": [],
-            "order": 11
+            "order": 14
           },
           {
             "name": "select_top_genes",
             "type": "text",
             "default": "500",
             "allowed": [],
-            "order": 12
+            "order": 15
           },
           {
             "name": "significance_threshold",
             "type": "text",
             "default": "0.05",
             "allowed": [],
-            "order": 13
+            "order": 16
           },
           {
             "name": "fold_change_threshold",
             "type": "text",
             "default": "1.2",
             "allowed": [],
-            "order": 14
+            "order": 17
           },
           {
             "name": "minimum_number_of_deg_genes",
             "type": "text",
             "default": "50",
             "allowed": [],
-            "order": 15
+            "order": 18
           },
           {
             "name": "minimum_pathway_hit_count",
             "type": "text",
             "default": "5",
             "allowed": [],
-            "order": 16
+            "order": 19
           },
           {
             "name": "p_value_threshold_for_output",
             "type": "text",
             "default": "0.05",
             "allowed": [],
-            "order": 17
+            "order": 20
           },
           {
             "name": "use_built_in_gene_universe",
             "type": "text",
             "default": "FALSE",
             "allowed": [],
-            "order": 18
+            "order": 21
           },
           {
             "name": "use_fdr_p_values",
             "type": "text",
             "default": "FALSE",
             "allowed": [],
-            "order": 19
+            "order": 22
           },
           {
             "name": "custom_pathway_name_column",
             "type": "text",
             "default": "gene_set_name",
             "allowed": [],
-            "order": 20
+            "order": 23
           },
           {
             "name": "custom_pathway_gene_column",
             "type": "text",
             "default": "gene_symbol",
             "allowed": [],
-            "order": 21
+            "order": 24
           },
           {
             "name": "number_of_pathways_to_plot",
             "type": "text",
             "default": "20",
             "allowed": [],
-            "order": 22
+            "order": 25
           },
           {
             "name": "pathway_axis_label_max_length",
             "type": "text",
             "default": "50",
             "allowed": [],
-            "order": 23
+            "order": 26
           },
           {
             "name": "pathway_axis_label_font_size",
             "type": "text",
             "default": "15",
             "allowed": [],
-            "order": 24
+            "order": 27
           },
           {
             "name": "x_axis_title_font_size",
             "type": "text",
             "default": "20",
             "allowed": [],
-            "order": 25
+            "order": 28
           },
           {
             "name": "y_axis_title_font_size",
             "type": "text",
             "default": "20",
             "allowed": [],
-            "order": 26
+            "order": 29
           },
           {
             "name": "x_axis_tick_font_size",
             "type": "text",
             "default": "15",
             "allowed": [],
-            "order": 27
+            "order": 30
           },
           {
             "name": "plot_top_pathways_up",
             "type": "text",
             "default": "TRUE",
             "allowed": [],
-            "order": 28
+            "order": 31
           },
           {
             "name": "pathways_to_use_up",
             "type": "text",
             "default": null,
             "allowed": [],
-            "order": 29
+            "order": 32
           },
           {
             "name": "plot_top_pathways_down",
             "type": "text",
             "default": "TRUE",
             "allowed": [],
-            "order": 30
+            "order": 33
           },
           {
             "name": "pathways_to_use_down",
             "type": "text",
             "default": null,
             "allowed": [],
-            "order": 31
+            "order": 34
           },
           {
             "name": "sort_bubble_plot_by",
@@ -7627,7 +7813,7 @@
               "enrichment score",
               "number of hits"
             ],
-            "order": 32
+            "order": 35
           },
           {
             "name": "plot_bubble_size",
@@ -7640,7 +7826,7 @@
               "Fisher's Exact pval",
               "fdr corrected pval"
             ],
-            "order": 33
+            "order": 36
           },
           {
             "name": "plot_bubble_color",
@@ -7653,7 +7839,7 @@
               "number of hits",
               "enrichment score"
             ],
-            "order": 34
+            "order": 37
           },
           {
             "name": "bubble_colors",
@@ -7664,7 +7850,7 @@
               "reds",
               "blue to red"
             ],
-            "order": 35
+            "order": 38
           },
           {
             "name": "color_for_bar",
@@ -7681,35 +7867,35 @@
               "OrangetoRed",
               "YellowOrangeRed"
             ],
-            "order": 36
+            "order": 39
           },
           {
             "name": "export_plot_width",
             "type": "text",
             "default": "12",
             "allowed": [],
-            "order": 37
+            "order": 40
           },
           {
             "name": "export_plot_height",
             "type": "text",
             "default": "12",
             "allowed": [],
-            "order": 38
+            "order": 41
           }
         ],
         "documented_aliases": {},
         "documented_hidden_inputs": {},
         "source_record_metadata": {
-          "canonical_source_commit": "eee4433cd74d0ce9bd1daba1571ca6312cba7ea2",
-          "module_version": "3.1.0",
+          "canonical_source_commit": "5caab82a6dc89c20a30f4cf3826618620b1daf0f",
+          "module_version": "3.2.0",
           "interface_version": 1,
           "has_per_file_sha256": true
         },
         "inferred_aliases": {},
         "alias_candidates": [],
         "runtime": {
-          "base_image": "codeocean/omix-r-pathway:r4.4.3-bioconductor3.20-v1",
+          "base_image": "codeocean/omix-r-pathway:r4.4.3-bioconductor3.20-v2",
           "digest": null
         }
       },
@@ -7717,9 +7903,9 @@
         {
           "canonical_path": "modules/OMIX-L2P-Single/R/L2P_Analysis.R",
           "adapter_path": "code/functions/L2P_Analysis.R",
-          "recorded_source_sha256": "c963f5c4168f7bb425d14b4ea0a00270bcff0818ee5b1e7d341b4209bff385bf",
-          "adapter_sha256": "c963f5c4168f7bb425d14b4ea0a00270bcff0818ee5b1e7d341b4209bff385bf",
-          "current_source_sha256": "c963f5c4168f7bb425d14b4ea0a00270bcff0818ee5b1e7d341b4209bff385bf",
+          "recorded_source_sha256": "f24c57751dcbda394cdf222bdf46892b6f463f98fb678d07234e921fa0c02054",
+          "adapter_sha256": "f24c57751dcbda394cdf222bdf46892b6f463f98fb678d07234e921fa0c02054",
+          "current_source_sha256": "f24c57751dcbda394cdf222bdf46892b6f463f98fb678d07234e921fa0c02054",
           "matches_recorded": true,
           "matches_current": true
         }
@@ -7737,6 +7923,13 @@
           "code": "app_panel_default_mismatch",
           "severity": "warning",
           "message": "App Panel default differs from the canonical contract.",
+          "control": "comparison",
+          "observed": "B-A"
+        },
+        {
+          "code": "app_panel_default_mismatch",
+          "severity": "warning",
+          "message": "App Panel default differs from the canonical contract.",
           "control": "species",
           "expected": "Human",
           "observed": "Mouse"
@@ -7745,29 +7938,29 @@
           "code": "runtime_digest_missing",
           "severity": "warning",
           "message": "Adapter runtime is tag-addressed; no immutable digest is recorded.",
-          "observed": "codeocean/omix-r-pathway:r4.4.3-bioconductor3.20-v1"
+          "observed": "codeocean/omix-r-pathway:r4.4.3-bioconductor3.20-v2"
         }
       ]
     },
     {
       "id": "OMIX-Volcano-Plot",
       "repository": "https://github.com/NIDAP-Community/OMIX-Volcano-Plot",
-      "canonical_commit": "d41b2e3b1e3a0971c4a8b0341678774675a5fbeb",
-      "adapter_commit": "2a30686f93830ca55e92dc9512c34028d4db4b20",
+      "canonical_commit": "53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f",
+      "adapter_commit": "eb57569a276df25f4364ff27fa4e114497066937",
       "inventory_states": {
         "schema_completeness": {
           "status": "verified",
           "note": "Merged PR #33 records 40 public/advanced CLI controls and 3 internal bindings, explicitly distinguishing canonical resolution_dpi from the implementation-only resolution_dpi_ argument.",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX/pull/33",
-            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-Volcano-Plot/schemas/interface.yml"
+            "https://github.com/NIDAP-Community/OMIX/blob/53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f/modules/OMIX-Volcano-Plot/schemas/interface.yml"
           ]
         },
         "scientific_export.recorded_parity": {
           "status": "verified",
           "note": "Independent Canvas and Beacon reviews of PR #2 confirm the complete managed export is byte-identical to the recorded canonical source.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/2a30686f93830ca55e92dc9512c34028d4db4b20/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/eb57569a276df25f4364ff27fa4e114497066937/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2"
           ]
         },
@@ -7775,16 +7968,16 @@
           "status": "verified",
           "note": "The merged default-branch export matches both its recorded source and the current canonical scientific file.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/2a30686f93830ca55e92dc9512c34028d4db4b20/code/functions/Volcano_Plot_Enhanced.R",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/eb57569a276df25f4364ff27fa4e114497066937/code/functions/Volcano_Plot_Enhanced.R",
             "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2",
-            "https://github.com/NIDAP-Community/OMIX/blob/d41b2e3b1e3a0971c4a8b0341678774675a5fbeb/modules/OMIX-Volcano-Plot/R/Volcano_Plot_Enhanced.R"
+            "https://github.com/NIDAP-Community/OMIX/blob/53b2ca65aa23f54477f698c4ab6ce0d6ab637a5f/modules/OMIX-Volcano-Plot/R/Volcano_Plot_Enhanced.R"
           ]
         },
         "scientific_export.source_record": {
           "status": "verified",
           "note": "The source record identifies canonical module 1.0.0/interface 1, the immutable source commit, exact file mapping and hash, hidden output binding, deprecated compatibility alias, and explicitly pending runtime, platform, Syncweaver, and release evidence.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/2a30686f93830ca55e92dc9512c34028d4db4b20/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/eb57569a276df25f4364ff27fa4e114497066937/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2"
           ]
         },
@@ -7792,45 +7985,49 @@
           "status": "verified",
           "note": "The source record lists the shared canonical and adapter SHA-256 value for every managed scientific file.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/2a30686f93830ca55e92dc9512c34028d4db4b20/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/eb57569a276df25f4364ff27fa4e114497066937/OMIX_MODULE_SOURCE.md"
           ]
         },
         "app_panel.coverage": {
           "status": "verified",
           "note": "The named App Panel exposes 39 canonical public and advanced controls with canonical names, types, choices, order, and defaults; output_dir is the sole documented platform-managed hidden control.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/2a30686f93830ca55e92dc9512c34028d4db4b20/.codeocean/app-panel.json",
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/2a30686f93830ca55e92dc9512c34028d4db4b20/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/eb57569a276df25f4364ff27fa4e114497066937/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/eb57569a276df25f4364ff27fa4e114497066937/OMIX_MODULE_SOURCE.md",
             "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2"
           ]
         },
         "runtime.provenance": {
           "status": "partial",
-          "note": "The source record verifies the published r-visualization GHCR image at sha256:1d9f453b49412aa05e9d3420cd4b1b4ea0beac4923cb40572af38b0ae2a46830. The adapter still selects the legacy Code Ocean py-r image; its digest and runtime-profile reconciliation remain unresolved and are not inferred from GHCR.",
+          "note": "Merged PR #5 selects Code Ocean OMIX Visualization v2 and removes the incompatible redundant capsule-local CRAN overlay. The starter base built in capsule 7447171, while its immutable imported digest and a representative run using the clean merged environment remain pending.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/2a30686f93830ca55e92dc9512c34028d4db4b20/OMIX_MODULE_SOURCE.md",
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/2a30686f93830ca55e92dc9512c34028d4db4b20/.codeocean/environment.json",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/eb57569a276df25f4364ff27fa4e114497066937/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/eb57569a276df25f4364ff27fa4e114497066937/.codeocean/environment.json",
             "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/3",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/5",
             "https://github.com/NIDAP-Community/OMIX/issues/43"
           ]
         },
         "local_tests": {
           "status": "verified",
-          "note": "PR #2 records passing source-parity, App Panel, input-discovery, adapter CLI, canonical-interface, visual-equivalence, and missing-value serialization checks with independent Canvas and Beacon review.",
+          "note": "PR #2 records passing source-parity, App Panel, input-discovery, adapter CLI, canonical-interface, visual-equivalence, and missing-value serialization checks. PR #5 additionally verifies the Inf App Panel translation, finite and unlimited CLI executions, dependency coverage, Dockerfile self-hash, and independent Beacon review without changing scientific source.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2"
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/2",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/5"
           ]
         },
         "code_ocean_validation": {
-          "status": "pending",
-          "note": "No durable Code Ocean validation record was found.",
-          "evidence": []
+          "status": "partial",
+          "note": "OMIX Visualization v2 was selected and its base built in capsule 7447171. The first container retained the old package overlay and reproduced the documented S7/ggplot2 conflict; a representative run after rebuilding the exact merged clean environment remains pending.",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/pull/5"
+          ]
         },
         "syncweaver.readiness": {
           "status": "pending",
           "note": "The managed directory now contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44.",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/tree/2a30686f93830ca55e92dc9512c34028d4db4b20/code/functions",
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/tree/eb57569a276df25f4364ff27fa4e114497066937/code/functions",
             "https://github.com/NIDAP-Community/OMIX/issues/44"
           ]
         }
@@ -9111,7 +9308,7 @@
         "inferred_aliases": {},
         "alias_candidates": [],
         "runtime": {
-          "base_image": "codeocean/py-r:python3.10.12-R4.2.3-IRkernel-ubuntu22.04",
+          "base_image": "codeocean/omix-r-visualization:r4.4.3-v2",
           "digest": null
         }
       },
@@ -9131,7 +9328,7 @@
           "code": "runtime_digest_missing",
           "severity": "warning",
           "message": "Adapter runtime is tag-addressed; no immutable digest is recorded.",
-          "observed": "codeocean/py-r:python3.10.12-R4.2.3-IRkernel-ubuntu22.04"
+          "observed": "codeocean/omix-r-visualization:r4.4.3-v2"
         }
       ]
     }
