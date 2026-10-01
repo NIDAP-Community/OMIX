@@ -9,7 +9,16 @@ if (length(script_argument) != 1L) {
   stop("Could not determine the location of scripts/run_gsva.R")
 }
 module_root <- normalizePath(file.path(dirname(sub("^--file=", "", script_argument)), ".."))
-source(file.path(module_root, "R", "GSVA_v1.R"))
+source(file.path(module_root, "R", "GSVA.R"))
+
+read_module_field <- function(field) {
+  metadata <- readLines(file.path(module_root, "module.yml"), warn = FALSE)
+  match <- grep(paste0("^", field, ":[[:space:]]*"), metadata, value = TRUE)
+  if (length(match) != 1L) {
+    stop("module.yml must define exactly one '", field, "' value.")
+  }
+  sub(paste0("^", field, ":[[:space:]]*"), "", match)
+}
 
 split_csv <- function(value) {
   if (is.null(value) || !nzchar(trimws(value))) return(character())
@@ -100,8 +109,8 @@ if (!is.finite(opt$image_height) || opt$image_height <= 0) stop("--image_height 
 
 dir.create(opt$output_dir, recursive = TRUE, showWarnings = FALSE)
 output_dir <- normalizePath(opt$output_dir, mustWork = TRUE)
-results_path <- file.path(output_dir, "gsva_v1_results.csv")
-plot_path <- file.path(output_dir, "gsva_v1_heatmap.png")
+results_path <- file.path(output_dir, "gsva_results.csv")
+plot_path <- file.path(output_dir, "gsva_heatmap.png")
 
 results <- run_gsva(
   normalized_data_file = normalized_path,
@@ -141,8 +150,9 @@ summary_lines <- c(
   paste("maximum gene-set size:", opt$maximum_geneset_size),
   paste("gene updating:", as_logical(opt$update_genes, "update_genes")),
   paste("gene sets scored:", nrow(results)),
-  "source template: NIDAP/Templates/GSVA_v1.R",
-  "source template SHA-256: 0d536870e979daa3a949e2a86aa12d72f25b160d26eec1148c0db33fc24b0c5d"
+  "OMIX module: OMIX-GSVA",
+  paste("OMIX module version:", read_module_field("version")),
+  paste("OMIX interface version:", read_module_field("interface_version"))
 )
 writeLines(summary_lines, file.path(output_dir, "gsva_run_summary.txt"))
 message("Wrote GSVA results to ", output_dir)

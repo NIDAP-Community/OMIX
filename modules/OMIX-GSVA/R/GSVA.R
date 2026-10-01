@@ -1,25 +1,20 @@
-#' GSVA - Sugarloaf V2 [CCBR] [scRNA-seq] [Bulk] [Beta]
+#' Gene Set Variation Analysis (GSVA)
 #'
 #' @description
-#' A template that performs Gene Set Variation Analysis or GSVA. *This template
-#' is a Beta version and is undergoing active development. If you encounter
-#' problems, please contact CCBR* NCICCBRNIDAP@@mail.nih.gov. By default, the
-#' template uses the Broad Institute MSigDB v2023.2 database as the gene set
-#' source.
+#' Calculate sample-level pathway enrichment scores from normalized continuous
+#' expression and a supplied long-format gene-set membership table.
 #'
 #' @details
-#' Contact CCBR at \email{NCICCBRNIDAP@@mail.nih.gov} if you encounter problems.
+#' The caller supplies normalized expression, sample metadata, and the pathway
+#' database explicitly. Raw integer counts are not appropriate input.
 #'
 #' @param normalized_data A data frame.
 #' @param sample_metadata_table A data frame. Sample metadata table.
 #' @param pathways_database
-#' A data frame. Dataset containing gene set membership information, listing
-#' genes in separate rows for each gene set. By default, the GSEA MSigDB
-#' v2023.2 [CCBR] NIDAP dataset (MSigDB v2023.2 human and mouse collections)
-#' is imported with the template. If a custom gene set database is used, the
-#' following columns are required: collection, gene_set_name, gene_symbol,
-#' species, and optionally pathways_database (the database name and version,
-#' e.g., MSigDB_v2023)
+#' A data frame containing gene-set membership information, with one gene per
+#' row. Required columns are collection, gene_set_name, gene_symbol, and
+#' species. An optional pathways_database column may record the database name
+#' and release.
 #' @param gene_column Character. Gene name column in the normalized data.
 #' @param sample_name_column Character. Column containing sample name.
 #' @param samples_to_include Character vector.
@@ -90,8 +85,8 @@ run_gsva <- function(
   sample_metadata_file = NULL,
   pathways_database_file = NULL,
   input_delim = "\t",
-  export_results_file = file.path(getwd(), "gsva_v1_results.csv"),
-  export_plot_file = file.path(getwd(), "gsva_v1_heatmap.png"),
+  export_results_file = file.path(getwd(), "gsva_results.csv"),
+  export_plot_file = file.path(getwd(), "gsva_heatmap.png"),
   export_plot_width = 12,
   export_plot_height = 10
 ) {
@@ -108,7 +103,7 @@ run_gsva <- function(
   library(stringr)
   library(tibble)
   ## -------------------------------- ##
-  ## User-Defined Template Parameters ##
+  ## Input loading ##
   ## -------------------------------- ##
 
   read_input_table <- function(tbl, file_path, delim) {
@@ -495,10 +490,3 @@ run_gsva <- function(
 
   gsva.df
 }
-
-#################################################
-## Global imports and functions included below ##
-#################################################
-
-# Functions defined here will be available to call in
-# the code for any table.

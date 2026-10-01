@@ -118,6 +118,18 @@ the root README for environment setup instead of duplicating installation
 instructions. A deployment link must remain supplementary: the canonical
 README must be complete for local and HPC users.
 
+Write for the public scientific user rather than preserving internal template
+history. Do not put personal workstation paths, internal template paths or
+checksums, migration narratives, or legacy platform labels such as
+`Sugarloaf`, `[CCBR]`, and `[Beta]` in a current module README or source title.
+Use capability-based source and output names rather than embedding an internal
+template revision in the filename. Historical attribution belongs in the
+changelog or Git history when it is useful; reproducibility records should
+identify the OMIX module version/commit, runtime identity, command, and input
+data provenance. Remove editor boilerplate when importing source. If renaming
+an established public file or output, treat it as an interface change and use
+the versioning policy rather than silently breaking callers.
+
 ## Data and runtime discipline
 
 - Do not commit credentials, real study data, generated results, package
