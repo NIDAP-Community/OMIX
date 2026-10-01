@@ -22,5 +22,28 @@ for (option in c(
 }
 stopifnot(!grepl('"/data/', cli_text, fixed = TRUE))
 stopifnot(!grepl('"/results"', cli_text, fixed = TRUE))
+stopifnot(grepl('--feature_id_column", type = "character", default = "GeneName"', cli_text, fixed = TRUE))
+stopifnot(grepl("--feature_id_column is fixed to GeneName", cli_text, fixed = TRUE))
+
+schema_text <- paste(readLines(schema_file, warn = FALSE), collapse = "\n")
+stopifnot(grepl("allowed: [GeneName]", schema_text, fixed = TRUE))
+
+invalid_feature_output <- suppressWarnings(system2(
+  file.path(R.home("bin"), "Rscript"),
+  c(
+    shQuote(cli_file),
+    "--seurat_rds", "not-used.rds",
+    "--donor_column", "Donor",
+    "--group_column", "Group",
+    "--cell_type_column", "CellType",
+    "--cell_type", "Monocytes",
+    "--feature_id_column", "Gene"
+  ),
+  stdout = TRUE,
+  stderr = TRUE
+))
+invalid_feature_status <- attr(invalid_feature_output, "status")
+stopifnot(!is.null(invalid_feature_status), invalid_feature_status != 0L)
+stopifnot(any(grepl("fixed to GeneName", invalid_feature_output, fixed = TRUE)))
 
 message("OMIX-Seurat-Pseudobulk module layout checks passed")

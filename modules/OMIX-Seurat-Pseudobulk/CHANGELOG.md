@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.1
+
+- Constrained `feature_id_column` to the only implemented and downstream-safe
+  value, `GeneName`, in the schema and CLI validation.
+- Clarified that this is a fixed handoff contract rather than a configurable
+  scientific parameter. The interface version remains 1 because the
+  implementation already rejected every other value.
+
 ## 0.4.0 - 2026-09-21
 
 - Moved the module to the dedicated `r-seurat-conversion` runtime profile.

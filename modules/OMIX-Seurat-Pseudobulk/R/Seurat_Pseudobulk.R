@@ -34,7 +34,8 @@
 #'   documented Harmony-corrected gene-expression matrix for
 #'   `mean_harmony_corrected_expression`, or the `data` layer of the
 #'   declared SCTransform assay for `mean_sctransform_expression`.
-#' @param feature_id_column Output feature-ID column. Default: "GeneName".
+#' @param feature_id_column Output feature-ID column. Fixed to "GeneName" for
+#'   compatible DEG and Limma handoffs.
 #' @param min_cells Minimum selected cells in each donor-by-group profile.
 #' @param on_insufficient_cells Whether profiles below min_cells cause an error
 #'   (default) or are intentionally dropped.

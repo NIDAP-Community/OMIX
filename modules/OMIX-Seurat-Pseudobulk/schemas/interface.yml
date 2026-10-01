@@ -50,6 +50,8 @@ parameters:
   feature_id_column:
     type: string
     default: GeneName
+    allowed: [GeneName]
+    description: Fixed feature identifier required by the downstream DEG and Limma handoff contracts.
   min_cells:
     type: integer
     default: 20

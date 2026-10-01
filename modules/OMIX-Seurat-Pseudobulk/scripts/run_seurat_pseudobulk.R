@@ -36,7 +36,7 @@ option_list <- list(
   make_option("--aggregation_method", type = "character", default = "sum_counts", help = "sum_counts, mean_harmony_corrected_expression, or mean_sctransform_expression [default: %default]"),
   make_option("--assay", type = "character", default = "auto", help = "Source assay; auto resolves to RNA for raw/Harmony and SCT for SCTransform"),
   make_option("--layer", type = "character", default = "auto", help = "Source layer; auto resolves to counts for sum_counts and data for continuous-expression modes"),
-  make_option("--feature_id_column", type = "character", default = "GeneName"),
+  make_option("--feature_id_column", type = "character", default = "GeneName", help = "Fixed downstream feature-ID column [default: %default]"),
   make_option("--min_cells", type = "integer", default = 20L),
   make_option("--on_insufficient_cells", type = "character", default = "error", help = "error or drop [default: %default]"),
   make_option("--output_dir", type = "character", default = "results")
@@ -58,6 +58,9 @@ if (!opt$on_insufficient_cells %in% c("error", "drop")) {
 }
 if (!opt$aggregation_method %in% c("sum_counts", "mean_harmony_corrected_expression", "mean_sctransform_expression")) {
   stop("ERROR: --aggregation_method must be sum_counts, mean_harmony_corrected_expression, or mean_sctransform_expression")
+}
+if (!identical(opt$feature_id_column, "GeneName")) {
+  stop("ERROR: --feature_id_column is fixed to GeneName for compatible downstream handoffs")
 }
 cell_filter_column <- if (nzchar(opt$cell_filter_column)) opt$cell_filter_column else NULL
 cell_filter_values <- parse_csv_values(opt$cell_filter_values)
