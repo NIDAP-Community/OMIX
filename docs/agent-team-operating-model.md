@@ -141,6 +141,17 @@ source and file hashes, and obtains Beacon review. Harbor must also ensure every
 user-settable canonical parameter is exposed in the App Panel; intentionally
 hidden platform-managed inputs require an explicit provenance record.
 
+Harbor also owns the manual adapter release sequence until equivalent
+Syncweaver automation is validated. Harbor establishes the final adapter
+candidate, supports syncing and platform validation of that exact commit, and,
+after an explicitly authorized platform publication, prepares the single
+metadata-only post-release pull request described in the
+[release automation contract](release-automation-contract.md). Harbor records
+the source commit, run, platform release, runtime, and intended tag target; it
+does not insert a provisional evidence commit between the successful platform
+run and publication. The project owner retains release authorization unless it
+has been explicitly delegated for that bounded release.
+
 Several Harbor task instances may work in parallel when they use separate
 adapter repositories and worktrees. Atlas still assigns one owner per adapter
 and orders any shared canonical or runtime dependencies.
@@ -189,12 +200,46 @@ governance that Beacon authored. A different domain owner or Atlas reviews
 those changes. Domain owners author scientific documentation; Beacon checks
 that it is accurate, complete, and consistent with the implementation.
 
+For a platform release, Beacon verifies Harbor's post-release record against
+the external evidence: the released source commit, final validation run ID and
+date, platform release version and URL, runtime identity, and adapter tag
+target. Beacon confirms that the bookkeeping pull request is metadata-only and
+that the tag targets the validated release candidate rather than the later
+evidence-record commit. Beacon reports discrepancies; it does not rewrite the
+record or perform Harbor's platform work.
+
+After bootstrap, Syncweaver may replace the repetitive bookkeeping portion of
+this sequence by opening the same single post-release pull request and creating
+the annotated tag after approval. It must not publish a platform release,
+select a version, relax validation, or copy platform-side scientific changes
+back into canonical OMIX. Harbor remains responsible for platform translation
+and exceptions, Beacon for independent verification, and Atlas for dependency
+and merge sequencing.
+
 ## Repository and branch rules
 
 1. Give every agent a separate Git worktree or clone. Never run two writing
    agents in the same working directory.
-2. Start each task branch from the current `origin/main`.
-3. Use one branch and pull request per bounded outcome, for example:
+2. On a developer workstation, place every active OMIX or deployment-adapter
+   task checkout under a workspace-visible root selected by the maintainer,
+   for example `$OMIX_WORKTREES_ROOT/<Agent>-<short-task>`. This applies to
+   linked worktrees and to the initial checkout of a new adapter repository.
+   The root is local configuration: never commit a contributor's personal name
+   or absolute home-directory path. If filesystem or sandbox permissions
+   prevent the configured location, Atlas must report the exception and the
+   actual path immediately instead of silently using a hidden or temporary
+   directory.
+3. Atlas includes the worktree path, branch, tracked issue, and draft pull
+   request in each active-task status update. A task is not described as
+   externally visible until its branch or draft pull request has been pushed.
+4. After a pull request is merged or closed, Atlas verifies that the worktree
+   is clean, has no unpushed commit, and has no remaining active pull request.
+   Atlas then removes it with `git worktree remove` from its owning repository
+   and prunes stale worktree metadata. Never delete a registered worktree with
+   a raw recursive filesystem command. Preserve and report any dirty,
+   divergent, unmerged, or otherwise uncertain checkout.
+5. Start each task branch from the current `origin/main`.
+6. Use one branch and pull request per bounded outcome, for example:
 
    ```text
    feature/seurat-handoff-validation
@@ -203,17 +248,17 @@ that it is accurate, complete, and consistent with the implementation.
    release/r-seurat-conversion-v1
    ```
 
-4. Assign directory ownership before editing. Shared root files, GitHub
+7. Assign directory ownership before editing. Shared root files, GitHub
    workflows, documentation indexes, and release manifests belong to the
    coordinator or an explicitly assigned integration agent.
-5. Preserve unrelated local changes. Do not use destructive Git operations to
+8. Preserve unrelated local changes. Do not use destructive Git operations to
    make another agent's work disappear.
-6. Rebase or merge the latest `origin/main` only when the coordinator requests
+9. Rebase or merge the latest `origin/main` only when the coordinator requests
    it or before final review. Resolve conflicts in the task's owned scope and
    escalate cross-scope conflicts.
-7. Do not commit study data, generated results, credentials, package caches, or
+10. Do not commit study data, generated results, credentials, package caches, or
    large local fixtures.
-8. Link a tracked work item before implementation begins. The issue is the
+11. Link a tracked work item before implementation begins. The issue is the
    transactional status record; this document is the durable summary of the
    queue and operating rules.
 
@@ -426,3 +471,12 @@ Before publishing:
 - publish only the affected runtime or adapter;
 - record the immutable digest or platform release identifier; and
 - never move or overwrite an existing release tag or manifest record.
+
+After an adapter platform release:
+
+- Harbor opens one metadata-only post-release evidence pull request;
+- Beacon verifies its immutable commit, run, release, runtime, and tag links;
+- Atlas requests the one required owner merge and sequences tag finalization;
+  and
+- Syncweaver may automate these bookkeeping steps once its safeguards and
+  approval gates satisfy the release automation contract.
