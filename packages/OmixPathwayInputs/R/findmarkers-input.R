@@ -127,34 +127,50 @@
 
 .omix_findmarkers_match_wide_columns <- function(columns) {
   specs <- .omix_findmarkers_suffix_specs()
+  suffix_table <- do.call(
+    rbind,
+    lapply(names(specs), function(statistic) {
+      data.frame(
+        statistic = statistic,
+        suffix = specs[[statistic]],
+        stringsAsFactors = FALSE
+      )
+    })
+  )
   matches <- vector("list", length(columns))
   for (index in seq_along(columns)) {
     column <- columns[[index]]
-    found <- NULL
-    for (statistic in names(specs)) {
-      suffix_hits <- specs[[statistic]][endsWith(column, specs[[statistic]])]
-      if (length(suffix_hits) > 1L) {
-        stop(
-          "ERROR: FindMarkers column `", column,
-          "` matches more than one supported suffix.",
-          call. = FALSE
-        )
-      }
-      if (length(suffix_hits) == 1L) {
-        suffix <- suffix_hits[[1L]]
-        prefix <- substr(column, 1L, nchar(column) - nchar(suffix))
-        if (nzchar(prefix)) {
-          found <- list(
-            column = column,
-            comparison = prefix,
-            statistic = statistic,
-            suffix = suffix,
-            column_index = index
-          )
-        }
-      }
+    hit_indexes <- which(endsWith(column, suffix_table$suffix))
+    if (length(hit_indexes) == 0L) {
+      next
     }
-    matches[[index]] <- found
+
+    # Some supported suffixes are proper endings of longer supported suffixes:
+    # `_avg_logFC` ends in `_logFC`. Use the longest exact suffix so the more
+    # specific documented form wins.
+    hit_lengths <- nchar(suffix_table$suffix[hit_indexes])
+    hit_indexes <- hit_indexes[hit_lengths == max(hit_lengths)]
+    if (length(hit_indexes) > 1L) {
+      stop(
+        "ERROR: FindMarkers column `", column,
+        "` has equally specific supported suffix mappings: ",
+        paste(suffix_table$suffix[hit_indexes], collapse = ", "), ".",
+        call. = FALSE
+      )
+    }
+
+    hit <- hit_indexes[[1L]]
+    suffix <- suffix_table$suffix[[hit]]
+    prefix <- substr(column, 1L, nchar(column) - nchar(suffix))
+    if (nzchar(prefix)) {
+      matches[[index]] <- list(
+        column = column,
+        comparison = prefix,
+        statistic = suffix_table$statistic[[hit]],
+        suffix = suffix,
+        column_index = index
+      )
+    }
   }
   Filter(Negate(is.null), matches)
 }

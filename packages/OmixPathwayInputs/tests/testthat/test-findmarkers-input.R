@@ -46,6 +46,31 @@ test_that("explicit wide comparison order is preserved", {
   )
 })
 
+test_that("the longest supported suffix wins for legacy wide exports", {
+  legacy <- data.frame(
+    Gene = c("GeneA", "GeneB"),
+    legacy_p_val = c(0.01, 0.20),
+    legacy_avg_logFC = c(0.8, -0.4),
+    legacy_pct.1 = c(0.7, 0.2),
+    legacy_pct.2 = c(0.3, 0.5),
+    legacy_p_val_adj = c(0.03, 0.40),
+    check.names = FALSE
+  )
+
+  profile <- normalize_findmarkers_deg_input(legacy)
+
+  expect_identical(profile$comparisons, "legacy")
+  expect_identical(
+    unname(profile$source_columns$fold_change),
+    "legacy_avg_logFC"
+  )
+  expect_identical(
+    unname(profile$source_columns$adjusted),
+    "legacy_p_val_adj"
+  )
+  expect_identical(profile$data$legacy_logFC, legacy$legacy_avg_logFC)
+})
+
 test_that("native current and legacy Seurat profiles receive explicit labels", {
   current <- data.frame(
     p_val = c(0.01, 0.20),
@@ -108,6 +133,39 @@ test_that("native profiles never invent a biological comparison label", {
   expect_error(
     normalize_findmarkers_deg_input(native, comparison_labels = "A-B"),
     "both `avg_log2FC` and `avg_logFC`",
+    fixed = TRUE
+  )
+})
+
+test_that("ambiguous gene columns fail closed", {
+  ambiguous <- wide_findmarkers_example()
+  ambiguous$GeneName <- ambiguous$Gene
+
+  expect_error(
+    normalize_findmarkers_deg_input(ambiguous),
+    "Multiple possible gene columns",
+    fixed = TRUE
+  )
+})
+
+test_that("incomplete and unknown wide comparisons fail closed", {
+  incomplete <- data.frame(
+    Gene = "GeneA",
+    incomplete_avg_log2FC = 0.8,
+    check.names = FALSE
+  )
+  expect_error(
+    normalize_findmarkers_deg_input(incomplete),
+    "lack a log-fold-change column or a nominal/adjusted p-value column",
+    fixed = TRUE
+  )
+
+  expect_error(
+    normalize_findmarkers_deg_input(
+      wide_findmarkers_example(),
+      comparison_labels = "not_present"
+    ),
+    "Requested FindMarkers comparison(s) were not found",
     fixed = TRUE
   )
 })

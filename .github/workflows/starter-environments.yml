@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - starter-environments/**
+      - packages/OmixPathwayInputs/**
       - packages/OmixPathwayPlots/**
       - .dockerignore
       - .github/workflows/starter-environments.yml
@@ -12,6 +13,7 @@ on:
       - main
     paths:
       - starter-environments/**
+      - packages/OmixPathwayInputs/**
       - packages/OmixPathwayPlots/**
       - .dockerignore
       - .github/workflows/starter-environments.yml
@@ -85,9 +87,9 @@ jobs:
               - 'starter-environments/r-singlecell/**'
               - '!starter-environments/r-singlecell/README.md'
             pathway_package:
-              - 'packages/OmixPathwayPlots/**'
-              - '!packages/OmixPathwayPlots/README.md'
-              - '!packages/OmixPathwayPlots/CHANGELOG.md'
+              - 'packages/OmixPathway*/**'
+              - '!packages/OmixPathway*/README.md'
+              - '!packages/OmixPathway*/CHANGELOG.md'
             conversion:
               - 'starter-environments/r-seurat-conversion/**'
               - '!starter-environments/r-seurat-conversion/README.md'
@@ -249,6 +251,30 @@ jobs:
               --file starter-environments/r-singlecell/Dockerfile \
               .
           fi
+
+      - name: Verify pathway runtime
+        if: steps.targets.outputs.pathway == 'true'
+        run: |
+          docker run --rm --entrypoint Rscript omix-r-pathway:ci -e '
+            expected <- c(
+              l2p = "0.0.14",
+              l2psupp = "0.0.14",
+              OmixPathwayInputs = "0.1.0",
+              OmixPathwayPlots = "0.2.0"
+            )
+            observed <- vapply(names(expected), function(package) {
+              as.character(utils::packageVersion(package))
+            }, character(1))
+            stopifnot(identical(observed, expected))
+            writeLines(sprintf("%s %s", names(observed), observed))
+          '
+
+          docker run --rm \
+            --volume "${{ github.workspace }}:/omix:ro" \
+            --workdir /omix \
+            --entrypoint Rscript \
+            omix-r-pathway:ci \
+            -e 'testthat::test_local("packages/OmixPathwayInputs")'
 
       - name: Build r-seurat-conversion
         if: steps.targets.outputs.conversion == 'true'
@@ -545,7 +571,9 @@ jobs:
                 # than a package repository, so renv cannot record a
                 # restorable repository source for them in this ad hoc
                 # inventory snapshot.
-                exclude = c("l2p", "l2psupp", "OmixPathwayPlots"),
+                exclude = c(
+                  "l2p", "l2psupp", "OmixPathwayInputs", "OmixPathwayPlots"
+                ),
                 prompt = FALSE
               )
             '

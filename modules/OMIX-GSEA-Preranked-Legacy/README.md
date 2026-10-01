@@ -47,7 +47,9 @@ order unless `--contrasts` supplies another order. Native tables using
 `p_val`, `avg_log2FC` (or legacy `avg_logFC`), `pct.1`, `pct.2`, and
 `p_val_adj` require one explicit contrast label. When the ranking suffix is
 not explicitly supplied, recognized FindMarkers input ranks by its signed
-log fold change through `_logFC`. Detection fractions are ignored. See the
+log fold change through `_logFC`. The label must describe Seurat `ident.1`
+relative to `ident.2`; OMIX does not invert the sign. Detection fractions are
+ignored. See the
 shared [FindMarkers input contract](../../docs/findmarkers-pathway-input.md).
 
 Use `--contrasts` only when you want a subset or a specific analysis and plot

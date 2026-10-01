@@ -46,7 +46,9 @@ accepts wide Seurat `FindMarkers()` families containing `pval`, `adjpval`,
 complete FindMarkers families are used in first source-column order. Supplying
 `--comparisons` selects and reorders them. Native one-comparison tables using
 `p_val`, `avg_log2FC` (or `avg_logFC`), and `p_val_adj` require exactly one
-comparison label. Detection fractions are ignored for pathway testing. See
+comparison label describing Seurat `ident.1` relative to `ident.2`; signed
+fold changes are retained without inversion. Detection fractions are ignored
+for pathway testing. See
 the shared [FindMarkers input contract](../../docs/findmarkers-pathway-input.md).
 
 For a consistent alternative naming convention, set

@@ -15,6 +15,19 @@ helper_lines <- readLines(helper, warn = FALSE)
 helper_main <- grep("^arguments <-", helper_lines)[1L]
 stopifnot(!is.na(helper_main))
 eval(parse(text = helper_lines[seq_len(helper_main - 1L)]))
+stopifnot(is.function(install_omix_pathway_packages))
+
+pathway_source_packages <- c(
+  OmixPathwayInputs = "0.1.0",
+  OmixPathwayPlots = "0.2.0"
+)
+for (package in names(pathway_source_packages)) {
+  description <- read.dcf(
+    file.path(repo_root, "packages", package, "DESCRIPTION")
+  )
+  observed_version <- unname(description[1L, "Version"])
+  stopifnot(identical(observed_version, pathway_source_packages[[package]]))
+}
 
 profile_locks <- file.path(
   repo_root,
@@ -32,7 +45,9 @@ for (module_dir in module_dirs) {
   profile <- trimws(sub("^runtime_profile:[[:space:]]*", "", profile_line))
   stopifnot(file.exists(file.path(repo_root, "starter-environments", profile, "renv.lock")))
   readme <- readLines(file.path(module_dir, "README.md"), warn = FALSE)
-  stopifnot(any(grepl("Runtime profile", readme, fixed = TRUE)))
+  # Documentation may call this a runtime or a runtime profile. Require the
+  # actual profile identifier instead of coupling the check to one heading.
+  stopifnot(any(grepl(profile, readme, fixed = TRUE)))
   stopifnot(any(grepl("restore-omix-runtime.R", readme, fixed = TRUE)))
 }
 

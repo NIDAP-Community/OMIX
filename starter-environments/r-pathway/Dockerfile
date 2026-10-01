@@ -60,11 +60,13 @@ RUN curl --fail --location --retry 3 \
     && R -q -e "install.packages(c('/tmp/l2p_0.0-14.tar.gz', '/tmp/l2psupp_0.0-14.tar.gz'), repos = NULL)" \
     && rm /tmp/l2p_0.0-14.tar.gz /tmp/l2psupp_0.0-14.tar.gz
 
-# Shared bubble-plot behaviour is versioned with the OMIX source checkout.
-# It is installed after the locked CRAN/Bioconductor dependencies and beside
-# the two immutable L2P tarballs above.
+# Shared input compatibility and bubble-plot behaviour are versioned with the
+# OMIX source checkout. Install them after the locked CRAN/Bioconductor
+# dependencies and beside the two immutable L2P tarballs above.
+COPY packages/OmixPathwayInputs /tmp/OmixPathwayInputs
 COPY packages/OmixPathwayPlots /tmp/OmixPathwayPlots
-RUN R CMD INSTALL --library="$R_LIBS_USER" /tmp/OmixPathwayPlots \
-    && rm -rf /tmp/OmixPathwayPlots
+RUN R CMD INSTALL --library="$R_LIBS_USER" /tmp/OmixPathwayInputs \
+    && R CMD INSTALL --library="$R_LIBS_USER" /tmp/OmixPathwayPlots \
+    && rm -rf /tmp/OmixPathwayInputs /tmp/OmixPathwayPlots
 
 WORKDIR /workspace

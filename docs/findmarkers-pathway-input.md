@@ -48,7 +48,9 @@ Legacy tables may use `avg_logFC`. Genes may be in a named column, retained R
 row names, or the unnamed first column produced when row names are written to
 CSV. Because these statistic names do not contain a biological comparison,
 the caller must provide exactly one comparison label. OMIX never invents that
-label from file position or metadata.
+label from file position or metadata. FindMarkers reports positive fold change
+for features enriched in `ident.1` relative to `ident.2`; OMIX retains that
+sign unchanged, so the supplied label must use the same direction.
 
 ## Statistical mappings
 
@@ -75,4 +77,3 @@ stops when it finds multiple plausible gene columns, both current and legacy
 native fold-change columns, duplicate column names, incomplete FindMarkers
 families, or requested comparisons that are absent. Existing exact column and
 suffix controls remain available and override automatic module choices.
-

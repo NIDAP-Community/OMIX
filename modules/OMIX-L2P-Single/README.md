@@ -55,6 +55,8 @@ accepts wide `FindMarkers()` families such as
 `C_1_vs_2_adjpval`. Native one-comparison tables using `p_val`,
 `avg_log2FC` (or legacy `avg_logFC`), `pct.1`, `pct.2`, and `p_val_adj` are
 accepted when `--comparison` supplies the otherwise absent biological label.
+That label must describe Seurat `ident.1` relative to `ident.2`; the signed
+FindMarkers fold change is retained without inversion.
 Detection-fraction columns are ignored for pathway testing. See the shared
 [FindMarkers input contract](../../docs/findmarkers-pathway-input.md).
 

@@ -4,18 +4,12 @@ on:
   pull_request:
     paths:
       - modules/OMIX-GSVA/**
-      - starter-environments/r-pathway/**
       - .github/workflows/gsva-r-pathway-runtime.yml
   workflow_dispatch:
 
 permissions:
   contents: read
   packages: read
-
-env:
-  # Published from OMIX 29a390a1273e7f493d17cc59f0a1670bb1c914c8 by
-  # Starter Environments run 35242190309. Keep the test on an immutable image.
-  R_PATHWAY_EXPECTED_DIGEST: sha256:25ad9f50df5a4d7f70a7e3debed13f8d5c9b07cbc46d57fdf5c3cf4f2e767ddc
 
 jobs:
   gsva-runtime:
@@ -36,13 +30,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          version="$(tr -d '[:space:]' < starter-environments/r-pathway/VERSION)"
+          version="$(jq -r '.environments["r-pathway"].version' starter-environments/release-manifest.json)"
+          expected_digest="$(jq -r '.environments["r-pathway"].digest' starter-environments/release-manifest.json)"
+          test -n "$version"
+          test "$version" != "null"
+          test -n "$expected_digest"
+          test "$expected_digest" != "null"
           image="ghcr.io/nidap-community/omix-r-pathway:${version}"
           docker pull "$image"
           digest_reference="$(docker inspect --format '{{index .RepoDigests 0}}' "$image")"
           test -n "$digest_reference"
           resolved_digest="${digest_reference##*@}"
-          test "$resolved_digest" = "$R_PATHWAY_EXPECTED_DIGEST"
+          test "$resolved_digest" = "$expected_digest"
           {
             echo "image=$image"
             echo "digest_reference=$digest_reference"

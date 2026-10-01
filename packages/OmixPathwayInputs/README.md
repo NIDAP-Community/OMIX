@@ -13,6 +13,8 @@ The initial `0.1.0` contract recognizes Seurat `FindMarkers()` results:
   legacy `avg_logFC`, and `pct.1`/`pct.2`.
 
 Native unprefixed tables require one explicit biological comparison label.
+Signed FindMarkers fold changes are retained without inversion. For a native
+table, that label must describe Seurat `ident.1` relative to `ident.2`.
 The package never interprets detection fractions as pathway statistics and
 never changes enrichment thresholds, duplicate-gene handling, or missing-value
 handling. See the shared
