@@ -30,8 +30,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          version="$(jq -r '.environments["r-pathway"].version' starter-environments/release-manifest.json)"
-          expected_digest="$(jq -r '.environments["r-pathway"].digest' starter-environments/release-manifest.json)"
+          version="$(jq -r '.images["r-pathway"].version' starter-environments/release-manifest.json)"
+          expected_digest="$(jq -r '.images["r-pathway"].digest' starter-environments/release-manifest.json)"
           test -n "$version"
           test "$version" != "null"
           test -n "$expected_digest"
