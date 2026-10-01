@@ -94,7 +94,7 @@ supply `--input_delim ','`.
 - The heatmap uses base R `stats::heatmap`, including row scaling and
   clustering.
 
-## Runtime and reproducibility
+## Runtime profile and reproducibility
 
 The module uses the shared `r-pathway` runtime. Its lockfile pins R 4.4.3,
 Bioconductor 3.20, and GSVA 2.0.7; `l2psupp` 0.0-14 is installed from the
