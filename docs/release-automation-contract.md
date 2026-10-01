@@ -55,8 +55,10 @@ It must include:
 
 `canonical.source_ref`, every validation `source_ref`, and the canonical tag
 target must be the same full 40-character commit SHA. For an adapter,
-`adapter.source_ref`, the adapter tag target, and the source-record commit
-must likewise agree.
+`adapter.source_ref`, every platform validation `source_ref`, and the adapter
+tag target must likewise agree. A later metadata-only commit may record the
+resulting platform release; it must identify that earlier immutable adapter
+source commit rather than presenting itself as the validated release source.
 
 ## Version decision is supplied, not guessed
 
@@ -106,6 +108,37 @@ Before an adapter tag, the workflow must additionally verify:
 5. Runtime identity is recorded, or the request contains a specific pending
    reason. The agent must never fabricate an OCI digest or lockfile reference.
 6. A human approval names the adapter source commit and requested tag.
+
+## Single post-release evidence pull request
+
+A platform release produces identifiers that do not exist until publication,
+so they cannot all be committed into the release candidate beforehand. Use the
+following sequence to avoid a circular or repeatedly invalidated release:
+
+1. Merge all scientific exports, adapter behavior, App Panel, runtime, tests,
+   and user documentation into the adapter default branch. Release-record
+   fields that do not yet exist remain explicitly **Pending**.
+2. Sync that exact final commit to the deployment platform and run the release
+   candidate. Keep provisional run evidence in a CI artifact, tracked issue,
+   or agent work record; do not make a pre-release evidence-only commit.
+3. Confirm that representative platform validation passed for that exact
+   commit, then publish only with explicit human authorization.
+4. Open one metadata-only post-release pull request recording the exact source
+   commit, validation run ID and date, platform release version and URL,
+   runtime identity, adapter tag name and target, and validation outcome.
+5. Create the annotated adapter tag at the validated source commit after the
+   post-release record and approval gates pass. The tag does not point at the
+   later evidence-record commit.
+
+The post-release pull request must not change scientific code, adapter entry
+points, App Panel behavior, runtime configuration, or tests. If any such change
+is needed, stop: merge the correction, establish a new release-candidate
+commit, resync it, and repeat platform validation before publication.
+
+This is normally one post-release pull request, not a pre-release evidence pull
+request followed by a second bookkeeping pull request. Syncweaver may automate
+the record and tag when it can prove the immutable commit/run/release links and
+has the structured request and approval required by this contract.
 
 ## Allowed file changes in `prepare`
 
