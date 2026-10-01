@@ -21,12 +21,14 @@ pathway_source_packages <- c(
   OmixPathwayInputs = "0.1.0",
   OmixPathwayPlots = "0.2.0"
 )
+dockerignore <- readLines(file.path(repo_root, ".dockerignore"), warn = FALSE)
 for (package in names(pathway_source_packages)) {
   description <- read.dcf(
     file.path(repo_root, "packages", package, "DESCRIPTION")
   )
   observed_version <- unname(description[1L, "Version"])
   stopifnot(identical(observed_version, pathway_source_packages[[package]]))
+  stopifnot(any(grepl(paste0("!packages/", package, "/**"), dockerignore, fixed = TRUE)))
 }
 
 profile_locks <- file.path(

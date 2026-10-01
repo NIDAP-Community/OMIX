@@ -1,5 +1,5 @@
 # r-pathway deliberately builds from the repository root so it can install the
-# shared OmixPathwayPlots source package. Limit that context to its own inputs.
+# shared OMIX pathway source packages. Limit that context to its own inputs.
 *
 !starter-environments/
 !starter-environments/r-pathway/
@@ -15,5 +15,7 @@
 !bridges/seurat/
 !bridges/seurat/**
 !packages/
+!packages/OmixPathwayInputs/
+!packages/OmixPathwayInputs/**
 !packages/OmixPathwayPlots/
 !packages/OmixPathwayPlots/**
