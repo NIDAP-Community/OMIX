@@ -33,6 +33,10 @@ require Seurat.
 - One exact cell-type value to aggregate.
 - Optional invariant sample-level metadata columns, such as `Batch`, to retain for DEG modelling.
 
+The output feature identifier is fixed to `GeneName`. This is part of the
+portable handoff contract with OMIX DEG Analysis and OMIX Limma Analysis; it
+is not a freely configurable column name.
+
 Every selected donor-by-group profile must have at least 20 cells by default.
 The module stops on an under-populated profile unless `--on_insufficient_cells drop` is explicitly selected.
 
@@ -158,6 +162,7 @@ Analysis.
 ## Integration
 
 The module uses the optional [OmixSeurat bridge](../../bridges/seurat/README.md)
-and the portable [omix_standard_input](../../core/README.md) contract. No Code
-Ocean adapter exists yet; add one only after the portable CLI has been run
-successfully with a representative object.
+and the portable [omix_standard_input](../../core/README.md) contract. A
+[Code Ocean deployment adapter](https://github.com/NIDAP-Community/OMIX-Seurat-Pseudobulk)
+is under review; its platform validation and release status are recorded in
+that repository rather than inferred from this portable module.
