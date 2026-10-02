@@ -26,9 +26,10 @@ ranked, all-gene pathway analysis, use
 
 Choose one comparison, or an ordered batch of comparisons, from a compatible
 DEG table, then use the copyable command in [Run locally or on HPC](#run-locally-or-on-hpc).
-If the table contains exactly one complete comparison prefix using the
-configured suffixes (by default `_pval` and `_FC`), the comparison argument
-may be omitted and that prefix is selected automatically.
+If a conventional table contains exactly one complete comparison prefix using
+the configured suffixes (by default `_pval` and `_FC`), the comparison argument
+may be omitted. A recognized wide Seurat `FindMarkers()` table instead runs all
+complete comparison families in source-column order.
 
 ## Inputs
 
@@ -47,6 +48,17 @@ Treatment-Control_adjpval, Treatment-Control_FC
 The automatic detection can be overridden with explicit gene, ranking,
 significance, and fold-change column arguments when the input uses another
 naming convention.
+
+The shared [`OmixPathwayInputs`](../../packages/OmixPathwayInputs) profile also
+accepts wide `FindMarkers()` families such as
+`C_1_vs_2_pval`, `C_1_vs_2_logFC`, `C_1_vs_2_pct1`, `C_1_vs_2_pct2`, and
+`C_1_vs_2_adjpval`. Native one-comparison tables using `p_val`,
+`avg_log2FC` (or legacy `avg_logFC`), `pct.1`, `pct.2`, and `p_val_adj` are
+accepted when `--comparison` supplies the otherwise absent biological label.
+That label must describe Seurat `ident.1` relative to `ident.2`; the signed
+FindMarkers fold change is retained without inversion.
+Detection-fraction columns are ignored for pathway testing. See the shared
+[FindMarkers input contract](../../docs/findmarkers-pathway-input.md).
 
 For repeated alternative suffixes, set `--t_statistic_suffix`,
 `--significance_suffix`, or `--fold_change_suffix`. For example, a threshold
@@ -93,10 +105,11 @@ Rscript "$OMIX_ROOT/modules/OMIX-L2P-Single/scripts/run_l2p_single.R" \
 ```
 
 Use either `--comparison` or `--comparisons`, not both. If both are omitted,
-the module proceeds only when it detects exactly one complete comparison
-prefix using the canonical `_pval` and `_FC` suffixes (or `_tstat` in rank
-mode). It lists the available prefixes and stops when the choice is
-ambiguous, rather than selecting a biological contrast by column order.
+a recognized wide FindMarkers table runs every complete family in source
+order. Other tables proceed only when exactly one conventional comparison is
+unambiguous; the module lists available prefixes and stops when the choice is
+ambiguous. A native unprefixed FindMarkers table always requires one explicit
+comparison label.
 Batched runs infer
 comparison-prefixed columns automatically; do not provide fixed
 `--t_statistic_column`, `--significance_column`, or `--fold_change_column`
@@ -135,6 +148,9 @@ same result, provenance, and plot files listed above.
 - Comparison-column suffixes default to `_tstat`, `_pval`, and `_FC`.
   Alternative suffixes are explicit settings; the module does not silently
   substitute adjusted p-values for nominal p-values.
+- Recognized FindMarkers input uses nominal p-value and signed log2 fold change
+  in the default threshold mode. The existing linear fold-change threshold is
+  converted to log2 units by L2P; `pct` columns are not analysis inputs.
 - The pathway database and annotation behavior are supplied by the locked
   `r-pathway` runtime. Record the runtime lockfile, module commit, and input
   table provenance with any scientific result.

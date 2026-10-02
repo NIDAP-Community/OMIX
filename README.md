@@ -56,6 +56,7 @@ capability.
 
 | Package | Runtime profile | Purpose |
 | --- | --- | --- |
+| [OmixPathwayInputs](packages/OmixPathwayInputs) | `r-pathway` | Normalize documented pathway DEG-table profiles, including Seurat `FindMarkers()` wide and native exports. |
 | [OmixPathwayPlots](packages/OmixPathwayPlots) | `r-pathway` | Standardize supported GSEA/L2P tables and render the shared pathway bubble plot. |
 
 ## Module catalog

@@ -10,7 +10,7 @@ inputs:
     type: path
     classification: public
     formats: [csv, tsv, txt, rds]
-    description: Differential-expression table with one gene identifier column and one or more ranking-score columns.
+    description: Differential-expression table with one gene identifier column and one or more ranking-score columns. Recognized Seurat FindMarkers wide and native profiles are normalized by the shared OmixPathwayInputs package.
   pathways_database:
     required: true
     type: path
@@ -37,14 +37,14 @@ parameters:
     type: string
     default: _tstat
     classification: public
-    description: Exact suffix used to identify ranking-score columns and derive contrast names.
+    description: Exact suffix used to identify ranking-score columns and derive contrast names. When this control is not explicitly supplied, a recognized FindMarkers table uses signed log fold change through the normalized `_logFC` alias; other inputs retain `_tstat`.
   contrasts:
     type: string
     default: null
     classification: public
     delimiter: ","
     preserves_order: true
-    description: Optional comma-separated contrast names. When supplied, only these contrasts are analyzed and plotted in the given order; when omitted, every column ending in gene_scores_suffix is used in source-table column order.
+    description: Optional comma-separated contrast names. When supplied, only these contrasts are analyzed and plotted in the given order. A recognized wide FindMarkers table uses all complete families in source-column order when omitted; a native unprefixed FindMarkers table requires exactly one supplied label. Other inputs use every column ending in gene_scores_suffix.
   pathways_species:
     type: string
     default: Human

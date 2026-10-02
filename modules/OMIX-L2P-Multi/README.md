@@ -40,6 +40,17 @@ The module uses the comma-separated `--comparisons` value to resolve these
 columns. Use explicit column-list arguments if a legacy or custom export does
 not follow the conventional comparison-prefix pattern.
 
+The shared [`OmixPathwayInputs`](../../packages/OmixPathwayInputs) profile
+accepts wide Seurat `FindMarkers()` families containing `pval`, `adjpval`,
+`logFC`, `pct1`, and `pct2` fields. When `--comparisons` is omitted, all
+complete FindMarkers families are used in first source-column order. Supplying
+`--comparisons` selects and reorders them. Native one-comparison tables using
+`p_val`, `avg_log2FC` (or `avg_logFC`), and `p_val_adj` require exactly one
+comparison label describing Seurat `ident.1` relative to `ident.2`; signed
+fold changes are retained without inversion. Detection fractions are ignored
+for pathway testing. See
+the shared [FindMarkers input contract](../../docs/findmarkers-pathway-input.md).
+
 For a consistent alternative naming convention, set
 `--t_statistic_suffix`, `--significance_suffix`, or
 `--fold_change_suffix`. For example,
@@ -83,10 +94,11 @@ Rscript "$OMIX_ROOT/modules/OMIX-L2P-Multi/scripts/run_l2p_multi.R" \
 
 ## Method notes
 
-- `--comparisons` is required; list comparison names exactly as they occur in
-  the DEG column prefixes and in the desired analysis and shared bubble-plot
-  and result-table order. For example, `B-A,C-A,C-B` requires matching
-  `C-B_*` columns; it does not invert an available `B-C_*` result.
+- `--comparisons` is required for conventional DEG layouts. It may be omitted
+  for a recognized wide FindMarkers table, which uses source-column order.
+  When supplied, list comparison names exactly as they occur in the DEG
+  prefixes and in the desired analysis, plot, and result order. For example,
+  `B-A,C-A,C-B` does not invert an available `B-C_*` result.
 - Comparison-column suffixes default to `_tstat`, `_pval`, and `_FC`.
   Alternative suffixes are explicit settings and apply uniformly across the
   ordered comparison list. The module does not infer comparison order from
@@ -96,6 +108,10 @@ Rscript "$OMIX_ROOT/modules/OMIX-L2P-Multi/scripts/run_l2p_multi.R" \
   `<comparison>_pval` and `<comparison>_FC` columns when they are available.
   To use the legacy top/bottom t-statistic ranking method instead, pass
   `--select_by_rank true`; its rank-specific options then apply.
+- For recognized FindMarkers tables, the threshold method maps the nominal
+  p-value and signed log2 fold change automatically. The linear
+  `--fold_change_threshold` is still converted to log2 units; `pct` columns
+  remain ignored metadata.
 - `--collections_to_include` defaults to `H` (MSigDB Hallmark), which is a
   useful compact starting collection for multi-comparison interpretation.
 - Export selection and figure selection are deliberately separate. A pathway

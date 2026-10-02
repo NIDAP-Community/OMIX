@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Add shared Seurat `FindMarkers()` input compatibility through
+  `OmixPathwayInputs` 0.1.0. Wide families run in source order when comparison
+  controls are blank; native unprefixed tables require one explicit label.
+  Existing thresholds, explicit overrides, duplicate handling, and missing
+  value behavior are unchanged. Module version becomes 3.3.0; interface 1
+  remains compatible.
 - Add advanced comparison-column suffix controls for ranking, significance,
   and fold change. They support deterministic automatic detection and ordered
   batches with nonstandard but consistent suffixes, while exact column

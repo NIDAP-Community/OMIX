@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - starter-environments/**
+      - packages/OmixPathwayInputs/**
       - packages/OmixPathwayPlots/**
       - .dockerignore
       - .github/workflows/starter-environments.yml
@@ -12,6 +13,7 @@ on:
       - main
     paths:
       - starter-environments/**
+      - packages/OmixPathwayInputs/**
       - packages/OmixPathwayPlots/**
       - .dockerignore
       - .github/workflows/starter-environments.yml
@@ -85,9 +87,9 @@ jobs:
               - 'starter-environments/r-singlecell/**'
               - '!starter-environments/r-singlecell/README.md'
             pathway_package:
-              - 'packages/OmixPathwayPlots/**'
-              - '!packages/OmixPathwayPlots/README.md'
-              - '!packages/OmixPathwayPlots/CHANGELOG.md'
+              - 'packages/OmixPathway*/**'
+              - '!packages/OmixPathway*/README.md'
+              - '!packages/OmixPathway*/CHANGELOG.md'
             conversion:
               - 'starter-environments/r-seurat-conversion/**'
               - '!starter-environments/r-seurat-conversion/README.md'
@@ -249,6 +251,53 @@ jobs:
               --file starter-environments/r-singlecell/Dockerfile \
               .
           fi
+
+      - name: Verify pathway runtime
+        if: steps.targets.outputs.pathway == 'true'
+        run: |
+          docker run --rm --entrypoint Rscript omix-r-pathway:ci -e '
+            expected <- c(
+              l2p = "0.0.14",
+              l2psupp = "0.0.14",
+              OmixPathwayInputs = "0.1.0",
+              OmixPathwayPlots = "0.2.0"
+            )
+            observed <- vapply(names(expected), function(package) {
+              as.character(utils::packageVersion(package))
+            }, character(1))
+            stopifnot(identical(observed, expected))
+            legacy <- data.frame(
+              Gene = c("GeneA", "GeneB"),
+              legacy_p_val = c(0.01, 0.20),
+              legacy_avg_logFC = c(0.8, -0.4),
+              legacy_pct.1 = c(0.7, 0.2),
+              legacy_pct.2 = c(0.3, 0.5),
+              legacy_p_val_adj = c(0.03, 0.40),
+              check.names = FALSE
+            )
+            profile <- OmixPathwayInputs::normalize_findmarkers_deg_input(legacy)
+            stopifnot(
+              identical(profile$comparisons, "legacy"),
+              identical(
+                unname(profile$source_columns$fold_change),
+                "legacy_avg_logFC"
+              )
+            )
+            writeLines(sprintf("%s %s", names(observed), observed))
+          '
+
+          for cli in \
+            modules/OMIX-L2P-Single/scripts/run_l2p_single.R \
+            modules/OMIX-L2P-Multi/scripts/run_l2p_multi.R \
+            modules/OMIX-GSEA-Preranked-Legacy/scripts/run_gsea.R
+          do
+            docker run --rm \
+              --volume "${{ github.workspace }}:/omix:ro" \
+              --workdir /omix \
+              --entrypoint Rscript \
+              omix-r-pathway:ci \
+              "$cli" --help
+          done
 
       - name: Build r-seurat-conversion
         if: steps.targets.outputs.conversion == 'true'
@@ -545,7 +594,9 @@ jobs:
                 # than a package repository, so renv cannot record a
                 # restorable repository source for them in this ad hoc
                 # inventory snapshot.
-                exclude = c("l2p", "l2psupp", "OmixPathwayPlots"),
+                exclude = c(
+                  "l2p", "l2psupp", "OmixPathwayInputs", "OmixPathwayPlots"
+                ),
                 prompt = FALSE
               )
             '

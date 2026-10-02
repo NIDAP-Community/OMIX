@@ -24,6 +24,7 @@ stopifnot(grepl(
   fixed = TRUE
 ))
 stopifnot(grepl("resolve_l2p_comparisons", cli_text, fixed = TRUE))
+stopifnot(grepl("OmixPathwayInputs::normalize_findmarkers_deg_input", cli_text, fixed = TRUE))
 stopifnot(grepl("--output_dir", cli_text, fixed = TRUE))
 stopifnot(grepl('make_option("--number_of_pathways_to_plot", type = "integer", default = 20L)', cli_text, fixed = TRUE))
 stopifnot(grepl('make_option("--select_by_rank", type = "character", default = "false")', cli_text, fixed = TRUE))

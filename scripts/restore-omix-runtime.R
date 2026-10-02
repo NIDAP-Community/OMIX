@@ -3,8 +3,9 @@
 # Create a reproducible, writable OMIX runtime for one portable module.
 #
 # Shared profile locks intentionally avoid a repository-wide dependency set.
-# This helper restores the profile selected by module.yml, installs the two
-# immutable source packages that are intentionally outside r-pathway's lock,
+# This helper restores the profile selected by module.yml, installs the
+# immutable and repository-owned source packages intentionally outside
+# r-pathway's lock,
 # applies a pinned module overlay when declared, then snapshots the resulting
 # run project. The generated <project>/renv.lock is the effective lockfile for
 # that specific module and should be retained with the analysis provenance.
@@ -148,22 +149,38 @@ install_pathway_archives <- function(repo_root, project) {
   }
 }
 
-install_omix_pathway_plots <- function(repo_root, project) {
-  package_dir <- file.path(repo_root, "packages", "OmixPathwayPlots")
-  description <- file.path(package_dir, "DESCRIPTION")
-  if (!file.exists(description)) {
-    abort("The r-pathway profile requires the shared source package: ", description)
-  }
-  library_path <- renv::paths$library(project = project)
-  message("Installing shared OMIX pathway plotting package from ", package_dir)
-  utils::install.packages(
-    package_dir,
-    repos = NULL,
-    type = "source",
-    lib = library_path
+install_omix_pathway_packages <- function(repo_root, project) {
+  expected_versions <- c(
+    OmixPathwayInputs = "0.1.0",
+    OmixPathwayPlots = "0.2.0"
   )
-  if (!requireNamespace("OmixPathwayPlots", quietly = TRUE, lib.loc = library_path)) {
-    abort("OmixPathwayPlots did not install successfully from ", package_dir)
+  library_path <- renv::paths$library(project = project)
+
+  for (package in names(expected_versions)) {
+    package_dir <- file.path(repo_root, "packages", package)
+    description <- file.path(package_dir, "DESCRIPTION")
+    if (!file.exists(description)) {
+      abort("The r-pathway profile requires the shared source package: ", description)
+    }
+    message("Installing shared OMIX pathway package from ", package_dir)
+    utils::install.packages(
+      package_dir,
+      repos = NULL,
+      type = "source",
+      lib = library_path
+    )
+    if (!requireNamespace(package, quietly = TRUE, lib.loc = library_path)) {
+      abort(package, " did not install successfully from ", package_dir)
+    }
+    installed_version <- as.character(
+      utils::packageVersion(package, lib.loc = library_path)
+    )
+    if (!identical(installed_version, expected_versions[[package]])) {
+      abort(
+        "Expected ", package, " ", expected_versions[[package]],
+        " but installed ", installed_version, " from ", package_dir
+      )
+    }
   }
 }
 
@@ -243,7 +260,7 @@ message("Restoring shared runtime profile ", runtime$profile)
 renv::restore(project = project, lockfile = file.path(project, "renv.lock"), prompt = FALSE)
 if (identical(runtime$profile, "r-pathway")) {
   install_pathway_archives(repo_root, project)
-  install_omix_pathway_plots(repo_root, project)
+  install_omix_pathway_packages(repo_root, project)
 }
 install_bioconductor_overlays(runtime$overlays, project)
 

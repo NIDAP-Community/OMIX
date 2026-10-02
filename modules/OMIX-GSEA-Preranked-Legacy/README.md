@@ -40,6 +40,18 @@ example `Treatment-Control_tstat`. It auto-detects `GeneName`, then `Gene
 Symbols` and other common identifier columns; specify `--gene_names_column`
 when the input uses a different name.
 
+The shared [`OmixPathwayInputs`](../../packages/OmixPathwayInputs) profile
+also accepts Seurat `FindMarkers()` tables. Wide tables may use comparison
+families such as `C_1_vs_2_logFC`; all complete families run in source-column
+order unless `--contrasts` supplies another order. Native tables using
+`p_val`, `avg_log2FC` (or legacy `avg_logFC`), `pct.1`, `pct.2`, and
+`p_val_adj` require one explicit contrast label. When the ranking suffix is
+not explicitly supplied, recognized FindMarkers input ranks by its signed
+log fold change through `_logFC`. The label must describe Seurat `ident.1`
+relative to `ident.2`; OMIX does not invert the sign. Detection fractions are
+ignored. See the
+shared [FindMarkers input contract](../../docs/findmarkers-pathway-input.md).
+
 Use `--contrasts` only when you want a subset or a specific analysis and plot
 order. For example, `--contrasts B-A,C-A,C-B` uses precisely those score
 columns in that order. If it is omitted, GSEA uses every column ending in the
@@ -93,6 +105,9 @@ ordered `--contrasts` behavior are recorded in
 - `--contrasts` is optional. Leaving it blank discovers all matching score
   columns; supplying it both limits the analysis and establishes contrast
   order for the p-value summary panels and result factor levels.
+- Recognized FindMarkers input defaults to signed log fold change as its GSEA
+  ranking score. An explicitly supplied `--gene_scores_suffix` still takes
+  precedence, preserving custom score and t-statistic workflows.
 - Positive and negative normalized enrichment scores correspond to the two
   ends of the supplied ranking; interpret direction in the context of the
   contrast definition.
