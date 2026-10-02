@@ -6,11 +6,30 @@ module_root <- normalizePath(file.path(dirname(sub("^--file=", "", script_arg)),
 function_file <- file.path(module_root, "R", "GSVA.R")
 cli_file <- file.path(module_root, "scripts", "run_gsva.R")
 schema_file <- file.path(module_root, "schemas", "interface.yml")
+module_file <- file.path(module_root, "module.yml")
 
-stopifnot(file.exists(function_file), file.exists(cli_file), file.exists(schema_file))
+stopifnot(
+  file.exists(function_file), file.exists(cli_file),
+  file.exists(schema_file), file.exists(module_file)
+)
 invisible(parse(file = function_file))
 invisible(parse(file = cli_file))
 source(function_file, local = TRUE)
+
+# The module metadata and machine-readable schema describe one public
+# interface. A filename-contract change must advance both values together.
+read_interface_version <- function(path) {
+  lines <- readLines(path, warn = FALSE)
+  version_line <- grep("^interface_version:[[:space:]]*", lines, value = TRUE)
+  stopifnot(length(version_line) == 1L)
+  as.integer(sub("^interface_version:[[:space:]]*", "", version_line))
+}
+module_interface_version <- read_interface_version(module_file)
+schema_interface_version <- read_interface_version(schema_file)
+stopifnot(
+  identical(module_interface_version, 2L),
+  identical(schema_interface_version, module_interface_version)
+)
 
 gsva_defaults <- formals(run_gsva)
 stopifnot(identical(eval(gsva_defaults$species), "Human"))
