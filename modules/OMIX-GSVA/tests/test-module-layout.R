@@ -3,7 +3,7 @@
 script_arg <- grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE)
 if (length(script_arg) != 1L) stop("Run this test with Rscript tests/test-module-layout.R")
 module_root <- normalizePath(file.path(dirname(sub("^--file=", "", script_arg)), ".."))
-function_file <- file.path(module_root, "R", "GSVA_v1.R")
+function_file <- file.path(module_root, "R", "GSVA.R")
 cli_file <- file.path(module_root, "scripts", "run_gsva.R")
 schema_file <- file.path(module_root, "schemas", "interface.yml")
 
@@ -27,6 +27,15 @@ stopifnot(identical(eval(gsva_defaults$display_warnings), -1))
 function_text <- paste(readLines(function_file, warn = FALSE), collapse = "\n")
 stopifnot(!grepl("@import", function_text, fixed = TRUE))
 stopifnot(!grepl("@export", function_text, fixed = TRUE))
+for (legacy_label in c("Sugarloaf", "[CCBR]", "[Beta]", "Global imports and functions included below")) {
+  stopifnot(!grepl(legacy_label, function_text, fixed = TRUE))
+}
+
+readme_text <- paste(readLines(file.path(module_root, "README.md"), warn = FALSE), collapse = "\n")
+for (private_provenance in c("Template provenance", "NIDAP/Templates", "No deployment adapter is registered yet")) {
+  stopifnot(!grepl(private_provenance, readme_text, fixed = TRUE))
+}
+stopifnot(grepl("https://github.com/NIDAP-Community/OMIX-GSVA", readme_text, fixed = TRUE))
 
 cli_text <- paste(readLines(cli_file, warn = FALSE), collapse = "\n")
 for (option in c(
@@ -39,5 +48,7 @@ for (option in c(
 }
 stopifnot(!grepl('"/data/', cli_text, fixed = TRUE))
 stopifnot(!grepl('"/results', cli_text, fixed = TRUE))
+stopifnot(!grepl("GSVA_v1", cli_text, fixed = TRUE))
+stopifnot(!grepl("gsva_v1", cli_text, fixed = TRUE))
 
 message("OMIX-GSVA module layout checks passed")

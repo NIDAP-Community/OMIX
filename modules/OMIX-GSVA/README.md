@@ -1,17 +1,15 @@
 # OMIX GSVA
 
 Calculate sample-level pathway enrichment scores from a normalized
-gene-by-sample expression matrix. This module preserves the CCBR
-`GSVA_v1.R` scientific function and exposes it through an explicit-path,
-platform-neutral command line.
+gene-by-sample expression matrix.
 
 ## What it does
 
 OMIX GSVA selects one or more collections from a long gene-set membership
 table, aligns those gene sets to the expression matrix, and calculates one
-enrichment score per gene set and sample. It supports the template's `gsva`,
-`ssgsea`, `zscore`, and `plage` methods and writes both the score table and the
-template heatmap.
+enrichment score per gene set and sample. It supports the `gsva`, `ssgsea`,
+`zscore`, and `plage` methods and writes both a score table and an overview
+heatmap.
 
 Use it when normalized, continuous expression is available and sample-level
 pathway activity is the desired downstream representation. Do not supply raw
@@ -77,26 +75,26 @@ supply `--input_delim ','`.
 
 | File | Use |
 | --- | --- |
-| `gsva_v1_results.csv` | Gene-set-by-sample score table with `Geneset` first. Use this as continuous enrichment input for downstream modeling. |
-| `gsva_v1_heatmap.png` | Template-compatible row-scaled heatmap of the score matrix. |
-| `gsva_run_summary.txt` | Paths, selected samples and collections, method settings, and template provenance. |
+| `gsva_results.csv` | Gene-set-by-sample score table with `Geneset` first. Use this as continuous enrichment input for downstream modeling. |
+| `gsva_heatmap.png` | Row-scaled heatmap of the score matrix. |
+| `gsva_run_summary.txt` | Paths, selected samples and collections, method settings, and OMIX module identity. |
 
 ## Method notes
 
-- Scientific defaults are preserved from `GSVA_v1.R`: method `gsva`, minimum
-  gene-set size 15, maximum size 1200, Human expression/database species,
-  Hallmark collection, and gene-symbol updating enabled.
+- Defaults are method `gsva`, minimum gene-set size 15, maximum size 1200,
+  Human expression/database species, Hallmark collection, and gene-symbol
+  updating enabled.
 - `--update_genes true` uses `l2psupp` to update symbols before GSVA. Disable it
   only when the supplied identifiers and gene-set database have already been
   deliberately harmonized.
-- If expression and database species differ, the template maps orthologs with
+- If expression and database species differ, the module maps orthologs with
   `l2psupp::o2o` before scoring.
 - Multiple requested collections are combined into one GSVA call. Gene-set
   names therefore need to be unique across the selected collections.
-- The heatmap uses the original base-R `stats::heatmap` behavior, including
-  row scaling and clustering.
+- The heatmap uses base R `stats::heatmap`, including row scaling and
+  clustering.
 
-## Runtime and reproducibility
+## Runtime profile and reproducibility
 
 The module uses the shared `r-pathway` runtime. Its lockfile pins R 4.4.3,
 Bioconductor 3.20, and GSVA 2.0.7; `l2psupp` 0.0-14 is installed from the
@@ -112,18 +110,10 @@ For a reproducible result, record the OMIX commit, the effective runtime
 lockfile or published image digest, the full command, and provenance for all
 three input tables.
 
-## Template provenance and compatibility
+## Interface and deployment
 
-The implementation comes from `NIDAP/Templates/GSVA_v1.R` (template version
-1; SHA-256
-`0d536870e979daa3a949e2a86aa12d72f25b160d26eec1148c0db33fc24b0c5d`).
-That source is byte-identical to the curated template-library copy and the
-earlier OMIX_Test prototype at the time this module was created. Cleanup was
-limited to removing package-only roxygen directives, correcting source
-documentation to match the existing `update_genes = TRUE` default, and moving
-platform selection into this explicit-path CLI. The statistical function,
-method choices, defaults, gene-set construction, mapping, scoring, and heatmap
-behavior remain intact.
-
-The public interface is defined in [schemas/interface.yml](schemas/interface.yml).
-No deployment adapter is registered yet.
+The complete portable interface is defined in
+[schemas/interface.yml](schemas/interface.yml). For a Code Ocean deployment,
+use the [OMIX GSVA adapter](https://github.com/NIDAP-Community/OMIX-GSVA).
+The adapter supplies platform-specific input discovery and UI configuration;
+this module remains the source of truth for reusable scientific behavior.

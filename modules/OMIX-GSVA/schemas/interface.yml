@@ -77,14 +77,14 @@ parameters:
     default: results
 outputs:
   gsva_results:
-    path: gsva_v1_results.csv
+    path: gsva_results.csv
     format: csv
     description: Gene-set-by-sample enrichment score table with Geneset as the first column.
   gsva_heatmap:
-    path: gsva_v1_heatmap.png
+    path: gsva_heatmap.png
     format: png
     description: Row-scaled base-R heatmap of the enrichment score matrix.
   run_summary:
     path: gsva_run_summary.txt
     format: text
-    description: Input paths, selected samples, collections, method, size limits, and template provenance.
+    description: Input paths, selected samples, collections, method, size limits, and OMIX module identity.

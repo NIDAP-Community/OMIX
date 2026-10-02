@@ -37,6 +37,14 @@ module. Declare a module's runtime profile in `module.yml`, document
 user-facing dependencies in its README, and use explicit package namespaces
 or explicit dependency checks in code where practical.
 
+Canonical modules use stable, capability-based public names. Current README
+text and source-level help must not expose personal workstation paths,
+internal template paths or checksums, migration narratives, legacy platform
+labels, or editor boilerplate. Do not encode an internal template revision in
+a current source or output filename. Retain useful history in the changelog or
+Git history, and treat any rename of an established public input, output, or
+CLI contract as a versioned interface change.
+
 By contrast, `packages/<name>/` is a standard R package with its own
 `DESCRIPTION` and `NAMESPACE`. Only there are roxygen package directives
 appropriate: `@export` defines public package functions, and `@importFrom`
