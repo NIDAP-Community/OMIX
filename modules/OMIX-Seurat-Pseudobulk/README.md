@@ -164,5 +164,5 @@ Analysis.
 The module uses the optional [OmixSeurat bridge](../../bridges/seurat/README.md)
 and the portable [omix_standard_input](../../core/README.md) contract. A
 [Code Ocean deployment adapter](https://github.com/NIDAP-Community/OMIX-Seurat-Pseudobulk)
-is under review; its platform validation and release status are recorded in
-that repository rather than inferred from this portable module.
+is maintained separately; its platform-validation and release status are
+recorded in that repository rather than inferred from this portable module.
