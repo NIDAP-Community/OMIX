@@ -1,4 +1,4 @@
-interface_version: 1
+interface_version: 2
 entrypoint: scripts/run_gsva.R
 inputs:
   normalized_data:

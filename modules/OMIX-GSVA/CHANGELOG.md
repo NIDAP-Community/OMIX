@@ -10,6 +10,8 @@
 - Registered and linked the OMIX GSVA Code Ocean deployment adapter.
 - Removed editor boilerplate without changing GSVA methods, parameters,
   scientific defaults, score-table structure, or heatmap behavior.
+- Corrected the schema metadata to record interface version 2 consistently
+  with `module.yml` and added regression coverage for future version changes.
 
 ## 0.1.0
 
