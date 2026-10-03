@@ -9,4 +9,6 @@ description: Aggregate one selected Seurat cell type into raw donor-by-group pse
 data_policy: No data are committed. Callers supply an explicit Seurat RDS and cell-metadata column names; the module writes portable donor-level matrices, metadata, and provenance.
 runtime_profile: r-seurat-conversion
 entrypoint: scripts/run_seurat_pseudobulk.R
-deployment_adapters: []
+deployment_adapters:
+  - platform: code-ocean
+    repository: https://github.com/NIDAP-Community/OMIX-Seurat-Pseudobulk

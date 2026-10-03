@@ -8,8 +8,13 @@ module_root <- normalizePath(file.path(dirname(sub("^--file=", "", script_arg)),
 function_file <- file.path(module_root, "R", "Seurat_Pseudobulk.R")
 cli_file <- file.path(module_root, "scripts", "run_seurat_pseudobulk.R")
 schema_file <- file.path(module_root, "schemas", "interface.yml")
+metadata_file <- file.path(module_root, "module.yml")
+readme_file <- file.path(module_root, "README.md")
 
-stopifnot(file.exists(function_file), file.exists(cli_file), file.exists(schema_file))
+stopifnot(
+  file.exists(function_file), file.exists(cli_file), file.exists(schema_file),
+  file.exists(metadata_file), file.exists(readme_file)
+)
 invisible(parse(file = function_file))
 invisible(parse(file = cli_file))
 
@@ -45,5 +50,15 @@ invalid_feature_output <- suppressWarnings(system2(
 invalid_feature_status <- attr(invalid_feature_output, "status")
 stopifnot(!is.null(invalid_feature_status), invalid_feature_status != 0L)
 stopifnot(any(grepl("fixed to GeneName", invalid_feature_output, fixed = TRUE)))
+
+adapter_url <- "https://github.com/NIDAP-Community/OMIX-Seurat-Pseudobulk"
+metadata_text <- paste(readLines(metadata_file, warn = FALSE), collapse = "\n")
+readme_text <- paste(readLines(readme_file, warn = FALSE), collapse = "\n")
+stopifnot(
+  grepl("platform: code-ocean", metadata_text, fixed = TRUE),
+  grepl(adapter_url, metadata_text, fixed = TRUE),
+  grepl(adapter_url, readme_text, fixed = TRUE),
+  !grepl("is under review", readme_text, fixed = TRUE)
+)
 
 message("OMIX-Seurat-Pseudobulk module layout checks passed")

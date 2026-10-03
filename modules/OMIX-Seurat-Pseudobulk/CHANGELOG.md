@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Registered the accepted Code Ocean deployment-adapter repository without
+  changing the portable scientific implementation or interface version.
+
 ## 0.4.1
 
 - Constrained `feature_id_column` to the only implemented and downstream-safe
