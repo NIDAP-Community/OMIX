@@ -90,6 +90,13 @@ source layer before passing the result to OMIX DEG Analysis in
 `harmony_mean_expression` mode. Do not add `Batch` again in that downstream
 mode; retain it only as provenance/QC metadata.
 
+For compatibility with older serialized Seurat objects, the bridge can read
+the standard `counts`, `data`, or `scale.data` matrix directly from a legacy
+slot-based `Assay` when the installed SeuratObject layer accessor does not
+recognize that assay. The assay and layer must still be named explicitly; the
+bridge does not infer a corrected-expression matrix or substitute a Harmony
+embedding.
+
 ## Read an RDS
 
 ```r

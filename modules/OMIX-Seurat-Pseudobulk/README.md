@@ -23,6 +23,9 @@ applies an explicit cell-level filter, and makes one donor-by-group profile.
 It reads objects through the OmixSeurat bridge. The dedicated
 `r-seurat-conversion` runtime includes full Seurat only at this conversion
 boundary, so that it can read specialized legacy classes such as `SCTAssay`.
+It also supports the standard matrix slots of legacy `Assay` objects when a
+declared assay such as `Harmony` is present in the serialized object but is not
+recognized by the installed SeuratObject layer accessor.
 Every downstream OMIX module receives portable tables and does not install or
 require Seurat.
 

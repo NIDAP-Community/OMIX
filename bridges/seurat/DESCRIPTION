@@ -1,7 +1,7 @@
 Package: OmixSeurat
 Type: Package
 Title: Seurat Donor-Level Aggregation Bridge for OMIX
-Version: 0.3.0
+Version: 0.3.1
 Authors@R: c(
     person("Margaret", "Cam", email = "maggie.cam@nih.gov", role = c("aut", "cre")))
 Author: Margaret Cam [aut, cre]
