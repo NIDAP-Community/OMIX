@@ -62,8 +62,20 @@ parameters:
     default: -1
   input_delim:
     type: string
-    default: "\t"
-    description: Delimiter shared by the three input tables; use a comma for CSV files.
+    default: auto
+    description: Optional shared delimiter fallback. Auto detects each input independently when omitted or set to auto.
+  normalized_data_delim:
+    type: string
+    default: ""
+    description: Optional delimiter override for normalized_data; when blank, the shared fallback or auto detection is used.
+  sample_metadata_delim:
+    type: string
+    default: ""
+    description: Optional delimiter override for sample_metadata; when blank, the shared fallback or auto detection is used.
+  pathways_database_delim:
+    type: string
+    default: ""
+    description: Optional delimiter override for pathways_database; when blank, the shared fallback or auto detection is used.
   image_width:
     type: number
     default: 12

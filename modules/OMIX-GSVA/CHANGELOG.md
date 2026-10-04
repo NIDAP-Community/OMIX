@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0
+
+- Added deterministic per-input delimiter detection and optional overrides for
+  normalized expression, sample metadata, and pathway membership tables so
+  CSV and TSV inputs can be used together in one run.
+- Retained `input_delim` as the backward-compatible fallback when an
+  input-specific delimiter is not supplied.
+
 ## 0.2.0
 
 - Replaced legacy internal template names and revision suffixes with stable

@@ -1,3 +1,47 @@
+resolve_gsva_delim <- function(
+  file_path,
+  input_name,
+  input_specific_delim = NULL,
+  shared_delim = NULL
+) {
+  decode_delim <- function(value) {
+    if (is.null(value)) return(NULL)
+    if (identical(value, "\t")) return("\t")
+    normalized <- trimws(value)
+    if (!nzchar(normalized) || identical(tolower(normalized), "auto")) {
+      return(NULL)
+    }
+    if (normalized %in% c("\\t", "tab")) return("\t")
+    if (identical(tolower(normalized), "comma")) return(",")
+    value
+  }
+
+  explicit_delim <- decode_delim(input_specific_delim)
+  if (!is.null(explicit_delim)) return(explicit_delim)
+
+  fallback_delim <- decode_delim(shared_delim)
+  if (!is.null(fallback_delim)) return(fallback_delim)
+
+  extension <- tolower(tools::file_ext(file_path))
+  if (identical(extension, "csv")) return(",")
+  if (extension %in% c("tsv", "tab")) return("\t")
+
+  header <- readLines(file_path, n = 1L, warn = FALSE)
+  if (length(header) != 1L || !nzchar(header)) {
+    stop("ERROR: Could not detect a delimiter for ", input_name,
+         "; the file is empty. Supply an explicit delimiter.")
+  }
+  comma_fields <- length(strsplit(header, ",", fixed = TRUE)[[1L]])
+  tab_fields <- length(strsplit(header, "\t", fixed = TRUE)[[1L]])
+  if (comma_fields > 1L && tab_fields == 1L) return(",")
+  if (tab_fields > 1L && comma_fields == 1L) return("\t")
+
+  stop(
+    "ERROR: Could not unambiguously detect the delimiter for ", input_name,
+    " from '", file_path, "'. Supply its explicit delimiter."
+  )
+}
+
 #' Gene Set Variation Analysis (GSVA)
 #'
 #' @description
@@ -54,7 +98,13 @@
 #' @param normalized_data_file Optional file path for normalized_data.
 #' @param sample_metadata_file Optional file path for sample_metadata_table.
 #' @param pathways_database_file Optional file path for pathways_database.
-#' @param input_delim Delimiter used when reading input files. Default: "\t".
+#' @param input_delim Shared fallback delimiter used when an input-specific
+#' delimiter is not supplied. When NULL or "auto", each file is detected
+#' independently. Default: NULL.
+#' @param normalized_data_delim Optional delimiter for normalized_data_file.
+#' @param sample_metadata_delim Optional delimiter for sample_metadata_file.
+#' @param pathways_database_delim Optional delimiter for
+#' pathways_database_file.
 #' @param export_results_file Optional CSV path for GSVA table output.
 #' @param export_plot_file Optional PNG path for GSVA heatmap output.
 #' @param export_plot_width Plot width in inches for PNG output.
@@ -63,7 +113,6 @@
 #' @return
 #' A data frame of GSVA enrichment scores (gene sets x samples) with a
 #' leading Geneset column.
-#'
 run_gsva <- function(
   normalized_data = NULL,
   sample_metadata_table = NULL,
@@ -84,7 +133,10 @@ run_gsva <- function(
   normalized_data_file = NULL,
   sample_metadata_file = NULL,
   pathways_database_file = NULL,
-  input_delim = "\t",
+  input_delim = NULL,
+  normalized_data_delim = NULL,
+  sample_metadata_delim = NULL,
+  pathways_database_delim = NULL,
   export_results_file = file.path(getwd(), "gsva_results.csv"),
   export_plot_file = file.path(getwd(), "gsva_heatmap.png"),
   export_plot_width = 12,
@@ -106,8 +158,19 @@ run_gsva <- function(
   ## Input loading ##
   ## -------------------------------- ##
 
-  read_input_table <- function(tbl, file_path, delim) {
+  read_input_table <- function(
+    tbl,
+    file_path,
+    input_name,
+    input_specific_delim
+  ) {
     if (!is.null(file_path) && nzchar(file_path)) {
+      delim <- resolve_gsva_delim(
+        file_path,
+        input_name,
+        input_specific_delim,
+        input_delim
+      )
       return(utils::read.delim(
         file_path,
         sep = delim,
@@ -121,17 +184,20 @@ run_gsva <- function(
   normalized_data <- read_input_table(
     normalized_data,
     normalized_data_file,
-    input_delim
+    "normalized data",
+    normalized_data_delim
   )
   sample_metadata_table <- read_input_table(
     sample_metadata_table,
     sample_metadata_file,
-    input_delim
+    "sample metadata",
+    sample_metadata_delim
   )
   pathways_database <- read_input_table(
     pathways_database,
     pathways_database_file,
-    input_delim
+    "pathways database",
+    pathways_database_delim
   )
 
   if (is.null(normalized_data)) {
