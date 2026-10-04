@@ -914,6 +914,14 @@ omix_deg_analysis <- function(
   values
 }
 
+.omix_deg_auto_batch_effect_columns <- function(metadata, analysis_mode) {
+  metadata <- as.data.frame(metadata, check.names = FALSE)
+  if (identical(analysis_mode, "raw_counts") && "Batch" %in% names(metadata)) {
+    return("Batch")
+  }
+  character()
+}
+
 .omix_deg_summarize_rows <- function(matrix, gene_ids, method) {
   if (anyNA(gene_ids) || any(gene_ids == "")) {
     stop("Gene identifiers must be present and non-empty.", call. = FALSE)
