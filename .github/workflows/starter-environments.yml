@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - starter-environments/**
+      - core/**
+      - bridges/seurat/**
       - packages/OmixPathwayInputs/**
       - packages/OmixPathwayPlots/**
       - .dockerignore
@@ -13,6 +15,8 @@ on:
       - main
     paths:
       - starter-environments/**
+      - core/**
+      - bridges/seurat/**
       - packages/OmixPathwayInputs/**
       - packages/OmixPathwayPlots/**
       - .dockerignore
@@ -60,6 +64,8 @@ jobs:
       pathway: ${{ steps.changes.outputs.pathway }}
       pathway_package: ${{ steps.changes.outputs.pathway_package }}
       conversion: ${{ steps.changes.outputs.conversion }}
+      core_package: ${{ steps.changes.outputs.core_package }}
+      seurat_bridge: ${{ steps.changes.outputs.seurat_bridge }}
       singlecell: ${{ steps.changes.outputs.singlecell }}
       visualization: ${{ steps.changes.outputs.visualization }}
       statistics: ${{ steps.changes.outputs.statistics }}
@@ -93,6 +99,12 @@ jobs:
             conversion:
               - 'starter-environments/r-seurat-conversion/**'
               - '!starter-environments/r-seurat-conversion/README.md'
+            core_package:
+              - 'core/**'
+              - '!core/README.md'
+            seurat_bridge:
+              - 'bridges/seurat/**'
+              - '!bridges/seurat/README.md'
             visualization:
               - 'starter-environments/r-visualization/**'
               - '!starter-environments/r-visualization/README.md'
@@ -128,6 +140,8 @@ jobs:
           PATHWAY_CHANGED: ${{ needs.filter.outputs.pathway }}
           PATHWAY_PACKAGE_CHANGED: ${{ needs.filter.outputs.pathway_package }}
           CONVERSION_CHANGED: ${{ needs.filter.outputs.conversion }}
+          CORE_PACKAGE_CHANGED: ${{ needs.filter.outputs.core_package }}
+          SEURAT_BRIDGE_CHANGED: ${{ needs.filter.outputs.seurat_bridge }}
           SINGLECELL_CHANGED: ${{ needs.filter.outputs.singlecell }}
           VISUALIZATION_CHANGED: ${{ needs.filter.outputs.visualization }}
           STATISTICS_CHANGED: ${{ needs.filter.outputs.statistics }}
@@ -150,6 +164,13 @@ jobs:
               fi
               conversion="$CONVERSION_CHANGED"
               singlecell="$SINGLECELL_CHANGED"
+              # Both profiles install Core and OmixSeurat directly from the
+              # checked-out source tree, outside their registry lockfiles.
+              # Rebuild both whenever either embedded package changes.
+              if [[ "$CORE_PACKAGE_CHANGED" == "true" || "$SEURAT_BRIDGE_CHANGED" == "true" ]]; then
+                conversion=true
+                singlecell=true
+              fi
               visualization="$VISUALIZATION_CHANGED"
               statistics="$STATISTICS_CHANGED"
               if [[ "$base" == "true" ]]; then
@@ -396,6 +417,7 @@ jobs:
               as.character(packageVersion(package))
             }, character(1))
             stopifnot(methods::getClass("SCTAssay")@package == "Seurat")
+            stopifnot(identical(unname(versions["OmixSeurat"]), "0.3.1"))
             writeLines(paste(sprintf("%s %s", packages, versions), collapse = "\\n"))
           '
 
