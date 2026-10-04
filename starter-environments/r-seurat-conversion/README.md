@@ -38,6 +38,10 @@ legacy slot-based `Harmony/data` assay and an `SCTAssay`, then verifies the
 supported RNA, Harmony-assay, and SCT-assay conversions. The v1 image remains
 immutable and must not be retagged or overwritten.
 
+The image inherits the verified r-base v1 parent by its immutable OCI digest,
+not by a mutable readable tag. CI replaces that parent only when it is
+simultaneously validating a changed local r-base candidate.
+
 After publishing, record the immutable GHCR digest in
 `starter-environments/release-manifest.json` and use that digest-qualified
 reference for reproducible scientific runs.
