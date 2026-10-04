@@ -88,7 +88,7 @@ option_list <- list(
   make_option("--contrast_variable_columns", type = "character", default = "Group"),
   make_option("--contrasts", type = "character", default = "B-A"),
   make_option("--covariate_columns", type = "character", default = ""),
-  make_option("--batch_effect_columns", type = "character", default = "auto", help = "Comma-separated technical batch columns; auto resolves to Batch for raw_counts and blank for continuous-expression modes"),
+  make_option("--batch_effect_columns", type = "character", default = "auto", help = "Comma-separated technical batch columns; auto uses Batch for raw_counts only when that metadata column exists, and otherwise uses no batch term"),
   make_option("--donor_variable_column", type = "character", default = ""),
   make_option("--filter_low_expression", type = "character", default = "auto"),
   make_option("--return_batch_corrected_values", type = "character", default = "auto"),
@@ -164,7 +164,7 @@ results <- omix_deg_analysis(
   covariate_columns = split_csv(opt$covariate_columns),
   donor_variable_column = split_csv(opt$donor_variable_column),
   batch_effect_columns = if (identical(tolower(trimws(opt$batch_effect_columns)), "auto")) {
-    if (identical(analysis_mode, "raw_counts")) "Batch" else character()
+    .omix_deg_auto_batch_effect_columns(metadata, analysis_mode)
   } else {
     split_csv(opt$batch_effect_columns)
   },

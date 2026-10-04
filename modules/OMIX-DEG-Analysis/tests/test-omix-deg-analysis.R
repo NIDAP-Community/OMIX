@@ -24,6 +24,23 @@ make_unpaired_fixture <- function() {
 }
 
 fixture <- make_unpaired_fixture()
+stopifnot(
+  identical(
+    .omix_deg_auto_batch_effect_columns(fixture$metadata, "raw_counts"),
+    "Batch"
+  ),
+  identical(
+    .omix_deg_auto_batch_effect_columns(
+      fixture$metadata[, setdiff(names(fixture$metadata), "Batch"), drop = FALSE],
+      "raw_counts"
+    ),
+    character()
+  ),
+  identical(
+    .omix_deg_auto_batch_effect_columns(fixture$metadata, "harmony_mean_expression"),
+    character()
+  )
+)
 stopifnot(identical(
   names(formals(.omix_deg_normalization_profile)),
   "value"
@@ -56,6 +73,43 @@ stopifnot(identical(attr(unpaired, "omix_deg_run")$model_type, "linear"))
 stopifnot(identical(attr(unpaired, "omix_deg_run")$expression_output, "batch_adjusted_voom"))
 stopifnot(identical(attr(unpaired, "omix_deg_run")$normalization_method, "TMM + Quantile"))
 stopifnot(identical(attr(unpaired, "omix_deg_run")$voom_scale_normalization, "quantile"))
+
+metadata_without_batch <- fixture$metadata[, setdiff(names(fixture$metadata), "Batch"), drop = FALSE]
+unpaired_without_batch <- omix_deg_analysis(
+  Dataset = fixture$dataset,
+  Metadata_Table = metadata_without_batch,
+  sample_names_column = "Sample",
+  samples_to_include = metadata_without_batch$Sample,
+  gene_names_column = "Gene",
+  contrast_variable_columns = "Condition",
+  contrasts = "B-A",
+  batch_effect_columns = .omix_deg_auto_batch_effect_columns(
+    metadata_without_batch,
+    "raw_counts"
+  )
+)
+stopifnot(
+  identical(attr(unpaired_without_batch, "omix_deg_run")$modeled_covariates, character()),
+  identical(attr(unpaired_without_batch, "omix_deg_run")$adjusted_columns, character())
+)
+
+explicit_missing_batch_error <- tryCatch(
+  omix_deg_analysis(
+    Dataset = fixture$dataset,
+    Metadata_Table = metadata_without_batch,
+    sample_names_column = "Sample",
+    samples_to_include = metadata_without_batch$Sample,
+    gene_names_column = "Gene",
+    contrast_variable_columns = "Condition",
+    contrasts = "B-A",
+    batch_effect_columns = "Batch"
+  ),
+  error = conditionMessage
+)
+stopifnot(identical(
+  explicit_missing_batch_error,
+  "Metadata_Table is missing required column(s): Batch"
+))
 
 diagnostic_directory <- tempfile("omix-deg-normalization-diagnostics-")
 diagnostic_run <- omix_deg_analysis(

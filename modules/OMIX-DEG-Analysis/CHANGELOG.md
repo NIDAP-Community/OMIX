@@ -6,6 +6,13 @@
   and internal classifications, including the existing sample-selection and
   output-directory controls. This does not change DEG behavior or defaults.
 
+## 0.4.1
+
+- Made the raw-count CLI's automatic batch selection conditional on the
+  metadata actually containing a `Batch` column. Complete pseudobulk bundles
+  without technical-batch metadata now run without a batch term, while an
+  explicitly requested missing batch column still produces an error.
+
 ## 0.4.0 - 2026-09-18
 
 - Added sct_mean_expression for log2-scale donor means derived from Seurat

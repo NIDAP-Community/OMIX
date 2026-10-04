@@ -145,6 +145,10 @@ downstream DEG table.
 - Batch adjustment is fitted with the statistical model. The appended
   expression block supports downstream visualization; it does not replace the
   model statistics.
+- In raw-count mode, `--batch_effect_columns auto` uses `Batch` only when that
+  metadata column is present. Metadata without a technical-batch column is
+  analyzed without a batch term. Explicitly naming a batch column remains a
+  strict request and fails when that column is missing.
 
 ### Harmony-corrected mean expression
 

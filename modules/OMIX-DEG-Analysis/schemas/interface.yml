@@ -89,7 +89,7 @@ parameters:
     classification: advanced
     type: string
     default: auto
-    description: auto resolves to Batch for raw_counts and blank for continuous-expression modes. Technical batch terms are never allowed for harmony_mean_expression because upstream Harmony is the declared batch correction. For sct_mean_expression, include an unhandled technical batch as covariate_columns rather than using batch_effect_columns.
+    description: For raw_counts, auto uses Batch when that metadata column exists and otherwise uses no batch term. An explicitly named column is required and validated. Technical batch terms are never allowed for harmony_mean_expression because upstream Harmony is the declared batch correction. For sct_mean_expression, include an unhandled technical batch as covariate_columns rather than using batch_effect_columns.
   donor_variable_column:
     cli: --donor_variable_column
     classification: advanced
