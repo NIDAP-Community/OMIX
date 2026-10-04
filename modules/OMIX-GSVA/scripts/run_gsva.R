@@ -38,6 +38,11 @@ required_path <- function(path, argument) {
   normalizePath(path, mustWork = TRUE)
 }
 
+display_delim <- function(value) {
+  if (identical(value, "\t")) return("\\t (tab)")
+  value
+}
+
 option_list <- list(
   make_option("--normalized_data", type = "character", default = "", help = "Normalized expression CSV, TSV, or TXT table"),
   make_option("--sample_metadata", type = "character", default = "", help = "Sample metadata CSV, TSV, or TXT table"),
@@ -55,7 +60,10 @@ option_list <- list(
   make_option("--maximum_geneset_size", type = "integer", default = 1200L),
   make_option("--update_genes", type = "character", default = "true", help = "true or false [default: %default]"),
   make_option("--display_warnings", type = "integer", default = -1L),
-  make_option("--input_delim", type = "character", default = "\t", help = "Delimiter shared by input tables [default: tab]"),
+  make_option("--input_delim", type = "character", default = "auto", help = "Fallback delimiter or auto detection [default: %default]"),
+  make_option("--normalized_data_delim", type = "character", default = "", help = "Optional normalized-expression delimiter; otherwise detect automatically"),
+  make_option("--sample_metadata_delim", type = "character", default = "", help = "Optional sample-metadata delimiter; otherwise detect automatically"),
+  make_option("--pathways_database_delim", type = "character", default = "", help = "Optional pathway-database delimiter; otherwise detect automatically"),
   make_option("--image_width", type = "double", default = 12),
   make_option("--image_height", type = "double", default = 10),
   make_option("--output_dir", type = "character", default = "results")
@@ -66,15 +74,34 @@ normalized_path <- required_path(opt$normalized_data, "normalized_data")
 metadata_path <- required_path(opt$sample_metadata, "sample_metadata")
 pathways_path <- required_path(opt$pathways_database, "pathways_database")
 
+normalized_data_delim <- resolve_gsva_delim(
+  normalized_path,
+  "normalized data",
+  opt$normalized_data_delim,
+  opt$input_delim
+)
+sample_metadata_delim <- resolve_gsva_delim(
+  metadata_path,
+  "sample metadata",
+  opt$sample_metadata_delim,
+  opt$input_delim
+)
+pathways_database_delim <- resolve_gsva_delim(
+  pathways_path,
+  "pathways database",
+  opt$pathways_database_delim,
+  opt$input_delim
+)
+
 normalized_preview <- utils::read.delim(
   normalized_path,
-  sep = opt$input_delim,
+  sep = normalized_data_delim,
   check.names = FALSE,
   stringsAsFactors = FALSE
 )
 metadata_preview <- utils::read.delim(
   metadata_path,
-  sep = opt$input_delim,
+  sep = sample_metadata_delim,
   check.names = FALSE,
   stringsAsFactors = FALSE
 )
@@ -130,6 +157,9 @@ results <- run_gsva(
   update_genes = as_logical(opt$update_genes, "update_genes"),
   display_warnings = opt$display_warnings,
   input_delim = opt$input_delim,
+  normalized_data_delim = normalized_data_delim,
+  sample_metadata_delim = sample_metadata_delim,
+  pathways_database_delim = pathways_database_delim,
   export_results_file = results_path,
   export_plot_file = plot_path,
   export_plot_width = opt$image_width,
@@ -141,6 +171,9 @@ summary_lines <- c(
   paste("normalized data:", normalized_path),
   paste("sample metadata:", metadata_path),
   paste("pathways database:", pathways_path),
+  paste("normalized data delimiter:", display_delim(normalized_data_delim)),
+  paste("sample metadata delimiter:", display_delim(sample_metadata_delim)),
+  paste("pathways database delimiter:", display_delim(pathways_database_delim)),
   paste("samples:", paste(samples_to_include, collapse = ", ")),
   paste("collections:", paste(collections_to_include, collapse = ", ")),
   paste("expression species:", opt$species),

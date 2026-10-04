@@ -24,8 +24,8 @@ complete command below with explicit paths. No deployment platform is required.
 
 ```bash
 Rscript modules/OMIX-GSVA/scripts/run_gsva.R \
-  --normalized_data /path/to/normalized_expression.tsv \
-  --sample_metadata /path/to/sample_metadata.tsv \
+  --normalized_data /path/to/normalized_expression.csv \
+  --sample_metadata /path/to/sample_metadata.csv \
   --pathways_database /path/to/pathway_membership.tsv \
   --gene_column Gene \
   --sample_name_column Sample \
@@ -68,8 +68,12 @@ The module does not bundle MSigDB or any other gene-set database. Supply a
 versioned data asset at runtime and retain its source, version, and license in
 the analysis provenance.
 
-All three inputs use `--input_delim`, which defaults to a tab. For CSV inputs,
-supply `--input_delim ','`.
+Delimiters are detected independently for each input: `.csv` selects a comma,
+`.tsv`/`.tab` selects a tab, and other extensions are detected from an
+unambiguous header. Override detection with `--normalized_data_delim`,
+`--sample_metadata_delim`, or `--pathways_database_delim`. The legacy
+`--input_delim` remains available as a shared fallback. Use `','` for CSV and
+`'\t'` for TSV/TXT inputs. Ambiguous files stop with the affected input named.
 
 ## Outputs
 

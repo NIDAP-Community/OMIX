@@ -1,6 +1,6 @@
 name: omix-gsva
 display_name: OMIX GSVA
-version: 0.2.0
+version: 0.3.0
 interface_version: 2
 module_type: pathway
 status: development

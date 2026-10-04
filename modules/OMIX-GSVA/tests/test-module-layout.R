@@ -42,6 +42,10 @@ stopifnot(identical(eval(gsva_defaults$minimum_geneset_size), 15))
 stopifnot(identical(eval(gsva_defaults$maximum_geneset_size), 1200))
 stopifnot(identical(eval(gsva_defaults$update_genes), TRUE))
 stopifnot(identical(eval(gsva_defaults$display_warnings), -1))
+stopifnot(is.null(gsva_defaults$input_delim))
+stopifnot(is.null(gsva_defaults$normalized_data_delim))
+stopifnot(is.null(gsva_defaults$sample_metadata_delim))
+stopifnot(is.null(gsva_defaults$pathways_database_delim))
 
 function_text <- paste(readLines(function_file, warn = FALSE), collapse = "\n")
 stopifnot(!grepl("@import", function_text, fixed = TRUE))
@@ -61,7 +65,9 @@ for (option in c(
   "--normalized_data", "--sample_metadata", "--pathways_database",
   "--gene_column", "--sample_name_column", "--samples_to_include",
   "--collections_to_include", "--method", "--minimum_geneset_size",
-  "--maximum_geneset_size", "--update_genes", "--output_dir"
+  "--maximum_geneset_size", "--update_genes", "--input_delim",
+  "--normalized_data_delim", "--sample_metadata_delim",
+  "--pathways_database_delim", "--output_dir"
 )) {
   stopifnot(grepl(option, cli_text, fixed = TRUE))
 }

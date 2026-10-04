@@ -48,27 +48,45 @@ pathways <- rbind(
   )
 )
 
-expression_path <- file.path(test_root, "normalized.tsv")
-metadata_path <- file.path(test_root, "metadata.tsv")
+expression_path <- file.path(test_root, "normalized.csv")
+metadata_path <- file.path(test_root, "metadata.csv")
 pathways_path <- file.path(test_root, "pathways.tsv")
-utils::write.table(expression, expression_path, sep = "\t", row.names = FALSE, quote = FALSE)
-utils::write.table(metadata, metadata_path, sep = "\t", row.names = FALSE, quote = FALSE)
+utils::write.csv(expression, expression_path, row.names = FALSE, quote = FALSE)
+utils::write.csv(metadata, metadata_path, row.names = FALSE, quote = FALSE)
 utils::write.table(pathways, pathways_path, sep = "\t", row.names = FALSE, quote = FALSE)
 
-status <- system2(
-  file.path(R.home("bin"), "Rscript"),
-  c(
+run_cli <- function(
+  normalized_path,
+  sample_metadata_path,
+  pathway_membership_path,
+  results_dir,
+  capture_output = FALSE
+) {
+  arguments <- c(
     "--vanilla", shQuote(cli_file),
-    "--normalized_data", shQuote(expression_path),
-    "--sample_metadata", shQuote(metadata_path),
-    "--pathways_database", shQuote(pathways_path),
+    "--normalized_data", shQuote(normalized_path),
+    "--sample_metadata", shQuote(sample_metadata_path),
+    "--pathways_database", shQuote(pathway_membership_path),
     "--gene_column", "Gene",
     "--minimum_geneset_size", "5",
     "--maximum_geneset_size", "100",
     "--update_genes", "false",
-    "--output_dir", shQuote(output_dir)
+    "--output_dir", shQuote(results_dir)
   )
-)
+  if (capture_output) {
+    return(suppressWarnings(system2(
+      file.path(R.home("bin"), "Rscript"),
+      arguments,
+      stdout = TRUE,
+      stderr = TRUE
+    )))
+  }
+  system2(file.path(R.home("bin"), "Rscript"), arguments)
+}
+
+# The representative run deliberately mixes CSV expression/metadata with a
+# TSV pathway table and relies on independent auto-detection.
+status <- run_cli(expression_path, metadata_path, pathways_path, output_dir)
 stopifnot(identical(status, 0L))
 
 results_path <- file.path(output_dir, "gsva_results.csv")
@@ -88,7 +106,49 @@ summary_text <- readLines(summary_path, warn = FALSE)
 stopifnot(any(grepl("method: gsva", summary_text, fixed = TRUE)))
 stopifnot(any(grepl("gene sets scored: 2", summary_text, fixed = TRUE)))
 stopifnot(any(grepl("OMIX module: OMIX-GSVA", summary_text, fixed = TRUE)))
-stopifnot(any(grepl("OMIX module version: 0.2.0", summary_text, fixed = TRUE)))
+stopifnot(any(grepl("normalized data delimiter: ,", summary_text, fixed = TRUE)))
+stopifnot(any(grepl("sample metadata delimiter: ,", summary_text, fixed = TRUE)))
+stopifnot(any(grepl("pathways database delimiter: \\t (tab)", summary_text, fixed = TRUE)))
+stopifnot(any(grepl("OMIX module version: 0.3.0", summary_text, fixed = TRUE)))
 stopifnot(!any(grepl("source template", summary_text, fixed = TRUE)))
+
+# Uniform TSV and CSV inputs remain supported without delimiter flags.
+for (format in c("tsv", "csv")) {
+  uniform_dir <- file.path(test_root, paste0("uniform-", format))
+  uniform_expression <- file.path(test_root, paste0("normalized-all.", format))
+  uniform_metadata <- file.path(test_root, paste0("metadata-all.", format))
+  uniform_pathways <- file.path(test_root, paste0("pathways-all.", format))
+  if (identical(format, "csv")) {
+    utils::write.csv(expression, uniform_expression, row.names = FALSE, quote = FALSE)
+    utils::write.csv(metadata, uniform_metadata, row.names = FALSE, quote = FALSE)
+    utils::write.csv(pathways, uniform_pathways, row.names = FALSE, quote = FALSE)
+  } else {
+    utils::write.table(expression, uniform_expression, sep = "\t", row.names = FALSE, quote = FALSE)
+    utils::write.table(metadata, uniform_metadata, sep = "\t", row.names = FALSE, quote = FALSE)
+    utils::write.table(pathways, uniform_pathways, sep = "\t", row.names = FALSE, quote = FALSE)
+  }
+  uniform_status <- run_cli(
+    uniform_expression,
+    uniform_metadata,
+    uniform_pathways,
+    uniform_dir
+  )
+  stopifnot(identical(uniform_status, 0L))
+  stopifnot(file.exists(file.path(uniform_dir, "gsva_results.csv")))
+}
+
+# Ambiguous delimiter detection fails before parsing and names the affected
+# input so users know which override to provide.
+ambiguous_expression <- file.path(test_root, "normalized-ambiguous.txt")
+writeLines("Gene,S1\tS2", ambiguous_expression)
+ambiguous_output <- run_cli(
+  ambiguous_expression,
+  metadata_path,
+  pathways_path,
+  file.path(test_root, "ambiguous-results"),
+  capture_output = TRUE
+)
+stopifnot(!is.null(attr(ambiguous_output, "status")))
+stopifnot(any(grepl("normalized data", ambiguous_output, fixed = TRUE)))
 
 message("OMIX-GSVA representative CLI test passed")
