@@ -122,4 +122,7 @@ effect of interest.
 ## Interface and deployment
 
 See [`schemas/interface.yml`](schemas/interface.yml) for the complete public
-contract. This module has no deployment adapter yet.
+contract. The optional
+[OMIX Limma Analysis deployment adapter](https://github.com/NIDAP-Community/OMIX-Limma-Analysis)
+provides Code Ocean input discovery, App Panel controls, result routing, and
+runtime selection without changing this canonical scientific implementation.

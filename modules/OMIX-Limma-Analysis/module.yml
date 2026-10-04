@@ -9,4 +9,6 @@ description: Template-preserving limma analysis for declared continuous feature-
 data_policy: No data are committed. Callers supply explicit continuous matrices and aligned sample metadata paths.
 runtime_profile: r-statistics
 entrypoint: scripts/run_limma_analysis.R
-deployment_adapters: []
+deployment_adapters:
+  - platform: code-ocean
+    repository: https://github.com/NIDAP-Community/OMIX-Limma-Analysis

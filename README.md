@@ -72,16 +72,16 @@ interface and runtime layer; it is not required to run the module locally.
 | Module | Deployment repository | Purpose | Status |
 | --- | --- | --- | --- |
 | [OMIX-DEG-Analysis](modules/OMIX-DEG-Analysis) | [OMIX-DEG-Analysis](https://github.com/NIDAP-Community/OMIX-DEG-Analysis) | Raw-count, Harmony-corrected donor-mean, or SCTransform donor-mean differential expression | Review |
-| [OMIX-Limma-Analysis](modules/OMIX-Limma-Analysis) | — | Direct limma analysis for declared continuous expression and feature-score matrices | Development |
+| [OMIX-Limma-Analysis](modules/OMIX-Limma-Analysis) | [OMIX-Limma-Analysis](https://github.com/NIDAP-Community/OMIX-Limma-Analysis) | Direct limma analysis for declared continuous expression and feature-score matrices | Development |
 | [OMIX-Gene-Boxplots](modules/OMIX-Gene-Boxplots) | [OMIX-Gene-Boxplots](https://github.com/NIDAP-Community/OMIX-Gene-Boxplots) | Gene-expression boxplots with optional model-consistent DEG annotations | Review |
 | [OMIX-GSEA-Preranked-Legacy](modules/OMIX-GSEA-Preranked-Legacy) | [OMIX-GSEA-Preranked-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy) | Legacy preranked GSEA | Active |
 | [OMIX-GSEA-Filters-Legacy](modules/OMIX-GSEA-Filters-Legacy) | [OMIX-GSEA-Filters-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy) | Filter and subset GSEA result tables | Active |
 | [OMIX-GSEA-Visualization-Legacy](modules/OMIX-GSEA-Visualization-Legacy) | [OMIX-GSEA-Visualization-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy) | Legacy GSEA enrichment-score and leading-edge visualization | Review |
-| [OMIX-GSVA](modules/OMIX-GSVA) | — | Sample-level pathway enrichment scores from normalized continuous expression | Development |
+| [OMIX-GSVA](modules/OMIX-GSVA) | [OMIX-GSVA](https://github.com/NIDAP-Community/OMIX-GSVA) | Sample-level pathway enrichment scores from normalized continuous expression | Development |
 | [OMIX-Volcano-Plot](modules/OMIX-Volcano-Plot) | [OMIX-Volcano-Plot](https://github.com/NIDAP-Community/OMIX-Volcano-Plot) | Differential-expression volcano plot | Active |
 | [OMIX-L2P-Single](modules/OMIX-L2P-Single) | [OMIX-L2P-Single](https://github.com/NIDAP-Community/OMIX-L2P-Single) | Single-comparison L2P | Active |
 | [OMIX-L2P-Multi](modules/OMIX-L2P-Multi) | [OMIX-L2P-Multi](https://github.com/NIDAP-Community/OMIX-L2P-Multi) | Multi-comparison L2P | Active |
-| [OMIX-Seurat-Pseudobulk](modules/OMIX-Seurat-Pseudobulk) | — | Donor-level raw-count pseudobulk, Harmony-corrected means, or SCTransform means from one Seurat cell type | Review |
+| [OMIX-Seurat-Pseudobulk](modules/OMIX-Seurat-Pseudobulk) | [OMIX-Seurat-Pseudobulk](https://github.com/NIDAP-Community/OMIX-Seurat-Pseudobulk) | Donor-level raw-count pseudobulk, Harmony-corrected means, or SCTransform means from one Seurat cell type | Review |
 
 ## Contribute or automate work
 
