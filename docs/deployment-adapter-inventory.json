@@ -7,7 +7,7 @@
     "canonical_repository_commit": "3700650c00f0567b8c56a337fce26ddba10db5dc",
     "work_item": "https://github.com/NIDAP-Community/OMIX/issues/45",
     "policy": "docs/deployment-adapter-guide.md",
-    "note": "Evidence-based inventory of adapters registered in canonical module.yml files. This refresh adds the released OMIX-Limma-Analysis deployment adapter, records the GSVA Standard release, and advances Pseudobulk test evidence. Existing reviewed adapter evidence is preserved. GSEA Preranked remains deferred. Pending and unknown values are not release claims, and a published GHCR digest is not Code Ocean runtime identity."
+    "note": "Evidence-based inventory of adapters registered in canonical module.yml files. This refresh adds the released OMIX-Limma-Analysis adapter, records completed GSVA validation and tag finalization, and advances Pseudobulk test evidence. Existing reviewed adapter evidence is preserved. GSEA Preranked remains deferred. Pending and unknown values are not release claims, and a published GHCR digest is not Code Ocean runtime identity."
   },
   "status_vocabulary": [
     "verified",
@@ -621,8 +621,13 @@
         "source_commit": "3700650c00f0567b8c56a337fce26ddba10db5dc",
         "last_module_change_commit": "a5f910a321f61fbf0218b235f8f5f8d6d63ae2bd",
         "schema_path": "modules/OMIX-GSVA/schemas/interface.yml",
+        "release_tag": "module/omix-gsva/v0.3.0",
+        "release_tag_object": "63d2b24534c6efefa533cba6f7d47ea1ca4993ce",
+        "release_tag_target": "5396be0203b94fc1e22cb2eaf74d8265a32466a7",
+        "release_tag_url": "https://github.com/NIDAP-Community/OMIX/releases/tag/module%2Fomix-gsva%2Fv0.3.0",
         "evidence": [
-          "https://github.com/NIDAP-Community/OMIX/blob/3700650c00f0567b8c56a337fce26ddba10db5dc/modules/OMIX-GSVA/module.yml"
+          "https://github.com/NIDAP-Community/OMIX/blob/3700650c00f0567b8c56a337fce26ddba10db5dc/modules/OMIX-GSVA/module.yml",
+          "https://github.com/NIDAP-Community/OMIX/issues/62#issuecomment-5984233634"
         ]
       },
       "schema_completeness": {
@@ -635,10 +640,13 @@
       "deployment": {
         "repository": "https://github.com/NIDAP-Community/OMIX-GSVA",
         "default_branch": "master",
-        "default_branch_commit": "3abda77f6c29a95ab0fc6139713aa76b447db17b",
-        "source_record_url": "https://github.com/NIDAP-Community/OMIX-GSVA/blob/3abda77f6c29a95ab0fc6139713aa76b447db17b/OMIX_MODULE_SOURCE.md",
-        "app_panel_url": "https://github.com/NIDAP-Community/OMIX-GSVA/blob/3abda77f6c29a95ab0fc6139713aa76b447db17b/.codeocean/app-panel.json",
-        "release_tag": null
+        "default_branch_commit": "258f68a02c68bce329ef2f1054a5aad328d2e17b",
+        "source_record_url": "https://github.com/NIDAP-Community/OMIX-GSVA/blob/258f68a02c68bce329ef2f1054a5aad328d2e17b/OMIX_MODULE_SOURCE.md",
+        "app_panel_url": "https://github.com/NIDAP-Community/OMIX-GSVA/blob/258f68a02c68bce329ef2f1054a5aad328d2e17b/.codeocean/app-panel.json",
+        "release_tag": "v0.1.0",
+        "release_tag_object": "b5bb8213f577fdaa1bb6b2053b936e2c90167405",
+        "release_tag_target": "1508651439504680991eb6ef1ffe38d2cc7d5853",
+        "release_tag_url": "https://github.com/NIDAP-Community/OMIX-GSVA/releases/tag/v0.1.0"
       },
       "scientific_export": {
         "recorded_source_commit": "5396be0203b94fc1e22cb2eaf74d8265a32466a7",
@@ -648,7 +656,7 @@
           "status": "verified",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX-GSVA/pull/2",
-            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/3abda77f6c29a95ab0fc6139713aa76b447db17b/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/258f68a02c68bce329ef2f1054a5aad328d2e17b/OMIX_MODULE_SOURCE.md"
           ],
           "note": "Merged PR #2 and its passing source-parity contract verify the complete 0.3.0 scientific export at canonical source commit 5396be0."
         },
@@ -656,23 +664,24 @@
           "status": "verified",
           "evidence": [
             "https://github.com/NIDAP-Community/OMIX-GSVA/pull/2",
-            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/3abda77f6c29a95ab0fc6139713aa76b447db17b/code/functions/GSVA.R",
+            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/258f68a02c68bce329ef2f1054a5aad328d2e17b/code/functions/GSVA.R",
             "https://github.com/NIDAP-Community/OMIX/blob/3700650c00f0567b8c56a337fce26ddba10db5dc/modules/OMIX-GSVA/R/GSVA.R"
           ],
           "note": "The merged default-branch export matches its recorded source and the canonical 0.3.0 scientific file at this inventory snapshot."
         },
         "source_record": {
-          "status": "verified",
+          "status": "partial",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/3abda77f6c29a95ab0fc6139713aa76b447db17b/OMIX_MODULE_SOURCE.md",
-            "https://github.com/NIDAP-Community/OMIX-GSVA/pull/3"
+            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/258f68a02c68bce329ef2f1054a5aad328d2e17b/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSVA/pull/5",
+            "https://github.com/NIDAP-Community/OMIX/issues/62#issuecomment-5984233634"
           ],
-          "note": "The merged source record captures canonical 0.3.0/interface 2, immutable source commit, exact mapping and hashes, runtime provenance, delimiter translations, the GSVA platform release, and the explicitly pending adapter tag and ssgsea acceptance run."
+          "note": "The merged source record captures canonical 0.3.0/interface 2, its finalized canonical tag, immutable source commit, exact mapping and hashes, runtime provenance, delimiter translations, both platform runs, and the Standard release. It still describes adapter tag v0.1.0 as pending even though the annotated tag was subsequently finalized at validated source 1508651; the durable issue #62 audit supplies that final fact."
         },
         "hash_manifest": {
           "status": "verified",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/3abda77f6c29a95ab0fc6139713aa76b447db17b/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/258f68a02c68bce329ef2f1054a5aad328d2e17b/OMIX_MODULE_SOURCE.md"
           ],
           "note": "The merged source record lists matching canonical and adapter SHA-256 values for the managed scientific file."
         },
@@ -694,8 +703,8 @@
         "coverage": {
           "status": "verified",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/3abda77f6c29a95ab0fc6139713aa76b447db17b/.codeocean/app-panel.json",
-            "https://github.com/NIDAP-Community/OMIX-GSVA/actions/runs/37223118571/job/111497268389"
+            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/258f68a02c68bce329ef2f1054a5aad328d2e17b/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-GSVA/actions/runs/37230062075/job/111517677937"
           ],
           "note": "The merged named 22-parameter App Panel passes the adapter contract check and exposes the canonical public and advanced controls, including independent delimiter overrides."
         }
@@ -706,7 +715,7 @@
         "provenance": {
           "status": "partial",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/3abda77f6c29a95ab0fc6139713aa76b447db17b/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/258f68a02c68bce329ef2f1054a5aad328d2e17b/OMIX_MODULE_SOURCE.md"
           ],
           "note": "The merged source record supplies public runtime digest sha256:25ad9f50df5a4d7f70a7e3debed13f8d5c9b07cbc46d57fdf5c3cf4f2e767ddc and its Code Ocean tag, but the imported Code Ocean environment identity remains pending."
         }
@@ -714,24 +723,29 @@
       "local_tests": {
         "status": "verified",
         "evidence": [
-          "https://github.com/NIDAP-Community/OMIX-GSVA/actions/runs/37223118571/job/111497268389",
-          "https://github.com/NIDAP-Community/OMIX-GSVA/pull/3"
+          "https://github.com/NIDAP-Community/OMIX-GSVA/actions/runs/37230062075/job/111517677937",
+          "https://github.com/NIDAP-Community/OMIX-GSVA/pull/5"
         ],
-        "note": "The full adapter contract check passed for metadata-only PR #3, which merged the reviewed platform-release record at default-branch commit 3abda77."
+        "note": "The full adapter contract check passed for metadata-only PR #5, which recorded the canonical tag and merged at default-branch commit 258f68a."
       },
       "code_ocean_validation": {
-        "status": "partial",
+        "status": "verified",
         "source_capsule": "https://poc-nci.codeocean.io/capsule/3631910/tree",
         "release_version": "1.0",
         "release_url": "https://poc-nci.codeocean.io/capsule/f60059de-0260-4e49-83a0-b367d99fbd0b/tree/v1",
         "run_id": 1130403,
-        "evidence": [
-          "https://github.com/NIDAP-Community/OMIX-GSVA/blob/3abda77f6c29a95ab0fc6139713aa76b447db17b/OMIX_MODULE_SOURCE.md",
-          "https://poc-nci.codeocean.io/capsule/f60059de-0260-4e49-83a0-b367d99fbd0b/tree/v1",
-          "https://github.com/NIDAP-Community/OMIX-GSVA/pull/3",
-          "https://github.com/NIDAP-Community/OMIX/issues/62"
+        "validation_run_ids": [
+          1130403,
+          1139932
         ],
-        "note": "Code Ocean Standard release 1.0 was produced from source capsule 3631910 by run 1130403 and validates the default gsva method at adapter source commit 1508651. The supported ssgsea method has no recorded platform run and no adapter tag has been finalized, so validation remains partial under issue #62."
+        "evidence": [
+          "https://github.com/NIDAP-Community/OMIX-GSVA/blob/258f68a02c68bce329ef2f1054a5aad328d2e17b/OMIX_MODULE_SOURCE.md",
+          "https://poc-nci.codeocean.io/capsule/f60059de-0260-4e49-83a0-b367d99fbd0b/tree/v1",
+          "https://github.com/NIDAP-Community/OMIX-GSVA/pull/4",
+          "https://github.com/NIDAP-Community/OMIX-GSVA/pull/5",
+          "https://github.com/NIDAP-Community/OMIX/issues/62#issuecomment-5984233634"
+        ],
+        "note": "Code Ocean source capsule 3631910 validated the default gsva method in release-producing run 1130403 and the supported ssgsea alternative in run 1139932 at adapter source commit 1508651. Standard release 1.0 and both annotated release tags are finalized, and the closed issue #62 audit records inspected outputs for both methods."
       },
       "work_tracking": {
         "issues": [
@@ -753,6 +767,16 @@
             "number": 3,
             "url": "https://github.com/NIDAP-Community/OMIX-GSVA/pull/3",
             "state": "merged"
+          },
+          {
+            "number": 4,
+            "url": "https://github.com/NIDAP-Community/OMIX-GSVA/pull/4",
+            "state": "merged"
+          },
+          {
+            "number": 5,
+            "url": "https://github.com/NIDAP-Community/OMIX-GSVA/pull/5",
+            "state": "merged"
           }
         ]
       },
@@ -762,7 +786,7 @@
         "readiness": {
           "status": "pending",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSVA/tree/3abda77f6c29a95ab0fc6139713aa76b447db17b/code/functions",
+            "https://github.com/NIDAP-Community/OMIX-GSVA/tree/258f68a02c68bce329ef2f1054a5aad328d2e17b/code/functions",
             "https://github.com/NIDAP-Community/OMIX/issues/44"
           ],
           "note": "The managed directory contains the verified canonical export, but no generated Syncweaver lock or production onboarding record exists on the default branch."
