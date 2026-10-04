@@ -5,6 +5,13 @@
 - Registered the accepted Code Ocean deployment-adapter repository without
   changing the portable scientific implementation or interface version.
 
+## 0.4.2
+
+- Restored compatible extraction of standard expression matrices from legacy
+  slot-based Seurat `Assay` objects, including a declared `Harmony/data`
+  assay, when the installed SeuratObject layer accessor does not recognize the
+  assay name. The public interface and aggregation behavior are unchanged.
+
 ## 0.4.1
 
 - Constrained `feature_id_column` to the only implemented and downstream-safe

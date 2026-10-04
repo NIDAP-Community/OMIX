@@ -570,25 +570,49 @@ omix_read_seurat_rds <- function(path, ...) {
 }
 
 .omix_seurat_extract_layer <- function(seurat_object, assay, layer) {
+  # Legacy Seurat `Assay` objects store the standard expression matrices in
+  # formal S4 slots (`counts`, `data`, and `scale.data`). Read those slots
+  # directly before calling the modern layer accessor. This is important for
+  # older serialized objects whose assay is present in `object@assays` but is
+  # not recognized by the installed SeuratObject `LayerData()` method.
+  #
+  # Keep this fallback assay- and study-agnostic: the caller still declares
+  # the assay and layer, and only the standard matrix-bearing Assay slots are
+  # eligible. Current Assay5 objects continue through `LayerData()` below.
+  assays <- tryCatch(methods::slot(seurat_object, "assays"), error = function(error) NULL)
+  if (!is.null(assays) && assay %in% names(assays)) {
+    assay_object <- assays[[assay]]
+    assay_slots <- tryCatch(methods::slotNames(assay_object), error = function(error) character())
+    legacy_expression_slots <- c("counts", "data", "scale.data")
+    if (layer %in% legacy_expression_slots && layer %in% assay_slots) {
+      slot_value <- tryCatch(
+        methods::slot(assay_object, layer),
+        error = function(error) NULL
+      )
+      if (is.matrix(slot_value) || inherits(slot_value, "Matrix")) {
+        return(slot_value)
+      }
+    }
+  }
+
   accessor_error <- NULL
-  counts <- tryCatch(
+  layer_data <- tryCatch(
     SeuratObject::LayerData(seurat_object, assay = assay, layer = layer),
     error = function(error) {
       accessor_error <<- error
       NULL
     }
   )
-  if (!is.null(counts)) {
-    return(counts)
+  if (!is.null(layer_data)) {
+    return(layer_data)
   }
 
-  assays <- tryCatch(methods::slot(seurat_object, "assays"), error = function(error) NULL)
+  # Some serialized current objects can expose their Assay5 `layers` slot even
+  # when the high-level accessor fails. Preserve that narrow compatibility
+  # fallback without treating arbitrary assay metadata slots as expression.
   if (!is.null(assays) && assay %in% names(assays)) {
     assay_object <- assays[[assay]]
-    assay_slots <- methods::slotNames(assay_object)
-    if (identical(layer, "counts") && "counts" %in% assay_slots) {
-      return(methods::slot(assay_object, "counts"))
-    }
+    assay_slots <- tryCatch(methods::slotNames(assay_object), error = function(error) character())
     if ("layers" %in% assay_slots) {
       layers <- methods::slot(assay_object, "layers")
       if (layer %in% names(layers)) {

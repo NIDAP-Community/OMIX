@@ -1,6 +1,6 @@
 name: omix-seurat-pseudobulk
 display_name: OMIX Seurat Pseudobulk
-version: 0.4.1
+version: 0.4.2
 interface_version: 1
 module_type: single-cell-pseudobulk
 status: review

@@ -99,6 +99,35 @@ test_that("Seurat bridge creates direct-limma donor means from a declared expres
   expect_equal(input$provenance$aggregation, "mean_by_donor_and_group")
 })
 
+test_that("Seurat bridge reads data from a legacy Assay slot", {
+  object <- make_seurat_fixture()
+  raw_counts <- SeuratObject::LayerData(object, assay = "RNA", layer = "counts")
+  corrected_expression <- log2(as.matrix(raw_counts) + 1)
+
+  # CreateAssayObject deliberately creates the legacy slot-based `Assay`
+  # representation rather than an Assay5 layer collection. The Harmony name is
+  # representative; the bridge fallback is generic for any declared assay.
+  legacy_assay <- SeuratObject::CreateAssayObject(counts = raw_counts)
+  methods::slot(legacy_assay, "data") <- Matrix::Matrix(
+    corrected_expression,
+    sparse = TRUE
+  )
+  object[["Harmony"]] <- legacy_assay
+  expect_s4_class(object[["Harmony"]], "Assay")
+  expect_true("data" %in% methods::slotNames(object[["Harmony"]]))
+
+  extracted <- omix_seurat_extract_expression(
+    object,
+    assay = "Harmony",
+    layer = "data"
+  )
+  expect_s3_class(extracted, "omix_seurat_expression_cells")
+  expect_equal(as.matrix(extracted$expression), corrected_expression)
+  expect_identical(rownames(extracted$metadata), colnames(corrected_expression))
+  expect_equal(extracted$provenance$assay, "Harmony")
+  expect_equal(extracted$provenance$layer, "data")
+})
+
 test_that("Seurat bridge rejects non-invariant retained sample metadata", {
   object <- make_seurat_fixture()
   object$Batch[c("Cell1", "Cell2")] <- c("Run1", "RunX")
