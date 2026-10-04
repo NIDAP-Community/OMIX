@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "date": "2026-10-03",
+    "date": "2026-10-04",
     "canonical_repository": "NIDAP-Community/OMIX",
     "canonical_repository_url": "https://github.com/NIDAP-Community/OMIX",
-    "canonical_repository_commit": "4b28d1697a8267848b003ac3b285d8a1e4eebef7",
+    "canonical_repository_commit": "3700650c00f0567b8c56a337fce26ddba10db5dc",
     "work_item": "https://github.com/NIDAP-Community/OMIX/issues/45",
     "policy": "docs/deployment-adapter-guide.md",
-    "note": "Evidence-based inventory of adapters registered in canonical module.yml files. This refresh adds the merged OMIX-Seurat-Pseudobulk and OMIX-GSVA deployment adapters. Existing reviewed adapter evidence is preserved. GSEA Preranked remains deferred. Pending and unknown values are not release claims, and a published GHCR digest is not Code Ocean runtime identity."
+    "note": "Evidence-based inventory of adapters registered in canonical module.yml files. This refresh adds the released OMIX-Limma-Analysis deployment adapter and advances OMIX-GSVA to its merged 0.3.0 export. Existing reviewed adapter evidence is preserved. GSEA Preranked remains deferred. Pending and unknown values are not release claims, and a published GHCR digest is not Code Ocean runtime identity."
   },
   "status_vocabulary": [
     "verified",
@@ -25,7 +25,7 @@
         "module_path": "modules/OMIX-DEG-Analysis",
         "module_version": "0.4.0",
         "interface_version": 2,
-        "source_commit": "4b28d1697a8267848b003ac3b285d8a1e4eebef7",
+        "source_commit": "3700650c00f0567b8c56a337fce26ddba10db5dc",
         "last_module_change_commit": "05942952981001e462fb8daa00b5304632ddc2da",
         "schema_path": "modules/OMIX-DEG-Analysis/schemas/interface.yml",
         "evidence": [
@@ -174,7 +174,7 @@
         "module_path": "modules/OMIX-GSEA-Filters-Legacy",
         "module_version": "1.0.0",
         "interface_version": 1,
-        "source_commit": "4b28d1697a8267848b003ac3b285d8a1e4eebef7",
+        "source_commit": "3700650c00f0567b8c56a337fce26ddba10db5dc",
         "last_module_change_commit": "ca6b7b19088c369d72d20360343ec59f6346f407",
         "schema_path": "modules/OMIX-GSEA-Filters-Legacy/schemas/interface.yml",
         "evidence": [
@@ -346,7 +346,7 @@
         "module_path": "modules/OMIX-GSEA-Preranked-Legacy",
         "module_version": "5.3.0",
         "interface_version": 1,
-        "source_commit": "4b28d1697a8267848b003ac3b285d8a1e4eebef7",
+        "source_commit": "3700650c00f0567b8c56a337fce26ddba10db5dc",
         "last_module_change_commit": "ca6b7b19088c369d72d20360343ec59f6346f407",
         "schema_path": "modules/OMIX-GSEA-Preranked-Legacy/schemas/interface.yml",
         "evidence": [
@@ -480,7 +480,7 @@
         "module_path": "modules/OMIX-GSEA-Visualization-Legacy",
         "module_version": "4.0.0",
         "interface_version": 1,
-        "source_commit": "4b28d1697a8267848b003ac3b285d8a1e4eebef7",
+        "source_commit": "3700650c00f0567b8c56a337fce26ddba10db5dc",
         "last_module_change_commit": "ca6b7b19088c369d72d20360343ec59f6346f407",
         "schema_path": "modules/OMIX-GSEA-Visualization-Legacy/schemas/interface.yml",
         "evidence": [
@@ -616,62 +616,62 @@
       "id": "OMIX-GSVA",
       "canonical": {
         "module_path": "modules/OMIX-GSVA",
-        "module_version": "0.2.0",
+        "module_version": "0.3.0",
         "interface_version": 2,
-        "source_commit": "4b28d1697a8267848b003ac3b285d8a1e4eebef7",
-        "last_module_change_commit": "ddbd1cda0de386f6e0b44b5eb90627969661aac4",
+        "source_commit": "3700650c00f0567b8c56a337fce26ddba10db5dc",
+        "last_module_change_commit": "a5f910a321f61fbf0218b235f8f5f8d6d63ae2bd",
         "schema_path": "modules/OMIX-GSVA/schemas/interface.yml",
         "evidence": [
-          "https://github.com/NIDAP-Community/OMIX/blob/4b28d1697a8267848b003ac3b285d8a1e4eebef7/modules/OMIX-GSVA/module.yml"
+          "https://github.com/NIDAP-Community/OMIX/blob/3700650c00f0567b8c56a337fce26ddba10db5dc/modules/OMIX-GSVA/module.yml"
         ]
       },
       "schema_completeness": {
         "status": "verified",
         "evidence": [
-          "https://github.com/NIDAP-Community/OMIX/blob/4b28d1697a8267848b003ac3b285d8a1e4eebef7/modules/OMIX-GSVA/schemas/interface.yml"
+          "https://github.com/NIDAP-Community/OMIX/blob/3700650c00f0567b8c56a337fce26ddba10db5dc/modules/OMIX-GSVA/schemas/interface.yml"
         ],
-        "note": "The canonical 0.2.0/interface 2 schema is registered at the inventory snapshot and defines the deployment-facing GSVA contract."
+        "note": "The canonical 0.3.0/interface 2 schema is registered at the inventory snapshot and defines the deployment-facing GSVA contract, including independent input-delimiter controls."
       },
       "deployment": {
         "repository": "https://github.com/NIDAP-Community/OMIX-GSVA",
         "default_branch": "master",
-        "default_branch_commit": "7c60c8a53fa4b6a92e4c3184c1cb2ef2090a5ea6",
-        "source_record_url": "https://github.com/NIDAP-Community/OMIX-GSVA/blob/7c60c8a53fa4b6a92e4c3184c1cb2ef2090a5ea6/OMIX_MODULE_SOURCE.md",
-        "app_panel_url": "https://github.com/NIDAP-Community/OMIX-GSVA/blob/7c60c8a53fa4b6a92e4c3184c1cb2ef2090a5ea6/.codeocean/app-panel.json"
+        "default_branch_commit": "1508651439504680991eb6ef1ffe38d2cc7d5853",
+        "source_record_url": "https://github.com/NIDAP-Community/OMIX-GSVA/blob/1508651439504680991eb6ef1ffe38d2cc7d5853/OMIX_MODULE_SOURCE.md",
+        "app_panel_url": "https://github.com/NIDAP-Community/OMIX-GSVA/blob/1508651439504680991eb6ef1ffe38d2cc7d5853/.codeocean/app-panel.json"
       },
       "scientific_export": {
-        "recorded_source_commit": "4b28d1697a8267848b003ac3b285d8a1e4eebef7",
-        "recorded_module_version": "0.2.0",
+        "recorded_source_commit": "5396be0203b94fc1e22cb2eaf74d8265a32466a7",
+        "recorded_module_version": "0.3.0",
         "recorded_interface_version": 2,
         "recorded_parity": {
           "status": "verified",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSVA/pull/1",
-            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/7c60c8a53fa4b6a92e4c3184c1cb2ef2090a5ea6/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-GSVA/pull/2",
+            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/1508651439504680991eb6ef1ffe38d2cc7d5853/OMIX_MODULE_SOURCE.md"
           ],
-          "note": "Beacon review and merged PR #1 verify byte-identical source parity at reviewed head f3188fb, now present on default branch commit 7c60c8a."
+          "note": "Merged PR #2 and its passing source-parity contract verify the complete 0.3.0 scientific export at canonical source commit 5396be0."
         },
         "current_parity": {
           "status": "verified",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSVA/pull/1",
-            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/7c60c8a53fa4b6a92e4c3184c1cb2ef2090a5ea6/code/functions/GSVA.R",
-            "https://github.com/NIDAP-Community/OMIX/blob/4b28d1697a8267848b003ac3b285d8a1e4eebef7/modules/OMIX-GSVA/R/GSVA.R"
+            "https://github.com/NIDAP-Community/OMIX-GSVA/pull/2",
+            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/1508651439504680991eb6ef1ffe38d2cc7d5853/code/functions/GSVA.R",
+            "https://github.com/NIDAP-Community/OMIX/blob/3700650c00f0567b8c56a337fce26ddba10db5dc/modules/OMIX-GSVA/R/GSVA.R"
           ],
-          "note": "The merged default-branch export matches its recorded source and the canonical 0.2.0 scientific file at this inventory snapshot."
+          "note": "The merged default-branch export matches its recorded source and the canonical 0.3.0 scientific file at this inventory snapshot."
         },
         "source_record": {
           "status": "verified",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/7c60c8a53fa4b6a92e4c3184c1cb2ef2090a5ea6/OMIX_MODULE_SOURCE.md",
-            "https://github.com/NIDAP-Community/OMIX-GSVA/pull/1"
+            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/1508651439504680991eb6ef1ffe38d2cc7d5853/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-GSVA/pull/2"
           ],
-          "note": "The merged source record captures canonical 0.2.0/interface 2, the immutable source commit, exact mapping and hashes, runtime provenance, and explicitly pending platform evidence."
+          "note": "The merged source record captures canonical 0.3.0/interface 2, immutable source commit, exact mapping and hashes, runtime provenance, delimiter translations, and explicitly pending platform evidence."
         },
         "hash_manifest": {
           "status": "verified",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/7c60c8a53fa4b6a92e4c3184c1cb2ef2090a5ea6/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/1508651439504680991eb6ef1ffe38d2cc7d5853/OMIX_MODULE_SOURCE.md"
           ],
           "note": "The merged source record lists matching canonical and adapter SHA-256 values for the managed scientific file."
         },
@@ -679,9 +679,9 @@
           {
             "canonical_path": "modules/OMIX-GSVA/R/GSVA.R",
             "adapter_path": "code/functions/GSVA.R",
-            "recorded_source_sha256": "483feeca3e5a0da01b2f925791dfe0f61dadb26bbed45c3cc3bafd26b9eca41b",
-            "adapter_sha256": "483feeca3e5a0da01b2f925791dfe0f61dadb26bbed45c3cc3bafd26b9eca41b",
-            "current_source_sha256": "483feeca3e5a0da01b2f925791dfe0f61dadb26bbed45c3cc3bafd26b9eca41b",
+            "recorded_source_sha256": "2ef7ab5d3726a89676ffb6e5e6b1bc42b41c4ef59093d3754252c8035b0fa7ad",
+            "adapter_sha256": "2ef7ab5d3726a89676ffb6e5e6b1bc42b41c4ef59093d3754252c8035b0fa7ad",
+            "current_source_sha256": "2ef7ab5d3726a89676ffb6e5e6b1bc42b41c4ef59093d3754252c8035b0fa7ad",
             "matches_recorded": true,
             "matches_current": true
           }
@@ -689,14 +689,14 @@
         "extra_files_in_code_functions": []
       },
       "app_panel": {
-        "parameter_count": 19,
+        "parameter_count": 22,
         "coverage": {
           "status": "verified",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/7c60c8a53fa4b6a92e4c3184c1cb2ef2090a5ea6/.codeocean/app-panel.json",
-            "https://github.com/NIDAP-Community/OMIX-GSVA/actions/runs/37150948457/job/111284550761"
+            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/1508651439504680991eb6ef1ffe38d2cc7d5853/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-GSVA/actions/runs/37178055104/job/111364733692"
           ],
-          "note": "The merged named 19-parameter App Panel passes the adapter contract check and exposes the canonical public and advanced controls."
+          "note": "The merged named 22-parameter App Panel passes the adapter contract check and exposes the canonical public and advanced controls, including independent delimiter overrides."
         }
       },
       "runtime": {
@@ -705,7 +705,7 @@
         "provenance": {
           "status": "partial",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/7c60c8a53fa4b6a92e4c3184c1cb2ef2090a5ea6/OMIX_MODULE_SOURCE.md"
+            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/1508651439504680991eb6ef1ffe38d2cc7d5853/OMIX_MODULE_SOURCE.md"
           ],
           "note": "The merged source record supplies public runtime digest sha256:25ad9f50df5a4d7f70a7e3debed13f8d5c9b07cbc46d57fdf5c3cf4f2e767ddc and its Code Ocean tag, but the imported Code Ocean environment identity remains pending."
         }
@@ -713,15 +713,15 @@
       "local_tests": {
         "status": "verified",
         "evidence": [
-          "https://github.com/NIDAP-Community/OMIX-GSVA/actions/runs/37150948457/job/111284550761",
-          "https://github.com/NIDAP-Community/OMIX-GSVA/pull/1"
+          "https://github.com/NIDAP-Community/OMIX-GSVA/actions/runs/37178055104/job/111364733692",
+          "https://github.com/NIDAP-Community/OMIX-GSVA/pull/2"
         ],
-        "note": "The adapter contract check passed at reviewed head f3188fb, which merged to default branch commit 7c60c8a."
+        "note": "The adapter contract check passed for PR #2 and the reviewed export merged to default branch commit 1508651."
       },
       "code_ocean_validation": {
         "status": "pending",
         "evidence": [
-          "https://github.com/NIDAP-Community/OMIX-GSVA/blob/7c60c8a53fa4b6a92e4c3184c1cb2ef2090a5ea6/OMIX_MODULE_SOURCE.md"
+          "https://github.com/NIDAP-Community/OMIX-GSVA/blob/1508651439504680991eb6ef1ffe38d2cc7d5853/OMIX_MODULE_SOURCE.md"
         ],
         "note": "Code Ocean computation validation and a platform release identifier have not yet been recorded."
       },
@@ -733,6 +733,11 @@
             "number": 1,
             "url": "https://github.com/NIDAP-Community/OMIX-GSVA/pull/1",
             "state": "merged"
+          },
+          {
+            "number": 2,
+            "url": "https://github.com/NIDAP-Community/OMIX-GSVA/pull/2",
+            "state": "merged"
           }
         ]
       },
@@ -742,7 +747,7 @@
         "readiness": {
           "status": "pending",
           "evidence": [
-            "https://github.com/NIDAP-Community/OMIX-GSVA/tree/7c60c8a53fa4b6a92e4c3184c1cb2ef2090a5ea6/code/functions",
+            "https://github.com/NIDAP-Community/OMIX-GSVA/tree/1508651439504680991eb6ef1ffe38d2cc7d5853/code/functions",
             "https://github.com/NIDAP-Community/OMIX/issues/44"
           ],
           "note": "The managed directory contains the verified canonical export, but no generated Syncweaver lock or production onboarding record exists on the default branch."
@@ -755,7 +760,7 @@
         "module_path": "modules/OMIX-Gene-Boxplots",
         "module_version": "1.0.0",
         "interface_version": 1,
-        "source_commit": "4b28d1697a8267848b003ac3b285d8a1e4eebef7",
+        "source_commit": "3700650c00f0567b8c56a337fce26ddba10db5dc",
         "last_module_change_commit": "a2b3dce8be702c109aa115aaaab23ea9fc69f702",
         "schema_path": "modules/OMIX-Gene-Boxplots/schemas/interface.yml",
         "evidence": [
@@ -902,7 +907,7 @@
         "module_path": "modules/OMIX-L2P-Multi",
         "module_version": "4.2.0",
         "interface_version": 1,
-        "source_commit": "4b28d1697a8267848b003ac3b285d8a1e4eebef7",
+        "source_commit": "3700650c00f0567b8c56a337fce26ddba10db5dc",
         "last_module_change_commit": "d7c4931e3b943961ab199083b8121fb29de606c6",
         "schema_path": "modules/OMIX-L2P-Multi/schemas/interface.yml",
         "evidence": [
@@ -1072,7 +1077,7 @@
         "module_path": "modules/OMIX-L2P-Single",
         "module_version": "3.3.0",
         "interface_version": 1,
-        "source_commit": "4b28d1697a8267848b003ac3b285d8a1e4eebef7",
+        "source_commit": "3700650c00f0567b8c56a337fce26ddba10db5dc",
         "last_module_change_commit": "41bf8eba4e281178bd78207612b38e5a55f98195",
         "schema_path": "modules/OMIX-L2P-Single/schemas/interface.yml",
         "evidence": [
@@ -1213,12 +1218,168 @@
       }
     },
     {
+      "id": "OMIX-Limma-Analysis",
+      "canonical": {
+        "module_path": "modules/OMIX-Limma-Analysis",
+        "module_version": "0.1.0",
+        "interface_version": 1,
+        "source_commit": "3700650c00f0567b8c56a337fce26ddba10db5dc",
+        "last_module_change_commit": "f5c81d23b541b2337b66d832544d04c31d126672",
+        "schema_path": "modules/OMIX-Limma-Analysis/schemas/interface.yml",
+        "evidence": [
+          "https://github.com/NIDAP-Community/OMIX/blob/3700650c00f0567b8c56a337fce26ddba10db5dc/modules/OMIX-Limma-Analysis/module.yml",
+          "https://github.com/NIDAP-Community/OMIX/pull/79"
+        ]
+      },
+      "schema_completeness": {
+        "status": "verified",
+        "evidence": [
+          "https://github.com/NIDAP-Community/OMIX/blob/3700650c00f0567b8c56a337fce26ddba10db5dc/modules/OMIX-Limma-Analysis/schemas/interface.yml",
+          "https://github.com/NIDAP-Community/OMIX/pull/79"
+        ],
+        "note": "The canonical 0.1.0/interface 1 schema records the two required table inputs, 12 user-settable parameters, internal output_dir, and three declared outputs."
+      },
+      "deployment": {
+        "repository": "https://github.com/NIDAP-Community/OMIX-Limma-Analysis",
+        "default_branch": "main",
+        "default_branch_commit": "bd58480771e48d714eb6d55227921609e4dfa580",
+        "source_record_url": "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/blob/bd58480771e48d714eb6d55227921609e4dfa580/OMIX_MODULE_SOURCE.md",
+        "app_panel_url": "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/blob/bd58480771e48d714eb6d55227921609e4dfa580/.codeocean/app-panel.json",
+        "release_tag": "v0.1.0",
+        "release_tag_url": "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/tree/v0.1.0"
+      },
+      "scientific_export": {
+        "recorded_source_commit": "5396be0203b94fc1e22cb2eaf74d8265a32466a7",
+        "recorded_module_version": "0.1.0",
+        "recorded_interface_version": 1,
+        "recorded_parity": {
+          "status": "verified",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/blob/bd58480771e48d714eb6d55227921609e4dfa580/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/pull/1",
+            "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/pull/1#issuecomment-5982764247"
+          ],
+          "note": "Merged PR #1 and independent Beacon review confirm the managed export is byte-identical to canonical module 0.1.0/interface 1 at source commit 5396be0."
+        },
+        "current_parity": {
+          "status": "verified",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/blob/bd58480771e48d714eb6d55227921609e4dfa580/code/functions/OMIX_Limma_Analysis.R",
+            "https://github.com/NIDAP-Community/OMIX/blob/3700650c00f0567b8c56a337fce26ddba10db5dc/modules/OMIX-Limma-Analysis/R/OMIX_Limma_Analysis.R",
+            "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/pull/1"
+          ],
+          "note": "The released default-branch export matches both its recorded source and the current canonical scientific file at this inventory snapshot."
+        },
+        "source_record": {
+          "status": "verified",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/blob/bd58480771e48d714eb6d55227921609e4dfa580/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/pull/1",
+            "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/tree/v0.1.0"
+          ],
+          "note": "The release source record captures canonical 0.1.0/interface 1, immutable source commit, exact managed mapping and hash, runtime provenance, Code Ocean release evidence, and explicitly pending Harmony, GSVA, and Syncweaver acceptance evidence."
+        },
+        "hash_manifest": {
+          "status": "verified",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/blob/bd58480771e48d714eb6d55227921609e4dfa580/OMIX_MODULE_SOURCE.md"
+          ],
+          "note": "The source record lists matching canonical and adapter SHA-256 values for the managed scientific file."
+        },
+        "managed_files": [
+          {
+            "canonical_path": "modules/OMIX-Limma-Analysis/R/OMIX_Limma_Analysis.R",
+            "adapter_path": "code/functions/OMIX_Limma_Analysis.R",
+            "recorded_source_sha256": "4a389f09c14c849ec1bb7182cce7f82aad3171f2b51f20ea489fa72106abdc20",
+            "adapter_sha256": "4a389f09c14c849ec1bb7182cce7f82aad3171f2b51f20ea489fa72106abdc20",
+            "current_source_sha256": "4a389f09c14c849ec1bb7182cce7f82aad3171f2b51f20ea489fa72106abdc20",
+            "matches_recorded": true,
+            "matches_current": true
+          }
+        ],
+        "extra_files_in_code_functions": []
+      },
+      "app_panel": {
+        "parameter_count": 14,
+        "coverage": {
+          "status": "verified",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/blob/bd58480771e48d714eb6d55227921609e4dfa580/.codeocean/app-panel.json",
+            "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/actions/runs/37221606152/job/111492905108",
+            "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/pull/1"
+          ],
+          "note": "The named 14-parameter App Panel exposes all canonical user-facing controls; internal output_dir remains platform-managed."
+        }
+      },
+      "runtime": {
+        "tag": "codeocean/omix-r-statistics:r4.4.3-bioconductor3.20-v1",
+        "digest": null,
+        "provenance": {
+          "status": "partial",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/blob/bd58480771e48d714eb6d55227921609e4dfa580/OMIX_MODULE_SOURCE.md",
+            "https://github.com/NIDAP-Community/OMIX/pkgs/container/omix-r-statistics"
+          ],
+          "note": "The public runtime is pinned to digest sha256:1325722877fec5167d171aa766ddf7bbfd056e4999bf40fd8c1eabee495da667, and the Code Ocean run records OMIX Statistics (1). The imported Code Ocean environment's immutable platform identity is not recorded, so the distinct runtime.digest field remains unset."
+        }
+      },
+      "local_tests": {
+        "status": "verified",
+        "evidence": [
+          "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/actions/runs/37221606152/job/111492905108",
+          "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/pull/1",
+          "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/pull/1#issuecomment-5982764247"
+        ],
+        "note": "The adapter contract, CodeQL, parser, launcher, source-parity, App Panel, and representative Limma workflow checks passed for PR #1 before merge and release."
+      },
+      "code_ocean_validation": {
+        "status": "partial",
+        "source_capsule": "https://poc-nci.codeocean.io/capsule/8635652/tree",
+        "release_version": "1.0",
+        "release_url": "https://poc-nci.codeocean.io/capsule/ffab7e89-72c4-4271-b888-b02a1e06db7c/tree/v1",
+        "run_id": 1134919,
+        "evidence": [
+          "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/blob/bd58480771e48d714eb6d55227921609e4dfa580/OMIX_MODULE_SOURCE.md",
+          "https://poc-nci.codeocean.io/capsule/ffab7e89-72c4-4271-b888-b02a1e06db7c/tree/v1",
+          "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/pull/1#issuecomment-5982764247",
+          "https://github.com/NIDAP-Community/OMIX/issues/69"
+        ],
+        "note": "Code Ocean Standard release 1.0 was produced from source capsule 8635652 by computation 1134919 and records the successful SCT handoff and expected outputs. Harmony and GSVA platform handoff acceptance evidence is still missing, so OMIX issue #69 remains open and validation is partial."
+      },
+      "work_tracking": {
+        "issues": [
+          "https://github.com/NIDAP-Community/OMIX/issues/45",
+          "https://github.com/NIDAP-Community/OMIX/issues/69"
+        ],
+        "branches": [],
+        "pull_requests": [
+          {
+            "number": 1,
+            "url": "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/pull/1",
+            "state": "merged"
+          }
+        ]
+      },
+      "syncweaver": {
+        "lockfile_on_default_branch": false,
+        "mapping": null,
+        "readiness": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/tree/bd58480771e48d714eb6d55227921609e4dfa580/code/functions",
+            "https://github.com/NIDAP-Community/OMIX/issues/44"
+          ],
+          "note": "The managed directory contains the verified canonical export, but no generated Syncweaver lock or production onboarding record exists on the released default branch."
+        }
+      }
+    },
+    {
       "id": "OMIX-Seurat-Pseudobulk",
       "canonical": {
         "module_path": "modules/OMIX-Seurat-Pseudobulk",
         "module_version": "0.4.1",
         "interface_version": 1,
-        "source_commit": "4b28d1697a8267848b003ac3b285d8a1e4eebef7",
+        "source_commit": "3700650c00f0567b8c56a337fce26ddba10db5dc",
         "last_module_change_commit": "e3cc933ad812ca4af8fc6427e1f23e2a2ccd5e96",
         "schema_path": "modules/OMIX-Seurat-Pseudobulk/schemas/interface.yml",
         "evidence": [
@@ -1355,7 +1516,7 @@
         "module_path": "modules/OMIX-Volcano-Plot",
         "module_version": "1.0.0",
         "interface_version": 1,
-        "source_commit": "4b28d1697a8267848b003ac3b285d8a1e4eebef7",
+        "source_commit": "3700650c00f0567b8c56a337fce26ddba10db5dc",
         "last_module_change_commit": "2a337215cb49d66f911e9f76336e405fdd1c56ce",
         "schema_path": "modules/OMIX-Volcano-Plot/schemas/interface.yml",
         "evidence": [
