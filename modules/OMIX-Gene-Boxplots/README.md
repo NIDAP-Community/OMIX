@@ -28,7 +28,7 @@ values; it is not a replacement for the original DEG model.
 
 ## Quick start
 
-**Runtime profile:** [`r-visualization`](../../README.md#run-a-module-locally-or-on-an-hpc-cluster)
+**Runtime profile:** [`r-visualization`](../../README.md#run-a-module)
 
 **Command:** `scripts/run_gene_boxplots.R`
 

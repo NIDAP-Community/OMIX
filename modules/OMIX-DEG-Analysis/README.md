@@ -30,7 +30,7 @@ technical batch as a donor surrogate.
 
 ## Quick start
 
-**Runtime profile:** [`r-statistics`](../../README.md#run-a-module-locally-or-on-an-hpc-cluster)
+**Runtime profile:** [`r-statistics`](../../README.md#run-a-module)
 
 **Command:** `scripts/run_deg_analysis.R`
 
