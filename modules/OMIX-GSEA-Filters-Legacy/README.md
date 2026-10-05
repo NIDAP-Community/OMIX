@@ -18,7 +18,7 @@ or enrichment-curve and leading-edge visualization.
 
 ## Quick start
 
-**Runtime profile:** [`r-visualization`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
+**Runtime profile:** [`r-visualization`](../../README.md#run-a-module-on-a-shared-hpc-system)
 
 **Command:** `scripts/run_gsea_filters.R`
 

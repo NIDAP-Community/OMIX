@@ -43,7 +43,7 @@ added genes, so record that feature universe with the analysis.
 
 ## Quick start
 
-**Runtime profile:** [`r-statistics`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
+**Runtime profile:** [`r-statistics`](../../README.md#run-a-module-on-a-shared-hpc-system)
 
 Set `OMIX_ROOT` to the OMIX checkout and prepare a writable runtime project:
 

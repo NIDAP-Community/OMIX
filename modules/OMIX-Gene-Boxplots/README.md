@@ -28,7 +28,7 @@ values; it is not a replacement for the original DEG model.
 
 ## Quick start
 
-**Runtime profile:** [`r-visualization`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
+**Runtime profile:** [`r-visualization`](../../README.md#run-a-module-on-a-shared-hpc-system)
 
 **Command:** `scripts/run_gene_boxplots.R`
 

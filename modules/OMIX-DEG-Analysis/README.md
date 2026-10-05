@@ -30,7 +30,7 @@ technical batch as a donor surrogate.
 
 ## Quick start
 
-**Runtime profile:** [`r-statistics`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
+**Runtime profile:** [`r-statistics`](../../README.md#run-a-module-on-a-shared-hpc-system)
 
 **Command:** `scripts/run_deg_analysis.R`
 
