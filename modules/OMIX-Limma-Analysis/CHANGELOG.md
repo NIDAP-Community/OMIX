@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1
+
+- Accepts numeric modeled-group labels such as `0` and `1`, translating them
+  to deterministic syntactic design names while preserving natural contrast
+  and result labels such as `1-0`.
+- Adds direct function and command-line regression coverage for the numeric
+  grouping produced by Seurat Pseudobulk handoffs.
+
 ## 0.1.0
 
 - Initial portable OMIX module based on the analytical core of

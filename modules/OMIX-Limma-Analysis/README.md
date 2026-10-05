@@ -84,6 +84,12 @@ not add Donor both as a blocking variable and a fixed covariate.
 | Covariates | Optional fixed-effect columns, such as an unhandled technical variable. |
 | Donor | Optional repeated-measure blocking column; only valid when at least one donor has multiple modeled profiles. |
 
+Group values may be ordinary labels such as `A` and `B` or numeric labels such
+as `0` and `1`. Numeric labels are converted to valid internal R design names,
+so the natural contrast `1-0` is accepted; result columns retain the requested
+`1-0` label. Backtick a non-syntactic nonnumeric group label when referring to
+it in a contrast expression.
+
 When the matrix originates from OMIX Seurat Pseudobulk, supply its
 `Pseudobulk_Manifest.dcf`. The CLI accepts only the declared continuous
 Harmony or SCT paths, rejects a raw-count bundle with a redirect to DEG

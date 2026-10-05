@@ -45,6 +45,31 @@ reference_fit <- limma::eBayes(reference_fit)
 stopifnot(isTRUE(all.equal(result[["B-A_logFC"]], as.numeric(reference_fit$coefficients[, 1L]), tolerance = 1e-12)))
 stopifnot(isTRUE(all.equal(result[["B-A_pval"]], as.numeric(reference_fit$p.value[, 1L]), tolerance = 1e-12)))
 
+# Numeric upstream group labels must remain usable as their natural contrast
+# expression even though limma requires syntactically valid design names.
+numeric_metadata <- transform(metadata, Group = ifelse(Group == "A", "0", "1"))
+numeric_result <- omix_limma_analysis(
+  Dataset = expression,
+  Metadata_Table = numeric_metadata,
+  sample_names_column = "Sample",
+  samples_to_include = numeric_metadata$Sample,
+  gene_names_column = "GeneName",
+  contrast_variable_columns = "Group",
+  contrasts = "1-0"
+)
+stopifnot(all(c(
+  "0_Mean", "1_Mean", "1-0_FC", "1-0_logFC", "1-0_pval", "1-0_adjpval"
+) %in% names(numeric_result)))
+stopifnot(isTRUE(all.equal(
+  numeric_result[["1-0_logFC"]],
+  result[["B-A_logFC"]],
+  tolerance = 1e-12
+)))
+stopifnot(identical(
+  unname(attr(numeric_result, "omix_limma_run")$group_label_mapping),
+  c("X0", "X1")
+))
+
 # When the shared Templates checkout is available, compare the portable
 # extraction directly with the source template. The core test above remains
 # self-contained for a standalone OMIX checkout.
