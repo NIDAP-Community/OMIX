@@ -27,7 +27,7 @@ parameters:
   contrasts:
     type: string
     required: true
-    description: Comma-separated limma contrast expressions, such as B-A.
+    description: Comma-separated limma contrast expressions, such as B-A or 1-0. Numeric modeled-group labels are translated to valid internal design names while output labels preserve the requested expression.
   covariate_columns:
     type: string
     default: ""

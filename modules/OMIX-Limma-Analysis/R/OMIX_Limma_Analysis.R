@@ -68,6 +68,28 @@
   expression
 }
 
+.omix_limma_rewrite_contrast <- function(contrast, label_map) {
+  rewritten <- contrast
+  changed_labels <- names(label_map)[names(label_map) != unname(label_map)]
+  if (length(changed_labels) == 0L) return(rewritten)
+
+  # A non-syntactic label can always be referenced explicitly with backticks.
+  # Numeric group labels are also accepted without backticks so an upstream
+  # 0/1 grouping can use the natural contrast expression `1-0`.
+  changed_labels <- changed_labels[order(nchar(changed_labels), decreasing = TRUE)]
+  for (label in changed_labels) {
+    safe_label <- unname(label_map[[label]])
+    rewritten <- gsub(paste0("`", label, "`"), safe_label, rewritten, fixed = TRUE)
+    if (grepl("^[0-9]+(?:\\.[0-9]+)?$", label, perl = TRUE)) {
+      numeric_token <- paste0(
+        "(?<![[:alnum:]_.])", label, "(?![[:alnum:]_.])"
+      )
+      rewritten <- gsub(numeric_token, safe_label, rewritten, perl = TRUE)
+    }
+  }
+  rewritten
+}
+
 .omix_limma_design <- function(metadata, sample_names_column, contrast_variable_columns, covariate_columns) {
   if (length(contrast_variable_columns) > 1L) {
     metadata$contmerge <- paste0(
@@ -78,6 +100,9 @@
     metadata$contmerge <- metadata[[contrast_variable_columns[[1L]]]]
   }
   metadata$contmerge <- factor(metadata$contmerge)
+  original_group_labels <- levels(metadata$contmerge)
+  safe_group_labels <- make.names(original_group_labels, unique = TRUE)
+  group_label_map <- stats::setNames(safe_group_labels, original_group_labels)
   for (column in covariate_columns) metadata[[column]] <- factor(metadata[[column]])
   rownames(metadata) <- metadata[[sample_names_column]]
   design_formula <- if (length(covariate_columns) > 0L) {
@@ -89,7 +114,14 @@
   for (column in contrast_variable_columns) colnames(design) <- sub(paste0("^", column), "", colnames(design))
   colnames(design) <- gsub(":", ".", colnames(design), fixed = TRUE)
   colnames(design) <- sub("contmerge", "", colnames(design), fixed = TRUE)
-  list(metadata = metadata, design = design, formula = design_formula)
+  group_columns <- seq_along(original_group_labels)
+  colnames(design)[group_columns] <- safe_group_labels
+  list(
+    metadata = metadata,
+    design = design,
+    formula = design_formula,
+    group_label_map = group_label_map
+  )
 }
 
 .omix_limma_signed_fold_change <- function(coefficients) {
@@ -163,6 +195,13 @@ Limma_Analysis <- function(
   design_details <- .omix_limma_design(metadata, sample_names_column, contrast_variable_columns, covariate_columns)
   metadata <- design_details$metadata
   design <- design_details$design
+  rewritten_contrasts <- vapply(
+    contrasts,
+    .omix_limma_rewrite_contrast,
+    character(1),
+    label_map = design_details$group_label_map,
+    USE.NAMES = FALSE
+  )
   non_estimable <- colnames(design)[colSums(design) %in% c(0, 1)]
   if (length(non_estimable) > 0L) {
     design <- design[, !colnames(design) %in% non_estimable, drop = FALSE]
@@ -171,7 +210,7 @@ Limma_Analysis <- function(
     metadata <- metadata[rownames(design), , drop = FALSE]
   }
   if (qr(design)$rank < ncol(design)) stop("The design matrix is rank deficient; revise confounded groups or covariates.", call. = FALSE)
-  contrast_ok <- vapply(contrasts, function(contrast) tryCatch({ limma::makeContrasts(contrasts = contrast, levels = design); TRUE }, error = function(error) FALSE), logical(1))
+  contrast_ok <- vapply(rewritten_contrasts, function(contrast) tryCatch({ limma::makeContrasts(contrasts = contrast, levels = design); TRUE }, error = function(error) FALSE), logical(1))
   if (!all(contrast_ok)) stop("At least one requested contrast is not estimable from the design matrix.", call. = FALSE)
 
   if (length(donor_variable_column) == 1L) {
@@ -185,17 +224,25 @@ Limma_Analysis <- function(
     fit <- limma::lmFit(expression, design)
     model_type <- "linear"
   }
-  contrast_matrix <- limma::makeContrasts(contrasts = contrasts, levels = design)
+  contrast_matrix <- limma::makeContrasts(contrasts = rewritten_contrasts, levels = design)
+  colnames(contrast_matrix) <- contrasts
   fit <- limma::contrasts.fit(fit, contrast_matrix)
   fit <- limma::eBayes(fit, trend = identical(variance_model, "ebayes_trend"))
 
   group_means <- lapply(colnames(design), function(group_name) rowMeans(expression[, which(design[, group_name] == 1), drop = FALSE]))
-  names(group_means) <- paste0(colnames(design), "_Mean")
+  display_design_names <- colnames(design)
+  group_display <- stats::setNames(
+    names(design_details$group_label_map),
+    unname(design_details$group_label_map)
+  )
+  mapped_groups <- display_design_names %in% names(group_display)
+  display_design_names[mapped_groups] <- unname(group_display[display_design_names[mapped_groups]])
+  names(group_means) <- paste0(display_design_names, "_Mean")
   group_se <- lapply(colnames(design), function(group_name) {
     values <- expression[, which(design[, group_name] == 1), drop = FALSE]
     apply(values, 1L, function(value) stats::sd(value) / sqrt(sum(!is.na(value))))
   })
-  names(group_se) <- paste0(colnames(design), "_SE")
+  names(group_se) <- paste0(display_design_names, "_SE")
   coefficients <- fit$coefficients
   standard_errors <- sqrt(fit$s2.post) * fit$stdev.unscaled
   p_values <- fit$p.value
@@ -224,6 +271,7 @@ Limma_Analysis <- function(
   attr(results, "omix_limma_run") <- list(
     input_kind = input_kind, variance_model = variance_model, model_type = model_type,
     design_formula = paste(deparse(design_details$formula), collapse = " "),
+    group_label_mapping = design_details$group_label_map,
     contrast_variable_columns = contrast_variable_columns, covariate_columns = covariate_columns,
     donor_variable_column = donor_variable_column,
     consensus_correlation = if (is.null(correlation_fit)) NA_real_ else correlation_fit$consensus.correlation,

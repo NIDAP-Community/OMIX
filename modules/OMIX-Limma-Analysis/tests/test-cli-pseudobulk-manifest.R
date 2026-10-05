@@ -54,6 +54,30 @@ summary_lines <- readLines(file.path(output_dir, "run_summary.txt"))
 stopifnot(any(grepl("requested variance model: auto", summary_lines, fixed = TRUE)))
 stopifnot(any(grepl("variance model: ebayes_trend", summary_lines, fixed = TRUE)))
 
+# A Seurat-derived 0/1 grouping must work through the complete CLI handoff.
+numeric_metadata_path <- file.path(work_dir, "Numeric_Pseudobulk_Sample_Metadata.csv")
+numeric_output_dir <- file.path(work_dir, "numeric-results")
+utils::write.csv(
+  transform(metadata, Group = ifelse(Group == "A", "0", "1")),
+  numeric_metadata_path,
+  row.names = FALSE
+)
+numeric_output <- system2(file.path(R.home("bin"), "Rscript"), c(
+  cli,
+  "--matrix", matrix_path,
+  "--metadata", numeric_metadata_path,
+  "--contrast_variable_columns", "Group",
+  "--contrasts", "1-0",
+  "--pseudobulk_manifest", manifest_path,
+  "--output_dir", numeric_output_dir
+), stdout = TRUE, stderr = TRUE)
+stopifnot(is.null(attr(numeric_output, "status")))
+numeric_results <- utils::read.csv(
+  file.path(numeric_output_dir, "Limma_Analysis.csv"),
+  check.names = FALSE
+)
+stopifnot(all(c("0_Mean", "1_Mean", "1-0_logFC") %in% names(numeric_results)))
+
 raw_manifest_path <- file.path(work_dir, "raw-counts-manifest.dcf")
 base::write.dcf(data.frame(
   matrix_type = "raw_integer_counts",
