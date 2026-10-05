@@ -1,14 +1,13 @@
 # r-seurat-conversion
 
-`r-seurat-conversion` is the one OMIX runtime profile allowed to install the
-full Seurat package. Its responsibility is deliberately narrow: read current
-or legacy serialized Seurat objects, including specialized classes such as
-`SCTAssay`, and write portable matrices, aligned metadata, and a provenance
-manifest for downstream OMIX modules.
+`r-seurat-conversion` is the dedicated OMIX compatibility and conversion
+runtime for current or legacy serialized Seurat objects, including specialized
+classes such as `SCTAssay`. It writes portable matrices, aligned metadata, and
+a provenance manifest for downstream OMIX modules.
 
-It serves `OMIX-Seurat-Pseudobulk`. It is not a general single-cell analysis
-environment and must not become a dependency of DEG, Limma, pathway, or
-visualization modules.
+It serves `OMIX-Seurat-Pseudobulk` as a purpose-built object-conversion
+environment. Downstream DEG, Limma, pathway, and visualization modules consume
+the portable outputs rather than the serialized Seurat object.
 
 ## Conversion boundary
 
@@ -19,12 +18,12 @@ The runtime may read:
   means; and
 - legacy or current Seurat `SCT/data` for donor-level SCTransform means.
 
-It must emit the portable files and `Pseudobulk_Manifest.dcf` declared by the
-module. Downstream modules read those tables; they do not open a Seurat object
-or install Seurat.
+It emits the portable files and `Pseudobulk_Manifest.dcf` declared by the
+module. Downstream modules read those tables rather than opening the Seurat
+object directly.
 
 The Harmony embedding (`reductions$harmony@cell.embeddings`) is not a
-gene-expression matrix and is never a conversion target.
+gene-expression matrix and is excluded from the supported conversion inputs.
 
 ## Release contract
 

@@ -18,7 +18,7 @@ across them. Use [OMIX-L2P-Single](../OMIX-L2P-Single) for one comparison.
 
 ## Quick start
 
-**Runtime profile:** [`r-pathway`](../../README.md#run-a-module-on-biowulf-or-another-shared-r-system)
+**Runtime profile:** [`r-pathway`](../../README.md#run-a-module)
 
 **Command:** `scripts/run_l2p_multi.R`
 

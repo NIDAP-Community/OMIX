@@ -12,7 +12,7 @@ in a container, or on HPC.
    fit your study.
 3. Restore its runtime profile once, then run the module's explicit-path CLI
    with your own input and output locations. The
-   [local/HPC example](#run-a-module-on-biowulf-or-another-shared-r-system)
+   [run example](#run-a-module)
    uses DEG Analysis.
 4. Preserve the resulting effective `renv.lock`, module commit, immutable
    image digest where applicable, command, and input checksums with the
@@ -103,12 +103,13 @@ container overlays. This keeps pathway modules independent of MOSuite while
 allowing the same pinned OCI image to run locally, in Docker, and on HPC.
 See the [runtime guide](docs/runtime-guide.md).
 
-## Run a module on Biowulf or another shared R system
+## Run a module
 
 OMIX modules are ordinary R source files with command-line entry points. The
-command-line interface is the recommended way to run a module on Biowulf, a
-workstation, or a different workflow system. It loads the module's source
-itself and accepts explicit input and output paths.
+same explicit-path command-line interface can run on a compatible local
+workstation, in a container, or on an HPC/shared system; no single environment
+is required. It loads the module's source and accepts explicit input and output
+paths.
 
 Each module selects a **runtime profile** in its `module.yml`. Use the matching
 committed `renv.lock` below to create a user-local R project:
@@ -120,13 +121,11 @@ committed `renv.lock` below to create a user-local R project:
 | `r-pathway` | OMIX-GSEA-Preranked-Legacy, OMIX-GSEA-Visualization-Legacy, OMIX-GSVA, OMIX-L2P-Single, OMIX-L2P-Multi | `starter-environments/r-pathway/renv.lock` |
 | `r-seurat-conversion` | OMIX-Seurat-Pseudobulk | `starter-environments/r-seurat-conversion/renv.lock` |
 
-The released locks target R 4.4.3 and Bioconductor 3.20 where applicable.
-`r-seurat-conversion` is intentionally the only profile that includes full
-Seurat; all downstream analytical profiles remain lightweight. For
+The released locks target R 4.4.3 and Bioconductor 3.20 where applicable. For
 reproducibility, use the published digest recorded in
 `starter-environments/release-manifest.json` once the maintainer adds the
-release record for the selected version. On Biowulf, check which R module is
-currently offered before loading the matching version:
+release record for the selected version. On a shared HPC system, check which R
+module is currently available before loading the matching version:
 
 ```bash
 module spider R

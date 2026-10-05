@@ -47,7 +47,7 @@ profile and module overlay. Preserve that generated lock beside the results.
 
 For an R installation on a workstation or shared HPC system, create one
 writable runtime project per profile. The root README has the complete
-[local/HPC setup and DEG example](../README.md#run-a-module-on-biowulf-or-another-shared-r-system).
+[setup and DEG example](../README.md#run-a-module).
 
 For containers, mount the OMIX checkout read-only, a writable runtime project,
 explicit input data, and results. This uses the immutable statistics image for

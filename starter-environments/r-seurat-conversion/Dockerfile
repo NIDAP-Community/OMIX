@@ -1,8 +1,8 @@
 # `r4.4.3-v2` is the proposed immutable OMIX release tag. CI overrides this
 # argument with its local validation image; release records retain the resolved
 # digest.
-# This is deliberately the only OMIX profile with full Seurat: its role is to
-# convert serialized objects into portable tables.
+# This dedicated compatibility runtime uses full Seurat to convert serialized
+# objects into portable tables for downstream OMIX modules.
 ARG BASE_IMAGE=ghcr.io/nidap-community/omix-r-base@sha256:a762f2c8ae0657c9578e15d28672b3dcecb3de129edf7cbd7469c340c791547a
 FROM ${BASE_IMAGE}
 
@@ -11,8 +11,8 @@ LABEL org.opencontainers.image.description="Seurat compatibility and conversion 
 LABEL org.opencontainers.image.source="https://github.com/NIDAP-Community/OMIX"
 
 # Seurat imports packages that compile graphics, graph, and optimization
-# extensions. These system headers belong only in this compatibility image,
-# never in the lightweight analytical runtime tiers.
+# extensions. These system headers are scoped to this compatibility image so
+# downstream analytical runtimes can consume the portable conversion outputs.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         libfontconfig1-dev \
@@ -32,11 +32,11 @@ ENV RENV_CONFIG_PPM_ENABLED=FALSE \
     RENV_CONFIG_INSTALL_JOBS=1 \
     R_LIBS_USER=/opt/omix/r-seurat-conversion/library
 
-# Full Seurat is restored here only to read specialized legacy classes such as
-# SCTAssay. It is not an analysis dependency for DEG, Limma, pathway, or
-# visualization modules. Restore from CRAN source archives: a dated snapshot
-# that predates a locked version cannot resolve that package's source. The lock
-# captures the registry dependency graph; Core and OmixSeurat remain
+# Full Seurat is restored here to read specialized legacy classes such as
+# SCTAssay. Downstream DEG, Limma, pathway, and visualization modules consume
+# the converted portable outputs. Restore from CRAN source archives: a dated
+# snapshot that predates a locked version cannot resolve that package's source.
+# The lock captures the registry dependency graph; Core and OmixSeurat remain
 # source-controlled OMIX packages below.
 RUN mkdir -p "$R_LIBS_USER" \
     && R -q -e "options(pkgType = 'source'); \
