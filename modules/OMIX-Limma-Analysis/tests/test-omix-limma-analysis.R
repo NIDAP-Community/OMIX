@@ -37,6 +37,71 @@ stopifnot(isTRUE(all.equal(result[["B-A_FC"]], c(2, 2^0.3, -1 / 2^-0.1), toleran
 stopifnot(identical(attr(result, "omix_limma_run")$variance_model, "ebayes"))
 stopifnot(identical(attr(result, "omix_limma_run")$model_type, "linear"))
 
+# A blank contrast is safe only when exactly one replicated two-group
+# comparison exists. Its direction follows the deterministic factor order.
+inferred_result <- omix_limma_analysis(
+  Dataset = expression,
+  Metadata_Table = metadata,
+  sample_names_column = "Sample",
+  samples_to_include = metadata$Sample,
+  gene_names_column = "GeneName",
+  contrast_variable_columns = "Group",
+  contrasts = NULL
+)
+stopifnot("B-A_logFC" %in% names(inferred_result))
+stopifnot(identical(attr(inferred_result, "omix_limma_run")$contrast_source, "inferred"))
+stopifnot(identical(attr(inferred_result, "omix_limma_run")$contrasts, "B-A"))
+stopifnot(length(attr(inferred_result, "omix_limma_run")$requested_contrasts) == 0L)
+
+three_group_metadata <- transform(metadata, Group = c("A", "A", "B", "B", "C", "C"))
+ambiguous_blank <- tryCatch(
+  omix_limma_analysis(
+    Dataset = expression,
+    Metadata_Table = three_group_metadata,
+    sample_names_column = "Sample",
+    samples_to_include = three_group_metadata$Sample,
+    gene_names_column = "GeneName",
+    contrast_variable_columns = "Group",
+    contrasts = NULL
+  ),
+  error = identity
+)
+stopifnot(inherits(ambiguous_blank, "error"))
+stopifnot(grepl("A=2, B=2, C=2", conditionMessage(ambiguous_blank), fixed = TRUE))
+
+singleton_metadata <- transform(metadata, Group = LETTERS[seq_len(nrow(metadata))])
+singleton_blank <- tryCatch(
+  omix_limma_analysis(
+    Dataset = expression,
+    Metadata_Table = singleton_metadata,
+    sample_names_column = "Sample",
+    samples_to_include = singleton_metadata$Sample,
+    gene_names_column = "GeneName",
+    contrast_variable_columns = "Group",
+    contrasts = NULL
+  ),
+  error = identity
+)
+stopifnot(inherits(singleton_blank, "error"))
+stopifnot(grepl("A=1, B=1", conditionMessage(singleton_blank), fixed = TRUE))
+
+# Numeric arithmetic must not be accepted as a contrast unless those numeric
+# labels are actual modeled groups.
+mismatched_numeric_contrast <- tryCatch(
+  omix_limma_analysis(
+    Dataset = expression,
+    Metadata_Table = metadata,
+    sample_names_column = "Sample",
+    samples_to_include = metadata$Sample,
+    gene_names_column = "GeneName",
+    contrast_variable_columns = "Group",
+    contrasts = "1-0"
+  ),
+  error = identity
+)
+stopifnot(inherits(mismatched_numeric_contrast, "error"))
+stopifnot(grepl("do not compare modeled group coefficients", conditionMessage(mismatched_numeric_contrast), fixed = TRUE))
+
 reference_design <- stats::model.matrix(~0 + Group, data = metadata)
 colnames(reference_design) <- sub("^Group", "", colnames(reference_design))
 reference_fit <- limma::lmFit(as.matrix(expression[, metadata$Sample]), reference_design)

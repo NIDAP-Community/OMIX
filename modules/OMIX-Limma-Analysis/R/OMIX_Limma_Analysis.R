@@ -12,7 +12,8 @@
 #' @param samples_to_include Sample IDs to model.
 #' @param gene_names_column Feature-ID column in Dataset.
 #' @param contrast_variable_columns One or two metadata columns defining groups.
-#' @param contrasts limma contrast expressions.
+#' @param contrasts Optional limma contrast expressions. When omitted, the only
+#'   comparison is inferred if exactly two modeled groups have replication.
 #' @param covariate_columns Optional fixed-effect metadata columns.
 #' @param donor_variable_column Optional repeated-measure blocking column.
 #' @param summarization_method Duplicate-feature summary, as in the template.
@@ -90,6 +91,43 @@
   rewritten
 }
 
+.omix_limma_group_counts <- function(metadata, contrast_variable_columns) {
+  labels <- if (length(contrast_variable_columns) > 1L) {
+    paste0(
+      metadata[[contrast_variable_columns[[1L]]]], ".",
+      metadata[[contrast_variable_columns[[2L]]]]
+    )
+  } else {
+    metadata[[contrast_variable_columns[[1L]]]]
+  }
+  table(factor(labels))
+}
+
+.omix_limma_format_group_counts <- function(group_counts) {
+  paste0(names(group_counts), "=", as.integer(group_counts), collapse = ", ")
+}
+
+.omix_limma_resolve_contrasts <- function(contrasts, group_counts) {
+  requested <- .omix_limma_as_character(contrasts, "contrasts", allow_empty = TRUE)
+  if (length(requested) > 0L) {
+    return(list(requested = requested, resolved = requested, source = "explicit"))
+  }
+
+  estimable_groups <- names(group_counts)[group_counts > 1L]
+  if (length(estimable_groups) == 2L) {
+    inferred <- paste0(estimable_groups[[2L]], "-", estimable_groups[[1L]])
+    return(list(requested = character(), resolved = inferred, source = "inferred"))
+  }
+
+  stop(
+    "No contrast was supplied and a single comparison cannot be inferred. ",
+    "Modeled group replicate counts: ", .omix_limma_format_group_counts(group_counts), ". ",
+    "Blank contrast inference requires exactly two groups with at least two samples each; ",
+    "otherwise provide an explicit contrast such as B-A.",
+    call. = FALSE
+  )
+}
+
 .omix_limma_design <- function(metadata, sample_names_column, contrast_variable_columns, covariate_columns) {
   if (length(contrast_variable_columns) > 1L) {
     metadata$contmerge <- paste0(
@@ -143,7 +181,7 @@ Limma_Analysis <- function(
     samples_to_include,
     gene_names_column,
     contrast_variable_columns,
-    contrasts,
+    contrasts = NULL,
     covariate_columns = NULL,
     donor_variable_column = NULL,
     summarization_method = "mean",
@@ -160,7 +198,7 @@ Limma_Analysis <- function(
   metadata <- as.data.frame(Metadata_Table, check.names = FALSE, stringsAsFactors = FALSE)
   contrast_variable_columns <- .omix_limma_as_character(contrast_variable_columns, "contrast_variable_columns")
   if (length(contrast_variable_columns) > 2L) stop("contrast_variable_columns may contain one or two columns.", call. = FALSE)
-  contrasts <- .omix_limma_as_character(contrasts, "contrasts")
+  contrasts <- .omix_limma_as_character(contrasts, "contrasts", allow_empty = TRUE)
   covariate_columns <- .omix_limma_as_character(covariate_columns, "covariate_columns", allow_empty = TRUE)
   donor_variable_column <- .omix_limma_as_character(donor_variable_column, "donor_variable_column", allow_empty = TRUE)
   if (length(donor_variable_column) > 1L) stop("donor_variable_column may name at most one metadata column.", call. = FALSE)
@@ -190,6 +228,10 @@ Limma_Analysis <- function(
   metadata <- metadata[match(samples_to_include, metadata[[sample_names_column]]), , drop = FALSE]
   if (anyNA(metadata[, required_metadata, drop = FALSE])) stop("Required metadata values must be non-missing.", call. = FALSE)
 
+  group_counts <- .omix_limma_group_counts(metadata, contrast_variable_columns)
+  contrast_details <- .omix_limma_resolve_contrasts(contrasts, group_counts)
+  contrasts <- contrast_details$resolved
+
   expression <- .omix_limma_collapse_features(dataset, gene_names_column, samples_to_include, summarization_method)
   if (!all(is.finite(expression))) stop("The selected continuous matrix contains non-finite values after duplicate-feature summarization.", call. = FALSE)
   design_details <- .omix_limma_design(metadata, sample_names_column, contrast_variable_columns, covariate_columns)
@@ -211,7 +253,13 @@ Limma_Analysis <- function(
   }
   if (qr(design)$rank < ncol(design)) stop("The design matrix is rank deficient; revise confounded groups or covariates.", call. = FALSE)
   contrast_ok <- vapply(rewritten_contrasts, function(contrast) tryCatch({ limma::makeContrasts(contrasts = contrast, levels = design); TRUE }, error = function(error) FALSE), logical(1))
-  if (!all(contrast_ok)) stop("At least one requested contrast is not estimable from the design matrix.", call. = FALSE)
+  if (!all(contrast_ok)) {
+    stop(
+      "At least one requested contrast is not estimable from the design matrix. ",
+      "Modeled group replicate counts: ", .omix_limma_format_group_counts(group_counts), ".",
+      call. = FALSE
+    )
+  }
 
   if (length(donor_variable_column) == 1L) {
     donor <- metadata[[donor_variable_column]]
@@ -225,6 +273,20 @@ Limma_Analysis <- function(
     model_type <- "linear"
   }
   contrast_matrix <- limma::makeContrasts(contrasts = rewritten_contrasts, levels = design)
+  group_design_rows <- intersect(unname(design_details$group_label_map), rownames(contrast_matrix))
+  valid_group_comparisons <- vapply(seq_len(ncol(contrast_matrix)), function(index) {
+    coefficients <- contrast_matrix[group_design_rows, index]
+    any(coefficients > 1e-12) && any(coefficients < -1e-12)
+  }, logical(1))
+  if (!all(valid_group_comparisons)) {
+    invalid <- contrasts[!valid_group_comparisons]
+    stop(
+      "Contrast expression(s) do not compare modeled group coefficients: ",
+      paste(invalid, collapse = ", "), ". Available groups: ",
+      paste(names(group_counts), collapse = ", "), ".",
+      call. = FALSE
+    )
+  }
   colnames(contrast_matrix) <- contrasts
   fit <- limma::contrasts.fit(fit, contrast_matrix)
   fit <- limma::eBayes(fit, trend = identical(variance_model, "ebayes_trend"))
@@ -272,6 +334,10 @@ Limma_Analysis <- function(
     input_kind = input_kind, variance_model = variance_model, model_type = model_type,
     design_formula = paste(deparse(design_details$formula), collapse = " "),
     group_label_mapping = design_details$group_label_map,
+    group_replicate_counts = group_counts,
+    requested_contrasts = contrast_details$requested,
+    contrasts = contrasts,
+    contrast_source = contrast_details$source,
     contrast_variable_columns = contrast_variable_columns, covariate_columns = covariate_columns,
     donor_variable_column = donor_variable_column,
     consensus_correlation = if (is.null(correlation_fit)) NA_real_ else correlation_fit$consensus.correlation,

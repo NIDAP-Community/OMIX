@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.2
+
+- Allows a blank contrast only when the selected model has exactly two groups
+  with at least two samples each, then records the deterministic inferred
+  comparison in run provenance.
+- Rejects contrast expressions that do not contain both positive and negative
+  modeled-group coefficients, preventing numeric text such as `1-0` from being
+  interpreted as ordinary arithmetic when the actual groups are unrelated.
+- Adds group replicate counts and requested-versus-resolved contrast details to
+  the run summary and actionable ambiguity diagnostics.
+
 ## 0.1.1
 
 - Accepts numeric modeled-group labels such as `0` and `1`, translating them
