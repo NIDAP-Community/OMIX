@@ -1,4 +1,4 @@
-interface_version: 1
+interface_version: 2
 entrypoint: scripts/run_limma_analysis.R
 inputs:
   matrix:
@@ -26,8 +26,8 @@ parameters:
     description: One or two comma-separated metadata columns defining the modeled groups.
   contrasts:
     type: string
-    required: true
-    description: Comma-separated limma contrast expressions, such as B-A or 1-0. Numeric modeled-group labels are translated to valid internal design names while output labels preserve the requested expression.
+    default: ""
+    description: Optional comma-separated limma contrast expressions, such as B-A or 1-0. When blank, the only comparison is inferred if exactly two modeled groups have at least two samples each. Numeric modeled-group labels are translated to valid internal design names while output labels preserve the requested expression.
   covariate_columns:
     type: string
     default: ""

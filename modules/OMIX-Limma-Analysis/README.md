@@ -70,6 +70,13 @@ Rscript "$OMIX_ROOT/modules/OMIX-Limma-Analysis/scripts/run_limma_analysis.R" \
   --output_dir results/limma
 ```
 
+You may omit `--contrasts` when the selected contrast variable produces
+exactly two groups with at least two samples per group. In that one
+unambiguous case, OMIX infers the second factor level minus the first (for
+example, `B-A` or `1-0`) and records that it was inferred. For three or more
+replicated groups, singleton-only groups, or other ambiguous designs, supply
+the intended contrast explicitly.
+
 Add `--donor_variable_column Donor` only if a donor contributes repeated
 profiles to the fitted design, such as paired time points or conditions. Do
 not add Donor both as a blocking variable and a fixed covariate.
@@ -88,7 +95,10 @@ Group values may be ordinary labels such as `A` and `B` or numeric labels such
 as `0` and `1`. Numeric labels are converted to valid internal R design names,
 so the natural contrast `1-0` is accepted; result columns retain the requested
 `1-0` label. Backtick a non-syntactic nonnumeric group label when referring to
-it in a contrast expression.
+it in a contrast expression. A contrast must contain both positive and
+negative coefficients for modeled groups. Consequently, an expression such as
+`1-0` is rejected unless `1` and `0` are actual selected group labels; it cannot
+silently become ordinary arithmetic.
 
 When the matrix originates from OMIX Seurat Pseudobulk, supply its
 `Pseudobulk_Manifest.dcf`. The CLI accepts only the declared continuous
@@ -109,7 +119,7 @@ that recommendation, but the run summary records both values.
 | --- | --- |
 | `Limma_Analysis.csv` | Differential-analysis results, optionally followed by the modeled sample matrix. |
 | `Sample_Metadata.csv` | Metadata aligned to modeled sample columns. |
-| `run_summary.txt` | Input paths, scale declaration, variance model, fitted design, and donor-correlation provenance. |
+| `run_summary.txt` | Input paths, scale declaration, requested and resolved contrasts, group replicate counts, variance model, fitted design, and donor-correlation provenance. |
 
 ## Method notes
 

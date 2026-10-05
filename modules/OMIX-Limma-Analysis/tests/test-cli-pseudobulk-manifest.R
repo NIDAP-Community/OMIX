@@ -54,6 +54,24 @@ summary_lines <- readLines(file.path(output_dir, "run_summary.txt"))
 stopifnot(any(grepl("requested variance model: auto", summary_lines, fixed = TRUE)))
 stopifnot(any(grepl("variance model: ebayes_trend", summary_lines, fixed = TRUE)))
 
+# Omitting --contrasts must infer the only replicated two-group comparison and
+# make that decision explicit in the run summary.
+inferred_output_dir <- file.path(work_dir, "inferred-results")
+inferred_output <- system2(file.path(R.home("bin"), "Rscript"), c(
+  cli,
+  "--matrix", matrix_path,
+  "--metadata", metadata_path,
+  "--contrast_variable_columns", "Group",
+  "--pseudobulk_manifest", manifest_path,
+  "--output_dir", inferred_output_dir
+), stdout = TRUE, stderr = TRUE)
+stopifnot(is.null(attr(inferred_output, "status")))
+inferred_summary <- readLines(file.path(inferred_output_dir, "run_summary.txt"))
+stopifnot(any(grepl("requested contrasts: <blank>", inferred_summary, fixed = TRUE)))
+stopifnot(any(grepl("resolved contrasts: B-A", inferred_summary, fixed = TRUE)))
+stopifnot(any(grepl("contrast source: inferred", inferred_summary, fixed = TRUE)))
+stopifnot(any(grepl("group replicate counts: A=3,B=3", inferred_summary, fixed = TRUE)))
+
 # A Seurat-derived 0/1 grouping must work through the complete CLI handoff.
 numeric_metadata_path <- file.path(work_dir, "Numeric_Pseudobulk_Sample_Metadata.csv")
 numeric_output_dir <- file.path(work_dir, "numeric-results")
