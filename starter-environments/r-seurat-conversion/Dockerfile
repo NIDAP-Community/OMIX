@@ -1,8 +1,9 @@
-# `r4.4.3-v1` is an immutable OMIX release tag. CI overrides this argument
-# with its local validation image; release records retain the resolved digest.
+# `r4.4.3-v2` is the proposed immutable OMIX release tag. CI overrides this
+# argument with its local validation image; release records retain the resolved
+# digest.
 # This is deliberately the only OMIX profile with full Seurat: its role is to
 # convert serialized objects into portable tables.
-ARG BASE_IMAGE=ghcr.io/nidap-community/omix-r-base:r4.4.3-v1
+ARG BASE_IMAGE=ghcr.io/nidap-community/omix-r-base@sha256:a762f2c8ae0657c9578e15d28672b3dcecb3de129edf7cbd7469c340c791547a
 FROM ${BASE_IMAGE}
 
 LABEL org.opencontainers.image.title="OMIX r-seurat-conversion starter"

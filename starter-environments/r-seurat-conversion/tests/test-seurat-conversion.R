@@ -6,6 +6,8 @@
 # expression representation to the portable OMIX handoff.
 set.seed(20260923)
 
+stopifnot(identical(as.character(utils::packageVersion("OmixSeurat")), "0.3.1"))
+
 feature_ids <- paste0("Gene", seq_len(120L))
 cell_ids <- paste0("Cell", seq_len(12L))
 counts <- Matrix::Matrix(
@@ -30,11 +32,15 @@ seurat_object <- SeuratObject::CreateSeuratObject(
   assay = "RNA"
 )
 harmony_expression <- log2(as.matrix(counts) + 1)
-seurat_object <- SeuratObject::SetAssayData(
-  object = seurat_object,
-  assay = "RNA",
-  layer = "harmony_corrected",
-  new.data = harmony_expression
+harmony_assay <- SeuratObject::CreateAssayObject(counts = counts)
+methods::slot(harmony_assay, "data") <- Matrix::Matrix(
+  harmony_expression,
+  sparse = TRUE
+)
+seurat_object[["Harmony"]] <- harmony_assay
+stopifnot(
+  inherits(seurat_object[["Harmony"]], "Assay"),
+  "data" %in% methods::slotNames(seurat_object[["Harmony"]])
 )
 seurat_object <- Seurat::SCTransform(
   object = seurat_object,
@@ -77,7 +83,7 @@ stopifnot(
 harmony_input <- do.call(
   OmixSeurat::omix_read_seurat_expression_rds,
   c(
-    list(path = rds_path, assay = "RNA", layer = "harmony_corrected"),
+    list(path = rds_path, assay = "Harmony", layer = "data"),
     common_arguments
   )
 )
