@@ -18,7 +18,7 @@ values.
 
 ## Quick start
 
-**Runtime profile:** [`r-visualization`](../../README.md#run-a-module-on-a-shared-hpc-system)
+**Runtime profile:** [`r-visualization`](../../README.md#run-a-module-locally-or-on-an-hpc-cluster)
 
 **Command:** `scripts/run_volcano_plot.R`
 

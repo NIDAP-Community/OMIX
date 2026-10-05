@@ -12,7 +12,7 @@ in a container, or on HPC.
    fit your study.
 3. Restore its runtime profile once, then run the module's explicit-path CLI
    with your own input and output locations. The
-   [local/HPC example](#run-a-module-on-a-shared-hpc-system)
+   [local or HPC example](#run-a-module-locally-or-on-an-hpc-cluster)
    uses DEG Analysis.
 4. Preserve the resulting effective `renv.lock`, module commit, immutable
    image digest where applicable, command, and input checksums with the
@@ -103,12 +103,13 @@ container overlays. This keeps pathway modules independent of MOSuite while
 allowing the same pinned OCI image to run locally, in Docker, and on HPC.
 See the [runtime guide](docs/runtime-guide.md).
 
-## Run a module on a shared HPC system
+## Run a module locally or on an HPC cluster
 
-OMIX modules are ordinary R source files with command-line entry points. The
-command-line interface is the recommended way to run a module on a shared HPC
-system, a workstation, or a different workflow system. It loads the module's
-source itself and accepts explicit input and output paths.
+OMIX modules are ordinary R source files with command-line entry points. A
+workstation with a compatible R environment is sufficient for ordinary runs;
+an HPC cluster or other shared system is optional for larger workloads or
+centrally managed environments. In either setting, the command-line interface
+loads the module's source and accepts explicit input and output paths.
 
 Each module selects a **runtime profile** in its `module.yml`. Use the matching
 committed `renv.lock` below to create a user-local R project:

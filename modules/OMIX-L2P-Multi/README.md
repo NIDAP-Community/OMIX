@@ -18,7 +18,7 @@ across them. Use [OMIX-L2P-Single](../OMIX-L2P-Single) for one comparison.
 
 ## Quick start
 
-**Runtime profile:** [`r-pathway`](../../README.md#run-a-module-on-a-shared-hpc-system)
+**Runtime profile:** [`r-pathway`](../../README.md#run-a-module-locally-or-on-an-hpc-cluster)
 
 **Command:** `scripts/run_l2p_multi.R`
 

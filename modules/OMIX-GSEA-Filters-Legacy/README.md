@@ -18,7 +18,7 @@ or enrichment-curve and leading-edge visualization.
 
 ## Quick start
 
-**Runtime profile:** [`r-visualization`](../../README.md#run-a-module-on-a-shared-hpc-system)
+**Runtime profile:** [`r-visualization`](../../README.md#run-a-module-locally-or-on-an-hpc-cluster)
 
 **Command:** `scripts/run_gsea_filters.R`
 

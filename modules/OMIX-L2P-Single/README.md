@@ -20,7 +20,7 @@ ranked, all-gene pathway analysis, use
 
 ## Quick start
 
-**Runtime profile:** [`r-pathway`](../../README.md#run-a-module-on-a-shared-hpc-system)
+**Runtime profile:** [`r-pathway`](../../README.md#run-a-module-locally-or-on-an-hpc-cluster)
 
 **Command:** `scripts/run_l2p_single.R`
 
