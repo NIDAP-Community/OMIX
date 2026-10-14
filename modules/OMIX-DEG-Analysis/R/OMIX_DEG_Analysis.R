@@ -312,12 +312,18 @@
   dge <- edgeR::calcNormFactors(dge, method = normalization_profile[["library_size"]])
   write_diagnostics <- isTRUE(normalization_diagnostics) && !is.null(diagnostics_output_dir)
 
+  # limma 3.66 enabled adaptive span selection by default, while the published
+  # OMIX runtime used the established fixed 0.5 span. Repeat these arguments on
+  # every pass so both the preliminary and final precision weights remain
+  # reproducible across supported limma releases.
   if (length(donor_variable_column) == 1L) {
     donor <- factor(sample_metadata[[donor_variable_column]])
     voom_first_pass <- limma::voom(
       dge,
       design,
-      normalize.method = normalization_profile[["voom_scale"]]
+      normalize.method = normalization_profile[["voom_scale"]],
+      span = 0.5,
+      adaptive.span = FALSE
     )
     correlation_fit <- limma::duplicateCorrelation(
       voom_first_pass,
@@ -330,7 +336,9 @@
       normalize.method = normalization_profile[["voom_scale"]],
       block = donor,
       correlation = correlation_fit$consensus.correlation,
-      save.plot = write_diagnostics
+      save.plot = write_diagnostics,
+      span = 0.5,
+      adaptive.span = FALSE
     )
     correlation_fit <- limma::duplicateCorrelation(
       voom_expression,
@@ -349,7 +357,9 @@
       dge,
       design,
       normalize.method = normalization_profile[["voom_scale"]],
-      save.plot = write_diagnostics
+      save.plot = write_diagnostics,
+      span = 0.5,
+      adaptive.span = FALSE
     )
     fit <- limma::lmFit(voom_expression, design)
     correlation_fit <- NULL
@@ -454,6 +464,8 @@
     normalization_method = normalization_profile[["label"]],
     library_size_normalization = normalization_profile[["library_size"]],
     voom_scale_normalization = normalization_profile[["voom_scale"]],
+    voom_trend_span = 0.5,
+    voom_adaptive_span = FALSE,
     genes_before_filtering = genes_before_filtering,
     genes_modelled = nrow(voom_expression$E),
     expression_output = if (identical(expression_for_downstream, voom_expression$E)) {

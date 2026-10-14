@@ -212,9 +212,11 @@ if (record_expected) {
     edgeR = package_version("edgeR"),
     limma = package_version("limma"),
     optparse = package_version("optparse"),
+    deg_voom_trend_span = "0.5",
+    deg_voom_adaptive_span = "false",
     note = paste(
-      "Candidate text baseline; record published-container equivalence",
-      "as a separate execution record."
+      "Candidate text baseline with the fixed OMIX DEG voom smoothing policy;",
+      "record published-container equivalence as a separate execution record."
     ),
     check.names = FALSE,
     stringsAsFactors = FALSE

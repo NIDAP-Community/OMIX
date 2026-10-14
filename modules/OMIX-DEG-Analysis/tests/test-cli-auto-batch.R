@@ -62,7 +62,9 @@ with_batch <- run_cli(metadata_with_batch_path, with_batch_output)
 stopifnot(
   identical(with_batch$status, 0L),
   file.exists(file.path(with_batch_output, "DEG_Analysis.csv")),
-  file.exists(file.path(with_batch_output, "Sample_Metadata.csv"))
+  file.exists(file.path(with_batch_output, "Sample_Metadata.csv")),
+  "voom trend span: 0.5" %in% readLines(file.path(with_batch_output, "run_summary.txt")),
+  "voom adaptive span: false" %in% readLines(file.path(with_batch_output, "run_summary.txt"))
 )
 
 without_batch_output <- file.path(working_dir, "without-batch")
