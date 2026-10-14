@@ -1,0 +1,14 @@
+format_version: 1
+matrix_type: harmony_corrected_mean_expression
+aggregation_method: mean_harmony_corrected_expression
+expected_downstream_module: OMIX-Limma-Analysis
+expected_downstream_mode: continuous_expression
+downstream_input_kind: log2_expression
+recommended_variance_model: ebayes
+feature_id_column: GeneName
+sample_id_column: Sample
+source_assay: Harmony
+source_layer: data
+upstream_batch_correction: Harmony
+cell_type: Monocytes
+feature_count: 120

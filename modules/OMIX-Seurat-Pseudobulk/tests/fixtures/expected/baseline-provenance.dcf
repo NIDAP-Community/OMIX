@@ -1,0 +1,15 @@
+format_version: 1
+fixture_seed: 92042
+fixture_features: 120
+fixture_profiles: 8
+cells_per_profile: 3
+r_version: 4.5.1
+Seurat: 5.3.0
+SeuratObject: 5.2.0
+sctransform: 0.4.2
+Omix: 0.2.0
+OmixSeurat: 0.3.1
+edgeR: 4.8.0
+limma: 3.66.0
+optparse: 1.8.2
+note: Text baselines were recorded locally with the runtime-v2 Seurat stack; published-container equivalence remains a separate execution record.

@@ -1,0 +1,14 @@
+format_version: 1
+matrix_type: raw_integer_counts
+aggregation_method: sum_counts
+expected_downstream_module: OMIX-DEG-Analysis
+expected_downstream_mode: raw_counts
+downstream_input_kind: raw_integer_counts
+recommended_variance_model: voom_precision_weights
+feature_id_column: GeneName
+sample_id_column: Sample
+source_assay: RNA
+source_layer: counts
+upstream_batch_correction: none
+cell_type: Monocytes
+feature_count: 120
