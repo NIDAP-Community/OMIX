@@ -22,6 +22,25 @@ Seurat-conversion, DEG, and Limma dependency sets:
 Rscript modules/OMIX-Seurat-Pseudobulk/tests/test-public-cli-equivalence.R
 ```
 
+The exact-runtime CI workflow runs the same driver in two phases with a shared
+writable handoff directory. The `conversion` phase executes fixture generation
+and all three Pseudobulk modes in the immutable published
+`r-seurat-conversion` image. The `downstream` phase then executes the routed
+DEG and Limma CLIs in the immutable published `r-statistics` image:
+
+```bash
+Rscript modules/OMIX-Seurat-Pseudobulk/tests/test-public-cli-equivalence.R \
+  --phase conversion --working-dir /path/to/handoff
+Rscript modules/OMIX-Seurat-Pseudobulk/tests/test-public-cli-equivalence.R \
+  --phase downstream --working-dir /path/to/handoff
+```
+
+Use a new handoff directory for the conversion phase. The workflow reads both
+digest-qualified image references and lockfile checksums from
+`starter-environments/release-manifest.json`, verifies each published package
+set, records output checksums, and uploads the text outputs as a reviewable CI
+artifact. It never builds, publishes, retags, or releases a runtime.
+
 The numeric tolerances are machine-readable in
 `fixtures/expected/equivalence-contract.dcf`. Raw pseudobulk counts must be
 exact. Harmony means use `1e-12`, SCT means use `1e-8`, and downstream model

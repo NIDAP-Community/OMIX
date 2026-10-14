@@ -23,24 +23,50 @@ expected_root <- file.path(fixture_root, "expected")
 test_arguments <- commandArgs(trailingOnly = TRUE)
 record_expected <- FALSE
 record_root <- NULL
+execution_phase <- "all"
+shared_working_dir <- NULL
 if (length(test_arguments) > 0L) {
-  if (length(test_arguments) != 2L || !identical(test_arguments[[1L]], "--record-expected")) {
+  if (length(test_arguments) == 2L && identical(test_arguments[[1L]], "--record-expected")) {
+    record_root <- test_arguments[[2L]]
+    if (!nzchar(record_root) || file.exists(record_root)) {
+      stop("--record-expected must name a new, non-existing directory.", call. = FALSE)
+    }
+    dir.create(record_root, recursive = TRUE, showWarnings = FALSE)
+    record_expected <- TRUE
+  } else if (
+    length(test_arguments) == 4L &&
+      identical(test_arguments[[1L]], "--phase") &&
+      identical(test_arguments[[3L]], "--working-dir")
+  ) {
+    execution_phase <- test_arguments[[2L]]
+    shared_working_dir <- test_arguments[[4L]]
+    if (!execution_phase %in% c("conversion", "downstream")) {
+      stop("--phase must be conversion or downstream.", call. = FALSE)
+    }
+    if (!nzchar(shared_working_dir)) {
+      stop("--working-dir must name a persistent handoff directory.", call. = FALSE)
+    }
+  } else {
     stop(
-      "Usage: test-public-cli-equivalence.R [--record-expected NEW_DIRECTORY]",
+      paste(
+        "Usage: test-public-cli-equivalence.R",
+        "[--record-expected NEW_DIRECTORY]",
+        "[--phase conversion|downstream --working-dir DIRECTORY]"
+      ),
       call. = FALSE
     )
   }
-  record_root <- test_arguments[[2L]]
-  if (!nzchar(record_root) || file.exists(record_root)) {
-    stop("--record-expected must name a new, non-existing directory.", call. = FALSE)
-  }
-  dir.create(record_root, recursive = TRUE, showWarnings = FALSE)
-  record_expected <- TRUE
 }
 
-required_packages <- c(
-  "Matrix", "Seurat", "SeuratObject", "sctransform", "OmixSeurat",
-  "optparse", "edgeR", "limma"
+conversion_packages <- c(
+  "Matrix", "Seurat", "SeuratObject", "sctransform", "OmixSeurat", "optparse"
+)
+downstream_packages <- c("optparse", "edgeR", "limma")
+required_packages <- switch(
+  execution_phase,
+  conversion = conversion_packages,
+  downstream = downstream_packages,
+  all = unique(c(conversion_packages, downstream_packages))
 )
 missing_packages <- required_packages[
   !vapply(required_packages, requireNamespace, logical(1), quietly = TRUE)
@@ -163,19 +189,36 @@ assert_summary_value <- function(path, expected_line) {
   }
 }
 
-working_dir <- tempfile("omix-pseudobulk-public-cli-equivalence-")
-dir.create(working_dir, recursive = TRUE)
-on.exit(unlink(working_dir, recursive = TRUE, force = TRUE), add = TRUE)
+if (is.null(shared_working_dir)) {
+  working_dir <- tempfile("omix-pseudobulk-public-cli-equivalence-")
+  dir.create(working_dir, recursive = TRUE)
+  on.exit(unlink(working_dir, recursive = TRUE, force = TRUE), add = TRUE)
+} else {
+  dir.create(shared_working_dir, recursive = TRUE, showWarnings = FALSE)
+  working_dir <- normalizePath(shared_working_dir)
+}
 
 fixture_path <- file.path(working_dir, "synthetic-seurat.rds")
-run_cli(
-  file.path(fixture_root, "generate_synthetic_seurat_fixture.R"),
-  fixture_path,
-  "Synthetic fixture generation"
-)
-fixture <- readRDS(fixture_path)
-if (!inherits(fixture[["SCT"]], "SCTAssay")) {
-  stop("Serialized fixture does not contain a real SCTAssay.", call. = FALSE)
+if (execution_phase %in% c("all", "conversion")) {
+  existing_outputs <- file.path(
+    working_dir,
+    c("raw-pseudobulk", "harmony-pseudobulk", "sct-pseudobulk")
+  )
+  if (any(file.exists(existing_outputs))) {
+    stop(
+      "Conversion phase requires a working directory without prior pseudobulk outputs.",
+      call. = FALSE
+    )
+  }
+  run_cli(
+    file.path(fixture_root, "generate_synthetic_seurat_fixture.R"),
+    fixture_path,
+    "Synthetic fixture generation"
+  )
+  fixture <- readRDS(fixture_path)
+  if (!inherits(fixture[["SCT"]], "SCTAssay")) {
+    stop("Serialized fixture does not contain a real SCTAssay.", call. = FALSE)
+  }
 }
 
 expected_features <- paste0("Gene", sprintf("%03d", seq_len(120L)))
@@ -233,174 +276,189 @@ for (index in seq_len(nrow(contract))) {
   mode <- unname(contract[index, "mode"])
   prefix <- unname(mode_prefix[[mode]])
   output_dir <- file.path(working_dir, paste0(tolower(prefix), "-pseudobulk"))
-  arguments <- c(
-    "--seurat_rds", fixture_path,
-    "--donor_column", "Donor",
-    "--group_column", "Group",
-    "--cell_type_column", "CellType",
-    "--cell_type", "Monocytes",
-    "--metadata_columns", "Batch",
-    "--cell_filter_column", "Include",
-    "--cell_filter_values", "yes",
-    "--aggregation_method", mode,
-    "--min_cells", "3",
-    "--output_dir", output_dir
-  )
-  run_cli(pseudobulk_cli, arguments, paste(prefix, "Pseudobulk CLI"))
-  mode_output[[mode]] <- output_dir
-
   metadata_path <- file.path(output_dir, "Pseudobulk_Sample_Metadata.csv")
-  metadata <- if (record_expected) {
-    read_csv(metadata_path)
-  } else {
-    compare_table(
-      metadata_path,
-      file.path(expected_root, "Pseudobulk_Sample_Metadata.csv"),
-      tolerance = 0,
-      label = paste(prefix, "sample metadata")
-    )
-  }
-  if (record_expected && index == 1L) {
-    invisible(file.copy(
-      metadata_path,
-      file.path(record_root, "Pseudobulk_Sample_Metadata.csv")
-    ))
-  }
-  stopifnot(
-    identical(as.character(metadata$Sample), expected_samples),
-    identical(as.character(metadata$Donor), expected_donors),
-    identical(as.character(metadata$Group), expected_groups),
-    identical(as.character(metadata$Batch), expected_batches),
-    identical(as.character(metadata$CellType), rep("Monocytes", 8L)),
-    identical(as.integer(metadata$Cells), rep(3L, 8L)),
-    !anyNA(metadata)
-  )
-
   matrix_file <- unname(contract[index, "matrix_file"])
   matrix_path <- file.path(output_dir, matrix_file)
-  matrix <- if (record_expected) {
-    read_csv(matrix_path)
-  } else {
-    compare_table(
-      matrix_path,
-      file.path(expected_root, unname(contract[index, "expected_matrix"])),
-      tolerance = as.numeric(contract[index, "matrix_tolerance"]),
-      label = paste(prefix, "donor-level matrix")
-    )
-  }
-  if (record_expected) {
-    invisible(file.copy(
-      matrix_path,
-      file.path(record_root, unname(contract[index, "expected_matrix"]))
-    ))
-  }
-  stopifnot(
-    identical(as.character(matrix[["GeneName"]]), expected_features),
-    identical(names(matrix)[-1L], expected_samples),
-    !anyNA(matrix)
-  )
-
   manifest_path <- file.path(output_dir, "Pseudobulk_Manifest.dcf")
-  expected_manifest_name <- paste0(prefix, "_Pseudobulk_Manifest.dcf")
-  manifest <- if (record_expected) {
-    base::read.dcf(manifest_path)
-  } else {
-    compare_manifest(
-      manifest_path,
-      file.path(expected_root, expected_manifest_name),
-      paste(prefix, "Pseudobulk")
-    )
-  }
-  if (record_expected) {
-    invisible(file.copy(
-      manifest_path,
-      file.path(record_root, expected_manifest_name)
-    ))
-  }
-  stopifnot(
-    identical(unname(manifest[1L, "matrix_type"]), unname(contract[index, "matrix_type"])),
-    identical(
-      unname(manifest[1L, "expected_downstream_module"]),
-      unname(contract[index, "downstream_module"])
-    ),
-    identical(
-      unname(manifest[1L, "recommended_variance_model"]),
-      unname(contract[index, "variance_model"])
-    )
-  )
-
   downstream_dir <- file.path(working_dir, paste0(tolower(prefix), "-downstream"))
-  if (identical(mode, "sum_counts")) {
-    run_cli(
-      deg_cli,
-      c(
-        "--input_type", "table",
-        "--analysis_mode", "raw_counts",
-        "--counts", file.path(output_dir, matrix_file),
-        "--metadata", metadata_path,
-        "--pseudobulk_manifest", file.path(output_dir, "Pseudobulk_Manifest.dcf"),
-        "--contrasts", "B-A",
-        "--donor_variable_column", "Donor",
-        "--batch_effect_columns", "Batch",
-        "--write_normalization_diagnostics", "false",
-        "--output_dir", downstream_dir
-      ),
-      "Raw-count DEG CLI"
-    )
-    assert_summary_value(file.path(downstream_dir, "run_summary.txt"), "analysis mode: raw_counts")
-    assert_summary_value(file.path(downstream_dir, "run_summary.txt"), "model type: repeated_measures")
-  } else {
-    run_cli(
-      limma_cli,
-      c(
-        "--matrix", file.path(output_dir, matrix_file),
-        "--metadata", metadata_path,
-        "--pseudobulk_manifest", file.path(output_dir, "Pseudobulk_Manifest.dcf"),
-        "--contrasts", "B-A",
-        "--donor_variable_column", "Donor",
-        "--output_dir", downstream_dir
-      ),
-      paste(prefix, "Limma CLI")
-    )
-    assert_summary_value(
-      file.path(downstream_dir, "run_summary.txt"),
-      paste("variance model:", unname(contract[index, "variance_model"]))
-    )
-  }
-  downstream_output[[mode]] <- downstream_dir
 
-  downstream_path <- file.path(
-    downstream_dir,
-    unname(contract[index, "downstream_file"])
-  )
-  downstream <- if (record_expected) {
-    read_csv(downstream_path)
-  } else {
-    compare_table(
-      downstream_path,
-      file.path(expected_root, unname(contract[index, "expected_downstream"])),
-      tolerance = as.numeric(contract[index, "downstream_tolerance"]),
-      label = paste(prefix, "downstream analysis")
+  if (execution_phase %in% c("all", "conversion")) {
+    arguments <- c(
+      "--seurat_rds", fixture_path,
+      "--donor_column", "Donor",
+      "--group_column", "Group",
+      "--cell_type_column", "CellType",
+      "--cell_type", "Monocytes",
+      "--metadata_columns", "Batch",
+      "--cell_filter_column", "Include",
+      "--cell_filter_values", "yes",
+      "--aggregation_method", mode,
+      "--min_cells", "3",
+      "--output_dir", output_dir
+    )
+    run_cli(pseudobulk_cli, arguments, paste(prefix, "Pseudobulk CLI"))
+    mode_output[[mode]] <- output_dir
+
+    metadata <- if (record_expected) {
+      read_csv(metadata_path)
+    } else {
+      compare_table(
+        metadata_path,
+        file.path(expected_root, "Pseudobulk_Sample_Metadata.csv"),
+        tolerance = 0,
+        label = paste(prefix, "sample metadata")
+      )
+    }
+    if (record_expected && index == 1L) {
+      invisible(file.copy(
+        metadata_path,
+        file.path(record_root, "Pseudobulk_Sample_Metadata.csv")
+      ))
+    }
+    stopifnot(
+      identical(as.character(metadata$Sample), expected_samples),
+      identical(as.character(metadata$Donor), expected_donors),
+      identical(as.character(metadata$Group), expected_groups),
+      identical(as.character(metadata$Batch), expected_batches),
+      identical(as.character(metadata$CellType), rep("Monocytes", 8L)),
+      identical(as.integer(metadata$Cells), rep(3L, 8L)),
+      !anyNA(metadata)
+    )
+
+    matrix <- if (record_expected) {
+      read_csv(matrix_path)
+    } else {
+      compare_table(
+        matrix_path,
+        file.path(expected_root, unname(contract[index, "expected_matrix"])),
+        tolerance = as.numeric(contract[index, "matrix_tolerance"]),
+        label = paste(prefix, "donor-level matrix")
+      )
+    }
+    if (record_expected) {
+      invisible(file.copy(
+        matrix_path,
+        file.path(record_root, unname(contract[index, "expected_matrix"]))
+      ))
+    }
+    stopifnot(
+      identical(as.character(matrix[["GeneName"]]), expected_features),
+      identical(names(matrix)[-1L], expected_samples),
+      !anyNA(matrix)
+    )
+
+    expected_manifest_name <- paste0(prefix, "_Pseudobulk_Manifest.dcf")
+    manifest <- if (record_expected) {
+      base::read.dcf(manifest_path)
+    } else {
+      compare_manifest(
+        manifest_path,
+        file.path(expected_root, expected_manifest_name),
+        paste(prefix, "Pseudobulk")
+      )
+    }
+    if (record_expected) {
+      invisible(file.copy(
+        manifest_path,
+        file.path(record_root, expected_manifest_name)
+      ))
+    }
+    stopifnot(
+      identical(unname(manifest[1L, "matrix_type"]), unname(contract[index, "matrix_type"])),
+      identical(
+        unname(manifest[1L, "expected_downstream_module"]),
+        unname(contract[index, "downstream_module"])
+      ),
+      identical(
+        unname(manifest[1L, "recommended_variance_model"]),
+        unname(contract[index, "variance_model"])
+      )
     )
   }
-  if (record_expected) {
-    invisible(file.copy(
-      downstream_path,
-      file.path(record_root, unname(contract[index, "expected_downstream"]))
-    ))
+
+  if (execution_phase %in% c("all", "downstream")) {
+    missing_handoff <- c(metadata_path, matrix_path, manifest_path)[
+      !file.exists(c(metadata_path, matrix_path, manifest_path))
+    ]
+    if (length(missing_handoff) > 0L) {
+      stop(
+        "Downstream phase is missing conversion handoff file(s): ",
+        paste(missing_handoff, collapse = ", "),
+        call. = FALSE
+      )
+    }
+    if (identical(mode, "sum_counts")) {
+      run_cli(
+        deg_cli,
+        c(
+          "--input_type", "table",
+          "--analysis_mode", "raw_counts",
+          "--counts", file.path(output_dir, matrix_file),
+          "--metadata", metadata_path,
+          "--pseudobulk_manifest", file.path(output_dir, "Pseudobulk_Manifest.dcf"),
+          "--contrasts", "B-A",
+          "--donor_variable_column", "Donor",
+          "--batch_effect_columns", "Batch",
+          "--write_normalization_diagnostics", "false",
+          "--output_dir", downstream_dir
+        ),
+        "Raw-count DEG CLI"
+      )
+      assert_summary_value(file.path(downstream_dir, "run_summary.txt"), "analysis mode: raw_counts")
+      assert_summary_value(file.path(downstream_dir, "run_summary.txt"), "model type: repeated_measures")
+    } else {
+      run_cli(
+        limma_cli,
+        c(
+          "--matrix", file.path(output_dir, matrix_file),
+          "--metadata", metadata_path,
+          "--pseudobulk_manifest", file.path(output_dir, "Pseudobulk_Manifest.dcf"),
+          "--contrasts", "B-A",
+          "--donor_variable_column", "Donor",
+          "--output_dir", downstream_dir
+        ),
+        paste(prefix, "Limma CLI")
+      )
+      assert_summary_value(
+        file.path(downstream_dir, "run_summary.txt"),
+        paste("variance model:", unname(contract[index, "variance_model"]))
+      )
+    }
+    downstream_output[[mode]] <- downstream_dir
+
+    downstream_path <- file.path(
+      downstream_dir,
+      unname(contract[index, "downstream_file"])
+    )
+    downstream <- if (record_expected) {
+      read_csv(downstream_path)
+    } else {
+      compare_table(
+        downstream_path,
+        file.path(expected_root, unname(contract[index, "expected_downstream"])),
+        tolerance = as.numeric(contract[index, "downstream_tolerance"]),
+        label = paste(prefix, "downstream analysis")
+      )
+    }
+    if (record_expected) {
+      invisible(file.copy(
+        downstream_path,
+        file.path(record_root, unname(contract[index, "expected_downstream"]))
+      ))
+    }
+    gene_column <- if ("GeneName" %in% names(downstream)) "GeneName" else "Gene"
+    stopifnot(
+      identical(as.character(downstream[[gene_column]]), expected_features),
+      identical(tail(names(downstream), length(expected_samples)), expected_samples)
+    )
   }
-  gene_column <- if ("GeneName" %in% names(downstream)) "GeneName" else "Gene"
-  stopifnot(
-    identical(as.character(downstream[[gene_column]]), expected_features),
-    identical(tail(names(downstream), length(expected_samples)), expected_samples)
-  )
 }
 
 if (record_expected) {
   message("Recorded candidate equivalence baseline in ", normalizePath(record_root))
 } else {
   message(
-    "OMIX Seurat Pseudobulk public-CLI equivalence passed for raw counts, ",
-    "legacy Harmony/data, and real SCTAssay routes"
+    "OMIX Seurat Pseudobulk public-CLI equivalence ", execution_phase,
+    " phase passed for raw counts, legacy Harmony/data, and real SCTAssay routes"
   )
 }

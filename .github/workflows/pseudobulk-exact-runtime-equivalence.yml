@@ -1,0 +1,175 @@
+name: Validate Pseudobulk exact-runtime handoff
+
+on:
+  pull_request:
+    paths:
+      - modules/OMIX-Seurat-Pseudobulk/**
+      - modules/OMIX-DEG-Analysis/**
+      - modules/OMIX-Limma-Analysis/**
+      - starter-environments/release-manifest.json
+      - starter-environments/r-seurat-conversion/renv.lock
+      - starter-environments/r-statistics/renv.lock
+      - scripts/verify-published-runtime.R
+      - .github/workflows/pseudobulk-exact-runtime-equivalence.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  exact-runtime-equivalence:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve immutable runtime records
+        id: runtimes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          conversion_reference="$(jq -r '.images["r-seurat-conversion"].immutable_reference' starter-environments/release-manifest.json)"
+          conversion_digest="$(jq -r '.images["r-seurat-conversion"].digest' starter-environments/release-manifest.json)"
+          statistics_reference="$(jq -r '.images["r-statistics"].immutable_reference' starter-environments/release-manifest.json)"
+          statistics_digest="$(jq -r '.images["r-statistics"].digest' starter-environments/release-manifest.json)"
+
+          test -n "$conversion_reference"
+          test "$conversion_reference" != "null"
+          test "${conversion_reference##*@}" = "$conversion_digest"
+          test -n "$statistics_reference"
+          test "$statistics_reference" != "null"
+          test "${statistics_reference##*@}" = "$statistics_digest"
+
+          {
+            echo "conversion_reference=$conversion_reference"
+            echo "statistics_reference=$statistics_reference"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "### Exact-runtime Pseudobulk handoff"
+            echo "- OMIX source: \`${GITHUB_SHA}\`"
+            echo "- Conversion runtime: \`${conversion_reference}\`"
+            echo "- DEG/Limma runtime: \`${statistics_reference}\`"
+            echo "- Platform: \`linux/amd64\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Pull and verify immutable published runtimes
+        env:
+          CONVERSION_REFERENCE: ${{ steps.runtimes.outputs.conversion_reference }}
+          STATISTICS_REFERENCE: ${{ steps.runtimes.outputs.statistics_reference }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test "$(sha256sum starter-environments/r-seurat-conversion/renv.lock | awk '{print $1}')" = \
+            "$(jq -r '.images["r-seurat-conversion"].lockfile_sha256' starter-environments/release-manifest.json)"
+          test "$(sha256sum starter-environments/r-statistics/renv.lock | awk '{print $1}')" = \
+            "$(jq -r '.images["r-statistics"].lockfile_sha256' starter-environments/release-manifest.json)"
+
+          docker pull "$CONVERSION_REFERENCE"
+          docker pull "$STATISTICS_REFERENCE"
+
+          test "$(docker image inspect --format '{{.Architecture}}' "$CONVERSION_REFERENCE")" = "amd64"
+          test "$(docker image inspect --format '{{.Architecture}}' "$STATISTICS_REFERENCE")" = "amd64"
+
+          docker run --rm \
+            --volume "${GITHUB_WORKSPACE}:/omix:ro" \
+            --entrypoint Rscript \
+            "$CONVERSION_REFERENCE" \
+            /omix/scripts/verify-published-runtime.R \
+              --manifest /omix/starter-environments/release-manifest.json \
+              --profile r-seurat-conversion
+
+          docker run --rm \
+            --volume "${GITHUB_WORKSPACE}:/omix:ro" \
+            --entrypoint Rscript \
+            "$STATISTICS_REFERENCE" \
+            /omix/scripts/verify-published-runtime.R \
+              --manifest /omix/starter-environments/release-manifest.json \
+              --profile r-statistics
+
+      - name: Generate and compare Pseudobulk outputs in exact conversion runtime
+        env:
+          CONVERSION_REFERENCE: ${{ steps.runtimes.outputs.conversion_reference }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          handoff_root="${RUNNER_TEMP}/pseudobulk-exact-runtime"
+          mkdir -p "$handoff_root"
+
+          docker run --rm \
+            --volume "${GITHUB_WORKSPACE}:/omix:ro" \
+            --volume "${handoff_root}:/handoff" \
+            --workdir /omix \
+            --entrypoint Rscript \
+            "$CONVERSION_REFERENCE" \
+            /omix/modules/OMIX-Seurat-Pseudobulk/tests/test-public-cli-equivalence.R \
+              --phase conversion \
+              --working-dir /handoff
+
+      - name: Route and compare outputs in exact DEG and Limma runtime
+        env:
+          STATISTICS_REFERENCE: ${{ steps.runtimes.outputs.statistics_reference }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          handoff_root="${RUNNER_TEMP}/pseudobulk-exact-runtime"
+
+          docker run --rm \
+            --volume "${GITHUB_WORKSPACE}:/omix:ro" \
+            --volume "${handoff_root}:/handoff" \
+            --workdir /omix \
+            --entrypoint Rscript \
+            "$STATISTICS_REFERENCE" \
+            /omix/modules/OMIX-Seurat-Pseudobulk/tests/test-public-cli-equivalence.R \
+              --phase downstream \
+              --working-dir /handoff
+
+      - name: Record output checksums and provenance
+        env:
+          CONVERSION_REFERENCE: ${{ steps.runtimes.outputs.conversion_reference }}
+          STATISTICS_REFERENCE: ${{ steps.runtimes.outputs.statistics_reference }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          handoff_root="${RUNNER_TEMP}/pseudobulk-exact-runtime"
+
+          {
+            echo "omix_source=${GITHUB_SHA}"
+            echo "platform=linux/amd64"
+            echo "conversion_runtime=${CONVERSION_REFERENCE}"
+            echo "downstream_runtime=${STATISTICS_REFERENCE}"
+            echo "conversion_lock_sha256=$(sha256sum starter-environments/r-seurat-conversion/renv.lock | awk '{print $1}')"
+            echo "statistics_lock_sha256=$(sha256sum starter-environments/r-statistics/renv.lock | awk '{print $1}')"
+          } > "${handoff_root}/exact-runtime-provenance.txt"
+
+          (
+            cd "$handoff_root"
+            find . -type f ! -name synthetic-seurat.rds ! -name output-sha256.txt -print0 \
+              | sort -z \
+              | xargs -0 sha256sum > output-sha256.txt
+          )
+
+          cat "${handoff_root}/exact-runtime-provenance.txt" >> "$GITHUB_STEP_SUMMARY"
+          echo '```text' >> "$GITHUB_STEP_SUMMARY"
+          cat "${handoff_root}/output-sha256.txt" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload reviewable equivalence outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: pseudobulk-exact-runtime-${{ github.sha }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            ${{ runner.temp }}/pseudobulk-exact-runtime
+            !${{ runner.temp }}/pseudobulk-exact-runtime/synthetic-seurat.rds
