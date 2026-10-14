@@ -125,7 +125,7 @@ Rscript "$OMIX_ROOT/modules/OMIX-DEG-Analysis/scripts/run_deg_analysis.R" \
 | --- | --- |
 | `DEG_Analysis.csv` | Differential-expression results whose first column is always `GeneName`, plus sample-level expression. Raw-count mode writes normalized/batch-adjusted voom log-CPM where requested; continuous-expression modes return their supplied donor means unchanged. |
 | `Sample_Metadata.csv` | Metadata for exactly the samples represented in the DEG expression block, in matching order. |
-| `run_summary.txt` | Input, filtering, model, contrast, and normalization provenance. |
+| `run_summary.txt` | Input, filtering, model, contrast, and normalization provenance, including the raw-count voom smoothing policy. |
 | `normalization_boxplots.png` | Raw-count mode only: before-and-after filtered log-CPM distribution summary. |
 | `normalization_densities.png` | Raw-count mode only: before-and-after filtered log-CPM density summary. |
 | `voom_mean_variance.png` | Raw-count mode only: final voom mean-variance trend used to estimate precision weights. |
@@ -178,6 +178,11 @@ downstream DEG table.
   upstream, leave it out rather than correcting it twice.
 
 ### Normalization
+
+Raw-count analysis fixes every voom mean-variance smoothing pass at
+`span = 0.5` with adaptive span selection disabled. This preserves the
+established OMIX DEG behavior across supported limma releases; it is an
+internal reproducibility policy, not a user-selectable analysis parameter.
 
 | Dataset type | Recommended normalization | Rationale |
 | --- | --- | --- |

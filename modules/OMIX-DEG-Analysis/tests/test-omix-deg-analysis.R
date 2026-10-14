@@ -5,6 +5,20 @@ if (length(script_arg) != 1L) {
 module_root <- normalizePath(file.path(dirname(sub("^--file=", "", script_arg)), ".."))
 source(file.path(module_root, "R", "OMIX_DEG_Analysis.R"))
 
+# Keep every raw-count voom pass independent of changing limma defaults. This
+# source-level guard complements the numerical assertions below and ensures a
+# future added pass cannot silently omit the established smoothing policy.
+raw_count_body <- paste(deparse(body(.omix_deg_analysis_raw_counts)), collapse = "\n")
+count_matches <- function(pattern, fixed = FALSE) {
+  matches <- gregexpr(pattern, raw_count_body, fixed = fixed, perl = !fixed)[[1L]]
+  if (matches[[1L]] < 0L) 0L else length(matches)
+}
+stopifnot(
+  identical(count_matches("limma::voom(", fixed = TRUE), 3L),
+  identical(count_matches("(?<![[:alnum:]_.])span = 0\\.5"), 3L),
+  identical(count_matches("adaptive.span = FALSE", fixed = TRUE), 3L)
+)
+
 make_unpaired_fixture <- function() {
   set.seed(42)
   sample_ids <- c("A1", "A2", "A3", "B1", "B2", "B3")
@@ -73,6 +87,13 @@ stopifnot(identical(attr(unpaired, "omix_deg_run")$model_type, "linear"))
 stopifnot(identical(attr(unpaired, "omix_deg_run")$expression_output, "batch_adjusted_voom"))
 stopifnot(identical(attr(unpaired, "omix_deg_run")$normalization_method, "TMM + Quantile"))
 stopifnot(identical(attr(unpaired, "omix_deg_run")$voom_scale_normalization, "quantile"))
+stopifnot(identical(attr(unpaired, "omix_deg_run")$voom_trend_span, 0.5))
+stopifnot(identical(attr(unpaired, "omix_deg_run")$voom_adaptive_span, FALSE))
+stopifnot(isTRUE(all.equal(
+  unname(unpaired[seq_len(3L), "B-A_logFC"]),
+  c(0.354063273337131, 0.619013182016237, 0.313048750700965),
+  tolerance = 1e-10
+)))
 
 metadata_without_batch <- fixture$metadata[, setdiff(names(fixture$metadata), "Batch"), drop = FALSE]
 unpaired_without_batch <- omix_deg_analysis(
@@ -152,6 +173,20 @@ paired <- omix_deg_analysis(
 )
 stopifnot(identical(attr(paired, "omix_deg_run")$model_type, "repeated_measures"))
 stopifnot(identical(attr(paired, "omix_deg_run")$expression_output, "batch_adjusted_voom"))
+stopifnot(identical(attr(paired, "omix_deg_run")$voom_trend_span, 0.5))
+stopifnot(identical(attr(paired, "omix_deg_run")$voom_adaptive_span, FALSE))
+stopifnot(
+  isTRUE(all.equal(
+    attr(paired, "omix_deg_run")$consensus_correlation,
+    0.0725579059798692,
+    tolerance = 1e-10
+  )),
+  isTRUE(all.equal(
+    unname(paired[seq_len(3L), "B-A_logFC"]),
+    c(0.158256078264968, 0.398911280242121, 0.380364034530229),
+    tolerance = 1e-10
+  ))
+)
 
 duplicate_metadata <- rbind(paired_metadata, transform(paired_metadata[1L, , drop = FALSE], Sample = "D1_A_repeat"))
 duplicate_counts <- cbind(paired_counts, D1_A_repeat = paired_counts[["D1_A"]])
