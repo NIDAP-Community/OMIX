@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Fixed every raw-count voom smoothing pass at `span = 0.5` with
+  `adaptive.span = FALSE`, preserving the behavior of the published runtime
+  when newer limma releases enable adaptive span selection by default. The
+  run summary now records both settings. This is a compatible scientific
+  reproducibility fix in module version 0.4.2; interface version 2 is
+  unchanged and no new public parameter is exposed.
 - Completed the machine-readable CLI contract with explicit public, advanced,
   and internal classifications, including the existing sample-selection and
   output-directory controls. This does not change DEG behavior or defaults.

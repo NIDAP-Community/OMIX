@@ -12,4 +12,8 @@ OmixSeurat: 0.3.1
 edgeR: 4.8.0
 limma: 3.66.0
 optparse: 1.8.2
-note: Text baselines were recorded locally with the runtime-v2 Seurat stack; published-container equivalence remains a separate execution record.
+deg_voom_trend_span: 0.5
+deg_voom_adaptive_span: false
+note: Text baselines were recorded locally with the runtime-v2 Seurat stack
+        and fixed OMIX DEG voom smoothing policy; published-container
+        equivalence remains a separate execution record.
