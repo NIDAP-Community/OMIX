@@ -10,13 +10,25 @@ cli_file <- file.path(module_root, "scripts", "run_seurat_pseudobulk.R")
 schema_file <- file.path(module_root, "schemas", "interface.yml")
 metadata_file <- file.path(module_root, "module.yml")
 readme_file <- file.path(module_root, "README.md")
+equivalence_test_file <- file.path(module_root, "tests", "test-public-cli-equivalence.R")
+fixture_generator_file <- file.path(
+  module_root, "tests", "fixtures", "generate_synthetic_seurat_fixture.R"
+)
+equivalence_contract_file <- file.path(
+  module_root, "tests", "fixtures", "expected", "equivalence-contract.dcf"
+)
 
 stopifnot(
   file.exists(function_file), file.exists(cli_file), file.exists(schema_file),
-  file.exists(metadata_file), file.exists(readme_file)
+  file.exists(metadata_file), file.exists(readme_file),
+  file.exists(equivalence_test_file), file.exists(fixture_generator_file),
+  file.exists(equivalence_contract_file)
 )
 invisible(parse(file = function_file))
 invisible(parse(file = cli_file))
+invisible(parse(file = equivalence_test_file))
+invisible(parse(file = fixture_generator_file))
+stopifnot(length(list.files(file.path(module_root, "tests"), pattern = "\\.rds$", recursive = TRUE)) == 0L)
 
 cli_text <- paste(readLines(cli_file, warn = FALSE), collapse = "\n")
 for (option in c(

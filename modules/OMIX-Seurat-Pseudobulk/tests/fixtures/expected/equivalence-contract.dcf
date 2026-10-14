@@ -1,0 +1,32 @@
+mode: sum_counts
+matrix_file: Pseudobulk_Counts.csv
+expected_matrix: Pseudobulk_Counts.csv
+matrix_tolerance: 0
+downstream_module: OMIX-DEG-Analysis
+downstream_file: DEG_Analysis.csv
+expected_downstream: Raw_DEG_Analysis.csv
+downstream_tolerance: 1e-7
+matrix_type: raw_integer_counts
+variance_model: voom_precision_weights
+
+mode: mean_harmony_corrected_expression
+matrix_file: Harmony_Mean_Expression.csv
+expected_matrix: Harmony_Mean_Expression.csv
+matrix_tolerance: 1e-12
+downstream_module: OMIX-Limma-Analysis
+downstream_file: Limma_Analysis.csv
+expected_downstream: Harmony_Limma_Analysis.csv
+downstream_tolerance: 1e-10
+matrix_type: harmony_corrected_mean_expression
+variance_model: ebayes
+
+mode: mean_sctransform_expression
+matrix_file: SCT_Mean_Log2_Expression.csv
+expected_matrix: SCT_Mean_Log2_Expression.csv
+matrix_tolerance: 1e-8
+downstream_module: OMIX-Limma-Analysis
+downstream_file: Limma_Analysis.csv
+expected_downstream: SCT_Limma_Analysis.csv
+downstream_tolerance: 1e-7
+matrix_type: sctransform_mean_log2_expression
+variance_model: ebayes_trend

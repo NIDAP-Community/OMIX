@@ -1,0 +1,9 @@
+"Sample","Donor","Group","Batch","CellType","Cells"
+"D1__A","D1","A","Run1","Monocytes",3
+"D1__B","D1","B","Run1","Monocytes",3
+"D2__A","D2","A","Run1","Monocytes",3
+"D2__B","D2","B","Run1","Monocytes",3
+"D3__A","D3","A","Run2","Monocytes",3
+"D3__B","D3","B","Run2","Monocytes",3
+"D4__A","D4","A","Run2","Monocytes",3
+"D4__B","D4","B","Run2","Monocytes",3

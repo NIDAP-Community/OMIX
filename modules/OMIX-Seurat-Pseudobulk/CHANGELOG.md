@@ -4,6 +4,10 @@
 
 - Registered the accepted Code Ocean deployment-adapter repository without
   changing the portable scientific implementation or interface version.
+- Added a deterministic, text-baselined public-CLI equivalence fixture covering
+  raw RNA counts, legacy gene-level `Harmony/data`, a real `SCTAssay`, and the
+  required canonical DEG or Limma downstream route. Scientific defaults and
+  the public interface are unchanged.
 
 ## 0.4.2
 
