@@ -123,6 +123,20 @@ run_cli <- function(script, arguments, label) {
   invisible(output)
 }
 
+equivalence_differences <- list()
+
+record_difference <- function(label, column, kind, observed, tolerance = "") {
+  equivalence_differences[[length(equivalence_differences) + 1L]] <<- data.frame(
+    output = label,
+    column = column,
+    difference_kind = kind,
+    observed = as.character(observed),
+    tolerance = as.character(tolerance),
+    stringsAsFactors = FALSE
+  )
+  invisible(NULL)
+}
+
 read_csv <- function(path) {
   utils::read.csv(
     path,
@@ -139,34 +153,68 @@ compare_table <- function(actual_path, expected_path, tolerance, label) {
   actual <- read_csv(actual_path)
   expected <- read_csv(expected_path)
   if (!identical(names(actual), names(expected))) {
-    stop(label, " column names/order differ from the committed baseline.", call. = FALSE)
+    record_difference(
+      label,
+      "<table>",
+      "column_names_or_order",
+      paste0(
+        "actual=", paste(names(actual), collapse = "|"),
+        "; expected=", paste(names(expected), collapse = "|")
+      )
+    )
+    return(invisible(actual))
   }
   if (!identical(dim(actual), dim(expected))) {
-    stop(label, " dimensions differ from the committed baseline.", call. = FALSE)
+    record_difference(
+      label,
+      "<table>",
+      "dimensions",
+      paste0(
+        "actual=", paste(dim(actual), collapse = "x"),
+        "; expected=", paste(dim(expected), collapse = "x")
+      )
+    )
+    return(invisible(actual))
   }
   for (column in names(expected)) {
     actual_missing <- is.na(actual[[column]])
     expected_missing <- is.na(expected[[column]])
     if (!identical(actual_missing, expected_missing)) {
-      stop(label, " missingness differs in column ", column, ".", call. = FALSE)
+      record_difference(
+        label,
+        column,
+        "missingness",
+        paste0(
+          "actual_rows=", paste(which(actual_missing), collapse = "|"),
+          "; expected_rows=", paste(which(expected_missing), collapse = "|")
+        )
+      )
     }
-    keep <- !expected_missing
+    keep <- !expected_missing & !actual_missing
     if (is.numeric(expected[[column]])) {
       if (!is.numeric(actual[[column]])) {
-        stop(label, " column ", column, " is no longer numeric.", call. = FALSE)
+        record_difference(label, column, "type", class(actual[[column]])[[1L]], "numeric")
+        next
       }
       difference <- abs(actual[[column]][keep] - expected[[column]][keep])
       maximum_difference <- if (length(difference)) max(difference) else 0
       if (!is.finite(maximum_difference) || maximum_difference > tolerance) {
-        stop(
-          label, " numeric difference in ", column, " is ",
+        record_difference(
+          label,
+          column,
+          "maximum_absolute_numeric_difference",
           format(maximum_difference, scientific = TRUE),
-          "; tolerance is ", format(tolerance, scientific = TRUE), ".",
-          call. = FALSE
+          format(tolerance, scientific = TRUE)
         )
       }
     } else if (!identical(actual[[column]][keep], expected[[column]][keep])) {
-      stop(label, " categorical/identifier values differ in column ", column, ".", call. = FALSE)
+      differing_rows <- which(keep & actual[[column]] != expected[[column]])
+      record_difference(
+        label,
+        column,
+        "categorical_or_identifier_values",
+        paste0("rows=", paste(differing_rows, collapse = "|"))
+      )
     }
   }
   invisible(actual)
@@ -177,7 +225,7 @@ compare_manifest <- function(actual_path, expected_path, label) {
   expected <- base::read.dcf(expected_path)
   if (!identical(colnames(actual), colnames(expected)) ||
       !identical(unname(actual), unname(expected))) {
-    stop(label, " manifest differs from the committed baseline.", call. = FALSE)
+    record_difference(label, "<manifest>", "manifest_values", "different")
   }
   invisible(actual)
 }
@@ -185,7 +233,12 @@ compare_manifest <- function(actual_path, expected_path, label) {
 assert_summary_value <- function(path, expected_line) {
   summary_lines <- readLines(path, warn = FALSE)
   if (!expected_line %in% summary_lines) {
-    stop("Missing expected run-summary line: ", expected_line, call. = FALSE)
+    record_difference(
+      basename(dirname(path)),
+      "<run_summary>",
+      "missing_expected_line",
+      expected_line
+    )
   }
 }
 
@@ -452,6 +505,29 @@ for (index in seq_len(nrow(contract))) {
       identical(tail(names(downstream), length(expected_samples)), expected_samples)
     )
   }
+}
+
+if (length(equivalence_differences) > 0L) {
+  difference_table <- do.call(rbind, equivalence_differences)
+  difference_path <- file.path(working_dir, "equivalence-differences.csv")
+  utils::write.csv(difference_table, difference_path, row.names = FALSE, na = "")
+  stop(
+    nrow(difference_table),
+    " deterministic equivalence difference(s) exceeded the committed contract. ",
+    "See ", difference_path, ".\n",
+    paste(
+      sprintf(
+        "%s [%s]: %s=%s (tolerance=%s)",
+        difference_table$output,
+        difference_table$column,
+        difference_table$difference_kind,
+        difference_table$observed,
+        difference_table$tolerance
+      ),
+      collapse = "\n"
+    ),
+    call. = FALSE
+  )
 }
 
 if (record_expected) {

@@ -39,7 +39,12 @@ Use a new handoff directory for the conversion phase. The workflow reads both
 digest-qualified image references and lockfile checksums from
 `starter-environments/release-manifest.json`, verifies each published package
 set, records output checksums, and uploads the text outputs as a reviewable CI
-artifact. It never builds, publishes, retags, or releases a runtime.
+artifact even when an equivalence comparison fails. On failure,
+`equivalence-differences.csv` lists every column whose maximum absolute numeric
+difference exceeds its tolerance, along with any schema, identifier,
+missingness, categorical, manifest, or summary difference. Runtime package
+versions are retained beside the candidate outputs. The workflow never builds,
+publishes, retags, or releases a runtime.
 
 The numeric tolerances are machine-readable in
 `fixtures/expected/equivalence-contract.dcf`. Raw pseudobulk counts must be

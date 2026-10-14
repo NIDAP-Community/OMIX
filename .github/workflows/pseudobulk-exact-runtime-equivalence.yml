@@ -107,6 +107,15 @@ jobs:
           mkdir -p "$handoff_root"
 
           docker run --rm \
+            --volume "${handoff_root}:/handoff" \
+            --entrypoint Rscript \
+            "$CONVERSION_REFERENCE" \
+            -e 'writeLines(c(
+              R.version.string,
+              sprintf("%s=%s", c("Seurat", "SeuratObject", "sctransform", "Omix", "OmixSeurat", "optparse"), vapply(c("Seurat", "SeuratObject", "sctransform", "Omix", "OmixSeurat", "optparse"), function(package) as.character(utils::packageVersion(package)), character(1)))
+            ), "/handoff/conversion-package-versions.txt")'
+
+          docker run --rm \
             --volume "${GITHUB_WORKSPACE}:/omix:ro" \
             --volume "${handoff_root}:/handoff" \
             --workdir /omix \
@@ -125,6 +134,15 @@ jobs:
           handoff_root="${RUNNER_TEMP}/pseudobulk-exact-runtime"
 
           docker run --rm \
+            --volume "${handoff_root}:/handoff" \
+            --entrypoint Rscript \
+            "$STATISTICS_REFERENCE" \
+            -e 'writeLines(c(
+              R.version.string,
+              sprintf("%s=%s", c("edgeR", "limma", "optparse"), vapply(c("edgeR", "limma", "optparse"), function(package) as.character(utils::packageVersion(package)), character(1)))
+            ), "/handoff/statistics-package-versions.txt")'
+
+          docker run --rm \
             --volume "${GITHUB_WORKSPACE}:/omix:ro" \
             --volume "${handoff_root}:/handoff" \
             --workdir /omix \
@@ -135,6 +153,7 @@ jobs:
               --working-dir /handoff
 
       - name: Record output checksums and provenance
+        if: ${{ always() }}
         env:
           CONVERSION_REFERENCE: ${{ steps.runtimes.outputs.conversion_reference }}
           STATISTICS_REFERENCE: ${{ steps.runtimes.outputs.statistics_reference }}
@@ -142,6 +161,7 @@ jobs:
         run: |
           set -euo pipefail
           handoff_root="${RUNNER_TEMP}/pseudobulk-exact-runtime"
+          mkdir -p "$handoff_root"
 
           {
             echo "omix_source=${GITHUB_SHA}"
@@ -150,6 +170,7 @@ jobs:
             echo "downstream_runtime=${STATISTICS_REFERENCE}"
             echo "conversion_lock_sha256=$(sha256sum starter-environments/r-seurat-conversion/renv.lock | awk '{print $1}')"
             echo "statistics_lock_sha256=$(sha256sum starter-environments/r-statistics/renv.lock | awk '{print $1}')"
+            echo "workflow_run=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           } > "${handoff_root}/exact-runtime-provenance.txt"
 
           (
@@ -165,6 +186,7 @@ jobs:
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload reviewable equivalence outputs
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: pseudobulk-exact-runtime-${{ github.sha }}
