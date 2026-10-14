@@ -340,6 +340,7 @@ for (index in seq_len(nrow(contract))) {
         "--metadata", metadata_path,
         "--pseudobulk_manifest", file.path(output_dir, "Pseudobulk_Manifest.dcf"),
         "--contrasts", "B-A",
+        "--donor_variable_column", "Donor",
         "--batch_effect_columns", "Batch",
         "--write_normalization_diagnostics", "false",
         "--output_dir", downstream_dir
@@ -347,7 +348,7 @@ for (index in seq_len(nrow(contract))) {
       "Raw-count DEG CLI"
     )
     assert_summary_value(file.path(downstream_dir, "run_summary.txt"), "analysis mode: raw_counts")
-    assert_summary_value(file.path(downstream_dir, "run_summary.txt"), "model type: linear")
+    assert_summary_value(file.path(downstream_dir, "run_summary.txt"), "model type: repeated_measures")
   } else {
     run_cli(
       limma_cli,
