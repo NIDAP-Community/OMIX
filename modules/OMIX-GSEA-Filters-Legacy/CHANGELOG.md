@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Reclassified canonical lifecycle status from active to review until a
+  current local-versus-Code Ocean scientific-output comparison is recorded.
+  This metadata correction does not change filtering behavior or release
+  state.
 - Complete the canonical CLI contract by classifying every control as public,
   advanced, or internal with the project-wide `classification` key, exact
   defaults and choices, and a deterministic schema-to-CLI contract test. This

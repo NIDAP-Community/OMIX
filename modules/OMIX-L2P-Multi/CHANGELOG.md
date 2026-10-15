@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Reclassified canonical lifecycle status from active to review until a
+  current local-versus-Code Ocean scientific-output comparison is recorded.
+  This metadata correction does not change pathway-analysis behavior or
+  release state.
 - Add shared Seurat `FindMarkers()` input compatibility through
   `OmixPathwayInputs` 0.1.0. `--comparisons` may be omitted only for a
   recognized wide profile, which preserves source order; native unprefixed

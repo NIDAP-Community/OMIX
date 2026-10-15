@@ -106,4 +106,20 @@ for status in sorted(ALLOWED_STATUSES):
     if f"`{status}`" not in policy:
         raise AssertionError(f"Lifecycle policy does not define {status}")
 
+required_active_gate_patterns = {
+    "cross-environment heading": r"Cross-environment reproducibility gate",
+    "Code Ocean comparison": (
+        r"local-versus-Code Ocean output\s+comparison is mandatory"
+    ),
+    "run status is insufficient": (
+        r"A successful capsule status by itself is not enough"
+    ),
+}
+for requirement, pattern in sorted(required_active_gate_patterns.items()):
+    if not re.search(pattern, policy):
+        raise AssertionError(
+            "Lifecycle policy is missing an Active-status reproducibility "
+            f"requirement: {requirement}"
+        )
+
 print("OMIX canonical module lifecycle and README catalog checks passed")

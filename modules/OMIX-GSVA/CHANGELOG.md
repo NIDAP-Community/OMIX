@@ -2,10 +2,12 @@
 
 ## Unreleased
 
-- Marked the canonical module active after lifecycle audit of its direct
-  locked-runtime validation, independent review, documented interface, and
-  current release evidence. This status change does not alter scientific
-  behavior, the public interface, or deployment-release state.
+- Advanced the canonical module from development to review after lifecycle
+  audit of its direct locked-runtime validation, independent review,
+  documented interface, and current release evidence. Promotion to active now
+  additionally requires a reviewed local-versus-Code Ocean output comparison.
+  This status change does not alter scientific behavior, the public interface,
+  or deployment-release state.
 
 ## 0.3.0
 

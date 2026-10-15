@@ -7,6 +7,11 @@ Version numbers correspond to adapter release versions (integers: v1, v2, v3, et
 
 ## [Unreleased]
 
+### Changed
+- Reclassified canonical lifecycle status from active to review until a
+  current local-versus-Code Ocean scientific-output comparison is recorded.
+  This metadata correction does not change GSEA behavior or release state.
+
 ### Added
 - Add shared Seurat `FindMarkers()` input compatibility through
   `OmixPathwayInputs` 0.1.0. Recognized wide profiles preserve source or

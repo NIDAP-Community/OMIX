@@ -3,7 +3,7 @@ display_name: OMIX-L2P-Multi
 version: 4.2.0
 interface_version: 1
 module_type: pathway
-status: active
+status: review
 owner: OMIX Team
 description: Platform-neutral multi-comparison L2P over-representation pathway analysis.
 data_policy: No data are committed. Callers supply an explicit DEG-table path through the CLI or a platform adapter.

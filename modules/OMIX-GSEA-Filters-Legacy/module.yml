@@ -3,7 +3,7 @@ display_name: OMIX-GSEA-Filters-Legacy
 version: 1.0.0
 interface_version: 1
 module_type: pathway
-status: active
+status: review
 owner: OMIX Team
 description: Filter, subset, and export GSEA result tables using statistical, annotation, gene, and contrast criteria.
 data_policy: No data are committed. Callers supply an explicit GSEA results-table path through the portable CLI or a platform adapter.
