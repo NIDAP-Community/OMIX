@@ -36,6 +36,10 @@ stopifnot(isTRUE(all.equal(result[["B-A_logFC"]], c(1, 0.3, -0.1), tolerance = 1
 stopifnot(isTRUE(all.equal(result[["B-A_FC"]], c(2, 2^0.3, -1 / 2^-0.1), tolerance = 1e-12)))
 stopifnot(identical(attr(result, "omix_limma_run")$variance_model, "ebayes"))
 stopifnot(identical(attr(result, "omix_limma_run")$model_type, "linear"))
+stopifnot(identical(attr(result, "omix_limma_run")$input_data_type, "normalized_bulk_expression"))
+variance_diagnostic <- attr(result, "omix_limma_variance_diagnostic")
+stopifnot(identical(names(variance_diagnostic), c("Feature", "Average_Signal", "Residual_SD")))
+stopifnot(nrow(variance_diagnostic) == nrow(expression))
 
 # A blank contrast is safe only when exactly one replicated two-group
 # comparison exists. Its direction follows the deterministic factor order.
@@ -188,6 +192,105 @@ trend_result <- omix_limma_analysis(
   variance_model = "ebayes_trend"
 )
 stopifnot(identical(attr(trend_result, "omix_limma_run")$variance_model, "ebayes_trend"))
+
+# Auto resolution is contract-based rather than guessed from matrix values.
+sct_contract <- omix_limma_resolve_input_contract(
+  input_data_type = "auto",
+  input_kind = "auto",
+  variance_model = "auto",
+  manifest_matrix_type = "sctransform_mean_log2_expression",
+  manifest_recommended_variance_model = "ebayes_trend"
+)
+stopifnot(identical(sct_contract$input_data_type, "sctransform_mean_expression"))
+stopifnot(identical(sct_contract$input_kind, "log2_expression"))
+stopifnot(identical(sct_contract$variance_model, "ebayes_trend"))
+stopifnot(identical(sct_contract$input_data_type_source, "manifest"))
+
+manifest_type_mismatch <- tryCatch(
+  omix_limma_resolve_input_contract(
+    input_data_type = "harmony_corrected_mean_expression",
+    manifest_matrix_type = "sctransform_mean_log2_expression",
+    variance_model = "auto"
+  ),
+  error = identity
+)
+stopifnot(inherits(manifest_type_mismatch, "error"))
+stopifnot(grepl("does not match the manifest", conditionMessage(manifest_type_mismatch), fixed = TRUE))
+
+harmony_contract <- omix_limma_resolve_input_contract(
+  input_data_type = "harmony_corrected_mean_expression",
+  variance_model = "auto"
+)
+stopifnot(identical(harmony_contract$variance_model, "ebayes"))
+
+gsva_contract <- omix_limma_resolve_input_contract(
+  input_data_type = "gsva_enrichment_scores",
+  variance_model = "auto"
+)
+stopifnot(identical(gsva_contract$input_kind, "enrichment_score"))
+stopifnot(identical(gsva_contract$variance_model, "ebayes"))
+
+other_auto <- tryCatch(
+  omix_limma_resolve_input_contract(
+    input_data_type = "other_continuous",
+    variance_model = "auto"
+  ),
+  error = identity
+)
+stopifnot(inherits(other_auto, "error"))
+stopifnot(grepl("Select ebayes or ebayes_trend", conditionMessage(other_auto), fixed = TRUE))
+
+# Fraction-only CIBERSORT tables use a boundary-safe arcsine-square-root
+# transform by default. An explicit logit remains available when the user can
+# justify and report its boundary pseudocount.
+fraction_expression <- data.frame(
+  GeneName = c("B_cells", "T_cells", "Myeloid"),
+  A1 = c(0.20, 0.50, 0.30), A2 = c(0.10, 0.55, 0.35), A3 = c(0.00, 0.60, 0.40),
+  B1 = c(0.40, 0.40, 0.20), B2 = c(0.35, 0.45, 0.20), B3 = c(0.30, 0.50, 0.20),
+  check.names = FALSE
+)
+fraction_contract <- omix_limma_resolve_input_contract(
+  input_data_type = "cibersort_relative_fractions",
+  variance_model = "auto",
+  fraction_transform = "auto"
+)
+stopifnot(identical(fraction_contract$input_kind, "continuous_score"))
+stopifnot(identical(fraction_contract$variance_model, "ebayes"))
+stopifnot(identical(fraction_contract$fraction_transform, "arcsin_sqrt"))
+fraction_result <- omix_limma_analysis(
+  Dataset = fraction_expression,
+  Metadata_Table = metadata,
+  sample_names_column = "Sample",
+  samples_to_include = metadata$Sample,
+  gene_names_column = "GeneName",
+  contrast_variable_columns = "Group",
+  contrasts = "B-A",
+  input_kind = fraction_contract$input_kind,
+  input_data_type = fraction_contract$input_data_type,
+  fraction_transform = fraction_contract$fraction_transform,
+  variance_model = fraction_contract$variance_model
+)
+stopifnot("B-A_effect" %in% names(fraction_result))
+stopifnot(all(is.finite(fraction_result$A1)))
+stopifnot(isTRUE(all.equal(fraction_result$A1, asin(sqrt(fraction_expression$A1)), tolerance = 1e-12)))
+
+missing_other_scale <- tryCatch(
+  omix_limma_analysis(
+    Dataset = expression,
+    Metadata_Table = metadata,
+    sample_names_column = "Sample",
+    samples_to_include = metadata$Sample,
+    gene_names_column = "GeneName",
+    contrast_variable_columns = "Group",
+    contrasts = "B-A",
+    input_kind = "continuous_score",
+    input_data_type = "other_continuous",
+    variance_model = "ebayes"
+  ),
+  error = identity
+)
+stopifnot(inherits(missing_other_scale, "error"))
+stopifnot(grepl("measurement_scale is required", conditionMessage(missing_other_scale), fixed = TRUE))
 
 invalid_kind <- tryCatch(
   omix_limma_analysis(

@@ -1,10 +1,9 @@
-#' Template-preserving limma analysis for declared continuous matrices.
+#' Limma analysis for declared continuous feature-by-sample matrices.
 #'
-#' This module is a portable extraction of the analytical core of
-#' `Templates/Limma_Analysis_v41.R`. It intentionally retains the template's
-#' data alignment, duplicate-feature summary, design, contrast, donor-blocking,
-#' empirical-Bayes, and result-column conventions. Interactive notebook plots,
-#' Sankey diagrams, and printed tables are replaced by explicit CLI outputs.
+#' The implementation aligns samples, summarizes duplicate features, constructs
+#' the requested design and contrasts, optionally models repeated donors, and
+#' applies limma empirical-Bayes moderation. The caller must declare what the
+#' continuous measurements represent; raw count matrices are not accepted.
 #'
 #' @param Dataset A feature-by-sample data frame with one feature-ID column.
 #' @param Metadata_Table Sample metadata with one row per supplied sample.
@@ -16,16 +15,22 @@
 #'   comparison is inferred if exactly two modeled groups have replication.
 #' @param covariate_columns Optional fixed-effect metadata columns.
 #' @param donor_variable_column Optional repeated-measure blocking column.
-#' @param summarization_method Duplicate-feature summary, as in the template.
+#' @param summarization_method Duplicate-feature summary function.
 #' @param return_matrix Append modeled sample values to the result table.
-#' @param fold_change_threshold Preserved template threshold recorded as provenance.
-#' @param first_pvalue_threshold Preserved template threshold recorded as provenance.
-#' @param second_pvalue_threshold Preserved template threshold recorded as provenance.
-#' @param input_kind Matrix interpretation: log2_expression, enrichment_score,
-#'   or continuous_score. Raw counts and untransformed proportions are rejected.
-#' @param variance_model eBayes reproduces the template default. ebayes_trend is
-#'   an explicit limma-trend option for a declared mean-dependent variance model.
-#' @return A template-compatible result data frame with OMIX provenance attached.
+#' @param fold_change_threshold Effect threshold recorded as provenance.
+#' @param first_pvalue_threshold Primary p-value threshold recorded as provenance.
+#' @param second_pvalue_threshold Secondary p-value threshold recorded as provenance.
+#' @param input_kind Effect-size interpretation: log2_expression,
+#'   enrichment_score, or continuous_score.
+#' @param input_data_type Scientific type of the supplied continuous matrix.
+#' @param measurement_scale Short user-facing description of the measurement
+#'   scale, required for other_continuous inputs.
+#' @param fraction_transform Transformation applied to CIBERSORT relative
+#'   fractions: none, arcsin_sqrt, or logit.
+#' @param fraction_pseudocount Boundary value used only for a logit transform.
+#' @param variance_model ebayes uses a constant prior variance; ebayes_trend
+#'   allows the prior variance to vary with average signal.
+#' @return A result data frame with OMIX provenance attached.
 
 .omix_limma_require <- function(package) {
   if (!requireNamespace(package, quietly = TRUE)) {
@@ -40,6 +45,204 @@
     stop(argument, " must contain at least one value.", call. = FALSE)
   }
   unique(values)
+}
+
+.omix_limma_input_data_types <- c(
+  "microarray_log2_expression",
+  "normalized_bulk_expression",
+  "log2_cpm_without_voom_weights",
+  "sctransform_mean_expression",
+  "harmony_corrected_mean_expression",
+  "gsva_enrichment_scores",
+  "cibersort_relative_fractions",
+  "cibersort_absolute_scores",
+  "methylation_m_values",
+  "normalized_proteomics",
+  "normalized_metabolomics",
+  "qpcr_delta_ct",
+  "copy_number_log2_ratios",
+  "normalized_chromatin_accessibility",
+  "normalized_crispr_scores",
+  "other_continuous"
+)
+
+.omix_limma_manifest_type_aliases <- c(
+  harmony_corrected_mean_expression = "harmony_corrected_mean_expression",
+  sctransform_mean_log2_expression = "sctransform_mean_expression",
+  gsva_enrichment_scores = "gsva_enrichment_scores",
+  cibersort_relative_fractions = "cibersort_relative_fractions",
+  cibersort_absolute_scores = "cibersort_absolute_scores",
+  raw_integer_counts = "raw_integer_counts"
+)
+
+.omix_limma_default_variance_model <- function(input_data_type) {
+  trend_types <- c(
+    "log2_cpm_without_voom_weights",
+    "sctransform_mean_expression",
+    "normalized_chromatin_accessibility"
+  )
+  if (identical(input_data_type, "other_continuous")) return(NA_character_)
+  if (input_data_type %in% trend_types) "ebayes_trend" else "ebayes"
+}
+
+.omix_limma_default_input_kind <- function(input_data_type) {
+  if (input_data_type %in% c(
+    "microarray_log2_expression", "normalized_bulk_expression",
+    "log2_cpm_without_voom_weights", "sctransform_mean_expression",
+    "harmony_corrected_mean_expression"
+  )) return("log2_expression")
+  if (identical(input_data_type, "gsva_enrichment_scores")) return("enrichment_score")
+  "continuous_score"
+}
+
+# Resolve user and manifest declarations before the model is fitted. This is
+# deliberately contract-based: SCT, Harmony, and GSVA cannot be distinguished
+# reliably by inspecting an arbitrary numeric matrix.
+omix_limma_resolve_input_contract <- function(
+    input_data_type = "auto",
+    input_kind = "auto",
+    variance_model = "auto",
+    fraction_transform = "auto",
+    manifest_matrix_type = "",
+    manifest_recommended_variance_model = "") {
+  input_data_type <- tolower(trimws(as.character(input_data_type)))
+  input_kind <- tolower(trimws(as.character(input_kind)))
+  variance_model <- tolower(trimws(as.character(variance_model)))
+  fraction_transform <- tolower(trimws(as.character(fraction_transform)))
+  manifest_matrix_type <- tolower(trimws(as.character(manifest_matrix_type)))
+  manifest_recommended_variance_model <- tolower(trimws(as.character(manifest_recommended_variance_model)))
+
+  if (length(input_data_type) != 1L || !input_data_type %in% c("auto", .omix_limma_input_data_types)) {
+    stop("input_data_type must be auto or a supported declared continuous data type.", call. = FALSE)
+  }
+  if (length(input_kind) != 1L || !input_kind %in% c("auto", "log2_expression", "enrichment_score", "continuous_score")) {
+    stop("input_kind must be auto, log2_expression, enrichment_score, or continuous_score.", call. = FALSE)
+  }
+  if (length(variance_model) != 1L || !variance_model %in% c("auto", "ebayes", "ebayes_trend")) {
+    stop("variance_model must be auto, ebayes, or ebayes_trend.", call. = FALSE)
+  }
+  if (length(fraction_transform) != 1L || !fraction_transform %in% c("auto", "none", "arcsin_sqrt", "logit")) {
+    stop("fraction_transform must be auto, none, arcsin_sqrt, or logit.", call. = FALSE)
+  }
+
+  resolved_type <- input_data_type
+  type_source <- "explicit"
+  manifest_resolved_type <- ""
+  if (nzchar(manifest_matrix_type)) {
+    if (!manifest_matrix_type %in% names(.omix_limma_manifest_type_aliases)) {
+      stop("The manifest declares unsupported matrix_type '", manifest_matrix_type, "'.", call. = FALSE)
+    }
+    manifest_resolved_type <- unname(.omix_limma_manifest_type_aliases[[manifest_matrix_type]])
+    if (identical(manifest_resolved_type, "raw_integer_counts")) {
+      stop(
+        "Raw integer counts are not valid for direct lmFit. Run OMIX-DEG-Analysis in raw-count mode so count filtering, library normalization, and limma-voom can be applied.",
+        call. = FALSE
+      )
+    }
+    if (!identical(resolved_type, "auto") && !identical(resolved_type, manifest_resolved_type)) {
+      stop(
+        "input_data_type ('", resolved_type, "') does not match the manifest matrix_type ('",
+        manifest_matrix_type, "').",
+        call. = FALSE
+      )
+    }
+  }
+  if (identical(resolved_type, "auto")) {
+    if (nzchar(manifest_resolved_type)) {
+      resolved_type <- manifest_resolved_type
+      type_source <- "manifest"
+    } else if (identical(input_kind, "enrichment_score")) {
+      resolved_type <- "gsva_enrichment_scores"
+      type_source <- "input_kind_fallback"
+    } else if (identical(input_kind, "log2_expression")) {
+      # Backward-compatible interpretation for callers predating
+      # input_data_type. New runs should make the type explicit or use a
+      # manifest, especially for SCT and Harmony handoffs.
+      resolved_type <- "normalized_bulk_expression"
+      type_source <- "input_kind_fallback"
+    } else {
+      stop(
+        "input_data_type=auto could not resolve the matrix type. Supply a compatible manifest or select an explicit input_data_type.",
+        call. = FALSE
+      )
+    }
+  }
+  if (identical(resolved_type, "raw_integer_counts")) {
+    stop(
+      "Raw integer counts are not valid for direct lmFit. Run OMIX-DEG-Analysis in raw-count mode so count filtering, library normalization, and limma-voom can be applied.",
+      call. = FALSE
+    )
+  }
+
+  resolved_kind <- if (identical(input_kind, "auto")) {
+    .omix_limma_default_input_kind(resolved_type)
+  } else {
+    input_kind
+  }
+  recommended_variance_model <- .omix_limma_default_variance_model(resolved_type)
+  variance_source <- "input_data_type"
+  if (manifest_recommended_variance_model %in% c("ebayes", "ebayes_trend")) {
+    recommended_variance_model <- manifest_recommended_variance_model
+    variance_source <- "manifest"
+  }
+  resolved_variance_model <- variance_model
+  if (identical(resolved_variance_model, "auto")) {
+    if (is.na(recommended_variance_model)) {
+      stop(
+        "variance_model=auto is not available for input_data_type=other_continuous. Select ebayes or ebayes_trend after considering the measurement scale and variance diagnostic.",
+        call. = FALSE
+      )
+    }
+    resolved_variance_model <- recommended_variance_model
+  } else {
+    variance_source <- "explicit"
+  }
+
+  resolved_fraction_transform <- fraction_transform
+  if (identical(resolved_fraction_transform, "auto")) {
+    resolved_fraction_transform <- if (identical(resolved_type, "cibersort_relative_fractions")) "arcsin_sqrt" else "none"
+  }
+  if (!identical(resolved_type, "cibersort_relative_fractions") && !identical(resolved_fraction_transform, "none")) {
+    stop("fraction_transform is only valid for cibersort_relative_fractions.", call. = FALSE)
+  }
+
+  list(
+    requested_input_data_type = input_data_type,
+    input_data_type = resolved_type,
+    input_data_type_source = type_source,
+    input_kind = resolved_kind,
+    requested_variance_model = variance_model,
+    recommended_variance_model = recommended_variance_model,
+    variance_model = resolved_variance_model,
+    variance_model_source = variance_source,
+    requested_fraction_transform = fraction_transform,
+    fraction_transform = resolved_fraction_transform
+  )
+}
+
+.omix_limma_transform_relative_fractions <- function(expression, method, pseudocount) {
+  tolerance <- sqrt(.Machine$double.eps)
+  if (any(expression < -tolerance | expression > 1 + tolerance)) {
+    stop("CIBERSORT relative fractions must be between 0 and 1 before transformation.", call. = FALSE)
+  }
+  expression <- pmin(pmax(expression, 0), 1)
+  sample_sums <- colSums(expression)
+  if (any(abs(sample_sums - 1) > 0.02)) {
+    warning(
+      "At least one CIBERSORT relative-fraction sample does not sum to approximately 1; verify whether the input contains relative fractions or absolute scores.",
+      call. = FALSE
+    )
+  }
+  if (identical(method, "none")) {
+    warning("Untransformed relative fractions were requested explicitly; inference may be sensitive to bounded, nonconstant variance.", call. = FALSE)
+    return(expression)
+  }
+  if (identical(method, "arcsin_sqrt")) return(asin(sqrt(expression)))
+  if (!is.numeric(pseudocount) || length(pseudocount) != 1L || !is.finite(pseudocount) || pseudocount <= 0 || pseudocount >= 0.5) {
+    stop("fraction_pseudocount must be one finite number greater than 0 and less than 0.5.", call. = FALSE)
+  }
+  clipped <- pmin(pmax(expression, pseudocount), 1 - pseudocount)
+  log(clipped / (1 - clipped))
 }
 
 .omix_limma_collapse_features <- function(dataset, gene_names_column, sample_ids, method) {
@@ -169,11 +372,12 @@
   fold_change
 }
 
-#' Run the template-compatible limma analysis.
+#' Run limma analysis on a declared continuous matrix.
 #'
-#' The public argument names and defaults through second_pvalue_threshold match
-#' Limma_Analysis_v41.R. `input_kind` and `variance_model` make the scale and
-#' variance assumption explicit without changing the template-equivalent default.
+#' The public argument names and defaults through second_pvalue_threshold retain
+#' the established analysis interface. The additional declarations make the
+#' measurement scale, input type, transformation, and variance assumption
+#' explicit without changing direct-function defaults for existing callers.
 Limma_Analysis <- function(
     Dataset,
     Metadata_Table,
@@ -190,10 +394,34 @@ Limma_Analysis <- function(
     first_pvalue_threshold = 0.05,
     second_pvalue_threshold = 0.01,
     input_kind = c("log2_expression", "enrichment_score", "continuous_score"),
-    variance_model = c("ebayes", "ebayes_trend")) {
+    variance_model = c("ebayes", "ebayes_trend"),
+    input_data_type = "auto",
+    measurement_scale = "",
+    fraction_transform = c("auto", "none", "arcsin_sqrt", "logit"),
+    fraction_pseudocount = 1e-04) {
   .omix_limma_require("limma")
   input_kind <- match.arg(input_kind)
   variance_model <- match.arg(variance_model)
+  input_data_type <- match.arg(input_data_type, c("auto", .omix_limma_input_data_types))
+  fraction_transform <- match.arg(fraction_transform)
+  input_contract <- omix_limma_resolve_input_contract(
+    input_data_type = input_data_type,
+    input_kind = input_kind,
+    variance_model = variance_model,
+    fraction_transform = fraction_transform
+  )
+  input_kind <- input_contract$input_kind
+  variance_model <- input_contract$variance_model
+  input_data_type <- input_contract$input_data_type
+  fraction_transform <- input_contract$fraction_transform
+  measurement_scale <- trimws(as.character(measurement_scale))
+  if (length(measurement_scale) != 1L) stop("measurement_scale must contain one value.", call. = FALSE)
+  if (identical(input_data_type, "other_continuous") && !nzchar(measurement_scale)) {
+    stop("measurement_scale is required for input_data_type=other_continuous.", call. = FALSE)
+  }
+  if (!identical(input_data_type, "cibersort_relative_fractions") && !identical(fraction_transform, "none")) {
+    stop("fraction_transform is only valid for cibersort_relative_fractions.", call. = FALSE)
+  }
   dataset <- as.data.frame(Dataset, check.names = FALSE, stringsAsFactors = FALSE)
   metadata <- as.data.frame(Metadata_Table, check.names = FALSE, stringsAsFactors = FALSE)
   contrast_variable_columns <- .omix_limma_as_character(contrast_variable_columns, "contrast_variable_columns")
@@ -211,7 +439,7 @@ Limma_Analysis <- function(
   }
   if (!all(make.names(names(dataset)) == names(dataset))) {
     invalid <- names(dataset)[make.names(names(dataset)) != names(dataset)]
-    stop("Dataset has non-syntactic column names, as rejected by Limma_Analysis_v41.R: ", paste(invalid, collapse = ", "), ".", call. = FALSE)
+    stop("Dataset has non-syntactic column names: ", paste(invalid, collapse = ", "), ".", call. = FALSE)
   }
   required_metadata <- unique(c(sample_names_column, contrast_variable_columns, covariate_columns, donor_variable_column))
   missing_metadata <- setdiff(required_metadata, names(metadata))
@@ -234,6 +462,13 @@ Limma_Analysis <- function(
 
   expression <- .omix_limma_collapse_features(dataset, gene_names_column, samples_to_include, summarization_method)
   if (!all(is.finite(expression))) stop("The selected continuous matrix contains non-finite values after duplicate-feature summarization.", call. = FALSE)
+  if (identical(input_data_type, "cibersort_relative_fractions")) {
+    expression <- .omix_limma_transform_relative_fractions(
+      expression,
+      method = fraction_transform,
+      pseudocount = fraction_pseudocount
+    )
+  }
   design_details <- .omix_limma_design(metadata, sample_names_column, contrast_variable_columns, covariate_columns)
   metadata <- design_details$metadata
   design <- design_details$design
@@ -247,7 +482,7 @@ Limma_Analysis <- function(
   non_estimable <- colnames(design)[colSums(design) %in% c(0, 1)]
   if (length(non_estimable) > 0L) {
     design <- design[, !colnames(design) %in% non_estimable, drop = FALSE]
-    if (ncol(design) == 0L) stop("No estimable design terms remain after template-compatible singleton removal.", call. = FALSE)
+    if (ncol(design) == 0L) stop("No estimable design terms remain after singleton removal.", call. = FALSE)
     expression <- expression[, rownames(design), drop = FALSE]
     metadata <- metadata[rownames(design), , drop = FALSE]
   }
@@ -289,6 +524,13 @@ Limma_Analysis <- function(
   }
   colnames(contrast_matrix) <- contrasts
   fit <- limma::contrasts.fit(fit, contrast_matrix)
+  variance_diagnostic <- data.frame(
+    Feature = rownames(expression),
+    Average_Signal = rowMeans(expression),
+    Residual_SD = fit$sigma,
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
   fit <- limma::eBayes(fit, trend = identical(variance_model, "ebayes_trend"))
 
   group_means <- lapply(colnames(design), function(group_name) rowMeans(expression[, which(design[, group_name] == 1), drop = FALSE]))
@@ -331,7 +573,11 @@ Limma_Analysis <- function(
   colnames(results) <- gsub(" - ", "-", colnames(results), fixed = TRUE)
   colnames(results) <- gsub("\\(", "", gsub("\\)", "", colnames(results)))
   attr(results, "omix_limma_run") <- list(
-    input_kind = input_kind, variance_model = variance_model, model_type = model_type,
+    input_kind = input_kind, input_data_type = input_data_type,
+    measurement_scale = measurement_scale,
+    fraction_transform = fraction_transform,
+    fraction_pseudocount = if (identical(fraction_transform, "logit")) fraction_pseudocount else NA_real_,
+    variance_model = variance_model, model_type = model_type,
     design_formula = paste(deparse(design_details$formula), collapse = " "),
     group_label_mapping = design_details$group_label_map,
     group_replicate_counts = group_counts,
@@ -345,6 +591,7 @@ Limma_Analysis <- function(
     summarization_method = summarization_method, fold_change_threshold = fold_change_threshold,
     first_pvalue_threshold = first_pvalue_threshold, second_pvalue_threshold = second_pvalue_threshold
   )
+  attr(results, "omix_limma_variance_diagnostic") <- variance_diagnostic
   results
 }
 

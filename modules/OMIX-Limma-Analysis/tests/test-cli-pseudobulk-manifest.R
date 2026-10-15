@@ -50,8 +50,14 @@ run_cli <- function(manifest, output) {
 success_output <- run_cli(manifest_path, output_dir)
 stopifnot(is.null(attr(success_output, "status")))
 stopifnot(file.exists(file.path(output_dir, "Limma_Analysis.csv")))
+stopifnot(file.exists(file.path(output_dir, "Variance_Diagnostic.csv")))
+stopifnot(file.exists(file.path(output_dir, "variance_diagnostic.png")))
 summary_lines <- readLines(file.path(output_dir, "run_summary.txt"))
+stopifnot(any(grepl("requested input data type: auto", summary_lines, fixed = TRUE)))
+stopifnot(any(grepl("input data type: sctransform_mean_expression", summary_lines, fixed = TRUE)))
+stopifnot(any(grepl("input data type source: manifest", summary_lines, fixed = TRUE)))
 stopifnot(any(grepl("requested variance model: auto", summary_lines, fixed = TRUE)))
+stopifnot(any(grepl("recommended variance model: ebayes_trend", summary_lines, fixed = TRUE)))
 stopifnot(any(grepl("variance model: ebayes_trend", summary_lines, fixed = TRUE)))
 
 # Omitting --contrasts must infer the only replicated two-group comparison and
@@ -106,5 +112,65 @@ base::write.dcf(data.frame(
 raw_output <- suppressWarnings(run_cli(raw_manifest_path, file.path(work_dir, "raw-results")))
 stopifnot(identical(attr(raw_output, "status"), 1L))
 stopifnot(any(grepl("OMIX-DEG-Analysis", raw_output, fixed = TRUE)))
+
+# Unknown continuous measurements must document their scale and make an
+# explicit variance-model decision rather than letting auto guess from values.
+other_output <- suppressWarnings(system2(file.path(R.home("bin"), "Rscript"), c(
+  cli,
+  "--matrix", matrix_path,
+  "--metadata", metadata_path,
+  "--contrast_variable_columns", "Group",
+  "--contrasts", "B-A",
+  "--input_data_type", "other_continuous",
+  "--input_kind", "continuous_score",
+  "--measurement_scale", shQuote("normalized arbitrary assay score"),
+  "--variance_model", "auto",
+  "--output_dir", file.path(work_dir, "other-results")
+), stdout = TRUE, stderr = TRUE))
+stopifnot(identical(attr(other_output, "status"), 1L))
+stopifnot(any(grepl("Select ebayes or ebayes_trend", other_output, fixed = TRUE)))
+
+other_success_dir <- file.path(work_dir, "other-explicit-results")
+other_success <- system2(file.path(R.home("bin"), "Rscript"), c(
+  cli,
+  "--matrix", matrix_path,
+  "--metadata", metadata_path,
+  "--contrast_variable_columns", "Group",
+  "--contrasts", "B-A",
+  "--input_data_type", "other_continuous",
+  "--input_kind", "continuous_score",
+  "--measurement_scale", shQuote("normalized arbitrary assay score"),
+  "--variance_model", "ebayes",
+  "--output_dir", other_success_dir
+), stdout = TRUE, stderr = TRUE)
+stopifnot(is.null(attr(other_success, "status")))
+other_summary <- readLines(file.path(other_success_dir, "run_summary.txt"))
+stopifnot(any(grepl("input data type: other_continuous", other_summary, fixed = TRUE)))
+stopifnot(any(grepl("measurement scale: normalized arbitrary assay score", other_summary, fixed = TRUE)))
+
+fraction_path <- file.path(work_dir, "CIBERSORT_Relative_Fractions.csv")
+fraction_output_dir <- file.path(work_dir, "fraction-results")
+utils::write.csv(data.frame(
+  GeneName = c("B_cells", "T_cells", "Myeloid"),
+  D1__A = c(0.2, 0.5, 0.3), D2__A = c(0.1, 0.55, 0.35), D3__A = c(0, 0.6, 0.4),
+  D1__B = c(0.4, 0.4, 0.2), D2__B = c(0.35, 0.45, 0.2), D3__B = c(0.3, 0.5, 0.2),
+  check.names = FALSE
+), fraction_path, row.names = FALSE)
+fraction_output <- system2(file.path(R.home("bin"), "Rscript"), c(
+  cli,
+  "--matrix", fraction_path,
+  "--metadata", metadata_path,
+  "--contrast_variable_columns", "Group",
+  "--contrasts", "B-A",
+  "--input_data_type", "cibersort_relative_fractions",
+  "--variance_model", "auto",
+  "--fraction_transform", "auto",
+  "--output_dir", fraction_output_dir
+), stdout = TRUE, stderr = TRUE)
+stopifnot(is.null(attr(fraction_output, "status")))
+fraction_summary <- readLines(file.path(fraction_output_dir, "run_summary.txt"))
+stopifnot(any(grepl("input kind: continuous_score", fraction_summary, fixed = TRUE)))
+stopifnot(any(grepl("fraction transform: arcsin_sqrt", fraction_summary, fixed = TRUE)))
+stopifnot(any(grepl("variance model: ebayes", fraction_summary, fixed = TRUE)))
 
 message("OMIX-Limma-Analysis CLI manifest handoff checks passed")

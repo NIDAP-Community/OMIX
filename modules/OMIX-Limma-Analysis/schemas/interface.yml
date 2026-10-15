@@ -1,10 +1,10 @@
-interface_version: 2
+interface_version: 3
 entrypoint: scripts/run_limma_analysis.R
 inputs:
   matrix:
     required: true
     formats: [csv, tsv, txt, rds]
-    description: Feature-by-sample continuous matrix. It must not contain raw integer RNA counts or untransformed relative proportions.
+    description: Feature-by-sample continuous matrix. Raw integer sequencing counts are not accepted. CIBERSORT relative fractions are accepted only through their declared input type and transformation controls.
   metadata:
     required: true
     formats: [csv, tsv, txt, rds]
@@ -41,14 +41,49 @@ parameters:
     allowed: [mean, max, sum]
   input_kind:
     type: string
-    default: log2_expression
-    allowed: [log2_expression, enrichment_score, continuous_score]
-    description: Declares the input scale and controls effect-size labeling. Relative proportions require a separately declared transform and are not accepted by this initial interface.
+    default: auto
+    allowed: [auto, log2_expression, enrichment_score, continuous_score]
+    description: Controls effect-size labeling. auto resolves log2 expression, enrichment-score, or generic continuous effects from input_data_type.
+  input_data_type:
+    type: string
+    default: auto
+    allowed:
+      - auto
+      - microarray_log2_expression
+      - normalized_bulk_expression
+      - log2_cpm_without_voom_weights
+      - sctransform_mean_expression
+      - harmony_corrected_mean_expression
+      - gsva_enrichment_scores
+      - cibersort_relative_fractions
+      - cibersort_absolute_scores
+      - methylation_m_values
+      - normalized_proteomics
+      - normalized_metabolomics
+      - qpcr_delta_ct
+      - copy_number_log2_ratios
+      - normalized_chromatin_accessibility
+      - normalized_crispr_scores
+      - other_continuous
+    description: Scientific interpretation of the matrix. auto uses a compatible manifest, or a limited backward-compatible input_kind mapping. Matrix values alone are never used to guess SCT, Harmony, GSVA, or another assay type.
+  measurement_scale:
+    type: string
+    default: ""
+    description: Short description of the supplied measurement scale. Required when input_data_type is other_continuous and recommended for all externally prepared matrices.
+  fraction_transform:
+    type: string
+    default: auto
+    allowed: [auto, none, arcsin_sqrt, logit]
+    description: Transformation for cibersort_relative_fractions. auto uses arcsin_sqrt because it handles exact zero and one fractions without inventing an effective cell-count denominator. logit uses fraction_pseudocount at the boundaries.
+  fraction_pseudocount:
+    type: number
+    default: 0.0001
+    description: Boundary replacement used only for an explicit logit transform of CIBERSORT relative fractions. Must be greater than 0 and less than 0.5.
   variance_model:
     type: string
     default: auto
     allowed: [auto, ebayes, ebayes_trend]
-    description: auto uses a compatible Pseudobulk_Manifest.dcf recommendation when supplied and otherwise uses template-equivalent ebayes. ebayes_trend is explicit limma empirical-Bayes trend modeling for a declared mean-dependent variance relationship.
+    description: auto resolves a documented default from the declared input data type or compatible manifest. ebayes uses a constant prior variance; ebayes_trend permits the prior variance to vary with average signal. other_continuous requires an explicit choice.
   pseudobulk_manifest:
     type: path
     default: ""
@@ -71,4 +106,12 @@ outputs:
   run_summary:
     path: run_summary.txt
     format: text
-    description: Matrix provenance, model settings, design, and donor-correlation details.
+    description: Matrix provenance, requested and resolved input type, transformation and variance model, design, and donor-correlation details.
+  variance_diagnostic:
+    path: Variance_Diagnostic.csv
+    format: csv
+    description: Per-feature average signal and pre-moderation residual standard deviation used to assess whether a mean-variance trend remains.
+  variance_diagnostic_plot:
+    path: variance_diagnostic.png
+    format: png
+    description: Residual standard deviation versus average signal with a lowess trend when enough features are available.
