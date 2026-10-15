@@ -13,8 +13,8 @@ of input in the same way.
 | Mode | Input | Model | Batch handling |
 | --- | --- | --- | --- |
 | `raw_counts` | Raw integer-like bulk or summed pseudobulk counts | Design-aware filtering, edgeR library-size normalization, limma-voom | Include known technical batch terms in the model. |
-| `harmony_mean_expression` | A documented, log2-scale, Harmony-corrected gene-expression matrix averaged per cell type × donor | Direct limma, with optional donor blocking | Do not add `Batch`, TMM, voom, or another normalization. Harmony is the declared upstream correction. |
-| `sct_mean_expression` | Log2-scale cell-type × donor means written from Seurat `SCT/data` by OMIX Seurat Pseudobulk | Direct limma, with optional donor blocking | SCTransform addresses sequencing depth, not necessarily technical batch. Model any remaining batch through `covariate_columns`; do not use count normalization or downstream batch-effect removal. |
+| `harmony_mean_expression` | A documented, log2-scale, Harmony-corrected gene-expression matrix averaged per cell type × donor | Direct limma with ordinary empirical Bayes and optional donor blocking | Do not add `Batch`, TMM, voom, or another normalization. Harmony is the declared upstream correction. |
+| `sct_mean_expression` | Log2-scale cell-type × donor means written from Seurat `SCT/data` by OMIX Seurat Pseudobulk | Direct limma with trend-aware empirical Bayes and optional donor blocking | SCTransform addresses sequencing depth, not necessarily technical batch. Model any remaining batch through `covariate_columns`; do not use count normalization or downstream batch-effect removal. |
 
 ## When to use it
 
@@ -163,6 +163,9 @@ downstream DEG table.
 - The output `*_logFC` is the limma coefficient on the declared corrected
   expression scale. Interpret `*_FC` as a fold change only when that input is
   log2-scale.
+- Moderated statistics use ordinary empirical Bayes (`trend = FALSE`) because
+  the declared Harmony-corrected mean-expression workflow does not retain the
+  SCT-like mean-dependent variance model.
 
 ### SCTransform mean expression
 
@@ -172,6 +175,9 @@ downstream DEG table.
 - This mode is direct limma: it rejects TMM, voom, edgeR filtering, and
   downstream batch-effect removal. Do not use raw `SCT/counts` here; they
   are depth-corrected values, not observed raw counts.
+- Moderated statistics use trend-aware empirical Bayes (`trend = TRUE`) to
+  allow the prior variance to depend on the average signal that remains in
+  donor-level SCT means. No voom observation weights are added.
 - SCTransform corrects sequencing depth. If an unhandled technical batch
   remains and is not confounded with Group, model it through
   `--covariate_columns Batch`. If it was already explicitly regressed

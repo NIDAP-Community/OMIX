@@ -643,12 +643,14 @@ omix_deg_analysis <- function(
     harmony_mean_expression = list(
       input_matrix_type = "harmony_corrected_mean_expression",
       input_label = "Harmony-corrected mean expression",
-      expression_output = "input_harmony_corrected_expression"
+      expression_output = "input_harmony_corrected_expression",
+      variance_model = "ebayes"
     ),
     sct_mean_expression = list(
       input_matrix_type = "sctransform_mean_log2_expression",
       input_label = "SCTransform mean log2 expression",
-      expression_output = "input_sctransform_log2_expression"
+      expression_output = "input_sctransform_log2_expression",
+      variance_model = "ebayes_trend"
     )
   )
   .omix_deg_analysis_continuous_means(
@@ -666,7 +668,8 @@ omix_deg_analysis <- function(
     analysis_mode = analysis_mode,
     input_matrix_type = continuous_details$input_matrix_type,
     input_label = continuous_details$input_label,
-    expression_output = continuous_details$expression_output
+    expression_output = continuous_details$expression_output,
+    variance_model = continuous_details$variance_model
   )
 }
 
@@ -685,7 +688,8 @@ omix_deg_analysis <- function(
   analysis_mode,
   input_matrix_type,
   input_label,
-  expression_output
+  expression_output,
+  variance_model
 ) {
   if (!requireNamespace("limma", quietly = TRUE)) {
     stop("Required package is not installed: limma", call. = FALSE)
@@ -705,6 +709,9 @@ omix_deg_analysis <- function(
   }
   if (!summarization_method %in% c("sum", "mean", "max")) {
     stop("summarization_method must be one of: sum, mean, max.", call. = FALSE)
+  }
+  if (!variance_model %in% c("ebayes", "ebayes_trend")) {
+    stop("variance_model must be ebayes or ebayes_trend.", call. = FALSE)
   }
   if (!is.logical(return_expression_matrix) || length(return_expression_matrix) != 1L || is.na(return_expression_matrix)) {
     stop("return_expression_matrix must be TRUE or FALSE.", call. = FALSE)
@@ -858,7 +865,7 @@ omix_deg_analysis <- function(
   }
   contrast_matrix <- limma::makeContrasts(contrasts = contrast_labels, levels = design)
   fit <- limma::contrasts.fit(fit, contrast_matrix)
-  fit <- limma::eBayes(fit)
+  fit <- limma::eBayes(fit, trend = identical(variance_model, "ebayes_trend"))
 
   calculate_standard_error <- function(values) {
     values <- values[is.finite(values)]
@@ -906,6 +913,7 @@ omix_deg_analysis <- function(
     analysis_mode = analysis_mode,
     input_matrix_type = input_matrix_type,
     model_type = model_type,
+    variance_model = variance_model,
     normalization_method = "None",
     library_size_normalization = "not_applicable",
     voom_scale_normalization = "not_applicable",

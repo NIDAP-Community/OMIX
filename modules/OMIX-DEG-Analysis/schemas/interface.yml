@@ -155,7 +155,7 @@ outputs:
   run_summary:
     path: run_summary.txt
     format: text
-    description: Analysis and normalization provenance, including the fixed raw-count voom trend span and adaptive-span status.
+    description: Analysis, normalization, and variance-model provenance, including the fixed raw-count voom trend span and adaptive-span status or the resolved continuous-expression empirical-Bayes model.
   normalization_boxplots:
     path: normalization_boxplots.png
     format: png

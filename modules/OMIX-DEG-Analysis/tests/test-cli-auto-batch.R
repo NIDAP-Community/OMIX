@@ -89,4 +89,43 @@ stopifnot(
   )
 )
 
+# Continuous-expression modes must record their deterministic empirical-Bayes
+# choice in the portable CLI summary. The same numeric fixture is sufficient
+# here because this test verifies routing and provenance, not assay origin.
+continuous_table <- count_table
+continuous_table[, sample_ids] <- log2(as.matrix(continuous_table[, sample_ids]) + 1)
+continuous_path <- file.path(working_dir, "continuous.csv")
+utils::write.csv(continuous_table, continuous_path, row.names = FALSE)
+run_continuous_cli <- function(analysis_mode, output_dir) {
+  output <- suppressWarnings(system2(
+    file.path(R.home("bin"), "Rscript"),
+    c(
+      entrypoint,
+      "--counts", continuous_path,
+      "--metadata", metadata_without_batch_path,
+      "--analysis_mode", analysis_mode,
+      "--output_dir", output_dir
+    ),
+    stdout = TRUE,
+    stderr = TRUE
+  ))
+  status <- attr(output, "status")
+  if (is.null(status)) status <- 0L
+  list(status = status, output = output)
+}
+
+harmony_output <- file.path(working_dir, "harmony")
+harmony <- run_continuous_cli("harmony_mean_expression", harmony_output)
+stopifnot(
+  identical(harmony$status, 0L),
+  "variance model: ebayes" %in% readLines(file.path(harmony_output, "run_summary.txt"))
+)
+
+sct_output <- file.path(working_dir, "sct")
+sct <- run_continuous_cli("sct_mean_expression", sct_output)
+stopifnot(
+  identical(sct$status, 0L),
+  "variance model: ebayes_trend" %in% readLines(file.path(sct_output, "run_summary.txt"))
+)
+
 message("OMIX DEG CLI automatic batch-selection checks passed")

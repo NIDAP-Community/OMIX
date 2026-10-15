@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Corrected the continuous-expression variance model: Harmony-corrected donor
+  means retain ordinary empirical Bayes, while SCTransform donor means now use
+  trend-aware empirical Bayes to match canonical OMIX Limma Analysis. The run
+  summary records the resolved variance model. This compatible scientific bug
+  fix advances the module to `0.4.3`; interface version `2` is unchanged.
 - Fixed every raw-count voom smoothing pass at `span = 0.5` with
   `adaptive.span = FALSE`, preserving the behavior of the published runtime
   when newer limma releases enable adaptive span selection by default. The

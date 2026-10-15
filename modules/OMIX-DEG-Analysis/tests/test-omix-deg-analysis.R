@@ -238,6 +238,7 @@ continuous <- omix_deg_analysis(
 stopifnot(all(c("GeneName", "B-A_logFC", "B-A_pval", "B-A_adjpval") %in% colnames(continuous)))
 stopifnot(identical(attr(continuous, "omix_deg_run")$analysis_mode, "harmony_mean_expression"))
 stopifnot(identical(attr(continuous, "omix_deg_run")$normalization_method, "None"))
+stopifnot(identical(attr(continuous, "omix_deg_run")$variance_model, "ebayes"))
 stopifnot(identical(attr(continuous, "omix_deg_run")$expression_output, "input_harmony_corrected_expression"))
 stopifnot(identical(attr(continuous, "omix_deg_run")$adjusted_columns, character()))
 continuous_batch_error <- tryCatch(
@@ -267,6 +268,7 @@ sct_continuous <- omix_deg_analysis(
   analysis_mode = "sct_mean_expression"
 )
 stopifnot(identical(attr(sct_continuous, "omix_deg_run")$analysis_mode, "sct_mean_expression"))
+stopifnot(identical(attr(sct_continuous, "omix_deg_run")$variance_model, "ebayes_trend"))
 stopifnot(identical(attr(sct_continuous, "omix_deg_run")$input_matrix_type, "sctransform_mean_log2_expression"))
 stopifnot(identical(attr(sct_continuous, "omix_deg_run")$expression_output, "input_sctransform_log2_expression"))
 sct_with_batch_covariate <- omix_deg_analysis(
@@ -296,5 +298,81 @@ sct_batch_error <- tryCatch(
   error = conditionMessage
 )
 stopifnot(grepl("covariate_columns", sct_batch_error, fixed = TRUE))
+
+# The continuous DEG modes share the canonical Limma scientific contract:
+# Harmony uses ordinary empirical Bayes, whereas SCTransform donor means use
+# trend-aware empirical Bayes. The SCT statistics must therefore agree with
+# the canonical Limma module for the same design and inputs.
+source(file.path(
+  dirname(module_root),
+  "OMIX-Limma-Analysis",
+  "R",
+  "OMIX_Limma_Analysis.R"
+))
+limma_sct <- omix_limma_analysis(
+  Dataset = continuous_dataset,
+  Metadata_Table = fixture$metadata,
+  sample_names_column = "Sample",
+  samples_to_include = fixture$metadata$Sample,
+  gene_names_column = "Gene",
+  contrast_variable_columns = "Condition",
+  contrasts = "B-A",
+  summarization_method = "mean",
+  return_matrix = TRUE,
+  input_kind = "log2_expression",
+  variance_model = "ebayes_trend",
+  input_data_type = "sctransform_mean_expression"
+)
+for (column in c("B-A_logFC", "B-A_tstat", "B-A_pval", "B-A_adjpval")) {
+  stopifnot(isTRUE(all.equal(
+    sct_continuous[[column]],
+    limma_sct[[column]],
+    tolerance = 1e-12,
+    check.attributes = FALSE
+  )))
+}
+
+paired_continuous_dataset <- paired_counts
+paired_continuous_dataset[, paired_metadata$Sample] <- log2(
+  as.matrix(paired_continuous_dataset[, paired_metadata$Sample]) + 1
+)
+deg_paired_sct <- omix_deg_analysis(
+  Dataset = paired_continuous_dataset,
+  Metadata_Table = paired_metadata,
+  sample_names_column = "Sample",
+  samples_to_include = paired_metadata$Sample,
+  gene_names_column = "Gene",
+  contrast_variable_columns = "Condition",
+  contrasts = "B-A",
+  donor_variable_column = "Donor",
+  analysis_mode = "sct_mean_expression"
+)
+limma_paired_sct <- omix_limma_analysis(
+  Dataset = paired_continuous_dataset,
+  Metadata_Table = paired_metadata,
+  sample_names_column = "Sample",
+  samples_to_include = paired_metadata$Sample,
+  gene_names_column = "Gene",
+  contrast_variable_columns = "Condition",
+  contrasts = "B-A",
+  donor_variable_column = "Donor",
+  summarization_method = "mean",
+  return_matrix = TRUE,
+  input_kind = "log2_expression",
+  variance_model = "ebayes_trend",
+  input_data_type = "sctransform_mean_expression"
+)
+stopifnot(
+  identical(attr(deg_paired_sct, "omix_deg_run")$model_type, "continuous_repeated_measures"),
+  identical(attr(deg_paired_sct, "omix_deg_run")$variance_model, "ebayes_trend")
+)
+for (column in c("B-A_logFC", "B-A_tstat", "B-A_pval", "B-A_adjpval")) {
+  stopifnot(isTRUE(all.equal(
+    deg_paired_sct[[column]],
+    limma_paired_sct[[column]],
+    tolerance = 1e-12,
+    check.attributes = FALSE
+  )))
+}
 
 message("OMIX DEG raw-count, Harmony-mean, and SCTransform-mean model tests passed")
