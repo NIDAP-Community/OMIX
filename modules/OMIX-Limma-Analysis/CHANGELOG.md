@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Advanced the canonical module from development to review after the
+  interface-3 implementation, documentation, direct tests, and exact-runtime
+  validation completed. Deployment-platform validation remains separate and
+  pending; this status change does not alter scientific behavior or the public
+  interface.
+
 ## 1.0.0
 
 - Advances the public interface to version 3: a standalone CLI run without a

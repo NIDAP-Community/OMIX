@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Reclassified canonical lifecycle status from active to review until a
+  current local-versus-Code Ocean scientific-output comparison is recorded.
+  This metadata correction does not change plotting behavior or release state.
 - Completed the existing interface-1 schema with every portable CLI control,
   public/advanced/internal classifications, exact defaults, and the canonical
   `resolution_dpi` to internal `resolution_dpi_` implementation binding.
