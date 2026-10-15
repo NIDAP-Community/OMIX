@@ -60,6 +60,11 @@ For a scientific or reusable-interface change:
 6. Run direct tests, a representative explicit-path CLI command, and the
    repository layout test.
 
+When changing a module's `status`, also follow the
+[canonical module lifecycle policy](module-lifecycle.md). Status describes the
+portable canonical module and must not be inferred from an adapter or platform
+release.
+
 Do not hard-code deployment paths in canonical code. Do not copy platform UI,
 runtime setup, or generated results into a canonical module.
 

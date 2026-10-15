@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Marked the canonical module active after lifecycle audit of its direct
+  locked-runtime validation, independent review, documented interface, and
+  current release evidence. This status change does not alter scientific
+  behavior, the public interface, or deployment-release state.
+
 ## 0.3.0
 
 - Added deterministic per-input delimiter detection and optional overrides for

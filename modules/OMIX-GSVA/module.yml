@@ -3,7 +3,7 @@ display_name: OMIX GSVA
 version: 0.3.0
 interface_version: 2
 module_type: pathway
-status: development
+status: active
 owner: OMIX Team
 description: Calculate sample-level pathway enrichment scores from normalized continuous expression.
 data_policy: No study data or generated results are committed. Callers supply explicit normalized-expression, sample-metadata, and gene-set membership paths.
