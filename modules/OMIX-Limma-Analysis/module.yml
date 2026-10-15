@@ -1,11 +1,11 @@
 name: omix-limma-analysis
 display_name: OMIX Limma Analysis
-version: 0.1.2
-interface_version: 2
+version: 1.0.0
+interface_version: 3
 module_type: statistical-analysis
 status: development
 owner: OMIX Team
-description: Template-preserving limma analysis for declared continuous feature-by-sample matrices, including corrected expression and enrichment scores.
+description: Limma analysis for declared continuous feature-by-sample matrices, with data-type-aware empirical-Bayes defaults and explicit provenance.
 data_policy: No data are committed. Callers supply explicit continuous matrices and aligned sample metadata paths.
 runtime_profile: r-statistics
 entrypoint: scripts/run_limma_analysis.R

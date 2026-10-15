@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.0.0
+
+- Advances the public interface to version 3: a standalone CLI run without a
+  compatible manifest must now declare `input_data_type` (or use one of the
+  limited explicit `input_kind` compatibility mappings) instead of silently
+  treating an unknown matrix as normalized bulk expression.
+- Adds a controlled `input_data_type` vocabulary for expression, pathway,
+  CIBERSORT, methylation, proteomic, metabolomic, qPCR, copy-number,
+  accessibility, CRISPR, and other continuous matrices.
+- Makes `variance_model=auto` resolve deterministically from a compatible
+  manifest or declared input type. Unknown `other_continuous` measurements
+  require an explicit variance model and measurement-scale description.
+- Adds declared CIBERSORT relative-fraction handling with automatic
+  arcsine-square-root transformation, optional boundary-controlled logit, and
+  a separate absolute-score type.
+- Writes residual-variance diagnostic data and a plot, and records requested
+  and resolved input, transformation, and variance decisions in run
+  provenance.
+- Rewrites the module README around supported scientific inputs, safe
+  automatic defaults, interpretation, and complete local or HPC usage.
+
 ## 0.1.2
 
 - Allows a blank contrast only when the selected model has exactly two groups

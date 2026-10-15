@@ -72,7 +72,7 @@ interface and runtime layer; it is not required to run the module locally.
 | Module | Deployment repository | Purpose | Status |
 | --- | --- | --- | --- |
 | [OMIX-DEG-Analysis](modules/OMIX-DEG-Analysis) | [OMIX-DEG-Analysis](https://github.com/NIDAP-Community/OMIX-DEG-Analysis) | Raw-count, Harmony-corrected donor-mean, or SCTransform donor-mean differential expression | Review |
-| [OMIX-Limma-Analysis](modules/OMIX-Limma-Analysis) | [OMIX-Limma-Analysis](https://github.com/NIDAP-Community/OMIX-Limma-Analysis) | Direct limma analysis for declared continuous expression and feature-score matrices | Development |
+| [OMIX-Limma-Analysis](modules/OMIX-Limma-Analysis) | [OMIX-Limma-Analysis](https://github.com/NIDAP-Community/OMIX-Limma-Analysis) | Limma analysis for declared continuous expression, pathway, composition, and other feature-score matrices | Development |
 | [OMIX-Gene-Boxplots](modules/OMIX-Gene-Boxplots) | [OMIX-Gene-Boxplots](https://github.com/NIDAP-Community/OMIX-Gene-Boxplots) | Gene-expression boxplots with optional model-consistent DEG annotations | Review |
 | [OMIX-GSEA-Preranked-Legacy](modules/OMIX-GSEA-Preranked-Legacy) | [OMIX-GSEA-Preranked-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy) | Legacy preranked GSEA | Active |
 | [OMIX-GSEA-Filters-Legacy](modules/OMIX-GSEA-Filters-Legacy) | [OMIX-GSEA-Filters-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy) | Filter and subset GSEA result tables | Active |
