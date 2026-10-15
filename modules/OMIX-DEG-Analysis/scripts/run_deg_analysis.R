@@ -204,6 +204,10 @@ writeLines(c(
   paste("analysis mode:", run_summary$analysis_mode),
   paste("input matrix type:", run_summary$input_matrix_type),
   paste("model type:", run_summary$model_type),
+  paste(
+    "variance model:",
+    if (identical(run_summary$analysis_mode, "raw_counts")) "voom precision weights plus ebayes" else run_summary$variance_model
+  ),
   paste("normalization profile:", run_summary$normalization_method),
   paste("library-size normalization:", run_summary$library_size_normalization),
   paste("voom-scale normalization:", run_summary$voom_scale_normalization),
