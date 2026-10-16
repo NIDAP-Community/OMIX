@@ -264,8 +264,12 @@ order.
   separate required logical inputs as separate replaceable nodes unless the
   canonical interface intentionally defines one combined bundle.
 - Use only small, redistributable, non-sensitive representative assets with
-  recorded provenance. A committed `.codeocean/datasets.json` is structural
-  evidence, not proof that the released capsule imports or replaces nodes.
+  recorded provenance. Declare every representative asset in both
+  `.codeocean/datasets.json` (the attached `/data` asset and mount) and the
+  App Panel's top-level `datasets` array (the visible, replaceable workflow
+  input node). The IDs must match. A file parameter is not a workflow input
+  node, and `.codeocean/datasets.json` alone is not proof that a released
+  capsule imports or replaces nodes.
 - Write stable, documented output names. Preserve every artifact required by a
   downstream adapter, including paired data and metadata tables.
 - In a blank workflow, test released-capsule import, replace each representative

@@ -249,6 +249,27 @@ def parse_datasets_manifest(raw: bytes | str) -> list[dict[str, str]]:
     return parsed
 
 
+def parse_panel_datasets(panel: dict[str, Any]) -> list[dict[str, str]]:
+    """Parse App Panel dataset declarations used for replaceable workflow nodes."""
+    datasets = panel.get("datasets", [])
+    if not isinstance(datasets, list):
+        raise AuditError("App Panel datasets must be an array")
+    parsed: list[dict[str, str]] = []
+    for index, item in enumerate(datasets):
+        if not isinstance(item, dict):
+            raise AuditError(f"App Panel datasets[{index}] must be an object")
+        dataset_id = item.get("id")
+        name = item.get("name")
+        if not isinstance(dataset_id, str) or not dataset_id:
+            raise AuditError(f"App Panel datasets[{index}] requires a non-empty id")
+        if not isinstance(name, str) or not name:
+            raise AuditError(f"App Panel datasets[{index}] requires a non-empty name")
+        parsed.append({"id": dataset_id, "name": name})
+    if len({item["id"] for item in parsed}) != len(parsed):
+        raise AuditError("App Panel dataset IDs must be unique")
+    return parsed
+
+
 def compare_datasets_manifest(
     observed: list[dict[str, str]], expected: list[dict[str, str]], minimum_nodes: int
 ) -> list[dict[str, Any]]:
@@ -271,6 +292,47 @@ def compare_datasets_manifest(
             "Pinned .codeocean/datasets.json disagrees with the inventory representative-assets record.",
             expected=expected,
             observed=observed,
+        )
+    return findings
+
+
+def compare_panel_datasets(
+    observed: list[dict[str, str]],
+    attached: list[dict[str, str]],
+    expected: list[dict[str, str]],
+    minimum_nodes: int,
+) -> list[dict[str, Any]]:
+    """Check that attached representative data is exposed as workflow inputs."""
+    findings: list[dict[str, Any]] = []
+    observed_ids = [item["id"] for item in observed]
+    attached_ids = [item["id"] for item in attached]
+    expected_ids = [item["id"] for item in expected]
+    if len(observed) < minimum_nodes:
+        add_finding(
+            findings,
+            "app_panel_workflow_datasets_missing",
+            "error",
+            "App Panel does not expose enough representative datasets as replaceable workflow inputs.",
+            expected=minimum_nodes,
+            observed=len(observed),
+        )
+    if observed_ids != expected_ids:
+        add_finding(
+            findings,
+            "inventory_panel_dataset_evidence_mismatch",
+            "error",
+            "Pinned App Panel dataset declarations disagree with the inventory representative-assets record.",
+            expected=expected_ids,
+            observed=observed_ids,
+        )
+    if observed_ids != attached_ids:
+        add_finding(
+            findings,
+            "app_panel_dataset_attachment_mismatch",
+            "error",
+            "App Panel workflow datasets do not match the IDs attached by .codeocean/datasets.json.",
+            expected=attached_ids,
+            observed=observed_ids,
         )
     return findings
 
@@ -447,7 +509,7 @@ def parse_r_options(text: str) -> list[ROption]:
     return options
 
 
-def parse_panel(text: str) -> tuple[bool, list[PanelControl]]:
+def parse_panel(text: str) -> tuple[bool, list[PanelControl], list[dict[str, str]]]:
     panel = json.loads(text)
     parameters = panel.get("parameters", [])
     if not isinstance(parameters, list):
@@ -463,7 +525,7 @@ def parse_panel(text: str) -> tuple[bool, list[PanelControl]]:
                 order=order,
             )
         )
-    return bool(panel.get("named_parameters", False)), controls
+    return bool(panel.get("named_parameters", False)), controls, parse_panel_datasets(panel)
 
 
 def parse_source_record_exceptions(text: str) -> dict[str, Any]:
@@ -826,7 +888,7 @@ def audit_adapter(adapter: dict[str, Any], source: Any) -> dict[str, Any]:
     adapter_main = source.get(slug, "code/main.R", adapter_commit).decode("utf-8")
     adapter_cli = parse_r_options(adapter_main)
     panel_text = source.get(slug, ".codeocean/app-panel.json", adapter_commit).decode("utf-8")
-    named_parameters, panel = parse_panel(panel_text)
+    named_parameters, panel, panel_datasets = parse_panel(panel_text)
     source_record = source.get(slug, "OMIX_MODULE_SOURCE.md", adapter_commit).decode("utf-8")
     exceptions = parse_source_record_exceptions(source_record)
     source_metadata = parse_source_record_metadata(source_record)
@@ -857,6 +919,14 @@ def audit_adapter(adapter: dict[str, Any], source: Any) -> dict[str, Any]:
         else:
             findings.extend(
                 compare_datasets_manifest(
+                    attached_datasets,
+                    workflow_contract["representative_assets"],
+                    workflow_contract["minimum_representative_nodes"],
+                )
+            )
+            findings.extend(
+                compare_panel_datasets(
+                    panel_datasets,
                     attached_datasets,
                     workflow_contract["representative_assets"],
                     workflow_contract["minimum_representative_nodes"],
@@ -964,6 +1034,9 @@ def audit_adapter(adapter: dict[str, Any], source: Any) -> dict[str, Any]:
                 "datasets_manifest_invalid",
                 "representative_input_assets_missing",
                 "inventory_dataset_evidence_mismatch",
+                "app_panel_workflow_datasets_missing",
+                "inventory_panel_dataset_evidence_mismatch",
+                "app_panel_dataset_attachment_mismatch",
             }
             for item in findings
         )
@@ -999,6 +1072,7 @@ def audit_adapter(adapter: dict[str, Any], source: Any) -> dict[str, Any]:
             "alias_candidates": candidates,
             "runtime": {"base_image": base_image, "digest": digest},
             "attached_datasets": attached_datasets,
+            "workflow_datasets": panel_datasets,
             "workflow_input_contract": {
                 "minimum_representative_nodes": workflow_contract["minimum_representative_nodes"],
                 "logical_inputs": workflow_contract["logical_inputs"],

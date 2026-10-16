@@ -204,6 +204,31 @@ class ContractComparisonTests(unittest.TestCase):
             [item["code"] for item in findings],
         )
 
+    def test_panel_dataset_declarations_match_attached_representative_data(self):
+        findings = MODULE.compare_panel_datasets(
+            [{"id": "asset-a", "name": "Example input"}],
+            [{"id": "asset-a", "mount": "input"}],
+            [{"id": "asset-a", "mount": "input"}],
+            1,
+        )
+        self.assertEqual([], findings)
+
+    def test_panel_dataset_declarations_detect_missing_or_mismatched_input_nodes(self):
+        findings = MODULE.compare_panel_datasets(
+            [],
+            [{"id": "asset-a", "mount": "input"}],
+            [{"id": "asset-a", "mount": "input"}],
+            1,
+        )
+        self.assertEqual(
+            ["app_panel_workflow_datasets_missing", "inventory_panel_dataset_evidence_mismatch", "app_panel_dataset_attachment_mismatch"],
+            [item["code"] for item in findings],
+        )
+
+    def test_panel_dataset_parser_rejects_missing_visible_name(self):
+        with self.assertRaisesRegex(MODULE.AuditError, "requires a non-empty name"):
+            MODULE.parse_panel_datasets({"datasets": [{"id": "asset-a"}]})
+
 
 if __name__ == "__main__":
     unittest.main()
