@@ -101,3 +101,13 @@ uses conservative classifications:
   adapters have current local-versus-platform output comparisons. This is a
   lifecycle-evidence correction, not a claim that their scientific behavior
   is defective.
+
+A subsequent reviewed evidence refresh for
+[issue #101](https://github.com/NIDAP-Community/OMIX/issues/101) records the
+current OMIX Limma Analysis interface-3 canonical and adapter commits, pinned
+runtime identity, representative platform runs, Standard Capsule release, and
+the local-versus-Code Ocean scientific-output comparison. With those gates
+complete and no known canonical blocker remaining, OMIX Limma Analysis now
+advances from `review` to `active`. This status change does not alter its
+scientific behavior, public interface, adapter version, runtime, or platform
+release.

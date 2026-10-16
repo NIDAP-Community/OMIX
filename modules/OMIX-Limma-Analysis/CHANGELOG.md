@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Advanced the canonical module from review to active after direct and
+  contract tests, independent review, exact-runtime validation, and the
+  reviewed local-versus-Code Ocean scientific-output comparison completed.
+  The comparison covered the current interface-3 implementation and recorded
+  numerical agreement within the declared tolerance; this lifecycle change
+  does not alter scientific behavior or the public interface.
 - Advanced the canonical module from development to review after the
   interface-3 implementation, documentation, direct tests, and exact-runtime
   validation completed. Deployment-platform validation remains separate and

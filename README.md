@@ -75,7 +75,7 @@ readiness.
 | Module | Deployment repository | Purpose | Status |
 | --- | --- | --- | --- |
 | [OMIX-DEG-Analysis](modules/OMIX-DEG-Analysis) | [OMIX-DEG-Analysis](https://github.com/NIDAP-Community/OMIX-DEG-Analysis) | Differential-expression analysis with separate raw-count edgeR/limma-voom, Harmony-corrected donor-mean direct-limma, and SCTransform donor-mean direct-limma paths, plus optional repeated-measures blocking. | Review |
-| [OMIX-Limma-Analysis](modules/OMIX-Limma-Analysis) | [OMIX-Limma-Analysis](https://github.com/NIDAP-Community/OMIX-Limma-Analysis) | Limma analysis for declared continuous feature-by-sample matrices, with data-type-aware empirical-Bayes defaults and explicit provenance. | Review |
+| [OMIX-Limma-Analysis](modules/OMIX-Limma-Analysis) | [OMIX-Limma-Analysis](https://github.com/NIDAP-Community/OMIX-Limma-Analysis) | Limma analysis for declared continuous feature-by-sample matrices, with data-type-aware empirical-Bayes defaults and explicit provenance. | Active |
 | [OMIX-Gene-Boxplots](modules/OMIX-Gene-Boxplots) | [OMIX-Gene-Boxplots](https://github.com/NIDAP-Community/OMIX-Gene-Boxplots) | Platform-neutral wrapper around the preserved CCBR gene-boxplot implementation, with workflow-ready inputs and outputs. | Review |
 | [OMIX-GSEA-Preranked-Legacy](modules/OMIX-GSEA-Preranked-Legacy) | [OMIX-GSEA-Preranked-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy) | Legacy preranked gene set enrichment analysis using fgsea. | Review |
 | [OMIX-GSEA-Filters-Legacy](modules/OMIX-GSEA-Filters-Legacy) | [OMIX-GSEA-Filters-Legacy](https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy) | Filter, subset, and export GSEA result tables using statistical, annotation, gene, and contrast criteria. | Review |
