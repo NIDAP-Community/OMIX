@@ -35,14 +35,19 @@ before editing.
    fail with the candidate paths and require explicit selection.
 4. Preserve stable output names and paired artifacts needed by downstream
    workflows.
-5. Use the named pinned runtime. Do not rebuild unrelated shared environments
+5. Configure representative attached data so a released capsule added to a
+   blank workflow creates replaceable data node(s), its compute node, and its
+   result node. Provide one node per independently required logical input, or
+   one node for an intentionally combined bundle. Test replacing each data node
+   with a compatible upstream result; never treat a manifest alone as proof.
+6. Use the named pinned runtime. Do not rebuild unrelated shared environments
    or use an unpinned `latest` image.
-6. Do not commit input data, generated results, credentials, package caches,
+7. Do not commit input data, generated results, credentials, package caches,
    or package-inventory archives.
-7. Validate an adapter change with a representative deployment run. Report
+8. Validate an adapter change with a representative deployment run. Report
    separately what was tested locally, in the deployment environment, and not
    tested.
-8. If `code/functions/` differs from its pinned canonical source, stop and
+9. If `code/functions/` differs from its pinned canonical source, stop and
    report the drift. Do not choose a winner by timestamp and do not overwrite
    the difference silently.
 

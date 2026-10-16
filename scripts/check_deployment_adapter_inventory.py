@@ -34,6 +34,9 @@ STATUS_FIELDS = (
     "runtime.provenance",
     "local_tests",
     "code_ocean_validation",
+    "workflow_inputs.dataset_declaration",
+    "workflow_inputs.released_capsule_import",
+    "workflow_inputs.upstream_replacement",
     "syncweaver.readiness",
 )
 
@@ -215,6 +218,42 @@ def validate(inventory: dict) -> None:
             if not isinstance(status_record.get("note"), str) or not status_record["note"]:
                 fail(f"{adapter_id}: {dotted_path}.note is required")
 
+        workflow_inputs = adapter["workflow_inputs"]
+        minimum_nodes = workflow_inputs.get("minimum_representative_nodes")
+        if not isinstance(minimum_nodes, int) or isinstance(minimum_nodes, bool) or minimum_nodes < 1:
+            fail(f"{adapter_id}: workflow_inputs.minimum_representative_nodes must be a positive integer")
+        logical_inputs = workflow_inputs.get("logical_inputs")
+        if not isinstance(logical_inputs, list) or not logical_inputs:
+            fail(f"{adapter_id}: workflow_inputs.logical_inputs must be a non-empty array")
+        logical_names = []
+        for item in logical_inputs:
+            if not isinstance(item, dict) or not isinstance(item.get("name"), str) or not item["name"]:
+                fail(f"{adapter_id}: every workflow logical input requires a name")
+            for boolean_field in ("required", "combined_bundle"):
+                if not isinstance(item.get(boolean_field), bool):
+                    fail(f"{adapter_id}: workflow logical input {item['name']} requires boolean {boolean_field}")
+            logical_names.append(item["name"])
+        if len(logical_names) != len(set(logical_names)):
+            fail(f"{adapter_id}: duplicate workflow logical input name")
+        if minimum_nodes > sum(item["required"] for item in logical_inputs):
+            fail(f"{adapter_id}: minimum representative nodes exceed required logical inputs")
+
+        representative_assets = workflow_inputs.get("representative_assets")
+        if not isinstance(representative_assets, list):
+            fail(f"{adapter_id}: workflow_inputs.representative_assets must be an array")
+        asset_ids = []
+        asset_mounts = []
+        for item in representative_assets:
+            if not isinstance(item, dict):
+                fail(f"{adapter_id}: every representative asset must be an object")
+            for field in ("id", "mount"):
+                if not isinstance(item.get(field), str) or not item[field]:
+                    fail(f"{adapter_id}: every representative asset requires non-empty {field}")
+            asset_ids.append(item["id"])
+            asset_mounts.append(item["mount"])
+        if len(asset_ids) != len(set(asset_ids)) or len(asset_mounts) != len(set(asset_mounts)):
+            fail(f"{adapter_id}: representative asset IDs and mounts must be unique")
+
         managed_files = adapter["scientific_export"].get("managed_files")
         if not isinstance(managed_files, list) or not managed_files:
             fail(f"{adapter_id}: scientific_export.managed_files must be non-empty")
@@ -270,8 +309,8 @@ def render(inventory: dict) -> str:
         "",
         "## Current status",
         "",
-        "| Adapter | Canonical | Deployment | Recorded export | Current parity | Schema | App Panel | Runtime | Code Ocean | Syncweaver | Active work |",
-        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+        "| Adapter | Canonical | Deployment | Recorded export | Current parity | Schema | App Panel | Runtime | Code Ocean | Workflow import | Upstream replacement | Syncweaver | Active work |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for item in inventory["adapters"]:
         canonical = item["canonical"]
@@ -293,6 +332,8 @@ def render(inventory: dict) -> str:
                     item["app_panel"]["coverage"]["status"],
                     item["runtime"]["provenance"]["status"],
                     item["code_ocean_validation"]["status"],
+                    item["workflow_inputs"]["released_capsule_import"]["status"],
+                    item["workflow_inputs"]["upstream_replacement"]["status"],
                     item["syncweaver"]["readiness"]["status"],
                     prs,
                 ]
@@ -343,6 +384,16 @@ def render(inventory: dict) -> str:
         )
         + "."
     )
+    workflow_imports_needing_evidence = [
+        (item["id"], item["workflow_inputs"]["released_capsule_import"]["status"])
+        for item in inventory["adapters"]
+        if item["workflow_inputs"]["released_capsule_import"]["status"] != "verified"
+    ]
+    upstream_replacements_needing_evidence = [
+        (item["id"], item["workflow_inputs"]["upstream_replacement"]["status"])
+        for item in inventory["adapters"]
+        if item["workflow_inputs"]["upstream_replacement"]["status"] != "verified"
+    ]
     lines.extend(
         [
             "",
@@ -353,6 +404,12 @@ def render(inventory: dict) -> str:
             f"- **Adapters without a Syncweaver lockfile on the default branch:** {', '.join(no_lock) if no_lock else 'None'}.",
             schema_finding,
             app_panel_finding,
+            "- **Released-capsule workflow imports needing evidence:** "
+            + ", ".join(f"{adapter_id} ({status})" for adapter_id, status in workflow_imports_needing_evidence)
+            + ".",
+            "- **Upstream-result replacement tests needing evidence:** "
+            + ", ".join(f"{adapter_id} ({status})" for adapter_id, status in upstream_replacements_needing_evidence)
+            + ".",
             "- **Runtime provenance:** no adapter source record in this snapshot supplies both a pinned runtime tag and immutable digest.",
             "",
             "## Reading the statuses",

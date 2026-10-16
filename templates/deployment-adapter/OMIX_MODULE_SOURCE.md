@@ -19,6 +19,8 @@
 | Adapter release tag | `<immutable adapter tag, or Pending>` |
 | Platform release | `<platform release ID/link, or Pending validation>` |
 | Runtime identity | `<immutable OCI tag@digest or lockfile reference, or Pending>` |
+| Released workflow import | `<blank-workflow evidence showing input, compute, and result nodes, or Pending>` |
+| Upstream input replacement | `<evidence for each required logical input, or Pending>` |
 
 See the canonical [versioning and release policy](https://github.com/NIDAP-Community/OMIX/blob/main/docs/versioning-and-releases.md). A source commit, an adapter tag, a platform release, and a runtime image are separate records; do not substitute one for another.
 

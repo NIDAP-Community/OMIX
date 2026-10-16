@@ -255,10 +255,22 @@ order.
   fail with candidate paths when more than one suitable file is found.
 - Prefer a single well-defined input bundle over unrelated independent files
   when a workflow produces a naturally paired set of artifacts.
+- A released Standard Capsule added to a blank workflow must create its compute
+  node, result node, and at least one representative, replaceable data node for
+  every independently required logical input. If the canonical contract uses a
+  combined bundle, one representative node may satisfy that bundle.
+- An upstream result replaces the corresponding representative data node; it
+  does not connect directly to a compute node that has no input node. Keep
+  separate required logical inputs as separate replaceable nodes unless the
+  canonical interface intentionally defines one combined bundle.
+- Use only small, redistributable, non-sensitive representative assets with
+  recorded provenance. A committed `.codeocean/datasets.json` is structural
+  evidence, not proof that the released capsule imports or replaces nodes.
 - Write stable, documented output names. Preserve every artifact required by a
   downstream adapter, including paired data and metadata tables.
-- Test upstream-result attachment and downstream-result handoff using a real
-  representative run before release.
+- In a blank workflow, test released-capsule import, replace each representative
+  node with a compatible upstream result, and run the downstream handoff before
+  release. Record these as separate pieces of evidence.
 
 ## Environment and release requirements
 

@@ -134,6 +134,10 @@ class DeploymentAdapterRendererTests(unittest.TestCase):
             "app_panel": {"coverage": {"status": app_panel_status}},
             "runtime": {"provenance": {"status": "partial"}},
             "code_ocean_validation": {"status": "pending"},
+            "workflow_inputs": {
+                "released_capsule_import": {"status": "pending"},
+                "upstream_replacement": {"status": "pending"},
+            },
             "work_tracking": {"pull_requests": []},
             "syncweaver": {
                 "lockfile_on_default_branch": False,
