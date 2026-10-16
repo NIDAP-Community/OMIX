@@ -33,6 +33,14 @@ Describe each supported input asset or upload here. For every input, state:
 - how the adapter selects it; and
 - what to do when there is more than one candidate.
 
+## Workflow input nodes
+
+When this released capsule is added to a blank workflow, document the
+representative data node created for each independently required logical input.
+State which upstream result replaces each node. If multiple files intentionally
+travel as one combined bundle, describe that bundle explicitly. Representative
+assets must be small, redistributable, non-sensitive, and provenance-recorded.
+
 ## Run the analysis
 
 1. <Attach or upload the required input.>

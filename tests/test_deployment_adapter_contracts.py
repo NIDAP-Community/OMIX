@@ -171,6 +171,39 @@ class ContractComparisonTests(unittest.TestCase):
         self.assertIn("app_panel_internal_exposed", codes)
         self.assertNotIn("adapter_cli_extra", codes)
 
+    def test_datasets_manifest_parser_accepts_unique_assets(self):
+        value = MODULE.parse_datasets_manifest(
+            '{"version":1,"attached_datasets":['
+            '{"id":"asset-a","mount":"expression"},'
+            '{"id":"asset-b","mount":"pathways"}]}'
+        )
+        self.assertEqual(
+            [
+                {"id": "asset-a", "mount": "expression"},
+                {"id": "asset-b", "mount": "pathways"},
+            ],
+            value,
+        )
+
+    def test_datasets_manifest_parser_rejects_duplicate_mounts(self):
+        with self.assertRaisesRegex(MODULE.AuditError, "mounts must be unique"):
+            MODULE.parse_datasets_manifest(
+                '{"version":1,"attached_datasets":['
+                '{"id":"asset-a","mount":"input"},'
+                '{"id":"asset-b","mount":"input"}]}'
+            )
+
+    def test_dataset_comparison_separates_structure_from_live_validation(self):
+        findings = MODULE.compare_datasets_manifest(
+            [{"id": "asset-a", "mount": "input"}],
+            [{"id": "asset-b", "mount": "input"}],
+            2,
+        )
+        self.assertEqual(
+            ["representative_input_assets_missing", "inventory_dataset_evidence_mismatch"],
+            [item["code"] for item in findings],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

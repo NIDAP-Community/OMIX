@@ -108,6 +108,11 @@ Before an adapter tag, the workflow must additionally verify:
 5. Runtime identity is recorded, or the request contains a specific pending
    reason. The agent must never fabricate an OCI digest or lockfile reference.
 6. A human approval names the adapter source commit and requested tag.
+7. Adding the released capsule to a blank workflow creates the documented
+   representative input data node or nodes, compute node, and result node.
+8. Each required representative input node has been replaced by a compatible
+   upstream result and the workflow handoff has completed successfully. A
+   `.codeocean/datasets.json` declaration alone does not satisfy either gate.
 
 ## Single post-release evidence pull request
 

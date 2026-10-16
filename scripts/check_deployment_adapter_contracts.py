@@ -52,6 +52,9 @@ INVENTORY_STATE_PATHS = (
     "runtime.provenance",
     "local_tests",
     "code_ocean_validation",
+    "workflow_inputs.dataset_declaration",
+    "workflow_inputs.released_capsule_import",
+    "workflow_inputs.upstream_replacement",
     "syncweaver.readiness",
 )
 
@@ -169,6 +172,15 @@ class GitHubContentSource:
         self._cache[key] = value
         return value
 
+    def get_optional(self, slug: str, path: str, ref: str) -> bytes | None:
+        """Return an optional repository file without hiding transport errors."""
+        try:
+            return self.get(slug, path, ref)
+        except AuditError as error:
+            if "HTTP Error 404" in str(error):
+                return None
+            raise
+
     @staticmethod
     def _urllib_get(api_path: str) -> bytes:
         request = urllib.request.Request(
@@ -202,6 +214,65 @@ class DirectoryContentSource:
             return candidate.read_bytes()
         except FileNotFoundError as error:
             raise AuditError(f"Missing adapter fixture: {candidate}") from error
+
+    def get_optional(self, slug: str, path: str, ref: str) -> bytes | None:
+        candidate = self.root / slug.replace("/", "__") / ref / path
+        return candidate.read_bytes() if candidate.is_file() else None
+
+
+def parse_datasets_manifest(raw: bytes | str) -> list[dict[str, str]]:
+    """Parse the Code Ocean attached-dataset declaration strictly."""
+    try:
+        if isinstance(raw, bytes):
+            raw = raw.decode("utf-8")
+        payload = json.loads(raw)
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise AuditError(".codeocean/datasets.json is not valid UTF-8 JSON") from error
+    if not isinstance(payload, dict) or payload.get("version") != 1:
+        raise AuditError(".codeocean/datasets.json must be a version-1 object")
+    datasets = payload.get("attached_datasets")
+    if not isinstance(datasets, list):
+        raise AuditError(".codeocean/datasets.json attached_datasets must be an array")
+    parsed: list[dict[str, str]] = []
+    for index, item in enumerate(datasets):
+        if not isinstance(item, dict):
+            raise AuditError(f"attached_datasets[{index}] must be an object")
+        dataset_id = item.get("id")
+        mount = item.get("mount")
+        if not isinstance(dataset_id, str) or not dataset_id or not isinstance(mount, str) or not mount:
+            raise AuditError(f"attached_datasets[{index}] requires non-empty id and mount")
+        parsed.append({"id": dataset_id, "mount": mount})
+    if len({item["id"] for item in parsed}) != len(parsed):
+        raise AuditError("attached dataset IDs must be unique")
+    if len({item["mount"] for item in parsed}) != len(parsed):
+        raise AuditError("attached dataset mounts must be unique")
+    return parsed
+
+
+def compare_datasets_manifest(
+    observed: list[dict[str, str]], expected: list[dict[str, str]], minimum_nodes: int
+) -> list[dict[str, Any]]:
+    """Return structural findings; live workflow behavior is intentionally out of scope."""
+    findings: list[dict[str, Any]] = []
+    if len(observed) < minimum_nodes:
+        add_finding(
+            findings,
+            "representative_input_assets_missing",
+            "error",
+            "Attached representative assets are fewer than the workflow contract minimum.",
+            expected=minimum_nodes,
+            observed=len(observed),
+        )
+    if observed != expected:
+        add_finding(
+            findings,
+            "inventory_dataset_evidence_mismatch",
+            "error",
+            "Pinned .codeocean/datasets.json disagrees with the inventory representative-assets record.",
+            expected=expected,
+            observed=observed,
+        )
+    return findings
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -768,6 +839,29 @@ def audit_adapter(adapter: dict[str, Any], source: Any) -> dict[str, Any]:
         exceptions,
         internal_bindings,
     )
+    workflow_contract = adapter["workflow_inputs"]
+    datasets_raw = source.get_optional(slug, ".codeocean/datasets.json", adapter_commit)
+    attached_datasets: list[dict[str, str]] = []
+    if datasets_raw is None:
+        add_finding(
+            findings,
+            "datasets_manifest_missing",
+            "error",
+            "Adapter does not declare representative attached data for released-workflow import.",
+        )
+    else:
+        try:
+            attached_datasets = parse_datasets_manifest(datasets_raw)
+        except AuditError as error:
+            add_finding(findings, "datasets_manifest_invalid", "error", str(error))
+        else:
+            findings.extend(
+                compare_datasets_manifest(
+                    attached_datasets,
+                    workflow_contract["representative_assets"],
+                    workflow_contract["minimum_representative_nodes"],
+                )
+            )
     expected_source = adapter["scientific_export"]
     for label, expected, observed in (
         ("canonical source commit", expected_source["recorded_source_commit"], source_metadata["canonical_source_commit"]),
@@ -861,6 +955,25 @@ def audit_adapter(adapter: dict[str, Any], source: Any) -> dict[str, Any]:
         and not digest
     ):
         add_finding(findings, "inventory_status_contradiction", "error", "Runtime provenance is verified but no immutable digest is recorded.")
+    if (
+        inventory_states["workflow_inputs.dataset_declaration"]["status"] == "verified"
+        and any(
+            item["code"]
+            in {
+                "datasets_manifest_missing",
+                "datasets_manifest_invalid",
+                "representative_input_assets_missing",
+                "inventory_dataset_evidence_mismatch",
+            }
+            for item in findings
+        )
+    ):
+        add_finding(
+            findings,
+            "inventory_status_contradiction",
+            "error",
+            "Dataset declaration is verified but structural attached-data findings remain.",
+        )
 
     return {
         "id": adapter["id"],
@@ -885,6 +998,11 @@ def audit_adapter(adapter: dict[str, Any], source: Any) -> dict[str, Any]:
             "inferred_aliases": aliases,
             "alias_candidates": candidates,
             "runtime": {"base_image": base_image, "digest": digest},
+            "attached_datasets": attached_datasets,
+            "workflow_input_contract": {
+                "minimum_representative_nodes": workflow_contract["minimum_representative_nodes"],
+                "logical_inputs": workflow_contract["logical_inputs"],
+            },
         },
         "managed_files": managed,
         "findings": sorted(findings, key=lambda item: (item["severity"], item["code"], item.get("control", ""))),
@@ -981,6 +1099,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         "## Limitations",
         "",
         "- This is static contract and provenance analysis; it does not execute capsules or validate Code Ocean state.",
+        "- A valid attached-dataset manifest does not prove that a released capsule imports data nodes into a blank workflow or that an upstream result can replace them.",
         "- Alias candidates are heuristic findings until explicitly recorded in `OMIX_MODULE_SOURCE.md`.",
         "- A tagged runtime without a digest remains partial provenance even if the image currently resolves.",
         "- App Panels without named parameters cannot be verified by control name.",

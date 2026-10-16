@@ -174,6 +174,48 @@
           ],
           "note": "The managed directory now contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44."
         }
+      },
+      "workflow_inputs": {
+        "minimum_representative_nodes": 1,
+        "logical_inputs": [
+          {
+            "name": "analysis_input_bundle",
+            "required": true,
+            "combined_bundle": true
+          }
+        ],
+        "representative_assets": [
+          {
+            "id": "09c9be79-c184-4a31-a583-8261e146035d",
+            "mount": "filteredRDS"
+          },
+          {
+            "id": "6478f7be-ec52-4eb8-b360-6d1766bebea1",
+            "mount": "filter-low-counts-deg-input"
+          }
+        ],
+        "dataset_declaration": {
+          "status": "partial",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-DEG-Analysis/blob/9df3074c62f29257493e04a462d743bcc5e35c77/.codeocean/datasets.json",
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "The pinned adapter declares representative attached data, but that structural declaration does not prove released-capsule workflow import or upstream replacement behavior."
+        },
+        "released_capsule_import": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "Blank-workflow import of the released capsule has not yet been recorded with durable evidence."
+        },
+        "upstream_replacement": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "Replacement of every required representative input node by a compatible upstream result has not yet been recorded with durable evidence."
+        }
       }
     },
     {
@@ -347,6 +389,44 @@
           ],
           "note": "The managed directory contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44."
         }
+      },
+      "workflow_inputs": {
+        "minimum_representative_nodes": 1,
+        "logical_inputs": [
+          {
+            "name": "gsea_results",
+            "required": true,
+            "combined_bundle": false
+          }
+        ],
+        "representative_assets": [
+          {
+            "id": "f165ec6c-115f-446a-8429-55073714c2ef",
+            "mount": "gsea_data"
+          }
+        ],
+        "dataset_declaration": {
+          "status": "partial",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Filters-Legacy/blob/5df1e9db1bb8a20f5fb0a35c28ea41d6f24838fb/.codeocean/datasets.json",
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "The pinned adapter declares representative attached data, but that structural declaration does not prove released-capsule workflow import or upstream replacement behavior."
+        },
+        "released_capsule_import": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "Blank-workflow import of the released capsule has not yet been recorded with durable evidence."
+        },
+        "upstream_replacement": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "Replacement of every required representative input node by a compatible upstream result has not yet been recorded with durable evidence."
+        }
       }
     },
     {
@@ -481,6 +561,53 @@
             "https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy/pull/1"
           ],
           "note": "PR #1 vendors a second whole-module tree under code/modules instead of maintaining the active code/functions export; it must be redesigned before merge."
+        }
+      },
+      "workflow_inputs": {
+        "minimum_representative_nodes": 2,
+        "logical_inputs": [
+          {
+            "name": "deg_table",
+            "required": true,
+            "combined_bundle": false
+          },
+          {
+            "name": "pathway_database",
+            "required": true,
+            "combined_bundle": false
+          }
+        ],
+        "representative_assets": [
+          {
+            "id": "28035d52-03e6-4761-8f50-72d48af496d1",
+            "mount": "deg_table"
+          },
+          {
+            "id": "eb51e72e-bcb9-400d-bf94-fc8cad85c7f1",
+            "mount": "msigdb"
+          }
+        ],
+        "dataset_declaration": {
+          "status": "partial",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Preranked-Legacy/blob/c29a0dc019a56b236298b6e65667c2bfd55cda07/.codeocean/datasets.json",
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "The pinned adapter declares representative attached data, but that structural declaration does not prove released-capsule workflow import or upstream replacement behavior."
+        },
+        "released_capsule_import": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "Blank-workflow import of the released capsule has not yet been recorded with durable evidence."
+        },
+        "upstream_replacement": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "Replacement of every required representative input node by a compatible upstream result has not yet been recorded with durable evidence."
         }
       }
     },
@@ -620,6 +747,62 @@
             "https://github.com/NIDAP-Community/OMIX/issues/44"
           ],
           "note": "The managed directory contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44."
+        }
+      },
+      "workflow_inputs": {
+        "minimum_representative_nodes": 3,
+        "logical_inputs": [
+          {
+            "name": "pathway_database",
+            "required": true,
+            "combined_bundle": false
+          },
+          {
+            "name": "filtered_gsea_results",
+            "required": true,
+            "combined_bundle": false
+          },
+          {
+            "name": "deg_expression_metadata_bundle",
+            "required": true,
+            "combined_bundle": true
+          }
+        ],
+        "representative_assets": [
+          {
+            "id": "98e9ac98-74cb-4149-afe9-62eef6891e45",
+            "mount": "deg-training"
+          },
+          {
+            "id": "e5c4e095-f2e5-48ac-8148-d7fdb8673e05",
+            "mount": "gsea_filter_results"
+          },
+          {
+            "id": "eb51e72e-bcb9-400d-bf94-fc8cad85c7f1",
+            "mount": "msigdb"
+          }
+        ],
+        "dataset_declaration": {
+          "status": "partial",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-GSEA-Visualization-Legacy/blob/f8a10972e6566941f35720b2c23356a1028e6513/.codeocean/datasets.json",
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "The pinned adapter declares representative attached data, but that structural declaration does not prove released-capsule workflow import or upstream replacement behavior."
+        },
+        "released_capsule_import": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "Blank-workflow import of the released capsule has not yet been recorded with durable evidence."
+        },
+        "upstream_replacement": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "Replacement of every required representative input node by a compatible upstream result has not yet been recorded with durable evidence."
         }
       }
     },
@@ -807,6 +990,53 @@
           ],
           "note": "The managed directory contains the verified canonical export, but no generated Syncweaver lock or production onboarding record exists on the default branch."
         }
+      },
+      "workflow_inputs": {
+        "minimum_representative_nodes": 2,
+        "logical_inputs": [
+          {
+            "name": "expression_metadata_bundle",
+            "required": true,
+            "combined_bundle": true
+          },
+          {
+            "name": "pathway_database",
+            "required": true,
+            "combined_bundle": false
+          }
+        ],
+        "representative_assets": [
+          {
+            "id": "46f900c9-ad59-4e80-9083-d845aab3dc21",
+            "mount": "msigdb"
+          },
+          {
+            "id": "98e9ac98-74cb-4149-afe9-62eef6891e45",
+            "mount": "deg-training"
+          }
+        ],
+        "dataset_declaration": {
+          "status": "partial",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-GSVA/blob/f6c91ca05f81ce04701c8a69f9a127f1f82d2d88/.codeocean/datasets.json",
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "The pinned adapter declares representative attached data, but that structural declaration does not prove released-capsule workflow import or upstream replacement behavior."
+        },
+        "released_capsule_import": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "Blank-workflow import of the released capsule has not yet been recorded with durable evidence."
+        },
+        "upstream_replacement": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "Replacement of every required representative input node by a compatible upstream result has not yet been recorded with durable evidence."
+        }
       }
     },
     {
@@ -955,6 +1185,44 @@
             "https://github.com/NIDAP-Community/OMIX/issues/44"
           ],
           "note": "The managed directory contains only the two verified canonical exports, but the generated Syncweaver lock and production onboarding remain pending under issue #44."
+        }
+      },
+      "workflow_inputs": {
+        "minimum_representative_nodes": 1,
+        "logical_inputs": [
+          {
+            "name": "expression_metadata_deg_bundle",
+            "required": true,
+            "combined_bundle": true
+          }
+        ],
+        "representative_assets": [
+          {
+            "id": "88462af0-654d-4850-8efd-9e307485eeed",
+            "mount": "deg-training"
+          }
+        ],
+        "dataset_declaration": {
+          "status": "partial",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Gene-Boxplots/blob/35ad616857080cc6ee250c3217598c4bf3653e7f/.codeocean/datasets.json",
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "The pinned adapter declares representative attached data, but that structural declaration does not prove released-capsule workflow import or upstream replacement behavior."
+        },
+        "released_capsule_import": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "Blank-workflow import of the released capsule has not yet been recorded with durable evidence."
+        },
+        "upstream_replacement": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "Replacement of every required representative input node by a compatible upstream result has not yet been recorded with durable evidence."
         }
       }
     },
@@ -1126,6 +1394,44 @@
           ],
           "note": "The scientific export is verified, but workflow_input.R and cli_compatibility.R remain co-located in code/functions. A reviewed generated mapping must exclude or relocate adapter-only support files before Syncweaver onboarding."
         }
+      },
+      "workflow_inputs": {
+        "minimum_representative_nodes": 1,
+        "logical_inputs": [
+          {
+            "name": "deg_table",
+            "required": true,
+            "combined_bundle": false
+          }
+        ],
+        "representative_assets": [
+          {
+            "id": "28035d52-03e6-4761-8f50-72d48af496d1",
+            "mount": "deg_table"
+          }
+        ],
+        "dataset_declaration": {
+          "status": "partial",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-L2P-Multi/blob/a28113cba70451dee9e85c3f665648962cf68617/.codeocean/datasets.json",
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "The pinned adapter declares representative attached data, but that structural declaration does not prove released-capsule workflow import or upstream replacement behavior."
+        },
+        "released_capsule_import": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "Blank-workflow import of the released capsule has not yet been recorded with durable evidence."
+        },
+        "upstream_replacement": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "Replacement of every required representative input node by a compatible upstream result has not yet been recorded with durable evidence."
+        }
       }
     },
     {
@@ -1272,6 +1578,44 @@
             "https://github.com/NIDAP-Community/OMIX/issues/44"
           ],
           "note": "The managed directory contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44."
+        }
+      },
+      "workflow_inputs": {
+        "minimum_representative_nodes": 1,
+        "logical_inputs": [
+          {
+            "name": "deg_table",
+            "required": true,
+            "combined_bundle": false
+          }
+        ],
+        "representative_assets": [
+          {
+            "id": "28035d52-03e6-4761-8f50-72d48af496d1",
+            "mount": "deg_table"
+          }
+        ],
+        "dataset_declaration": {
+          "status": "partial",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-L2P-Single/blob/ba32e3a90dcbb5b95856e712a484b441a061a947/.codeocean/datasets.json",
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "The pinned adapter declares representative attached data, but that structural declaration does not prove released-capsule workflow import or upstream replacement behavior."
+        },
+        "released_capsule_import": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "Blank-workflow import of the released capsule has not yet been recorded with durable evidence."
+        },
+        "upstream_replacement": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "Replacement of every required representative input node by a compatible upstream result has not yet been recorded with durable evidence."
         }
       }
     },
@@ -1470,6 +1814,41 @@
           ],
           "note": "The managed directory contains the verified canonical export, but no generated Syncweaver lock or production onboarding record exists on the default branch."
         }
+      },
+      "workflow_inputs": {
+        "minimum_representative_nodes": 1,
+        "logical_inputs": [
+          {
+            "name": "matrix_metadata_bundle",
+            "required": true,
+            "combined_bundle": true
+          }
+        ],
+        "representative_assets": [],
+        "dataset_declaration": {
+          "status": "blocked",
+          "evidence": [
+            "https://poc-nci.codeocean.io/workflow/419a13d8-3764-4759-89c5-670608fcf05c",
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "The pinned adapter has no .codeocean/datasets.json, and the live workflow imports the released capsule without a replaceable representative input node."
+        },
+        "released_capsule_import": {
+          "status": "blocked",
+          "evidence": [
+            "https://poc-nci.codeocean.io/workflow/419a13d8-3764-4759-89c5-670608fcf05c",
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "The live workflow shows the released capsule importing only compute and result nodes, with no representative input data node."
+        },
+        "upstream_replacement": {
+          "status": "blocked",
+          "evidence": [
+            "https://poc-nci.codeocean.io/workflow/419a13d8-3764-4759-89c5-670608fcf05c",
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "An upstream result cannot replace a representative input because the released capsule imports no input data node."
+        }
       }
     },
     {
@@ -1621,6 +2000,41 @@
             "https://github.com/NIDAP-Community/OMIX/issues/44"
           ],
           "note": "The managed directory contains the verified canonical export, but no generated Syncweaver lock or production onboarding record exists on the default branch."
+        }
+      },
+      "workflow_inputs": {
+        "minimum_representative_nodes": 1,
+        "logical_inputs": [
+          {
+            "name": "seurat_object",
+            "required": true,
+            "combined_bundle": false
+          }
+        ],
+        "representative_assets": [],
+        "dataset_declaration": {
+          "status": "blocked",
+          "evidence": [
+            "https://poc-nci.codeocean.io/workflow/419a13d8-3764-4759-89c5-670608fcf05c",
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "The pinned adapter has no .codeocean/datasets.json, and the live workflow imports the released capsule without a replaceable representative input node."
+        },
+        "released_capsule_import": {
+          "status": "blocked",
+          "evidence": [
+            "https://poc-nci.codeocean.io/workflow/419a13d8-3764-4759-89c5-670608fcf05c",
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "The live workflow shows the released capsule importing only compute and result nodes, with no representative input data node."
+        },
+        "upstream_replacement": {
+          "status": "blocked",
+          "evidence": [
+            "https://poc-nci.codeocean.io/workflow/419a13d8-3764-4759-89c5-670608fcf05c",
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "An upstream result cannot replace a representative input because the released capsule imports no input data node."
         }
       }
     },
@@ -1785,6 +2199,44 @@
             "https://github.com/NIDAP-Community/OMIX/issues/44"
           ],
           "note": "The managed directory now contains only the verified canonical export, but the generated Syncweaver lock and production onboarding remain pending under issue #44."
+        }
+      },
+      "workflow_inputs": {
+        "minimum_representative_nodes": 1,
+        "logical_inputs": [
+          {
+            "name": "deg_table",
+            "required": true,
+            "combined_bundle": false
+          }
+        ],
+        "representative_assets": [
+          {
+            "id": "28035d52-03e6-4761-8f50-72d48af496d1",
+            "mount": "deg_table"
+          }
+        ],
+        "dataset_declaration": {
+          "status": "partial",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Volcano-Plot/blob/44be95b6ac3da9c8ffc6d4d8dd997f16ba3fc225/.codeocean/datasets.json",
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "The pinned adapter declares representative attached data, but that structural declaration does not prove released-capsule workflow import or upstream replacement behavior."
+        },
+        "released_capsule_import": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "Blank-workflow import of the released capsule has not yet been recorded with durable evidence."
+        },
+        "upstream_replacement": {
+          "status": "pending",
+          "evidence": [
+            "https://github.com/NIDAP-Community/OMIX/issues/45"
+          ],
+          "note": "Replacement of every required representative input node by a compatible upstream result has not yet been recorded with durable evidence."
         }
       }
     }
