@@ -1824,14 +1824,21 @@
             "combined_bundle": true
           }
         ],
-        "representative_assets": [],
+        "representative_assets": [
+          {
+            "id": "3766a754-c931-4ff7-9e7b-83ffb64e7ea8",
+            "mount": "omix-seurat-pseudobulk-sct-demo"
+          }
+        ],
         "dataset_declaration": {
           "status": "blocked",
           "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Limma-Analysis/blob/122756fea4005ec5594bab2fc0fbf592dd673e31/.codeocean/datasets.json",
+            "https://github.com/NIDAP-Community/SCWorkflow-colorByGene/blob/main/.codeocean/app-panel.json",
             "https://poc-nci.codeocean.io/workflow/419a13d8-3764-4759-89c5-670608fcf05c",
             "https://github.com/NIDAP-Community/OMIX/issues/45"
           ],
-          "note": "The pinned adapter has no .codeocean/datasets.json, and the live workflow imports the released capsule without a replaceable representative input node."
+          "note": "The pinned adapter attaches the representative bundle through .codeocean/datasets.json, but its App Panel lacks the matching top-level datasets declaration needed to expose a replaceable workflow input node."
         },
         "released_capsule_import": {
           "status": "blocked",
@@ -2011,14 +2018,21 @@
             "combined_bundle": false
           }
         ],
-        "representative_assets": [],
+        "representative_assets": [
+          {
+            "id": "fc787e18-e381-42b8-ad91-be986796d813",
+            "mount": "combineNormalize"
+          }
+        ],
         "dataset_declaration": {
           "status": "blocked",
           "evidence": [
+            "https://github.com/NIDAP-Community/OMIX-Seurat-Pseudobulk/blob/a5b398bc0da897d4a84d8ab6c56c4a6d9a6fa27d/.codeocean/datasets.json",
+            "https://github.com/NIDAP-Community/SCWorkflow-colorByGene/blob/main/.codeocean/app-panel.json",
             "https://poc-nci.codeocean.io/workflow/419a13d8-3764-4759-89c5-670608fcf05c",
             "https://github.com/NIDAP-Community/OMIX/issues/45"
           ],
-          "note": "The pinned adapter has no .codeocean/datasets.json, and the live workflow imports the released capsule without a replaceable representative input node."
+          "note": "The pinned adapter attaches the representative Seurat object through .codeocean/datasets.json, but its App Panel lacks the matching top-level datasets declaration needed to expose a replaceable workflow input node."
         },
         "released_capsule_import": {
           "status": "blocked",
