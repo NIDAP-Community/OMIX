@@ -1,0 +1,5 @@
+Sample,Group,Batch
+Sample_A,Control,Batch1
+Sample_B,Control,Batch2
+Sample_C,Treated,Batch1
+Sample_D,Treated,Batch2

@@ -1,0 +1,14 @@
+name: omix-expression-heatmap
+display_name: OMIX Expression Heatmap
+version: 0.1.0
+interface_version: 1
+module_type: visualization
+status: draft
+owner: OMIX Team
+description: Render annotated ComplexHeatmap expression heatmaps from normalized continuous feature-by-sample matrices.
+data_policy: No study data or generated results are committed. Callers supply explicit expression-matrix and sample-metadata paths.
+runtime_profile: r-visualization
+runtime_overlay:
+  ComplexHeatmap: required-unpinned
+entrypoint: scripts/run_expression_heatmap.R
+deployment_adapters: []
