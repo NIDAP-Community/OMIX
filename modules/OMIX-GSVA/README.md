@@ -46,6 +46,14 @@ A delimited table with one unique gene-symbol column and numeric sample
 columns. The default gene column is `Gene`. Values must be normalized,
 continuous expression suitable for the chosen GSVA method—not raw counts.
 
+For an OMIX Limma Analysis downstream handoff, use the optional
+`Batch_Corrected_Expression.csv` output with its paired
+`Sample_Metadata.csv`. That matrix removes only user-declared technical batch
+effects while preserving the modeled biological groups. Do not use a
+statistics-only `Limma_Analysis.csv` in place of an expression matrix; use its
+appended sample columns only when they were deliberately retained and match
+the paired metadata.
+
 ### Sample metadata
 
 A delimited table with one row per sample. Its sample-ID column (default

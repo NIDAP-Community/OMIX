@@ -112,6 +112,30 @@ stopifnot(any(grepl("pathways database delimiter: \\t (tab)", summary_text, fixe
 stopifnot(any(grepl("OMIX module version: 0.3.0", summary_text, fixed = TRUE)))
 stopifnot(!any(grepl("source template", summary_text, fixed = TRUE)))
 
+# OMIX Limma Analysis writes a batch-corrected downstream bundle with exactly
+# the same public table contract: Gene followed by sample columns, paired with
+# Sample_Metadata.csv. Keep this cross-module handoff explicit so a future
+# change cannot silently break GSVA consumption of that optional Limma output.
+limma_bundle_dir <- file.path(test_root, "limma-batch-corrected-bundle")
+dir.create(limma_bundle_dir)
+limma_expression_path <- file.path(limma_bundle_dir, "Batch_Corrected_Expression.csv")
+limma_metadata_path <- file.path(limma_bundle_dir, "Sample_Metadata.csv")
+utils::write.csv(expression, limma_expression_path, row.names = FALSE, quote = FALSE)
+utils::write.csv(metadata, limma_metadata_path, row.names = FALSE, quote = FALSE)
+limma_output_dir <- file.path(test_root, "limma-handoff-results")
+limma_status <- run_cli(
+  limma_expression_path,
+  limma_metadata_path,
+  pathways_path,
+  limma_output_dir
+)
+stopifnot(identical(limma_status, 0L))
+limma_results <- utils::read.csv(
+  file.path(limma_output_dir, "gsva_results.csv"),
+  check.names = FALSE
+)
+stopifnot(identical(names(limma_results)[-1L], metadata$Sample))
+
 # Uniform TSV and CSV inputs remain supported without delimiter flags.
 for (format in c("tsv", "csv")) {
   uniform_dir <- file.path(test_root, paste0("uniform-", format))

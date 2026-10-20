@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Documents and regression-tests the compatible OMIX Limma Analysis
+  `Batch_Corrected_Expression.csv` plus `Sample_Metadata.csv` handoff. This
+  preserves the existing GSVA input contract and does not change methods,
+  defaults, or the public interface.
+
 - Advanced the canonical module from development to review after lifecycle
   audit of its direct locked-runtime validation, independent review,
   documented interface, and current release evidence. Promotion to active now
