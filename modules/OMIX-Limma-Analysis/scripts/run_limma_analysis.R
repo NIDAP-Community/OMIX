@@ -55,6 +55,7 @@ option_list <- list(
   make_option("--contrast_variable_columns", type = "character", default = "Group", help = "One or two comma-separated metadata columns"),
   make_option("--contrasts", type = "character", default = "", help = "Optional comma-separated limma contrasts; blank infers the only replicated two-group comparison"),
   make_option("--covariate_columns", type = "character", default = ""),
+  make_option("--batch_effect_columns", type = "character", default = "", help = "Optional comma-separated technical batch columns included in the model and eligible for downstream removal"),
   make_option("--donor_variable_column", type = "character", default = ""),
   make_option("--summarization_method", type = "character", default = "mean", help = "mean, max, or sum [default: %default]"),
   make_option("--input_data_type", type = "character", default = "auto", help = "Scientific matrix type or auto; see schemas/interface.yml [default: %default]"),
@@ -65,6 +66,7 @@ option_list <- list(
   make_option("--variance_model", type = "character", default = "auto", help = "auto, ebayes, or ebayes_trend [default: %default]"),
   make_option("--pseudobulk_manifest", type = "character", default = "", help = "Optional Pseudobulk_Manifest.dcf that validates a continuous-expression handoff"),
   make_option("--return_matrix", type = "character", default = "true", help = "Append modeled sample values to results [default: %default]"),
+  make_option("--return_batch_corrected_values", type = "character", default = "false", help = "Write Batch_Corrected_Expression.csv when batch columns are declared [default: %default]"),
   make_option("--output_dir", type = "character", default = "results")
 )
 opt <- parse_args(OptionParser(option_list = option_list))
@@ -140,9 +142,11 @@ results <- omix_limma_analysis(
   contrast_variable_columns = split_csv(opt$contrast_variable_columns),
   contrasts = split_csv(opt$contrasts),
   covariate_columns = split_csv(opt$covariate_columns),
+  batch_effect_columns = split_csv(opt$batch_effect_columns),
   donor_variable_column = split_csv(opt$donor_variable_column),
   summarization_method = opt$summarization_method,
   return_matrix = as_logical(opt$return_matrix, "return_matrix"),
+  return_batch_corrected_values = as_logical(opt$return_batch_corrected_values, "return_batch_corrected_values"),
   input_kind = input_contract$input_kind,
   variance_model = input_contract$variance_model,
   input_data_type = input_contract$input_data_type,
@@ -152,9 +156,24 @@ results <- omix_limma_analysis(
 )
 
 utils::write.csv(results, file.path(opt$output_dir, "Limma_Analysis.csv"), row.names = FALSE, na = "")
+run_summary <- attr(results, "omix_limma_run")
+if (isTRUE(run_summary$return_batch_corrected_values) && length(run_summary$adjusted_batch_columns) > 0L) {
+  downstream_expression <- attr(results, "omix_limma_downstream_expression")
+  downstream_table <- data.frame(
+    Gene = rownames(downstream_expression),
+    as.data.frame(downstream_expression, check.names = FALSE),
+    check.names = FALSE,
+    stringsAsFactors = FALSE
+  )
+  utils::write.csv(
+    downstream_table,
+    file.path(opt$output_dir, "Batch_Corrected_Expression.csv"),
+    row.names = FALSE,
+    na = ""
+  )
+}
 output_metadata <- metadata_input[match(selected_samples, as.character(metadata_input[[opt$sample_names_column]])), , drop = FALSE]
 utils::write.csv(output_metadata, file.path(opt$output_dir, "Sample_Metadata.csv"), row.names = FALSE, na = "")
-run_summary <- attr(results, "omix_limma_run")
 variance_diagnostic <- attr(results, "omix_limma_variance_diagnostic")
 utils::write.csv(
   variance_diagnostic,
@@ -200,6 +219,9 @@ writeLines(c(
   paste("variance model:", run_summary$variance_model),
   paste("model type:", run_summary$model_type),
   paste("design formula:", run_summary$design_formula),
+  paste("batch effect columns:", if (length(run_summary$batch_effect_columns)) paste(run_summary$batch_effect_columns, collapse = ",") else "<none>"),
+  paste("return batch-corrected values:", run_summary$return_batch_corrected_values),
+  paste("adjusted batch columns:", if (length(run_summary$adjusted_batch_columns)) paste(run_summary$adjusted_batch_columns, collapse = ",") else "<none>"),
   paste("requested contrasts:", if (length(run_summary$requested_contrasts)) paste(run_summary$requested_contrasts, collapse = ",") else "<blank>"),
   paste("resolved contrasts:", paste(run_summary$contrasts, collapse = ",")),
   paste("contrast source:", run_summary$contrast_source),

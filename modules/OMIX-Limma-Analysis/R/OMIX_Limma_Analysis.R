@@ -14,9 +14,15 @@
 #' @param contrasts Optional limma contrast expressions. When omitted, the only
 #'   comparison is inferred if exactly two modeled groups have replication.
 #' @param covariate_columns Optional fixed-effect metadata columns.
+#' @param batch_effect_columns Optional technical batch columns. They are
+#'   included in the DE model and can be removed from the returned downstream
+#'   expression matrix while preserving biological comparison groups.
 #' @param donor_variable_column Optional repeated-measure blocking column.
 #' @param summarization_method Duplicate-feature summary function.
 #' @param return_matrix Append modeled sample values to the result table.
+#' @param return_batch_corrected_values Write a separately accessible
+#'   downstream matrix with declared technical batch effects removed. This does
+#'   not alter DE coefficients, standard errors, or p-values.
 #' @param fold_change_threshold Effect threshold recorded as provenance.
 #' @param first_pvalue_threshold Primary p-value threshold recorded as provenance.
 #' @param second_pvalue_threshold Secondary p-value threshold recorded as provenance.
@@ -372,6 +378,41 @@ omix_limma_resolve_input_contract <- function(
   fold_change
 }
 
+# Remove only explicitly declared technical-batch effects from values intended
+# for a downstream continuous-expression workflow. The biological group design
+# is protected, so this presentation/handoff matrix cannot erase the modeled
+# biological comparison. The limma fit itself is always performed on the
+# unadjusted continuous matrix with the batch terms in its design.
+.omix_limma_batch_corrected_expression <- function(
+    expression,
+    metadata,
+    batch_effect_columns,
+    biological_design) {
+  if (length(batch_effect_columns) == 0L) return(expression)
+
+  batch_values <- lapply(batch_effect_columns, function(column) {
+    factor(metadata[[column]])
+  })
+  varying <- vapply(batch_values, function(value) nlevels(value) > 1L, logical(1))
+  batch_values <- batch_values[varying]
+  if (length(batch_values) == 0L) return(expression)
+
+  extra_covariates <- NULL
+  if (length(batch_values) > 2L) {
+    extra_covariates <- stats::model.matrix(
+      ~ 0 + .,
+      data = as.data.frame(batch_values[-c(1L, 2L)])
+    )
+  }
+  limma::removeBatchEffect(
+    expression,
+    batch = batch_values[[1L]],
+    batch2 = if (length(batch_values) >= 2L) batch_values[[2L]] else NULL,
+    covariates = extra_covariates,
+    design = biological_design
+  )
+}
+
 #' Run limma analysis on a declared continuous matrix.
 #'
 #' The public argument names and defaults through second_pvalue_threshold retain
@@ -387,9 +428,11 @@ Limma_Analysis <- function(
     contrast_variable_columns,
     contrasts = NULL,
     covariate_columns = NULL,
+    batch_effect_columns = NULL,
     donor_variable_column = NULL,
     summarization_method = "mean",
     return_matrix = TRUE,
+    return_batch_corrected_values = FALSE,
     fold_change_threshold = 1.2,
     first_pvalue_threshold = 0.05,
     second_pvalue_threshold = 0.01,
@@ -428,8 +471,18 @@ Limma_Analysis <- function(
   if (length(contrast_variable_columns) > 2L) stop("contrast_variable_columns may contain one or two columns.", call. = FALSE)
   contrasts <- .omix_limma_as_character(contrasts, "contrasts", allow_empty = TRUE)
   covariate_columns <- .omix_limma_as_character(covariate_columns, "covariate_columns", allow_empty = TRUE)
+  batch_effect_columns <- .omix_limma_as_character(batch_effect_columns, "batch_effect_columns", allow_empty = TRUE)
   donor_variable_column <- .omix_limma_as_character(donor_variable_column, "donor_variable_column", allow_empty = TRUE)
   if (length(donor_variable_column) > 1L) stop("donor_variable_column may name at most one metadata column.", call. = FALSE)
+  if (!is.logical(return_batch_corrected_values) || length(return_batch_corrected_values) != 1L || is.na(return_batch_corrected_values)) {
+    stop("return_batch_corrected_values must be TRUE or FALSE.", call. = FALSE)
+  }
+  if (length(intersect(batch_effect_columns, contrast_variable_columns)) > 0L) {
+    stop("A batch-effect column cannot also define the biological comparison group.", call. = FALSE)
+  }
+  if (length(donor_variable_column) == 1L && donor_variable_column %in% batch_effect_columns) {
+    stop("The donor column is handled through duplicateCorrelation; do not also specify it as a batch-effect column.", call. = FALSE)
+  }
   samples_to_include <- .omix_limma_as_character(samples_to_include, "samples_to_include")
   if (!is.character(gene_names_column) || length(gene_names_column) != 1L || !gene_names_column %in% names(dataset)) {
     stop("gene_names_column must name a column in Dataset.", call. = FALSE)
@@ -441,7 +494,7 @@ Limma_Analysis <- function(
     invalid <- names(dataset)[make.names(names(dataset)) != names(dataset)]
     stop("Dataset has non-syntactic column names: ", paste(invalid, collapse = ", "), ".", call. = FALSE)
   }
-  required_metadata <- unique(c(sample_names_column, contrast_variable_columns, covariate_columns, donor_variable_column))
+  required_metadata <- unique(c(sample_names_column, contrast_variable_columns, covariate_columns, batch_effect_columns, donor_variable_column))
   missing_metadata <- setdiff(required_metadata, names(metadata))
   if (length(missing_metadata) > 0L) stop("Metadata_Table lacks required column(s): ", paste(missing_metadata, collapse = ", "), ".", call. = FALSE)
   missing_samples <- setdiff(samples_to_include, names(dataset))
@@ -455,6 +508,17 @@ Limma_Analysis <- function(
   }
   metadata <- metadata[match(samples_to_include, metadata[[sample_names_column]]), , drop = FALSE]
   if (anyNA(metadata[, required_metadata, drop = FALSE])) stop("Required metadata values must be non-missing.", call. = FALSE)
+  adjusted_batch_columns <- batch_effect_columns[vapply(
+    batch_effect_columns,
+    function(column) length(unique(metadata[[column]])) > 1L,
+    logical(1)
+  )]
+  if (isTRUE(return_batch_corrected_values) && length(adjusted_batch_columns) == 0L) {
+    stop(
+      "return_batch_corrected_values requires at least one varying batch_effect_columns value in the selected samples.",
+      call. = FALSE
+    )
+  }
 
   group_counts <- .omix_limma_group_counts(metadata, contrast_variable_columns)
   contrast_details <- .omix_limma_resolve_contrasts(contrasts, group_counts)
@@ -469,7 +533,8 @@ Limma_Analysis <- function(
       pseudocount = fraction_pseudocount
     )
   }
-  design_details <- .omix_limma_design(metadata, sample_names_column, contrast_variable_columns, covariate_columns)
+  model_covariates <- unique(c(covariate_columns, adjusted_batch_columns))
+  design_details <- .omix_limma_design(metadata, sample_names_column, contrast_variable_columns, model_covariates)
   metadata <- design_details$metadata
   design <- design_details$design
   rewritten_contrasts <- vapply(
@@ -533,7 +598,18 @@ Limma_Analysis <- function(
   )
   fit <- limma::eBayes(fit, trend = identical(variance_model, "ebayes_trend"))
 
-  group_means <- lapply(colnames(design), function(group_name) rowMeans(expression[, which(design[, group_name] == 1), drop = FALSE]))
+  biological_design <- stats::model.matrix(~ 0 + contmerge, data = metadata)
+  downstream_expression <- if (isTRUE(return_batch_corrected_values)) {
+    .omix_limma_batch_corrected_expression(
+      expression = expression,
+      metadata = metadata,
+      batch_effect_columns = batch_effect_columns,
+      biological_design = biological_design
+    )
+  } else {
+    expression
+  }
+  group_means <- lapply(colnames(design), function(group_name) rowMeans(downstream_expression[, which(design[, group_name] == 1), drop = FALSE]))
   display_design_names <- colnames(design)
   group_display <- stats::setNames(
     names(design_details$group_label_map),
@@ -543,7 +619,7 @@ Limma_Analysis <- function(
   display_design_names[mapped_groups] <- unname(group_display[display_design_names[mapped_groups]])
   names(group_means) <- paste0(display_design_names, "_Mean")
   group_se <- lapply(colnames(design), function(group_name) {
-    values <- expression[, which(design[, group_name] == 1), drop = FALSE]
+    values <- downstream_expression[, which(design[, group_name] == 1), drop = FALSE]
     apply(values, 1L, function(value) stats::sd(value) / sqrt(sum(!is.na(value))))
   })
   names(group_se) <- paste0(display_design_names, "_SE")
@@ -568,7 +644,7 @@ Limma_Analysis <- function(
   results <- as.data.frame(cbind(do.call(cbind, group_means), do.call(cbind, group_se), result_effects, standard_errors, fit$t, p_values, adjusted_p_values), check.names = FALSE)
   results <- data.frame(Gene = rownames(expression), results, check.names = FALSE, stringsAsFactors = FALSE)
   if (isTRUE(return_matrix)) {
-    results <- data.frame(results, as.data.frame(expression, check.names = FALSE), check.names = FALSE, stringsAsFactors = FALSE)
+    results <- data.frame(results, as.data.frame(downstream_expression, check.names = FALSE), check.names = FALSE, stringsAsFactors = FALSE)
   }
   colnames(results) <- gsub(" - ", "-", colnames(results), fixed = TRUE)
   colnames(results) <- gsub("\\(", "", gsub("\\)", "", colnames(results)))
@@ -584,7 +660,11 @@ Limma_Analysis <- function(
     requested_contrasts = contrast_details$requested,
     contrasts = contrasts,
     contrast_source = contrast_details$source,
-    contrast_variable_columns = contrast_variable_columns, covariate_columns = covariate_columns,
+    contrast_variable_columns = contrast_variable_columns,
+    covariate_columns = covariate_columns,
+    batch_effect_columns = batch_effect_columns,
+    return_batch_corrected_values = return_batch_corrected_values,
+    adjusted_batch_columns = adjusted_batch_columns,
     donor_variable_column = donor_variable_column,
     consensus_correlation = if (is.null(correlation_fit)) NA_real_ else correlation_fit$consensus.correlation,
     genes_modelled = nrow(expression), samples_modelled = ncol(expression),
@@ -592,6 +672,7 @@ Limma_Analysis <- function(
     first_pvalue_threshold = first_pvalue_threshold, second_pvalue_threshold = second_pvalue_threshold
   )
   attr(results, "omix_limma_variance_diagnostic") <- variance_diagnostic
+  attr(results, "omix_limma_downstream_expression") <- downstream_expression
   results
 }
 

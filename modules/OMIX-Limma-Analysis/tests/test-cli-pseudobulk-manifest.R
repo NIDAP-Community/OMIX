@@ -60,6 +60,36 @@ stopifnot(any(grepl("requested variance model: auto", summary_lines, fixed = TRU
 stopifnot(any(grepl("recommended variance model: ebayes_trend", summary_lines, fixed = TRUE)))
 stopifnot(any(grepl("variance model: ebayes_trend", summary_lines, fixed = TRUE)))
 
+# A declared technical batch produces a dedicated continuous matrix for a
+# downstream tool, while retaining the standard Limma result bundle.
+batch_metadata_path <- file.path(work_dir, "Batch_Pseudobulk_Sample_Metadata.csv")
+batch_output_dir <- file.path(work_dir, "batch-results")
+utils::write.csv(
+  transform(metadata, Batch = c("Batch1", "Batch2", "Batch1", "Batch2", "Batch1", "Batch2")),
+  batch_metadata_path,
+  row.names = FALSE
+)
+batch_output <- system2(file.path(R.home("bin"), "Rscript"), c(
+  cli,
+  "--matrix", matrix_path,
+  "--metadata", batch_metadata_path,
+  "--contrasts", "B-A",
+  "--pseudobulk_manifest", manifest_path,
+  "--batch_effect_columns", "Batch",
+  "--return_batch_corrected_values", "true",
+  "--output_dir", batch_output_dir
+), stdout = TRUE, stderr = TRUE)
+stopifnot(is.null(attr(batch_output, "status")))
+stopifnot(file.exists(file.path(batch_output_dir, "Batch_Corrected_Expression.csv")))
+batch_matrix <- utils::read.csv(
+  file.path(batch_output_dir, "Batch_Corrected_Expression.csv"),
+  check.names = FALSE
+)
+stopifnot(identical(names(batch_matrix), c("Gene", metadata$Sample)))
+batch_summary <- readLines(file.path(batch_output_dir, "run_summary.txt"))
+stopifnot(any(grepl("batch effect columns: Batch", batch_summary, fixed = TRUE)))
+stopifnot(any(grepl("adjusted batch columns: Batch", batch_summary, fixed = TRUE)))
+
 # Omitting --contrasts must infer the only replicated two-group comparison and
 # make that decision explicit in the run summary.
 inferred_output_dir <- file.path(work_dir, "inferred-results")
