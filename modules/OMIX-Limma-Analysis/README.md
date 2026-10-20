@@ -93,7 +93,8 @@ contrast for every other design.
 | Matrix | CSV, TSV, TXT, or RDS feature-by-sample numeric matrix. The default feature-ID column is `GeneName`. |
 | Metadata | CSV, TSV, TXT, or RDS table with a unique `Sample` column matching matrix sample columns. |
 | Contrast columns | One or two metadata variables defining the groups to compare. |
-| Covariates | Optional fixed-effect columns, such as age, sex, or an unhandled technical variable. |
+| Covariates | Optional fixed-effect columns, such as age or sex. They are adjusted in the DE model but retained in the downstream expression matrix. |
+| Batch effects | Optional technical batch columns included as fixed effects. Set `--return_batch_corrected_values true` to write a separate batch-adjusted expression matrix for downstream continuous-score tools. |
 | Donor | Optional repeated-measure blocking column. Use it only when a donor contributes more than one modeled profile. |
 | Manifest | Optional upstream declaration of matrix type, intended downstream analysis, and recommended variance model. |
 
@@ -208,12 +209,24 @@ expression. Interpret the sign according to the supplied scale.
 | `run_summary.txt` | Requested and resolved input type, scale, transformation, variance model, design, contrasts, and donor-correlation provenance. |
 | `Variance_Diagnostic.csv` | Per-feature average signal and residual standard deviation before empirical-Bayes moderation. |
 | `variance_diagnostic.png` | Residual standard deviation versus average signal with a lowess trend when sufficient features are present. |
+| `Batch_Corrected_Expression.csv` | Written only when `--batch_effect_columns` and `--return_batch_corrected_values true` are supplied. This gene-by-sample matrix has the declared technical batch effect removed while protecting biological comparison groups. |
 
 ## Method notes
 
 The module fits `lmFit()`, applies the requested contrasts, and then runs
 `eBayes()` with or without its intensity trend. It does not perform count
 filtering, library-size normalization, TMM, or voom.
+
+### Batch-adjusted downstream matrix
+
+Batch adjustment is deliberately separate from the Limma DE calculation.
+When `--batch_effect_columns Batch` is supplied, `Batch` is included in the
+model. With `--return_batch_corrected_values true`, OMIX also writes
+`Batch_Corrected_Expression.csv` using `limma::removeBatchEffect()` while
+protecting the biological group design. This matrix is appropriate for a
+downstream continuous-expression step such as GSVA; the original DE
+coefficients, standard errors, and p-values are unchanged. Do not request a
+second batch adjustment for values that are already Harmony-corrected.
 
 For Harmony-corrected expression, confirm that the upstream correction did not
 remove or confound the biological effect of interest. For aggregated SCT or

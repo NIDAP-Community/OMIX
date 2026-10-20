@@ -321,6 +321,75 @@ covariate_result <- omix_limma_analysis(
 stopifnot("BatchBatch2_Mean" %in% names(covariate_result))
 stopifnot(identical(attr(covariate_result, "omix_limma_run")$covariate_columns, "Batch"))
 
+# Technical batch columns are modeled in the DE fit and can be removed only
+# from an explicit downstream matrix. The biological group design is protected
+# during removal, so the DE coefficient itself cannot depend on this optional
+# handoff output.
+batch_expression <- expression
+batch_expression[, c("A2", "B1", "B3")] <- batch_expression[, c("A2", "B1", "B3")] + 2
+batch_metadata <- transform(
+  metadata,
+  Batch = c("Batch1", "Batch2", "Batch1", "Batch2", "Batch1", "Batch2")
+)
+batch_model_only <- omix_limma_analysis(
+  Dataset = batch_expression,
+  Metadata_Table = batch_metadata,
+  sample_names_column = "Sample",
+  samples_to_include = batch_metadata$Sample,
+  gene_names_column = "GeneName",
+  contrast_variable_columns = "Group",
+  contrasts = "B-A",
+  batch_effect_columns = "Batch",
+  return_batch_corrected_values = FALSE
+)
+batch_corrected_result <- omix_limma_analysis(
+  Dataset = batch_expression,
+  Metadata_Table = batch_metadata,
+  sample_names_column = "Sample",
+  samples_to_include = batch_metadata$Sample,
+  gene_names_column = "GeneName",
+  contrast_variable_columns = "Group",
+  contrasts = "B-A",
+  batch_effect_columns = "Batch",
+  return_batch_corrected_values = TRUE
+)
+expected_batch_corrected <- limma::removeBatchEffect(
+  as.matrix(batch_expression[, batch_metadata$Sample]),
+  batch = factor(batch_metadata$Batch),
+  design = stats::model.matrix(~ 0 + Group, data = batch_metadata)
+)
+rownames(expected_batch_corrected) <- batch_expression$GeneName
+stopifnot(isTRUE(all.equal(
+  attr(batch_corrected_result, "omix_limma_downstream_expression"),
+  expected_batch_corrected,
+  tolerance = 1e-12
+)))
+stopifnot(isTRUE(all.equal(
+  batch_model_only[["B-A_logFC"]],
+  batch_corrected_result[["B-A_logFC"]],
+  tolerance = 1e-12
+)))
+stopifnot(identical(
+  attr(batch_corrected_result, "omix_limma_run")$adjusted_batch_columns,
+  "Batch"
+))
+
+batch_as_group <- tryCatch(
+  omix_limma_analysis(
+    Dataset = batch_expression,
+    Metadata_Table = batch_metadata,
+    sample_names_column = "Sample",
+    samples_to_include = batch_metadata$Sample,
+    gene_names_column = "GeneName",
+    contrast_variable_columns = "Batch",
+    contrasts = "Batch2-Batch1",
+    batch_effect_columns = "Batch"
+  ),
+  error = identity
+)
+stopifnot(inherits(batch_as_group, "error"))
+stopifnot(grepl("cannot also define", conditionMessage(batch_as_group), fixed = TRUE))
+
 donor_metadata <- data.frame(
   Sample = c("A1", "A2", "A3", "B1", "B2", "B3"),
   Group = c("A", "A", "A", "B", "B", "B"),

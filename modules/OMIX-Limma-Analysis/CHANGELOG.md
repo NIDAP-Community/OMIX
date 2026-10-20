@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Adds optional declared technical-batch handling for continuous matrices.
+  Batch columns are included in the Limma model, and the opt-in
+  `Batch_Corrected_Expression.csv` handoff removes only those batch effects
+  while protecting the biological group design. The DE statistics are
+  unchanged by this downstream-output option.
+
 - Advanced the canonical module from review to active after direct and
   contract tests, independent review, exact-runtime validation, and the
   reviewed local-versus-Code Ocean scientific-output comparison completed.

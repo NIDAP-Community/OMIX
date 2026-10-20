@@ -31,6 +31,10 @@ parameters:
   covariate_columns:
     type: string
     default: ""
+  batch_effect_columns:
+    type: string
+    default: ""
+    description: Optional comma-separated technical batch columns. They are included in the model and may be removed from the dedicated downstream expression matrix while preserving biological groups.
   donor_variable_column:
     type: string
     default: ""
@@ -91,6 +95,10 @@ parameters:
   return_matrix:
     type: boolean
     default: true
+  return_batch_corrected_values:
+    type: boolean
+    default: false
+    description: When true with declared batch_effect_columns, writes a batch-adjusted continuous matrix for downstream tools without changing Limma DE statistics.
   output_dir:
     type: path
     default: results
@@ -103,6 +111,11 @@ outputs:
     path: Sample_Metadata.csv
     format: csv
     description: Metadata aligned to the modeled matrix columns.
+  batch_corrected_expression:
+    path: Batch_Corrected_Expression.csv
+    format: csv
+    required_when: return_batch_corrected_values=true and batch_effect_columns is not empty
+    description: Gene-by-sample continuous matrix with declared technical batch effects removed while preserving biological comparison groups. Suitable for downstream continuous-score workflows.
   run_summary:
     path: run_summary.txt
     format: text
