@@ -1,0 +1,140 @@
+interface_version: 1
+entrypoint: scripts/run_expression_heatmap.R
+inputs:
+  expression_matrix:
+    classification: public
+    cli: --expression_matrix
+    type: path
+    required: true
+    formats: [csv, tsv, txt]
+    description: Normalized continuous feature-by-sample expression table. Features are rows and samples are columns.
+  sample_metadata:
+    classification: public
+    cli: --sample_metadata
+    type: path
+    required: true
+    formats: [csv, tsv, txt]
+    description: One row per sample, with a sample-ID column matching expression-matrix column names.
+parameters:
+  gene_column:
+    classification: public
+    type: string
+    default: auto
+    description: Feature identifier column. auto accepts Gene, GeneName, or the first column.
+  sample_name_column:
+    classification: public
+    type: string
+    default: Sample
+  sample_label_column:
+    classification: public
+    type: string
+    default: Sample
+    description: Metadata column used for displayed sample labels.
+  samples_to_include:
+    classification: public
+    type: string
+    default: ""
+    description: Optional comma-separated sample IDs. Blank selects matching metadata IDs in metadata order.
+  group_columns:
+    classification: public
+    type: string
+    default: ""
+    description: Optional comma-separated metadata columns used as top annotations.
+  include_all_genes:
+    classification: public
+    type: boolean
+    default: false
+  filter_top_genes_by_variance:
+    classification: public
+    type: boolean
+    default: true
+  top_genes_by_variance_to_include:
+    classification: public
+    type: integer
+    default: 500
+  specific_genes_to_include:
+    classification: public
+    type: string
+    default: None
+    description: Optional space-separated feature identifiers retained in addition to variable features.
+  cluster_genes:
+    classification: public
+    type: boolean
+    default: true
+  cluster_samples:
+    classification: public
+    type: boolean
+    default: true
+  center_and_rescale:
+    classification: public
+    type: boolean
+    default: true
+    description: Row-standardize selected features before rendering.
+  display_gene_names:
+    classification: public
+    type: boolean
+    default: false
+  display_sample_names:
+    classification: public
+    type: boolean
+    default: true
+  heatmap_color_scheme:
+    classification: public
+    type: string
+    default: Bu Yl Rd
+    allowed: [Default, Blue to Red, Red to Vanilla, Violet to Pink, Bu Yl Rd, Bu Wt Rd]
+  autoscale_heatmap_color:
+    classification: public
+    type: boolean
+    default: true
+  set_min_heatmap_color:
+    classification: advanced
+    type: number
+    default: -2
+  set_max_heatmap_color:
+    classification: advanced
+    type: number
+    default: 2
+  gene_name_font_size:
+    classification: public
+    type: number
+    default: 4
+  sample_name_font_size:
+    classification: public
+    type: number
+    default: 8
+  legend_font_size:
+    classification: public
+    type: number
+    default: 10
+  heatmap_title:
+    classification: public
+    type: string
+    default: ""
+  image_width:
+    classification: public
+    type: number
+    default: 12
+    units: inches
+  image_height:
+    classification: public
+    type: number
+    default: 10
+    units: inches
+  output_dir:
+    classification: public
+    type: path
+    default: results
+outputs:
+  heatmap:
+    path: expression_heatmap.png
+    format: png
+    description: Annotated expression heatmap rendered with ComplexHeatmap.
+  plotted_matrix:
+    path: expression_heatmap_matrix.csv
+    format: csv
+    description: Matrix actually displayed after duplicate-feature averaging, filtering, and optional row standardization.
+  run_summary:
+    path: expression_heatmap_run_summary.txt
+    format: text
+    description: Explicit inputs, selected samples, controls, and OMIX module identity.
