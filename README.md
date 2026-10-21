@@ -85,7 +85,7 @@ readiness.
 | [OMIX-L2P-Single](modules/OMIX-L2P-Single) | [OMIX-L2P-Single](https://github.com/NIDAP-Community/OMIX-L2P-Single) | Platform-neutral single-comparison L2P over-representation pathway analysis. | Review |
 | [OMIX-L2P-Multi](modules/OMIX-L2P-Multi) | [OMIX-L2P-Multi](https://github.com/NIDAP-Community/OMIX-L2P-Multi) | Platform-neutral multi-comparison L2P over-representation pathway analysis. | Review |
 | [OMIX-Seurat-Pseudobulk](modules/OMIX-Seurat-Pseudobulk) | [OMIX-Seurat-Pseudobulk](https://github.com/NIDAP-Community/OMIX-Seurat-Pseudobulk) | Aggregate one selected Seurat cell type into raw donor-by-group pseudobulk counts, Harmony-corrected donor means, or SCTransform donor means, with metadata and a compatible downstream-analysis manifest. | Review |
-| [OMIX-Expression-Heatmap](modules/OMIX-Expression-Heatmap) | — | Render annotated ComplexHeatmap expression heatmaps from normalized bulk or single-cell-derived continuous matrices. | Draft |
+| [OMIX-Expression-Heatmap](modules/OMIX-Expression-Heatmap) | — | Render annotated ComplexHeatmap expression heatmaps from normalized continuous feature-by-sample matrices. | Development |
 
 ## Contribute or automate work
 

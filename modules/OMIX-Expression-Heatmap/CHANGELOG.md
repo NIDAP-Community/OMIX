@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Corrected the canonical lifecycle classification to `development`, matching
+  the lifecycle policy while the required shared runtime remains unpinned and
+  unvalidated.
 - Added the draft platform-neutral OMIX Expression Heatmap module from the
   established ComplexHeatmap implementation.
 - Defined one explicit continuous-expression contract for bulk and

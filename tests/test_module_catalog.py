@@ -27,7 +27,12 @@ def top_level_scalars(text: str) -> dict[str, str]:
 def deployment_repository(text: str) -> str:
     match = re.search(r"(?m)^\s+repository:\s*(\S+)\s*$", text)
     if not match:
-        raise AssertionError("module.yml has no registered deployment repository")
+        if re.search(r"(?m)^deployment_adapters:\s*\[\]\s*$", text):
+            return "—"
+        raise AssertionError(
+            "module.yml has no registered deployment repository or explicit empty "
+            "deployment_adapters list"
+        )
     return match.group(1).strip('"\'')
 
 
@@ -65,12 +70,17 @@ def readme_records() -> dict[str, dict[str, str]]:
             raise AssertionError(f"Malformed README module-catalog row: {line}")
         module_link = LINK.fullmatch(cells[0])
         deployment_link = LINK.fullmatch(cells[1])
-        if not module_link or not deployment_link:
+        if not module_link or (not deployment_link and cells[1] != "—"):
             raise AssertionError(f"Malformed README catalog link: {line}")
         module_label, module_path = module_link.groups()
-        deployment_label, deployment_url = deployment_link.groups()
+        if deployment_link:
+            deployment_label, deployment_url = deployment_link.groups()
+        else:
+            deployment_label, deployment_url = "—", "—"
         module_id = Path(module_path).name
-        if module_label != module_id or deployment_label != module_id:
+        if module_label != module_id or (
+            deployment_label != "—" and deployment_label != module_id
+        ):
             raise AssertionError(
                 f"{module_id}: README link labels must use the canonical module directory name"
             )

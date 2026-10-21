@@ -64,7 +64,7 @@ to the 500 highest-variance features. Set `--include_all_genes true` and
 - Row standardization is enabled by default, making each displayed feature
   easier to compare across samples. Disable it to show the original continuous
   scale.
-- The current canonical module is draft because the shared runtime must still
+- The current canonical module is in development because the shared runtime must still
   record a pinned `ComplexHeatmap` dependency and receive validation. The
   interface and a small reproducible fixture are included now so that runtime
   validation is explicit rather than implicit.
@@ -74,4 +74,4 @@ to the 500 highest-variance features. Set `--include_all_genes true` and
 The complete portable interface is defined in
 [schemas/interface.yml](schemas/interface.yml). Deployment adapters will be
 listed in [module.yml](module.yml) when they are available; none is registered
-for this draft module.
+for this development module.
