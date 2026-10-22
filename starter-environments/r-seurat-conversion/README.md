@@ -30,12 +30,19 @@ gene-expression matrix and is excluded from the supported conversion inputs.
 The initial published version was `r4.4.3-v1`. Its committed `renv.lock` is
 pinned to R 4.4.3 and the known working Seurat 5.3.0 stack.
 
-The `r4.4.3-v2` candidate retains that registry dependency lock and installs
-OmixSeurat 0.3.1 from the same OMIX source commit used to build the image. Its
-targeted Linux CI build generates and serializes a synthetic object with a
-legacy slot-based `Harmony/data` assay and an `SCTAssay`, then verifies the
-supported RNA, Harmony-assay, and SCT-assay conversions. The v1 image remains
-immutable and must not be retagged or overwritten.
+The published `r4.4.3-v2` image remains immutable and records OmixSeurat
+0.3.1 in the release manifest. The current source profile retains the same
+registry dependency lock, then installs OmixSeurat from the checked-out OMIX
+bridge source. Its non-published candidate validation therefore installs
+OmixSeurat 0.4.0 and verifies both the legacy RNA, Harmony-assay, and
+SCT-assay conversions and a selected/all-cell-type Pseudobulk collection
+fixture. A source candidate is not a revision of the published v2 image.
+
+This candidate-validation change does not alter `VERSION`, publish an image,
+or amend `release-manifest.json`. A separately authorized release task must
+choose a new runtime version, publish it, resolve its immutable digest, and
+append a new release-manifest record before this source profile can be used as
+a released runtime.
 
 The image inherits the verified r-base v1 parent by its immutable OCI digest,
 not by a mutable readable tag. CI replaces that parent only when it is

@@ -417,7 +417,10 @@ jobs:
               as.character(packageVersion(package))
             }, character(1))
             stopifnot(methods::getClass("SCTAssay")@package == "Seurat")
-            stopifnot(identical(unname(versions["OmixSeurat"]), "0.3.1"))
+            # OmixSeurat is copied from bridges/seurat in this checkout after
+            # renv restores the registry lock, so this is a source-version
+            # assertion rather than a lockfile-version assertion.
+            stopifnot(identical(unname(versions["OmixSeurat"]), "0.4.0"))
             writeLines(paste(sprintf("%s %s", packages, versions), collapse = "\\n"))
           '
 
@@ -429,6 +432,16 @@ jobs:
             --entrypoint Rscript \
             omix-r-seurat-conversion:ci \
             /tests/test-seurat-conversion.R
+
+      - name: Smoke-test cell-type pseudobulk collection compatibility
+        if: steps.targets.outputs.conversion == 'true'
+        run: |
+          docker run --rm \
+            --volume "${{ github.workspace }}:/omix:ro" \
+            --entrypoint Rscript \
+            omix-r-seurat-conversion:ci \
+            /omix/starter-environments/r-seurat-conversion/tests/test-pseudobulk-collection-candidate.R \
+              --module_root /omix/modules/OMIX-Seurat-Pseudobulk
 
       - name: Capture statistics package inventory
         if: steps.targets.outputs.statistics == 'true'

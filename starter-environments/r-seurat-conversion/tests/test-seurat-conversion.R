@@ -6,7 +6,10 @@
 # expression representation to the portable OMIX handoff.
 set.seed(20260923)
 
-stopifnot(identical(as.character(utils::packageVersion("OmixSeurat")), "0.3.1"))
+# OmixSeurat is installed from this OMIX source checkout after the registry
+# lock is restored.  Keep this assertion aligned with the bridge source so a
+# candidate build cannot silently validate an older embedded bridge.
+stopifnot(identical(as.character(utils::packageVersion("OmixSeurat")), "0.4.0"))
 
 feature_ids <- paste0("Gene", seq_len(120L))
 cell_ids <- paste0("Cell", seq_len(12L))
