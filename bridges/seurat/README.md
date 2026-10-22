@@ -9,6 +9,10 @@ selects one cell type and makes one profile per donor-by-group pair. For raw
 counts it returns an `omix_standard_input`; for a declared corrected expression
 layer it returns an `omix_expression_input` with donor means.
 
+For a canonical selected/all cell-type pseudobulk collection, the bridge also
+lists exact non-missing labels after an explicit cell-level filter. It does not
+aggregate multiple cell types into one profile.
+
 ## Install
 
 Install OMIX Core and the bridge from the same OMIX revision:

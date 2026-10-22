@@ -29,7 +29,9 @@ option_list <- list(
   make_option("--donor_column", type = "character", help = "Cell-metadata donor column"),
   make_option("--group_column", type = "character", help = "Cell-metadata group column"),
   make_option("--cell_type_column", type = "character", help = "Cell-metadata cell-type column"),
-  make_option("--cell_type", type = "character", help = "One exact cell type to aggregate"),
+  make_option("--cell_type_mode", type = "character", default = "one", help = "one, selected, or all [default: %default]"),
+  make_option("--cell_type", type = "character", default = "", help = "One exact cell type for --cell_type_mode one"),
+  make_option("--cell_type_selection", type = "character", default = "", help = "Ordered one-column CellType CSV, TSV, or TXT table for --cell_type_mode selected"),
   make_option("--metadata_columns", type = "character", default = "", help = "Optional comma-separated invariant sample metadata columns, e.g. Batch,Sex"),
   make_option("--cell_filter_column", type = "character", default = "", help = "Optional cell-level filter column"),
   make_option("--cell_filter_values", type = "character", default = "", help = "Comma-separated values retained from --cell_filter_column"),
@@ -48,10 +50,25 @@ parser <- OptionParser(
 )
 opt <- parse_args(parser)
 
-for (name in c("seurat_rds", "donor_column", "group_column", "cell_type_column", "cell_type")) {
+for (name in c("seurat_rds", "donor_column", "group_column", "cell_type_column")) {
   if (is.null(opt[[name]]) || !nzchar(opt[[name]])) {
     stop("ERROR: --", name, " is required")
   }
+}
+if (!opt$cell_type_mode %in% c("one", "selected", "all")) {
+  stop("ERROR: --cell_type_mode must be one, selected, or all")
+}
+if (identical(opt$cell_type_mode, "one") && !nzchar(opt$cell_type)) {
+  stop("ERROR: --cell_type is required when --cell_type_mode one")
+}
+if (identical(opt$cell_type_mode, "selected") && !nzchar(opt$cell_type_selection)) {
+  stop("ERROR: --cell_type_selection is required when --cell_type_mode selected")
+}
+if (!identical(opt$cell_type_mode, "one") && nzchar(opt$cell_type)) {
+  stop("ERROR: --cell_type is only valid when --cell_type_mode one")
+}
+if (!identical(opt$cell_type_mode, "selected") && nzchar(opt$cell_type_selection)) {
+  stop("ERROR: --cell_type_selection is only valid when --cell_type_mode selected")
 }
 if (!opt$on_insufficient_cells %in% c("error", "drop")) {
   stop("ERROR: --on_insufficient_cells must be error or drop")
@@ -68,12 +85,11 @@ if (xor(is.null(cell_filter_column), is.null(cell_filter_values))) {
   stop("ERROR: Supply both --cell_filter_column and --cell_filter_values, or neither")
 }
 
-result <- omix_seurat_pseudobulk(
+common_arguments <- list(
   seurat_rds = opt$seurat_rds,
   donor_column = opt$donor_column,
   group_column = opt$group_column,
   cell_type_column = opt$cell_type_column,
-  cell_type = opt$cell_type,
   metadata_columns = parse_csv_values(opt$metadata_columns),
   cell_filter_column = cell_filter_column,
   cell_filter_values = cell_filter_values,
@@ -85,8 +101,23 @@ result <- omix_seurat_pseudobulk(
   on_insufficient_cells = opt$on_insufficient_cells,
   output_dir = opt$output_dir
 )
-message(
-  "Saved DEG-ready donor-level matrix to ", result$matrix_path,
-  ", aligned metadata to ", result$metadata_path,
-  ", and the mode manifest to ", result$manifest_path
-)
+if (identical(opt$cell_type_mode, "one")) {
+  result <- do.call(omix_seurat_pseudobulk, c(common_arguments, list(cell_type = opt$cell_type)))
+  message(
+    "Saved DEG-ready donor-level matrix to ", result$matrix_path,
+    ", aligned metadata to ", result$metadata_path,
+    ", and the mode manifest to ", result$manifest_path
+  )
+} else {
+  result <- do.call(omix_seurat_pseudobulk_collection, c(
+    common_arguments,
+    list(
+      cell_type_mode = opt$cell_type_mode,
+      cell_type_selection = if (nzchar(opt$cell_type_selection)) opt$cell_type_selection else NULL
+    )
+  ))
+  message(
+    "Saved cell-type pseudobulk collection catalog to ", result$catalog_path,
+    " and collection manifest to ", result$collection_manifest_path
+  )
+}

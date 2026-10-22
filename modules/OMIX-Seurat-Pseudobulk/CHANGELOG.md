@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Added an opt-in cell-type collection capability. Selected mode reads an
+  ordered exact-label table and all mode enumerates non-missing labels after
+  any explicit cell filter. Each label produces an ordinary nested pseudobulk
+  bundle plus a profile-level eligibility/provenance catalog; existing
+  one-cell-type calls and root-level output filenames are unchanged.
+- Collection mode keeps donor-by-group profiles as biological replicates,
+  applies the existing minimum-cell policy independently per cell type, and
+  rejects unknown labels, duplicate/empty selections, and labels with fewer
+  than two retained groups. It does not pool cells or fit Limma models.
 - Registered the accepted Code Ocean deployment-adapter repository without
   changing the portable scientific implementation or interface version.
 - Added a deterministic, text-baselined public-CLI equivalence fixture covering
