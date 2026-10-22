@@ -428,6 +428,7 @@ jobs:
         if: steps.targets.outputs.conversion == 'true'
         run: |
           docker run --rm \
+            --env OMIX_EXPECTED_OMIX_SEURAT_VERSION=0.4.0 \
             --volume "${{ github.workspace }}/starter-environments/r-seurat-conversion/tests:/tests:ro" \
             --entrypoint Rscript \
             omix-r-seurat-conversion:ci \

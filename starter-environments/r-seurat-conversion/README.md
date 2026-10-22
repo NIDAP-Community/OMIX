@@ -37,6 +37,10 @@ bridge source. Its non-published candidate validation therefore installs
 OmixSeurat 0.4.0 and verifies both the legacy RNA, Harmony-assay, and
 SCT-assay conversions and a selected/all-cell-type Pseudobulk collection
 fixture. A source candidate is not a revision of the published v2 image.
+The shared serialized-conversion fixture receives its expected OmixSeurat
+version explicitly: candidate CI supplies the source-built bridge version,
+while published-image verification reads the version recorded for that image
+in the release manifest.
 
 This candidate-validation change does not alter `VERSION`, publish an image,
 or amend `release-manifest.json`. A separately authorized release task must
