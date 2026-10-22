@@ -567,6 +567,14 @@ jobs:
         if: steps.targets.outputs.conversion == 'true'
         run: |
           mkdir -p build-artifacts/seurat-conversion
+          {
+            echo "omix_source=${GITHUB_SHA}"
+            echo "candidate_tag=omix-r-seurat-conversion:ci"
+            echo "candidate_image_id=$(docker image inspect --format '{{.Id}}' omix-r-seurat-conversion:ci)"
+            echo "platform=$(docker image inspect --format '{{.Architecture}}/{{.Os}}' omix-r-seurat-conversion:ci)"
+            echo "lockfile_sha256=$(sha256sum starter-environments/r-seurat-conversion/renv.lock | awk '{print $1}')"
+            echo "build_command=docker build --tag omix-r-seurat-conversion:ci --file starter-environments/r-seurat-conversion/Dockerfile ."
+          } > build-artifacts/seurat-conversion/candidate-image-provenance.txt
           docker run --rm \
             --volume "${{ github.workspace }}/build-artifacts/seurat-conversion:/out" \
             --entrypoint Rscript \
