@@ -677,3 +677,441 @@ Limma_Analysis <- function(
 }
 
 omix_limma_analysis <- Limma_Analysis
+
+# The collection helpers below are intentionally kept in the canonical Limma
+# module rather than an L2P adapter.  They run the ordinary donor-level Limma
+# implementation once for each already-aggregated cell type, then make the
+# strict, wide table that L2P Multi consumes.  They do not pool cells, fit an
+# interaction model, or try to reconcile different feature universes.
+
+.omix_limma_collection_scalar <- function(value, name) {
+  if (!is.character(value) || length(value) != 1L || is.na(value) || !nzchar(trimws(value))) {
+    stop(name, " must be one non-empty character value.", call. = FALSE)
+  }
+  trimws(value)
+}
+
+.omix_limma_collection_existing_path <- function(value, name) {
+  value <- .omix_limma_collection_scalar(value, name)
+  if (!file.exists(value)) stop(name, " was not found: ", value, call. = FALSE)
+  normalizePath(value, mustWork = TRUE)
+}
+
+.omix_limma_collection_read_table <- function(path) {
+  extension <- tolower(tools::file_ext(path))
+  if (identical(extension, "rds")) {
+    object <- readRDS(path)
+    if (is.matrix(object) || is.data.frame(object)) return(as.data.frame(object, check.names = FALSE))
+    stop("RDS input must contain a data frame or matrix: ", path, call. = FALSE)
+  }
+  if (identical(extension, "csv")) return(utils::read.csv(path, check.names = FALSE, stringsAsFactors = FALSE))
+  if (extension %in% c("tsv", "txt")) return(utils::read.delim(path, check.names = FALSE, stringsAsFactors = FALSE))
+  stop("Unsupported table input extension for ", path, ". Use CSV, TSV, TXT, or RDS.", call. = FALSE)
+}
+
+.omix_limma_collection_read_dcf <- function(path, name) {
+  record <- base::read.dcf(path)
+  if (nrow(record) != 1L) stop(name, " must contain exactly one record: ", path, call. = FALSE)
+  as.list(record[1L, , drop = TRUE])
+}
+
+.omix_limma_collection_dcf_value <- function(record, field) {
+  if (is.null(record) || !field %in% names(record)) return("")
+  trimws(as.character(record[[field]]))
+}
+
+.omix_limma_collection_hash <- function(path) {
+  value <- tryCatch(unname(tools::sha256sum(path)), error = function(error) NA_character_)
+  if (length(value) != 1L || is.na(value)) "<unavailable>" else as.character(value)
+}
+
+.omix_limma_collection_resolve_relative_path <- function(root, relative_path, field, cell_type_id) {
+  relative_path <- .omix_limma_collection_scalar(relative_path, paste0(field, " for ", cell_type_id))
+  if (grepl("^(/|[A-Za-z]:[/\\\\])", relative_path)) {
+    stop(field, " must be relative to the pseudobulk collection: ", relative_path, call. = FALSE)
+  }
+  candidate <- normalizePath(file.path(root, relative_path), mustWork = FALSE)
+  root_normalized <- normalizePath(root, mustWork = TRUE)
+  prefix <- paste0(root_normalized, .Platform$file.sep)
+  if (!identical(candidate, root_normalized) && !startsWith(candidate, prefix)) {
+    stop(field, " escapes the pseudobulk collection root for ", cell_type_id, ".", call. = FALSE)
+  }
+  if (!file.exists(candidate)) {
+    stop(field, " was not found for ", cell_type_id, ": ", candidate, call. = FALSE)
+  }
+  normalizePath(candidate, mustWork = TRUE)
+}
+
+.omix_limma_collection_require_columns <- function(table, columns, name) {
+  missing <- setdiff(columns, names(table))
+  if (length(missing) > 0L) {
+    stop(name, " lacks required column(s): ", paste(missing, collapse = ", "), ".", call. = FALSE)
+  }
+}
+
+.omix_limma_collection_read_catalog <- function(pseudobulk_collection_manifest) {
+  manifest_path <- .omix_limma_collection_existing_path(
+    pseudobulk_collection_manifest,
+    "pseudobulk_collection_manifest"
+  )
+  collection_root <- dirname(manifest_path)
+  manifest <- .omix_limma_collection_read_dcf(manifest_path, "Pseudobulk collection manifest")
+  if (!identical(.omix_limma_collection_dcf_value(manifest, "format_version"), "1") ||
+      !identical(.omix_limma_collection_dcf_value(manifest, "collection_kind"), "cell_type_pseudobulk")) {
+    stop("pseudobulk_collection_manifest is not a supported OMIX cell-type pseudobulk collection (format_version 1).", call. = FALSE)
+  }
+  selection_mode <- .omix_limma_collection_dcf_value(manifest, "cell_type_selection_mode")
+  if (!selection_mode %in% c("selected", "all")) {
+    stop("pseudobulk_collection_manifest must declare cell_type_selection_mode as selected or all.", call. = FALSE)
+  }
+  catalog_name <- .omix_limma_collection_dcf_value(manifest, "profile_catalog")
+  catalog_path <- .omix_limma_collection_resolve_relative_path(
+    collection_root, catalog_name, "profile_catalog", "collection"
+  )
+  catalog <- .omix_limma_collection_read_table(catalog_path)
+  required_columns <- c(
+    "CellTypeID", "CellType", "SelectionMode", "Donor", "Group", "Cells", "MinCells",
+    "ProfileEligibility", "MatrixPath", "MetadataPath", "BundleManifestPath",
+    "AggregationMethod", "SourceAssay", "SourceLayer", "SourceSeuratRds"
+  )
+  .omix_limma_collection_require_columns(catalog, required_columns, "Cell_Type_Profile_Catalog.csv")
+  if (nrow(catalog) == 0L) stop("Cell_Type_Profile_Catalog.csv must contain at least one profile.", call. = FALSE)
+  catalog[] <- lapply(catalog, function(value) if (is.factor(value)) as.character(value) else value)
+  character_columns <- c("CellTypeID", "CellType", "SelectionMode", "Donor", "Group", "ProfileEligibility",
+                         "MatrixPath", "MetadataPath", "BundleManifestPath", "AggregationMethod")
+  for (column in character_columns) {
+    value <- trimws(as.character(catalog[[column]]))
+    if (anyNA(value) || any(!nzchar(value))) {
+      stop("Cell_Type_Profile_Catalog.csv has an empty ", column, " value.", call. = FALSE)
+    }
+    catalog[[column]] <- value
+  }
+  if (any(catalog$SelectionMode != selection_mode)) {
+    stop(
+      "Cell_Type_Profile_Catalog.csv SelectionMode must match the collection manifest cell_type_selection_mode ('",
+      selection_mode, "').",
+      call. = FALSE
+    )
+  }
+  if (!all(catalog$ProfileEligibility %in% c("eligible", "dropped_insufficient_cells"))) {
+    stop("Cell_Type_Profile_Catalog.csv has unsupported ProfileEligibility values.", call. = FALSE)
+  }
+  profile_key <- paste(catalog$CellTypeID, catalog$Donor, catalog$Group, sep = "\r")
+  if (anyDuplicated(profile_key)) {
+    stop("Cell_Type_Profile_Catalog.csv has duplicate CellTypeID/Donor/Group profiles.", call. = FALSE)
+  }
+  cell_type_ids <- unique(catalog$CellTypeID)
+  cell_type_index <- match(catalog$CellTypeID, cell_type_ids)
+  catalog$CollectionOrder <- cell_type_index
+  records <- lapply(cell_type_ids, function(cell_type_id) {
+    rows <- catalog[catalog$CellTypeID == cell_type_id, , drop = FALSE]
+    constant_columns <- c("CellType", "SelectionMode", "MatrixPath", "MetadataPath", "BundleManifestPath", "AggregationMethod", "SourceAssay", "SourceLayer")
+    inconsistent <- constant_columns[vapply(constant_columns, function(column) length(unique(as.character(rows[[column]]))) != 1L, logical(1))]
+    if (length(inconsistent) > 0L) {
+      stop("Cell_Type_Profile_Catalog.csv has inconsistent ", paste(inconsistent, collapse = ", "), " for ", cell_type_id, ".", call. = FALSE)
+    }
+    if (identical(rows$AggregationMethod[[1L]], "sum_counts")) {
+      stop("Cell-type collection contains raw counts for ", cell_type_id, ". Use OMIX-DEG-Analysis rather than direct Limma.", call. = FALSE)
+    }
+    list(
+      id = cell_type_id,
+      label = rows$CellType[[1L]],
+      selection_mode = rows$SelectionMode[[1L]],
+      order = rows$CollectionOrder[[1L]],
+      rows = rows,
+      matrix_path = .omix_limma_collection_resolve_relative_path(collection_root, rows$MatrixPath[[1L]], "MatrixPath", cell_type_id),
+      metadata_path = .omix_limma_collection_resolve_relative_path(collection_root, rows$MetadataPath[[1L]], "MetadataPath", cell_type_id),
+      bundle_manifest_path = .omix_limma_collection_resolve_relative_path(collection_root, rows$BundleManifestPath[[1L]], "BundleManifestPath", cell_type_id)
+    )
+  })
+  list(
+    collection_root = collection_root,
+    collection_manifest_path = manifest_path,
+    collection_manifest = manifest,
+    catalog_path = catalog_path,
+    catalog = catalog,
+    records = records
+  )
+}
+
+.omix_limma_collection_resolve_bundle_contract <- function(bundle_manifest_path, cell_type_id) {
+  manifest <- .omix_limma_collection_read_dcf(bundle_manifest_path, "Pseudobulk manifest for ")
+  matrix_type <- .omix_limma_collection_dcf_value(manifest, "matrix_type")
+  if (identical(matrix_type, "raw_integer_counts")) {
+    stop("Pseudobulk manifest for ", cell_type_id, " declares raw_integer_counts; use OMIX-DEG-Analysis.", call. = FALSE)
+  }
+  if (!matrix_type %in% names(.omix_limma_manifest_type_aliases)) {
+    stop("Unsupported Pseudobulk matrix_type for ", cell_type_id, ": ", matrix_type, call. = FALSE)
+  }
+  if (!identical(.omix_limma_collection_dcf_value(manifest, "expected_downstream_module"), "OMIX-Limma-Analysis") ||
+      !identical(.omix_limma_collection_dcf_value(manifest, "expected_downstream_mode"), "continuous_expression")) {
+    stop("Pseudobulk manifest for ", cell_type_id, " does not declare an OMIX-Limma-Analysis continuous-expression handoff.", call. = FALSE)
+  }
+  input_contract <- omix_limma_resolve_input_contract(
+    input_data_type = "auto",
+    input_kind = "auto",
+    variance_model = "auto",
+    fraction_transform = "auto",
+    manifest_matrix_type = matrix_type,
+    manifest_recommended_variance_model = .omix_limma_collection_dcf_value(manifest, "recommended_variance_model")
+  )
+  declared_kind <- .omix_limma_collection_dcf_value(manifest, "downstream_input_kind")
+  if (nzchar(declared_kind) && !identical(declared_kind, input_contract$input_kind)) {
+    stop("Pseudobulk manifest input kind does not match its declared matrix type for ", cell_type_id, ".", call. = FALSE)
+  }
+  if (!identical(input_contract$input_kind, "log2_expression")) {
+    stop("L2P Multi export requires log2-expression pseudobulk for ", cell_type_id, " so an M-F_FC column is defined.", call. = FALSE)
+  }
+  list(manifest = manifest, input_contract = input_contract)
+}
+
+.omix_limma_collection_validate_m_f_profiles <- function(record, metadata, sample_names_column, contrast_variable_columns) {
+  .omix_limma_collection_require_columns(metadata, c(sample_names_column, "Donor", contrast_variable_columns), paste0("Metadata for ", record$id))
+  metadata[[sample_names_column]] <- as.character(metadata[[sample_names_column]])
+  if (anyNA(metadata[[sample_names_column]]) || any(!nzchar(metadata[[sample_names_column]])) || anyDuplicated(metadata[[sample_names_column]])) {
+    stop("Metadata for ", record$id, " must contain unique non-empty sample IDs.", call. = FALSE)
+  }
+  eligible <- record$rows[record$rows$ProfileEligibility == "eligible", , drop = FALSE]
+  eligible_m_f <- eligible[eligible$Group %in% c("M", "F"), , drop = FALSE]
+  expected_keys <- paste(eligible_m_f$Donor, eligible_m_f$Group, sep = "\r")
+  selected <- metadata[as.character(metadata[[contrast_variable_columns]]) %in% c("M", "F"), , drop = FALSE]
+  observed_keys <- paste(as.character(selected$Donor), as.character(selected[[contrast_variable_columns]]), sep = "\r")
+  if (anyDuplicated(observed_keys)) {
+    stop("Metadata for ", record$id, " has duplicate donor/group profiles for the M-F model.", call. = FALSE)
+  }
+  if (!setequal(expected_keys, observed_keys)) {
+    missing <- setdiff(expected_keys, observed_keys)
+    unexpected <- setdiff(observed_keys, expected_keys)
+    detail <- c(
+      if (length(missing)) paste0("missing eligible catalog profile(s): ", paste(missing, collapse = ", ")),
+      if (length(unexpected)) paste0("unexpected metadata profile(s): ", paste(unexpected, collapse = ", "))
+    )
+    stop("Metadata for ", record$id, " does not exactly match eligible catalog M/F profiles (", paste(detail, collapse = "; "), ").", call. = FALSE)
+  }
+  group_counts <- table(factor(as.character(selected[[contrast_variable_columns]]), levels = c("M", "F")))
+  if (any(group_counts < 2L)) {
+    stop("Cell type ", record$id, " requires at least two donor-level profiles in each M and F group; observed M=", group_counts[["M"]], ", F=", group_counts[["F"]], ".", call. = FALSE)
+  }
+  selected
+}
+
+.omix_limma_collection_validate_l2p_multi_shape <- function(table, comparisons) {
+  .omix_limma_collection_require_columns(table, "GeneName", "L2P_Multi_Input.csv")
+  genes <- as.character(table$GeneName)
+  if (anyNA(genes) || any(!nzchar(genes)) || anyDuplicated(genes)) {
+    stop("L2P_Multi_Input.csv must have unique non-empty GeneName values.", call. = FALSE)
+  }
+  for (comparison in comparisons) {
+    columns <- paste0(comparison, c("_tstat", "_pval", "_FC"))
+    .omix_limma_collection_require_columns(table, columns, "L2P_Multi_Input.csv")
+    for (column in columns) {
+      values <- suppressWarnings(as.numeric(table[[column]]))
+      if (length(values) != nrow(table) || any(!is.finite(values))) {
+        stop("L2P_Multi_Input.csv has non-finite numeric values in ", column, ".", call. = FALSE)
+      }
+    }
+  }
+  invisible(TRUE)
+}
+
+.omix_limma_collection_write_cell_type_bundle <- function(output_dir, result, metadata, run) {
+  dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+  utils::write.csv(result, file.path(output_dir, "Limma_Analysis.csv"), row.names = FALSE, na = "")
+  utils::write.csv(metadata, file.path(output_dir, "Sample_Metadata.csv"), row.names = FALSE, na = "")
+  diagnostic <- attr(result, "omix_limma_variance_diagnostic")
+  utils::write.csv(diagnostic, file.path(output_dir, "Variance_Diagnostic.csv"), row.names = FALSE, na = "")
+  writeLines(c(
+    "OMIX Limma Analysis cell-type collection run summary",
+    paste("cell type ID:", run$cell_type_id),
+    paste("cell type:", run$cell_type),
+    paste("source matrix:", run$source_matrix_path),
+    paste("source metadata:", run$source_metadata_path),
+    paste("source pseudobulk manifest:", run$source_bundle_manifest_path),
+    paste("contrast:", run$contrast),
+    paste("input data type:", run$limma_run$input_data_type),
+    paste("input kind:", run$limma_run$input_kind),
+    paste("variance model:", run$limma_run$variance_model),
+    paste("model type:", run$limma_run$model_type),
+    paste("group replicate counts:", paste0(names(run$limma_run$group_replicate_counts), "=", as.integer(run$limma_run$group_replicate_counts), collapse = ","))
+  ), file.path(output_dir, "run_summary.txt"))
+}
+
+#' Run M-F Limma models for an ordered pseudobulk cell-type collection.
+#'
+#' @description
+#' Consumes the collection manifest written by OMIX Seurat Pseudobulk, fits the
+#' ordinary continuous-matrix Limma model independently for each cell type, and
+#' writes a strict common-gene-universe wide table for OMIX L2P Multi.  This is
+#' a collection of independent donor-level M-F comparisons, not a pooled-cell
+#' analysis or a cell-type-by-group interaction model.
+#'
+#' @param pseudobulk_collection_manifest Pseudobulk collection manifest path.
+#' @param output_dir New or empty destination directory.
+#' @param contrast Fixed M-F contrast for the collection contract.
+#' @param sample_names_column Metadata sample-ID column.
+#' @param gene_names_column Matrix feature-ID column.
+#' @param covariate_columns Optional Limma covariate columns.
+#' @param batch_effect_columns Optional Limma technical batch columns.
+#' @param donor_variable_column Optional repeated-measure blocking column.
+#' @return Paths and comparison IDs for the L2P Multi handoff.
+omix_limma_cell_type_collection <- function(
+    pseudobulk_collection_manifest,
+    output_dir = "results",
+    contrast = "M-F",
+    sample_names_column = "Sample",
+    gene_names_column = "GeneName",
+    covariate_columns = NULL,
+    batch_effect_columns = NULL,
+    donor_variable_column = NULL) {
+  contrast <- .omix_limma_collection_scalar(contrast, "contrast")
+  if (!identical(contrast, "M-F")) {
+    stop("The cell-type collection contract currently supports only the explicit donor-level contrast M-F.", call. = FALSE)
+  }
+  output_dir <- .omix_limma_collection_scalar(output_dir, "output_dir")
+  if (file.exists(output_dir) && length(list.files(output_dir, all.files = TRUE, no.. = TRUE)) > 0L) {
+    stop("output_dir must be new or empty for a cell-type collection: ", output_dir, call. = FALSE)
+  }
+  collection <- .omix_limma_collection_read_catalog(pseudobulk_collection_manifest)
+  cell_type_runs <- vector("list", length(collection$records))
+  reference_genes <- NULL
+
+  for (index in seq_along(collection$records)) {
+    record <- collection$records[[index]]
+    bundle <- .omix_limma_collection_resolve_bundle_contract(record$bundle_manifest_path, record$id)
+    matrix <- .omix_limma_collection_read_table(record$matrix_path)
+    metadata <- .omix_limma_collection_read_table(record$metadata_path)
+    selected_metadata <- .omix_limma_collection_validate_m_f_profiles(
+      record, metadata, sample_names_column, "Group"
+    )
+    selected_samples <- as.character(selected_metadata[[sample_names_column]])
+    result <- omix_limma_analysis(
+      Dataset = matrix,
+      Metadata_Table = selected_metadata,
+      sample_names_column = sample_names_column,
+      samples_to_include = selected_samples,
+      gene_names_column = gene_names_column,
+      contrast_variable_columns = "Group",
+      contrasts = contrast,
+      covariate_columns = covariate_columns,
+      batch_effect_columns = batch_effect_columns,
+      donor_variable_column = donor_variable_column,
+      input_kind = bundle$input_contract$input_kind,
+      variance_model = bundle$input_contract$variance_model,
+      input_data_type = bundle$input_contract$input_data_type,
+      fraction_transform = bundle$input_contract$fraction_transform
+    )
+    required_statistics <- paste0(contrast, c("_tstat", "_pval", "_FC"))
+    .omix_limma_collection_require_columns(result, c("Gene", required_statistics), paste0("Limma results for ", record$id))
+    genes <- as.character(result$Gene)
+    if (anyNA(genes) || any(!nzchar(genes)) || anyDuplicated(genes)) {
+      stop("Limma results for ", record$id, " must have unique non-empty tested gene identifiers.", call. = FALSE)
+    }
+    if (is.null(reference_genes)) {
+      reference_genes <- genes
+    } else if (!identical(reference_genes, genes)) {
+      stop("Cell-type Limma results do not have the exact same ordered tested-gene universe; L2P Multi export will not union, intersect, reorder, or fill features.", call. = FALSE)
+    }
+    for (column in required_statistics) {
+      values <- suppressWarnings(as.numeric(result[[column]]))
+      if (length(values) != nrow(result) || any(!is.finite(values))) {
+        stop("Limma results for ", record$id, " have non-finite numeric values in ", column, ".", call. = FALSE)
+      }
+    }
+    cell_type_runs[[index]] <- list(
+      record = record,
+      bundle = bundle,
+      matrix = matrix,
+      metadata = selected_metadata,
+      result = result,
+      limma_run = attr(result, "omix_limma_run")
+    )
+  }
+
+  comparisons <- vapply(cell_type_runs, function(run) paste0(run$record$id, "__", contrast), character(1))
+  l2p_input <- data.frame(GeneName = reference_genes, check.names = FALSE, stringsAsFactors = FALSE)
+  provenance_rows <- vector("list", length(cell_type_runs))
+  for (index in seq_along(cell_type_runs)) {
+    run <- cell_type_runs[[index]]
+    comparison <- comparisons[[index]]
+    l2p_input[[paste0(comparison, "_tstat")]] <- as.numeric(run$result[[paste0(contrast, "_tstat")]])
+    l2p_input[[paste0(comparison, "_pval")]] <- as.numeric(run$result[[paste0(contrast, "_pval")]])
+    l2p_input[[paste0(comparison, "_FC")]] <- as.numeric(run$result[[paste0(contrast, "_FC")]])
+    provenance_rows[[index]] <- data.frame(
+      CollectionOrder = run$record$order,
+      Comparison = comparison,
+      CellTypeID = run$record$id,
+      CellType = run$record$label,
+      SelectionMode = run$record$selection_mode,
+      Contrast = contrast,
+      SourceMatrixPath = run$record$matrix_path,
+      SourceMatrixSHA256 = .omix_limma_collection_hash(run$record$matrix_path),
+      SourceMetadataPath = run$record$metadata_path,
+      SourceMetadataSHA256 = .omix_limma_collection_hash(run$record$metadata_path),
+      SourceBundleManifestPath = run$record$bundle_manifest_path,
+      SourceBundleManifestSHA256 = .omix_limma_collection_hash(run$record$bundle_manifest_path),
+      SourceLimmaAnalysisPath = file.path("cell_types", run$record$id, "Limma_Analysis.csv"),
+      InputDataType = run$limma_run$input_data_type,
+      InputKind = run$limma_run$input_kind,
+      VarianceModel = run$limma_run$variance_model,
+      ModelType = run$limma_run$model_type,
+      DonorVariableColumn = if (length(run$limma_run$donor_variable_column)) run$limma_run$donor_variable_column else "",
+      CovariateColumns = paste(run$limma_run$covariate_columns, collapse = ","),
+      BatchEffectColumns = paste(run$limma_run$batch_effect_columns, collapse = ","),
+      MProfiles = sum(as.character(run$metadata$Group) == "M"),
+      FProfiles = sum(as.character(run$metadata$Group) == "F"),
+      TestedGeneCount = nrow(run$result),
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    )
+  }
+  .omix_limma_collection_validate_l2p_multi_shape(l2p_input, comparisons)
+
+  dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+  for (run in cell_type_runs) {
+    bundle_dir <- file.path(output_dir, "cell_types", run$record$id)
+    .omix_limma_collection_write_cell_type_bundle(
+      output_dir = bundle_dir,
+      result = run$result,
+      metadata = run$metadata,
+      run = list(
+        cell_type_id = run$record$id,
+        cell_type = run$record$label,
+        source_matrix_path = run$record$matrix_path,
+        source_metadata_path = run$record$metadata_path,
+        source_bundle_manifest_path = run$record$bundle_manifest_path,
+        contrast = contrast,
+        limma_run = run$limma_run
+      )
+    )
+  }
+  provenance <- do.call(rbind, provenance_rows)
+  provenance$SourceLimmaAnalysisSHA256 <- vapply(
+    provenance$SourceLimmaAnalysisPath,
+    function(relative_path) .omix_limma_collection_hash(file.path(output_dir, relative_path)),
+    character(1)
+  )
+  catalog <- collection$catalog
+  output_paths <- stats::setNames(provenance$SourceLimmaAnalysisPath, provenance$CellTypeID)
+  catalog$LimmaAnalysisPath <- unname(output_paths[catalog$CellTypeID])
+  catalog$L2PComparison <- unname(provenance$Comparison[match(catalog$CellTypeID, provenance$CellTypeID)])
+  utils::write.csv(l2p_input, file.path(output_dir, "L2P_Multi_Input.csv"), row.names = FALSE, na = "")
+  utils::write.csv(provenance, file.path(output_dir, "L2P_Multi_Input_Provenance.csv"), row.names = FALSE, na = "")
+  utils::write.csv(catalog, file.path(output_dir, "Limma_Cell_Type_Collection_Catalog.csv"), row.names = FALSE, na = "")
+  writeLines(c(
+    "OMIX Limma cell-type collection run summary",
+    paste("pseudobulk collection manifest:", collection$collection_manifest_path),
+    paste("pseudobulk collection manifest SHA-256:", .omix_limma_collection_hash(collection$collection_manifest_path)),
+    paste("profile catalog:", collection$catalog_path),
+    paste("profile catalog SHA-256:", .omix_limma_collection_hash(collection$catalog_path)),
+    paste("contrast:", contrast),
+    paste("cell types:", paste(comparisons, collapse = ",")),
+    paste("tested genes:", length(reference_genes)),
+    "L2P Multi input uses the exact ordered common tested-gene universe; no pooling, interaction model, union, intersection, reordering, or missing-value fill was performed."
+  ), file.path(output_dir, "Limma_Cell_Type_Collection_Run_Summary.txt"))
+  list(
+    l2p_multi_input = file.path(output_dir, "L2P_Multi_Input.csv"),
+    provenance = file.path(output_dir, "L2P_Multi_Input_Provenance.csv"),
+    catalog = file.path(output_dir, "Limma_Cell_Type_Collection_Catalog.csv"),
+    comparisons = comparisons
+  )
+}

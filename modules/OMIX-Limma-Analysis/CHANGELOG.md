@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- Adds the optional collection-interface version 1 entry point for selected or
+  all OMIX Seurat Pseudobulk continuous-expression bundles. It fits an
+  independent donor-level M-F Limma model for every ordered cell type and
+  writes a deterministic L2P Multi input with stable cell-type-qualified
+  comparison names. Export rejects raw-count handoffs, insufficient M/F donor
+  replication, missing or duplicate collection routing, different ordered
+  tested-gene universes, and non-finite required statistics. It does not pool
+  cells, fit a cell-type interaction model, or union/intersect/fill features.
+
+- Bumps the semantic module version to 1.2.0 for this backward-compatible
+  scientific feature. The established one-matrix CLI and interface version 3
+  remain valid, so `interface_version` is unchanged.
+
 - Adds optional declared technical-batch handling for continuous matrices.
   Batch columns are included in the Limma model, and the opt-in
   `Batch_Corrected_Expression.csv` handoff removes only those batch effects
