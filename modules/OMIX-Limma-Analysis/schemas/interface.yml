@@ -128,3 +128,61 @@ outputs:
     path: variance_diagnostic.png
     format: png
     description: Residual standard deviation versus average signal with a lowess trend when enough features are available.
+collection_interface:
+  interface_version: 1
+  entrypoint: scripts/run_limma_cell_type_collection.R
+  description: Explicit selected/all cell-type pseudobulk collection interface. It runs independent donor-level M-F Limma models and writes a deterministic wide table for OMIX L2P Multi; it does not pool cells or fit a cell-type interaction model.
+  inputs:
+    pseudobulk_collection_manifest:
+      required: true
+      type: path
+      formats: [dcf]
+      description: Pseudobulk_Collection_Manifest.dcf from OMIX Seurat Pseudobulk selected or all mode. Its profile catalog and nested ordinary bundle paths are validated explicitly.
+  parameters:
+    contrast:
+      type: string
+      default: M-F
+      allowed: [M-F]
+      description: Fixed donor-level comparison. Both M and F require at least two donor-level profiles in every emitted cell type.
+    sample_names_column:
+      type: string
+      default: Sample
+    gene_names_column:
+      type: string
+      default: GeneName
+    covariate_columns:
+      type: string
+      default: ""
+      description: Optional comma-separated covariates modeled independently in every cell type.
+    batch_effect_columns:
+      type: string
+      default: ""
+      description: Optional comma-separated technical batch columns modeled independently in every cell type.
+    donor_variable_column:
+      type: string
+      default: ""
+      description: Optional repeated-measure donor blocking column. Supply only when a donor contributes repeated modeled profiles within each cell type.
+    output_dir:
+      type: path
+      default: results
+  outputs:
+    l2p_multi_input:
+      path: L2P_Multi_Input.csv
+      format: csv
+      description: GeneName plus ordered <stable-cell-type-id>__M-F_tstat, _pval, and _FC column families. Every emitted cell type has the exact same ordered tested-gene universe and finite required statistics.
+    l2p_multi_input_provenance:
+      path: L2P_Multi_Input_Provenance.csv
+      format: csv
+      description: Ordered comparison, stable/display cell-type identity, source paths and hashes, Limma model/contrast/variance decisions, profile counts, and output path for every exported cell type.
+    collection_catalog:
+      path: Limma_Cell_Type_Collection_Catalog.csv
+      format: csv
+      description: Input pseudobulk profile eligibility and routing with the associated Limma and L2P Multi comparison paths.
+    collection_run_summary:
+      path: Limma_Cell_Type_Collection_Run_Summary.txt
+      format: text
+      description: Collection source hashes, contrast, comparison order, tested-gene count, and strict common-universe statement.
+    per_cell_type_limma_bundles:
+      path: cell_types/<stable-cell-type-id>/
+      format: directory
+      description: Independent Limma_Analysis.csv, Sample_Metadata.csv, Variance_Diagnostic.csv, and run_summary.txt bundles for each exported cell type.

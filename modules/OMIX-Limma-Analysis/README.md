@@ -86,6 +86,42 @@ exactly two groups with at least two samples in each group. In that
 unambiguous case, OMIX records the inferred comparison. Supply an explicit
 contrast for every other design.
 
+## Cell-type collection to L2P Multi
+
+Use the separate collection command after OMIX Seurat Pseudobulk has run in
+`selected` or `all` mode with a continuous-expression aggregation method. The
+collection command reads its explicit `Pseudobulk_Collection_Manifest.dcf`,
+then runs the established Limma implementation independently for every
+cell-type bundle. It currently implements the donor-level `M-F` comparison.
+
+```bash
+Rscript "$OMIX_ROOT/modules/OMIX-Limma-Analysis/scripts/run_limma_cell_type_collection.R" \
+  --pseudobulk_collection_manifest /path/to/cell-type-pseudobulk/Pseudobulk_Collection_Manifest.dcf \
+  --contrast M-F \
+  --output_dir results/cell-type-limma
+```
+
+Every exported cell type must have at least two donor-level profiles in both
+the M and F groups. The command preserves Pseudobulk's selected order (or its
+deterministic all-mode order) and writes these L2P Multi comparison families:
+
+```text
+<stable-cell-type-id>__M-F_tstat
+<stable-cell-type-id>__M-F_pval
+<stable-cell-type-id>__M-F_FC
+```
+
+Pass `L2P_Multi_Input.csv` to OMIX L2P Multi and copy the ordered comparison
+names from `L2P_Multi_Input_Provenance.csv` into `--comparisons`. The export
+requires every cell type to have the *exact same ordered tested-gene universe*
+and finite t-statistic, p-value, and fold-change values. It fails on a
+mismatch; it never silently pools cells, unions/intersects/reorders features,
+or fills missing statistics.
+
+This is a collection of independent M-F models. It does not test whether the
+M-F effect differs between cell types. Such a question requires a separately
+specified and validated interaction-model workflow.
+
 ## Inputs
 
 | Input | Requirements |
@@ -210,6 +246,8 @@ expression. Interpret the sign according to the supplied scale.
 | `Variance_Diagnostic.csv` | Per-feature average signal and residual standard deviation before empirical-Bayes moderation. |
 | `variance_diagnostic.png` | Residual standard deviation versus average signal with a lowess trend when sufficient features are present. |
 | `Batch_Corrected_Expression.csv` | Written only when `--batch_effect_columns` and `--return_batch_corrected_values true` are supplied. This gene-by-sample matrix has the declared technical batch effect removed while protecting biological comparison groups. |
+| `L2P_Multi_Input.csv` | Collection-command output only: strict common-gene-universe wide table for OMIX L2P Multi. |
+| `L2P_Multi_Input_Provenance.csv` | Collection-command output only: ordered cell-type comparisons, source paths/hashes, and per-model decisions. |
 
 ## Method notes
 
