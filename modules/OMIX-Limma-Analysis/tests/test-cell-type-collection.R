@@ -157,6 +157,28 @@ expect_error(
   "profile_catalog was not found"
 )
 
+# The collection interface accepts only Pseudobulk selected/all bundles and
+# requires catalog provenance to agree with the manifest routing declaration.
+malformed_mode_root <- file.path(work_dir, "malformed-mode")
+make_collection(malformed_mode_root)
+malformed_mode_manifest <- file.path(malformed_mode_root, "Pseudobulk_Collection_Manifest.dcf")
+manifest <- base::read.dcf(malformed_mode_manifest)
+manifest[1L, "cell_type_selection_mode"] <- "one"
+base::write.dcf(manifest, malformed_mode_manifest)
+expect_error(
+  omix_limma_cell_type_collection(malformed_mode_manifest, file.path(work_dir, "malformed-mode-output")),
+  "cell_type_selection_mode as selected or all"
+)
+
+discordant_mode_root <- file.path(work_dir, "discordant-mode")
+catalog <- make_collection(discordant_mode_root)
+catalog$SelectionMode <- "all"
+utils::write.csv(catalog, file.path(discordant_mode_root, "Cell_Type_Profile_Catalog.csv"), row.names = FALSE)
+expect_error(
+  omix_limma_cell_type_collection(file.path(discordant_mode_root, "Pseudobulk_Collection_Manifest.dcf"), file.path(work_dir, "discordant-mode-output")),
+  "SelectionMode must match the collection manifest"
+)
+
 duplicate_root <- file.path(work_dir, "duplicate-catalog")
 catalog <- make_collection(duplicate_root)
 utils::write.csv(rbind(catalog, catalog[1L, , drop = FALSE]), file.path(duplicate_root, "Cell_Type_Profile_Catalog.csv"), row.names = FALSE)

@@ -760,6 +760,10 @@ omix_limma_analysis <- Limma_Analysis
       !identical(.omix_limma_collection_dcf_value(manifest, "collection_kind"), "cell_type_pseudobulk")) {
     stop("pseudobulk_collection_manifest is not a supported OMIX cell-type pseudobulk collection (format_version 1).", call. = FALSE)
   }
+  selection_mode <- .omix_limma_collection_dcf_value(manifest, "cell_type_selection_mode")
+  if (!selection_mode %in% c("selected", "all")) {
+    stop("pseudobulk_collection_manifest must declare cell_type_selection_mode as selected or all.", call. = FALSE)
+  }
   catalog_name <- .omix_limma_collection_dcf_value(manifest, "profile_catalog")
   catalog_path <- .omix_limma_collection_resolve_relative_path(
     collection_root, catalog_name, "profile_catalog", "collection"
@@ -781,6 +785,13 @@ omix_limma_analysis <- Limma_Analysis
       stop("Cell_Type_Profile_Catalog.csv has an empty ", column, " value.", call. = FALSE)
     }
     catalog[[column]] <- value
+  }
+  if (any(catalog$SelectionMode != selection_mode)) {
+    stop(
+      "Cell_Type_Profile_Catalog.csv SelectionMode must match the collection manifest cell_type_selection_mode ('",
+      selection_mode, "').",
+      call. = FALSE
+    )
   }
   if (!all(catalog$ProfileEligibility %in% c("eligible", "dropped_insufficient_cells"))) {
     stop("Cell_Type_Profile_Catalog.csv has unsupported ProfileEligibility values.", call. = FALSE)
