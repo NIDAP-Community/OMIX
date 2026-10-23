@@ -20,8 +20,20 @@ parameters:
     description: Cell-metadata column containing cell-type labels.
   cell_type:
     type: string
-    required: true
-    description: One exact cell-type label to retain before aggregation.
+    default: ""
+    required_when: cell_type_mode=one
+    description: One exact cell-type label to retain before aggregation in one mode. Existing one-mode calls retain the established root-level bundle layout.
+  cell_type_mode:
+    type: string
+    default: one
+    allowed: [one, selected, all]
+    description: one writes the established single bundle; selected reads an ordered exact-label selection table; all enumerates every non-missing label remaining after the explicit cell filter and writes a deterministic nested collection.
+  cell_type_selection:
+    type: path
+    default: ""
+    required_when: cell_type_mode=selected
+    formats: [csv, tsv, txt]
+    description: Ordered one-column table named CellType containing exact labels for selected mode. Duplicate, empty, and unknown labels are rejected.
   metadata_columns:
     type: string
     default: ""
@@ -79,3 +91,18 @@ outputs:
     path: Pseudobulk_Run_Summary.txt
     format: text
     description: Aggregation parameters, profile counts, correction provenance, and bridge provenance.
+  collection_profile_catalog:
+    path: Cell_Type_Profile_Catalog.csv
+    format: csv
+    required_when: cell_type_mode=selected or cell_type_mode=all
+    description: One row per cell type, donor, and group profile before output filtering, including cell counts, eligibility or exclusion, nested bundle paths, aggregation settings, and source provenance.
+  collection_manifest:
+    path: Pseudobulk_Collection_Manifest.dcf
+    format: dcf
+    required_when: cell_type_mode=selected or cell_type_mode=all
+    description: Collection routing and provenance record. Each nested cell_types/<stable-id> directory retains the ordinary Pseudobulk_Manifest.dcf consumed by downstream analysis.
+  collection_run_summary:
+    path: Pseudobulk_Collection_Run_Summary.txt
+    format: text
+    required_when: cell_type_mode=selected or cell_type_mode=all
+    description: Selected labels, mode, aggregation settings, and collection artifact names.

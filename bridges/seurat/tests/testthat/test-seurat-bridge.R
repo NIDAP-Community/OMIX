@@ -35,6 +35,31 @@ test_that("Seurat bridge extracts raw RNA counts without full Seurat", {
   expect_false("Seurat" %in% loadedNamespaces())
 })
 
+test_that("Seurat bridge enumerates exact post-filter cell-type labels", {
+  object <- make_seurat_fixture()
+  object$cell_type[c("Cell1", "Cell2", "Cell3", "Cell4")] <- "B cells"
+  object$qc_status[c("Cell1", "Cell2")] <- "fail"
+
+  labels <- omix_seurat_list_cell_types(
+    object,
+    cell_type_column = "cell_type",
+    cell_filter_column = "qc_status",
+    cell_filter_values = "pass"
+  )
+  expect_identical(labels$CellType, c("B cells", "Mono"))
+  expect_identical(labels$Cells, c(2L, 8L))
+
+  expect_error(
+    omix_seurat_list_cell_types(
+      object,
+      cell_type_column = "cell_type",
+      cell_filter_column = "qc_status",
+      cell_filter_values = "missing"
+    ),
+    "No non-missing cell-type labels remain"
+  )
+})
+
 test_that("Seurat bridge creates aligned donor-by-condition pseudobulk input", {
   object <- make_seurat_fixture()
   input <- omix_seurat_to_input(

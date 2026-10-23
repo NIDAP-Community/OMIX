@@ -139,6 +139,54 @@ The module does not normalize, batch-correct, or fit a statistical model. The
 manifest directs raw counts to DEG Analysis and continuous expression to Limma
 Analysis.
 
+## Multiple cell types
+
+The default one mode preserves the established one-label command and root-level
+output bundle. It is the right choice for one cell type.
+
+For a planned collection, use selected mode with an ordered CSV, TSV, or TXT
+table containing exactly one header column named CellType. Values are exact,
+case-sensitive labels. The module rejects duplicate, empty, and labels absent
+after the optional cell filter.
+
+    CellType
+    CD14+ Monocytes
+    CD4 T cells
+
+    Rscript modules/OMIX-Seurat-Pseudobulk/scripts/run_seurat_pseudobulk.R \
+      --seurat_rds /path/to/object.rds \
+      --donor_column donor \
+      --group_column sex \
+      --cell_type_column cell_type \
+      --cell_type_mode selected \
+      --cell_type_selection /path/to/cell_types.csv \
+      --aggregation_method mean_sctransform_expression \
+      --min_cells 20 \
+      --output_dir /path/to/results/cell-type-pseudobulk
+
+Use all mode to enumerate every non-missing cell-type label remaining after the
+same explicit cell filter. Labels are sorted deterministically. Both collection
+modes create one ordinary pseudobulk bundle per cell type beneath
+cell_types/<stable-id>/, plus:
+
+| File | Contents |
+| --- | --- |
+| Cell_Type_Profile_Catalog.csv | Original exact label, stable directory ID, donor, group, observed cells, minimum-cell eligibility/exclusion, nested paths, aggregation settings, and source provenance. |
+| Pseudobulk_Collection_Manifest.dcf | Collection-level mode and routing/provenance record. Do not pass this file to Limma; pass each nested ordinary Pseudobulk_Manifest.dcf. |
+| Pseudobulk_Collection_Run_Summary.txt | Human-readable selection and aggregation record. |
+
+The module applies min_cells independently to every cell type × donor × group
+profile. With on_insufficient_cells = error, it stops before writing the
+collection and identifies each affected profile. With drop, the catalog records
+the excluded profile; a cell type must still retain at least two groups to
+produce an ordinary downstream pseudobulk bundle.
+
+Collection mode does not pool cells across cell types, fit a joint model, or
+test a cell-type-by-group interaction. Run the compatible Limma analysis on
+each nested continuous-expression bundle. A separate canonical downstream
+collection step must validate a common tested-gene universe before a multi-
+comparison pathway module consumes the results.
+
 ## Data and method notes
 
 - `sum_counts` defaults to `--layer counts`. Do not aggregate normalized,
@@ -154,8 +202,9 @@ Analysis.
   effects, but it does not itself establish that a technical batch has been
   handled. Record any upstream regression and model remaining batch as a DEG
   covariate when it is estimable.
-- One invocation produces one cell-type-specific pseudobulk dataset. Run it
-  separately for each cell type that requires its own biological comparison.
+- One-mode invocation produces one cell-type-specific pseudobulk dataset.
+  Selected/all collection modes produce separate equivalent datasets rather
+  than pooling cells or treating cells as biological replicates.
 - `--metadata_columns` values must be non-missing and identical across all
   cells in each donor-by-group profile; this prevents ambiguous `Batch` or
   covariate assignments.

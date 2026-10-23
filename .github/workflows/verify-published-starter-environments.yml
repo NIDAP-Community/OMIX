@@ -53,6 +53,7 @@ jobs:
                   "reference": entry["immutable_reference"],
                   "lockfile": entry.get("lockfile") or "",
                   "lockfile_sha256": entry.get("lockfile_sha256") or "",
+                  "omix_seurat_version": entry.get("required_packages", {}).get("OmixSeurat", ""),
               })
           print("value=" + json.dumps({"include": include}, separators=(",", ":")))
           PY
@@ -93,6 +94,7 @@ jobs:
         if: ${{ matrix.profile == 'r-seurat-conversion' }}
         run: |
           docker run --rm \
+            --env OMIX_EXPECTED_OMIX_SEURAT_VERSION='${{ matrix.omix_seurat_version }}' \
             --volume "${{ github.workspace }}/starter-environments/r-seurat-conversion/tests:/tests:ro" \
             --entrypoint Rscript \
             '${{ matrix.reference }}' \

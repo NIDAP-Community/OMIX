@@ -135,6 +135,99 @@ omix_seurat_extract_expression <- function(
   )
 }
 
+#' List eligible cell-type labels from a Seurat object
+#'
+#' @description
+#' Returns exact, non-missing cell-type labels after applying the same optional
+#' cell-level filter used by the OMIX pseudobulk conversion functions. This is
+#' a conversion-boundary helper: downstream table-based OMIX modules never
+#' inspect Seurat objects.
+#'
+#' @param seurat_object A Seurat object supported by SeuratObject.
+#' @param cell_type_column Cell-metadata column containing cell-type labels.
+#' @param cell_filter_column Optional cell-metadata column used for an explicit
+#'   pre-enumeration filter.
+#' @param cell_filter_values Values retained from `cell_filter_column`. Supply
+#'   both filter arguments or neither.
+#'
+#' @return A data frame with exact `CellType` labels and the number of retained
+#'   cells for each label, ordered deterministically by label.
+#' @export
+omix_seurat_list_cell_types <- function(
+  seurat_object,
+  cell_type_column,
+  cell_filter_column = NULL,
+  cell_filter_values = NULL
+) {
+  if (!inherits(seurat_object, "Seurat")) {
+    stop("seurat_object must inherit from class 'Seurat'.", call. = FALSE)
+  }
+  cell_type_column <- .omix_seurat_single_string(cell_type_column, "cell_type_column")
+  if (xor(is.null(cell_filter_column), is.null(cell_filter_values))) {
+    stop("Supply both cell_filter_column and cell_filter_values, or neither.", call. = FALSE)
+  }
+  if (!is.null(cell_filter_column)) {
+    cell_filter_column <- .omix_seurat_single_string(cell_filter_column, "cell_filter_column")
+    cell_filter_values <- unique(as.character(cell_filter_values))
+    if (length(cell_filter_values) == 0L || anyNA(cell_filter_values) || any(cell_filter_values == "")) {
+      stop("cell_filter_values must contain one or more non-empty values.", call. = FALSE)
+    }
+  }
+
+  metadata <- tryCatch(
+    as.data.frame(methods::slot(seurat_object, "meta.data"), check.names = FALSE, stringsAsFactors = FALSE),
+    error = function(error) {
+      stop("Could not read Seurat cell metadata: ", conditionMessage(error), call. = FALSE)
+    }
+  )
+  required_columns <- c(cell_type_column, cell_filter_column)
+  missing_columns <- setdiff(required_columns, names(metadata))
+  if (length(missing_columns) > 0L) {
+    stop(
+      "Seurat cell metadata is missing required column(s): ",
+      paste(missing_columns, collapse = ", "),
+      ". Available columns: ", paste(names(metadata), collapse = ", "),
+      call. = FALSE
+    )
+  }
+
+  retained <- rep(TRUE, nrow(metadata))
+  if (!is.null(cell_filter_column)) {
+    retained <- as.character(metadata[[cell_filter_column]]) %in% cell_filter_values
+    retained[is.na(retained)] <- FALSE
+  }
+  labels <- as.character(metadata[[cell_type_column]])
+  retained <- retained & !is.na(labels) & nzchar(labels)
+  if (!any(retained)) {
+    stop(
+      "No non-missing cell-type labels remain after the requested cell filter.",
+      call. = FALSE
+    )
+  }
+  labels <- labels[retained]
+  # Radix sorting is independent of locale collation and gives all callers a
+  # reproducible catalog order. The exact original label is never normalized.
+  labels <- sort(unique(labels), method = "radix")
+  retained_labels <- as.character(metadata[[cell_type_column]])[retained]
+  counts <- vapply(labels, function(label) sum(retained_labels == label), integer(1))
+  data.frame(CellType = labels, Cells = counts, stringsAsFactors = FALSE, check.names = FALSE)
+}
+
+#' List eligible cell-type labels from a serialized Seurat object
+#'
+#' @inheritParams omix_seurat_list_cell_types
+#' @param path Path to an `.rds` file containing a Seurat object.
+#'
+#' @return A data frame with exact `CellType` labels and retained cell counts.
+#' @export
+omix_list_seurat_cell_types_rds <- function(path, ...) {
+  path <- .omix_seurat_single_string(path, "path")
+  if (!file.exists(path)) {
+    stop("Seurat RDS file does not exist: ", path, call. = FALSE)
+  }
+  omix_seurat_list_cell_types(readRDS(path), ...)
+}
+
 #' Create an OMIX pseudobulk input from one Seurat cell type
 #'
 #' @description

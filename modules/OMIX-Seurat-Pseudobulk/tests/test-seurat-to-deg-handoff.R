@@ -102,6 +102,96 @@ if (length(missing_packages) > 0L) {
     output_dir = output_dir
   )
   raw_sample_ids <- assert_bundle_alignment(pseudobulk)
+  # A collection retains the same donor-level pseudobulk semantics for each
+  # exact cell type. It does not pool cells across labels.
+  object$cell_type[seq(1L, ncol(object), by = 2L)] <- "B cells"
+  object$cell_type[seq(2L, ncol(object), by = 2L)] <- "Mono"
+  saveRDS(object, rds_path)
+  selection_path <- tempfile(fileext = ".csv")
+  utils::write.csv(
+    data.frame(CellType = c("Mono", "B cells"), check.names = FALSE),
+    selection_path,
+    row.names = FALSE
+  )
+  collection <- omix_seurat_pseudobulk_collection(
+    seurat_rds = rds_path,
+    donor_column = "donor",
+    group_column = "condition",
+    cell_type_column = "cell_type",
+    cell_type_mode = "selected",
+    cell_type_selection = selection_path,
+    min_cells = 1L,
+    output_dir = tempfile("omix-seurat-collection-")
+  )
+  collection_catalog <- utils::read.csv(collection$catalog_path, check.names = FALSE)
+  stopifnot(
+    identical(collection$selected_cell_types, c("Mono", "B cells")),
+    all(c("CellTypeID", "ProfileEligibility", "MatrixPath", "SourceSeuratRds") %in% names(collection_catalog)),
+    all(collection_catalog$ProfileEligibility == "eligible"),
+    length(unique(collection_catalog$CellTypeID)) == 2L,
+    all(file.exists(file.path(dirname(collection$catalog_path), collection_catalog$MatrixPath)))
+  )
+  all_collection <- omix_seurat_pseudobulk_collection(
+    seurat_rds = rds_path,
+    donor_column = "donor",
+    group_column = "condition",
+    cell_type_column = "cell_type",
+    cell_type_mode = "all",
+    min_cells = 1L,
+    output_dir = tempfile("omix-seurat-all-collection-")
+  )
+  stopifnot(identical(all_collection$selected_cell_types, c("B cells", "Mono")))
+  unknown_selection_path <- tempfile(fileext = ".csv")
+  utils::write.csv(data.frame(CellType = "Absent"), unknown_selection_path, row.names = FALSE)
+  unknown_selection <- tryCatch(
+    omix_seurat_pseudobulk_collection(
+      seurat_rds = rds_path,
+      donor_column = "donor",
+      group_column = "condition",
+      cell_type_column = "cell_type",
+      cell_type_mode = "selected",
+      cell_type_selection = unknown_selection_path,
+      min_cells = 1L,
+      output_dir = tempfile("omix-seurat-unknown-collection-")
+    ),
+    error = identity
+  )
+  stopifnot(inherits(unknown_selection, "error"))
+  stopifnot(grepl("absent after the cell filter", conditionMessage(unknown_selection), fixed = TRUE))
+  insufficient_collection <- tryCatch(
+    omix_seurat_pseudobulk_collection(
+      seurat_rds = rds_path,
+      donor_column = "donor",
+      group_column = "condition",
+      cell_type_column = "cell_type",
+      cell_type_mode = "all",
+      min_cells = 2L,
+      on_insufficient_cells = "error",
+      output_dir = tempfile("omix-seurat-insufficient-collection-")
+    ),
+    error = identity
+  )
+  stopifnot(inherits(insufficient_collection, "error"))
+  stopifnot(grepl("fewer than 2 cells", conditionMessage(insufficient_collection), fixed = TRUE))
+  dropped_collection <- tryCatch(
+    omix_seurat_pseudobulk_collection(
+      seurat_rds = rds_path,
+      donor_column = "donor",
+      group_column = "condition",
+      cell_type_column = "cell_type",
+      cell_type_mode = "all",
+      min_cells = 2L,
+      on_insufficient_cells = "drop",
+      output_dir = tempfile("omix-seurat-dropped-collection-")
+    ),
+    error = identity
+  )
+  stopifnot(inherits(dropped_collection, "error"))
+  stopifnot(grepl("fewer than two groups remain", conditionMessage(dropped_collection), fixed = TRUE))
+  # Restore the original one-cell-type fixture before the established raw,
+  # Harmony, and SCT handoff checks below.
+  object$cell_type <- "Mono"
+  saveRDS(object, rds_path)
   deg <- omix_deg_analysis(
     Dataset = pseudobulk$input$counts,
     Metadata_Table = pseudobulk$input$metadata,
@@ -286,5 +376,42 @@ if (length(missing_packages) > 0L) {
   )
   sct_summary <- readLines(file.path(sct_limma_output, "run_summary.txt"))
   stopifnot("variance model: ebayes_trend" %in% sct_summary)
+  # Verify that the collection writer preserves both direct-Limma matrix
+  # semantics, not just raw-count collection layout.
+  object$cell_type[seq(1L, ncol(object), by = 2L)] <- "B cells"
+  object$cell_type[seq(2L, ncol(object), by = 2L)] <- "Mono"
+  saveRDS(object, rds_path)
+  harmony_collection <- omix_seurat_pseudobulk_collection(
+    seurat_rds = rds_path,
+    donor_column = "donor",
+    group_column = "condition",
+    cell_type_column = "cell_type",
+    cell_type_mode = "all",
+    aggregation_method = "mean_harmony_corrected_expression",
+    min_cells = 1L,
+    output_dir = tempfile("omix-seurat-harmony-collection-")
+  )
+  harmony_collection_manifest <- base::read.dcf(
+    harmony_collection$bundles[[1L]]$manifest_path
+  )
+  stopifnot(identical(
+    unname(harmony_collection_manifest[1L, "matrix_type"]),
+    "harmony_corrected_mean_expression"
+  ))
+  sct_collection <- omix_seurat_pseudobulk_collection(
+    seurat_rds = rds_path,
+    donor_column = "donor",
+    group_column = "condition",
+    cell_type_column = "cell_type",
+    cell_type_mode = "all",
+    aggregation_method = "mean_sctransform_expression",
+    min_cells = 1L,
+    output_dir = tempfile("omix-seurat-sct-collection-")
+  )
+  sct_collection_manifest <- base::read.dcf(sct_collection$bundles[[1L]]$manifest_path)
+  stopifnot(identical(
+    unname(sct_collection_manifest[1L, "matrix_type"]),
+    "sctransform_mean_log2_expression"
+  ))
   message("OMIX Seurat pseudobulk handoff checks passed")
 }
