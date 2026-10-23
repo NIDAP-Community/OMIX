@@ -6,7 +6,25 @@
 # expression representation to the portable OMIX handoff.
 set.seed(20260923)
 
-stopifnot(identical(as.character(utils::packageVersion("OmixSeurat")), "0.3.1"))
+# The same legacy conversion fixture validates both a source-built candidate
+# and a published immutable image.  The calling workflow must therefore state
+# the bridge version it expects for the exact image under test rather than
+# assuming the current checkout's bridge version.
+expected_omix_seurat_version <- Sys.getenv("OMIX_EXPECTED_OMIX_SEURAT_VERSION", unset = "")
+if (!nzchar(expected_omix_seurat_version)) {
+  stop(
+    "Set OMIX_EXPECTED_OMIX_SEURAT_VERSION to the exact image's OmixSeurat version.",
+    call. = FALSE
+  )
+}
+observed_omix_seurat_version <- as.character(utils::packageVersion("OmixSeurat"))
+if (!identical(observed_omix_seurat_version, expected_omix_seurat_version)) {
+  stop(
+    "Expected OmixSeurat ", expected_omix_seurat_version,
+    " but image contains ", observed_omix_seurat_version, ".",
+    call. = FALSE
+  )
+}
 
 feature_ids <- paste0("Gene", seq_len(120L))
 cell_ids <- paste0("Cell", seq_len(12L))

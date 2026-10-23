@@ -417,7 +417,10 @@ jobs:
               as.character(packageVersion(package))
             }, character(1))
             stopifnot(methods::getClass("SCTAssay")@package == "Seurat")
-            stopifnot(identical(unname(versions["OmixSeurat"]), "0.3.1"))
+            # OmixSeurat is copied from bridges/seurat in this checkout after
+            # renv restores the registry lock, so this is a source-version
+            # assertion rather than a lockfile-version assertion.
+            stopifnot(identical(unname(versions["OmixSeurat"]), "0.4.0"))
             writeLines(paste(sprintf("%s %s", packages, versions), collapse = "\\n"))
           '
 
@@ -425,10 +428,21 @@ jobs:
         if: steps.targets.outputs.conversion == 'true'
         run: |
           docker run --rm \
+            --env OMIX_EXPECTED_OMIX_SEURAT_VERSION=0.4.0 \
             --volume "${{ github.workspace }}/starter-environments/r-seurat-conversion/tests:/tests:ro" \
             --entrypoint Rscript \
             omix-r-seurat-conversion:ci \
             /tests/test-seurat-conversion.R
+
+      - name: Smoke-test cell-type pseudobulk collection compatibility
+        if: steps.targets.outputs.conversion == 'true'
+        run: |
+          docker run --rm \
+            --volume "${{ github.workspace }}:/omix:ro" \
+            --entrypoint Rscript \
+            omix-r-seurat-conversion:ci \
+            /omix/starter-environments/r-seurat-conversion/tests/test-pseudobulk-collection-candidate.R \
+              --module_root /omix/modules/OMIX-Seurat-Pseudobulk
 
       - name: Capture statistics package inventory
         if: steps.targets.outputs.statistics == 'true'
@@ -554,6 +568,14 @@ jobs:
         if: steps.targets.outputs.conversion == 'true'
         run: |
           mkdir -p build-artifacts/seurat-conversion
+          {
+            echo "omix_source=${GITHUB_SHA}"
+            echo "candidate_tag=omix-r-seurat-conversion:ci"
+            echo "candidate_image_id=$(docker image inspect --format '{{.Id}}' omix-r-seurat-conversion:ci)"
+            echo "platform=$(docker image inspect --format '{{.Architecture}}/{{.Os}}' omix-r-seurat-conversion:ci)"
+            echo "lockfile_sha256=$(sha256sum starter-environments/r-seurat-conversion/renv.lock | awk '{print $1}')"
+            echo "build_command=docker build --tag omix-r-seurat-conversion:ci --file starter-environments/r-seurat-conversion/Dockerfile ."
+          } > build-artifacts/seurat-conversion/candidate-image-provenance.txt
           docker run --rm \
             --volume "${{ github.workspace }}/build-artifacts/seurat-conversion:/out" \
             --entrypoint Rscript \
