@@ -278,6 +278,8 @@ jobs:
         run: |
           docker run --rm --entrypoint Rscript omix-r-pathway:ci -e '
             expected <- c(
+              bitops = "1.0-9",
+              RCurl = "1.98-1.19",
               l2p = "0.0.14",
               l2psupp = "0.0.14",
               OmixPathwayInputs = "0.1.0",

@@ -39,6 +39,22 @@ profile_locks <- file.path(
 )
 stopifnot(all(file.exists(profile_locks)))
 
+pathway_lock <- jsonlite::read_json(
+  file.path(repo_root, "starter-environments", "r-pathway", "renv.lock"),
+  simplifyVector = FALSE
+)
+pathway_runtime_packages <- c(
+  bitops = "1.0-9",
+  RCurl = "1.98-1.19"
+)
+for (package in names(pathway_runtime_packages)) {
+  stopifnot(!is.null(pathway_lock$Packages[[package]]))
+  stopifnot(identical(
+    as.character(pathway_lock$Packages[[package]]$Version),
+    pathway_runtime_packages[[package]]
+  ))
+}
+
 module_dirs <- list.dirs(file.path(repo_root, "modules"), recursive = FALSE)
 for (module_dir in module_dirs) {
   module_yml <- readLines(file.path(module_dir, "module.yml"), warn = FALSE)
