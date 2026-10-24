@@ -73,23 +73,23 @@
       "provenance": "targeted Linux build and package inventory passed before publication; the published immutable digest passed lockfile, R, Bioconductor, GSVA, L2P, OmixPathwayPlots, and representative OMIX-GSVA verification after publication"
     },
     "r-seurat-conversion": {
-      "version": "r4.4.3-v2",
+      "version": "r4.4.3-v3",
       "image": "ghcr.io/nidap-community/omix-r-seurat-conversion",
-      "digest": "sha256:93efb77801cabe1371cdb4fffc83246f964471e7ffeeb873efff16068caa9a8a",
-      "immutable_reference": "ghcr.io/nidap-community/omix-r-seurat-conversion@sha256:93efb77801cabe1371cdb4fffc83246f964471e7ffeeb873efff16068caa9a8a",
+      "digest": "sha256:23dea282248fa4335c60f9b87538be04929acba67a10047267a0a31bd2e8391c",
+      "immutable_reference": "ghcr.io/nidap-community/omix-r-seurat-conversion@sha256:23dea282248fa4335c60f9b87538be04929acba67a10047267a0a31bd2e8391c",
       "r_version": "4.4.3",
       "lockfile": "starter-environments/r-seurat-conversion/renv.lock",
       "lockfile_sha256": "a0af1162d74d10fcf8cda9313e67b9db575d72adc04ed9b9d56f4909d0b08b29",
       "required_packages": {
         "Omix": "0.2.0",
-        "OmixSeurat": "0.3.1"
+        "OmixSeurat": "0.4.0"
       },
-      "source_commit": "75c917e76d00c9230db0f95df9efb560867cca85",
-      "publication_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/37257911813",
-      "verification_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/37259683505",
-      "resolved_on": "2026-10-05",
-      "verified_on": "2026-10-05",
-      "provenance": "targeted Linux build, package verification, and serialized RNA, legacy Harmony/data, and SCT conversion smoke tests passed before publication; the published immutable digest passed lockfile, package-set, and serialized conversion verification after publication",
+      "source_commit": "98df6d452538cc896d534e11aae4eb6a761b7f9f",
+      "publication_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40106621939",
+      "verification_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40110151312",
+      "resolved_on": "2026-10-24",
+      "verified_on": "2026-10-24",
+      "provenance": "targeted Linux build, package verification, serialized Seurat conversion, and selected/all Pseudobulk collection fixtures passed before publication; the published immutable digest passed package-set verification and exact Pseudobulk-to-DEG/Limma handoff comparison after publication",
       "releases": [
         {
           "version": "r4.4.3-v1",
@@ -128,6 +128,25 @@
           "resolved_on": "2026-10-05",
           "verified_on": "2026-10-05",
           "provenance": "targeted Linux build, package verification, and serialized RNA, legacy Harmony/data, and SCT conversion smoke tests passed before publication; the published immutable digest passed lockfile, package-set, and serialized conversion verification after publication"
+        },
+        {
+          "version": "r4.4.3-v3",
+          "image": "ghcr.io/nidap-community/omix-r-seurat-conversion",
+          "digest": "sha256:23dea282248fa4335c60f9b87538be04929acba67a10047267a0a31bd2e8391c",
+          "immutable_reference": "ghcr.io/nidap-community/omix-r-seurat-conversion@sha256:23dea282248fa4335c60f9b87538be04929acba67a10047267a0a31bd2e8391c",
+          "r_version": "4.4.3",
+          "lockfile": "starter-environments/r-seurat-conversion/renv.lock",
+          "lockfile_sha256": "a0af1162d74d10fcf8cda9313e67b9db575d72adc04ed9b9d56f4909d0b08b29",
+          "required_packages": {
+            "Omix": "0.2.0",
+            "OmixSeurat": "0.4.0"
+          },
+          "source_commit": "98df6d452538cc896d534e11aae4eb6a761b7f9f",
+          "publication_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40106621939",
+          "verification_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40110151312",
+          "resolved_on": "2026-10-24",
+          "verified_on": "2026-10-24",
+          "provenance": "targeted Linux build, package verification, serialized Seurat conversion, and selected/all Pseudobulk collection fixtures passed before publication; the published immutable digest passed package-set verification and exact Pseudobulk-to-DEG/Limma handoff comparison after publication"
         }
       ]
     }
