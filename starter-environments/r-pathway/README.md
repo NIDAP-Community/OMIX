@@ -23,6 +23,10 @@ they are installed from the immutable `L2P_REF` commit in
 [`Dockerfile`](Dockerfile). This preserves their source provenance without
 using a mutable `master` branch.
 
+`RCurl` 1.98-1.19 and its `bitops` dependency are locked because the imported
+L2P implementation loads `RCurl` directly during analysis. Keeping them in the
+profile lock makes that otherwise implicit runtime requirement reproducible.
+
 `OmixPathwayInputs` and `OmixPathwayPlots` are source-controlled in this
 repository at [`packages/`](../../packages). The runtime installs both from the
 exact OMIX checkout used for the image build. Record the OMIX commit as well as
