@@ -86,8 +86,10 @@
       },
       "source_commit": "98df6d452538cc896d534e11aae4eb6a761b7f9f",
       "publication_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40106621939",
+      "verification_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40110151312",
       "resolved_on": "2026-10-24",
-      "provenance": "targeted Linux build, package verification, serialized Seurat conversion, and selected/all Pseudobulk collection fixtures passed before publication; exact-digest post-publication verification is pending",
+      "verified_on": "2026-10-24",
+      "provenance": "targeted Linux build, package verification, serialized Seurat conversion, and selected/all Pseudobulk collection fixtures passed before publication; the published immutable digest passed package-set verification and exact Pseudobulk-to-DEG/Limma handoff comparison after publication",
       "releases": [
         {
           "version": "r4.4.3-v1",
@@ -141,8 +143,10 @@
           },
           "source_commit": "98df6d452538cc896d534e11aae4eb6a761b7f9f",
           "publication_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40106621939",
+          "verification_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40110151312",
           "resolved_on": "2026-10-24",
-          "provenance": "targeted Linux build, package verification, serialized Seurat conversion, and selected/all Pseudobulk collection fixtures passed before publication; exact-digest post-publication verification is pending"
+          "verified_on": "2026-10-24",
+          "provenance": "targeted Linux build, package verification, serialized Seurat conversion, and selected/all Pseudobulk collection fixtures passed before publication; the published immutable digest passed package-set verification and exact Pseudobulk-to-DEG/Limma handoff comparison after publication"
         }
       ]
     }
