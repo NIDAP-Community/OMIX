@@ -69,10 +69,10 @@
       },
       "source_commit": "0ea6223129de6d98d69469027c19fa1887b59f6a",
       "publication_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40143750294",
-      "verification_run": null,
+      "verification_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40202133221",
       "resolved_on": "2026-10-24",
-      "verified_on": null,
-      "provenance": "targeted Linux build, RCurl/L2P and OmixPathwayInputs/OmixPathwayPlots package inventory, and L2P Single, L2P Multi, and GSEA Preranked CLI smoke checks passed before publication; published immutable-digest verification pending",
+      "verified_on": "2026-10-25",
+      "provenance": "targeted Linux build, RCurl/L2P and OmixPathwayInputs/OmixPathwayPlots package inventory, and L2P Single, L2P Multi, and GSEA Preranked CLI smoke checks passed before publication; the published immutable digest passed lockfile checksum and package-set verification after publication",
       "releases": [
         {
           "version": "r4.4.3-bioconductor3.20-v2",
@@ -125,10 +125,10 @@
           },
           "source_commit": "0ea6223129de6d98d69469027c19fa1887b59f6a",
           "publication_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40143750294",
-          "verification_run": null,
+          "verification_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40202133221",
           "resolved_on": "2026-10-24",
-          "verified_on": null,
-          "provenance": "targeted Linux build, RCurl/L2P and OmixPathwayInputs/OmixPathwayPlots package inventory, and L2P Single, L2P Multi, and GSEA Preranked CLI smoke checks passed before publication; published immutable-digest verification pending"
+          "verified_on": "2026-10-25",
+          "provenance": "targeted Linux build, RCurl/L2P and OmixPathwayInputs/OmixPathwayPlots package inventory, and L2P Single, L2P Multi, and GSEA Preranked CLI smoke checks passed before publication; the published immutable digest passed lockfile checksum and package-set verification after publication"
         }
       ]
     },
