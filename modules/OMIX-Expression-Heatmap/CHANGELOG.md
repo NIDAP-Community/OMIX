@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Promoted the canonical module from `development` to `active` after
+  exact-image CLI and layout validation in published `r-visualization` v3,
+  lifecycle evidence review, and confirmation that no deployment adapter is
+  currently registered. The module remains platform-neutral; a future adapter
+  requires its own source-parity and local-versus-platform evidence.
 - Added L2P-informed automatic sample-axis font sizing, with a recorded
   resolved size and a compatible positive numeric override. The policy reacts
   to cohort size and label length while preserving metadata-driven labels.

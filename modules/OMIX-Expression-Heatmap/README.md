@@ -21,9 +21,11 @@ for visualization.
 ## Quick start
 
 The module requires `ComplexHeatmap` 2.22.0 in the `r-visualization` runtime.
-The published `r-visualization` v3 runtime supplies that pin. Record its
-immutable image digest with each reproducible analysis result. From an OMIX
-checkout with a compatible local runtime, run:
+The published `r-visualization` v3 runtime supplies that pin. Use
+`ghcr.io/nidap-community/omix-r-visualization@sha256:d0c00bf328a6a4897c243472db742860d20f7f700d7aab3bbe44dd96a7d5a842`
+for a reproducible container run, and record that immutable reference with
+each scientific result. From an OMIX checkout with a compatible local runtime,
+run:
 
 ```bash
 Rscript modules/OMIX-Expression-Heatmap/scripts/run_expression_heatmap.R \
@@ -103,13 +105,16 @@ sample ID exactly once. With clustering disabled and no other ordering mode,
 - Row standardization is enabled by default, making each displayed feature
   easier to compare across samples. Disable it to show the original continuous
   scale.
-- The canonical module remains in development. Its interface, reproducible
-  fixtures, and exact published-runtime validation are recorded separately
-  from any future lifecycle-promotion decision.
+- The canonical module is active for routine portable use with this documented
+  continuous-expression contract. Its direct CLI fixture, module layout, and
+  monorepo layout checks passed in the published `r-visualization` v3 image.
+- Record the OMIX commit, immutable runtime reference, command, and input
+  provenance with every scientific result. The small committed fixtures are
+  regression tests, not biological reference datasets.
 
 ## Interface and deployment
 
 The complete portable interface is defined in
 [schemas/interface.yml](schemas/interface.yml). Deployment adapters will be
-listed in [module.yml](module.yml) when they are available; none is registered
-for this development module.
+listed in [module.yml](module.yml) when they are available; none is currently
+registered for this active canonical module.
