@@ -9,6 +9,7 @@ module locally, in a container, or on HPC.
 | --- | --- |
 | Changing portable scientific code, a module interface, or documentation | [Module contract](module-contract.md), then [Contributor guide](contributor-guide.md) |
 | Creating or maintaining a deployment adapter | [Deployment adapter guide](deployment-adapter-guide.md) after the two documents above |
+| Deriving a standalone OCI application repository for OncoChat, HPC, and local use | [Standalone application repository contract](standalone-application-repository-contract.md) after the module contract |
 | Reviewing deployment parity, provenance, or readiness | [Deployment adapter inventory](deployment-adapter-inventory.md), then the adapter guide's audit checklist |
 | Preparing a parity-reviewed adapter for controlled Syncweaver maintenance | [Syncweaver transition contract](syncweaver-transition-contract.md) after the deployment adapter guide |
 | Changing a shared R/container environment or reproducing a result | [Runtime guide](runtime-guide.md) |
