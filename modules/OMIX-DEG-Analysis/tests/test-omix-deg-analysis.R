@@ -95,6 +95,27 @@ stopifnot(isTRUE(all.equal(
   tolerance = 1e-10
 )))
 
+# RSEM expected_count values are count-scale estimates and can be fractional.
+# They must follow the raw-count edgeR/voom path without rounding or rejection.
+rsem_expected_counts <- fixture$dataset
+rsem_expected_counts[, fixture$metadata$Sample] <-
+  rsem_expected_counts[, fixture$metadata$Sample] + 0.25
+rsem <- omix_deg_analysis(
+  Dataset = rsem_expected_counts,
+  Metadata_Table = fixture$metadata,
+  sample_names_column = "Sample",
+  samples_to_include = fixture$metadata$Sample,
+  gene_names_column = "Gene",
+  contrast_variable_columns = "Condition",
+  contrasts = "B-A",
+  batch_effect_columns = "Batch"
+)
+stopifnot(
+  identical(attr(rsem, "omix_deg_run")$analysis_mode, "raw_counts"),
+  nrow(rsem) > 0L,
+  all(is.finite(rsem[["B-A_logFC"]]))
+)
+
 metadata_without_batch <- fixture$metadata[, setdiff(names(fixture$metadata), "Batch"), drop = FALSE]
 unpaired_without_batch <- omix_deg_analysis(
   Dataset = fixture$dataset,

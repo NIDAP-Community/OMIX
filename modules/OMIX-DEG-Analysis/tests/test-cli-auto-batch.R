@@ -17,6 +17,8 @@ counts <- matrix(
 )
 counts[seq_len(20L), 4:6] <- counts[seq_len(20L), 4:6] + 50L
 count_table <- data.frame(GeneName = rownames(counts), counts, check.names = FALSE)
+rsem_expected_count_table <- count_table
+rsem_expected_count_table[, sample_ids] <- rsem_expected_count_table[, sample_ids] + 0.25
 metadata_with_batch <- data.frame(
   Sample = sample_ids,
   Group = rep(c("A", "B"), each = 3L),
@@ -29,16 +31,18 @@ working_dir <- tempfile("omix-deg-cli-auto-batch-")
 dir.create(working_dir, recursive = TRUE)
 on.exit(unlink(working_dir, recursive = TRUE), add = TRUE)
 counts_path <- file.path(working_dir, "counts.csv")
+rsem_expected_counts_path <- file.path(working_dir, "rsem-expected-counts.csv")
 metadata_with_batch_path <- file.path(working_dir, "metadata-with-batch.csv")
 metadata_without_batch_path <- file.path(working_dir, "metadata-without-batch.csv")
 utils::write.csv(count_table, counts_path, row.names = FALSE)
+utils::write.csv(rsem_expected_count_table, rsem_expected_counts_path, row.names = FALSE)
 utils::write.csv(metadata_with_batch, metadata_with_batch_path, row.names = FALSE)
 utils::write.csv(metadata_without_batch, metadata_without_batch_path, row.names = FALSE)
 
-run_cli <- function(metadata_path, output_dir, batch_effect_columns = NULL) {
+run_cli <- function(metadata_path, output_dir, batch_effect_columns = NULL, counts_input = counts_path) {
   arguments <- c(
     entrypoint,
-    "--counts", counts_path,
+    "--counts", counts_input,
     "--metadata", metadata_path,
     "--write_normalization_diagnostics", "false",
     "--output_dir", output_dir
@@ -65,6 +69,18 @@ stopifnot(
   file.exists(file.path(with_batch_output, "Sample_Metadata.csv")),
   "voom trend span: 0.5" %in% readLines(file.path(with_batch_output, "run_summary.txt")),
   "voom adaptive span: false" %in% readLines(file.path(with_batch_output, "run_summary.txt"))
+)
+
+# RSEM expected_count output is a fractional count-scale input. The public CLI
+# must pass it through the raw-count edgeR/voom path without rounding.
+rsem_expected_counts <- run_cli(
+  metadata_with_batch_path,
+  file.path(working_dir, "rsem-expected-counts"),
+  counts_input = rsem_expected_counts_path
+)
+stopifnot(
+  identical(rsem_expected_counts$status, 0L),
+  file.exists(file.path(working_dir, "rsem-expected-counts", "DEG_Analysis.csv"))
 )
 
 without_batch_output <- file.path(working_dir, "without-batch")

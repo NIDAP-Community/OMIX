@@ -12,7 +12,7 @@ of input in the same way.
 
 | Mode | Input | Model | Batch handling |
 | --- | --- | --- | --- |
-| `raw_counts` | Raw integer-like bulk or summed pseudobulk counts | Design-aware filtering, edgeR library-size normalization, limma-voom | Include known technical batch terms in the model. |
+| `raw_counts` | Raw count-scale bulk or summed pseudobulk values, including integer counts or RSEM `expected_count` estimates | Design-aware filtering, edgeR library-size normalization, limma-voom | Include known technical batch terms in the model. |
 | `harmony_mean_expression` | A documented, log2-scale, Harmony-corrected gene-expression matrix averaged per cell type × donor | Direct limma with ordinary empirical Bayes and optional donor blocking | Do not add `Batch`, TMM, voom, or another normalization. Harmony is the declared upstream correction. |
 | `sct_mean_expression` | Log2-scale cell-type × donor means written from Seurat `SCT/data` by OMIX Seurat Pseudobulk | Direct limma with trend-aware empirical Bayes and optional donor blocking | SCTransform addresses sequencing depth, not necessarily technical batch. Model any remaining batch through `covariate_columns`; do not use count normalization or downstream batch-effect removal. |
 
@@ -43,7 +43,7 @@ The standard table input consists of two CSV, TSV, TXT, or RDS files:
 
 | Input | Requirements |
 | --- | --- |
-| Matrix | In `raw_counts`, an integer-like feature-by-sample count table. In `harmony_mean_expression`, a finite, log2-scale Harmony-corrected mean-expression matrix. In `sct_mean_expression`, the `SCT_Mean_Log2_Expression.csv` file emitted by OMIX Seurat Pseudobulk. The default feature-ID column is `GeneName`; remaining columns are sample IDs. |
+| Matrix | In `raw_counts`, a finite, non-negative feature-by-sample count-scale table: observed integer counts and fractional RSEM `expected_count` estimates are supported. TPM, FPKM, CPM, log-transformed, and other normalized-expression values are not raw-count input. In `harmony_mean_expression`, use a finite, log2-scale Harmony-corrected mean-expression matrix. In `sct_mean_expression`, use the `SCT_Mean_Log2_Expression.csv` file emitted by OMIX-Seurat-Pseudobulk. The default feature-ID column is `GeneName`; remaining columns are sample IDs. |
 | Sample metadata | One row per sample with a unique sample-ID column. The default ID column is `Sample`; `Group` and, when applicable, `Batch` are common analysis columns. |
 
 Metadata sample IDs must exactly match the matrix sample columns. Supply

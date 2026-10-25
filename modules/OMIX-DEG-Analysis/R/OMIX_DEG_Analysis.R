@@ -13,7 +13,10 @@
 #' while preserving the biological comparison groups.
 #'
 #' @param Dataset Data frame containing one gene identifier column and raw
-#'   integer-like RNA-seq count columns.
+#'   count-scale RNA-seq columns. These may be observed integer counts or
+#'   non-negative fractional estimated counts, such as RSEM `expected_count`.
+#'   Do not supply TPM, FPKM, CPM, log-transformed, or other normalized
+#'   expression values to this raw-count workflow.
 #' @param Metadata_Table Sample-level metadata table.
 #' @param sample_names_column Metadata column containing sample identifiers.
 #' @param samples_to_include Count-matrix sample columns to analyse.
@@ -148,10 +151,6 @@
   if (any(!is.finite(raw_counts)) || any(raw_counts < 0)) {
     stop("Raw counts must be finite, non-negative numeric values.")
   }
-  if (any(abs(raw_counts - round(raw_counts)) > 1e-8)) {
-    stop("Raw-count input must be integer-like; use a transformed-expression workflow instead.")
-  }
-
   sample_metadata <- Metadata_Table[
     match(samples_to_include, Metadata_Table[[sample_names_column]]),
     ,

@@ -9,7 +9,7 @@ inputs:
       type: path
       default: ""
       formats: [csv, tsv, txt, rds]
-      description: Feature-by-sample raw integer counts for raw_counts, a declared log2-scale Harmony-corrected mean-expression matrix for harmony_mean_expression, or log2-scale SCT donor means written by OMIX-Seurat-Pseudobulk for sct_mean_expression.
+      description: Feature-by-sample finite, non-negative count-scale values for raw_counts, including observed integer counts or fractional RSEM expected_count estimates. TPM, FPKM, CPM, log-transformed, and other normalized-expression values are not valid raw_counts input. For harmony_mean_expression, supply a declared log2-scale Harmony-corrected mean-expression matrix; for sct_mean_expression, supply log2-scale SCT donor means written by OMIX-Seurat-Pseudobulk.
     metadata:
       cli: --metadata
       classification: public
@@ -47,7 +47,7 @@ parameters:
     type: string
     default: raw_counts
     allowed: [raw_counts, harmony_mean_expression, sct_mean_expression]
-    description: Select raw integer-count edgeR/voom analysis, direct limma on declared Harmony-corrected donor means, or direct limma on log2-scale SCT donor means. Do not interchange these modes.
+    description: Select raw count-scale edgeR/voom analysis (integer counts or RSEM expected_count estimates), direct limma on declared Harmony-corrected donor means, or direct limma on log2-scale SCT donor means. Do not interchange these modes.
   gene_names_column:
     cli: --gene_names_column
     classification: public
