@@ -36,14 +36,42 @@
       "provenance": "package set verified against the published image on 2026-09-08"
     },
     "r-visualization": {
-      "version": "r4.4.3-v2",
+      "version": "r4.4.3-v3",
       "image": "ghcr.io/nidap-community/omix-r-visualization",
-      "digest": "sha256:1d9f453b49412aa05e9d3420cd4b1b4ea0beac4923cb40572af38b0ae2a46830",
-      "immutable_reference": "ghcr.io/nidap-community/omix-r-visualization@sha256:1d9f453b49412aa05e9d3420cd4b1b4ea0beac4923cb40572af38b0ae2a46830",
+      "digest": "sha256:d0c00bf328a6a4897c243472db742860d20f7f700d7aab3bbe44dd96a7d5a842",
+      "immutable_reference": "ghcr.io/nidap-community/omix-r-visualization@sha256:d0c00bf328a6a4897c243472db742860d20f7f700d7aab3bbe44dd96a7d5a842",
       "r_version": "4.4.3",
       "lockfile": "starter-environments/r-visualization/renv.lock",
-      "lockfile_sha256": "ad17b0bec64cad3f97dfcc9e352f183fe99dcf77555b6bab6494ec277aa81b32",
-      "provenance": "digest resolved; package-set re-verification pending"
+      "lockfile_sha256": "43bcc21cd8813c42c50d5cd42f528bcb8ad7ce9124522bff20bb01a17680d1c1",
+      "source_commit": "71e015d6459ab532672a520b45a2aa397d46a3b8",
+      "publication_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40207663064",
+      "resolved_on": "2026-10-25",
+      "provenance": "targeted Linux build, visualization package-load verification, ComplexHeatmap Expression Heatmap CLI fixture, and package inventory passed before publication; the published immutable digest was independently resolved, with package-set re-verification pending",
+      "releases": [
+        {
+          "version": "r4.4.3-v2",
+          "image": "ghcr.io/nidap-community/omix-r-visualization",
+          "digest": "sha256:1d9f453b49412aa05e9d3420cd4b1b4ea0beac4923cb40572af38b0ae2a46830",
+          "immutable_reference": "ghcr.io/nidap-community/omix-r-visualization@sha256:1d9f453b49412aa05e9d3420cd4b1b4ea0beac4923cb40572af38b0ae2a46830",
+          "r_version": "4.4.3",
+          "lockfile": "starter-environments/r-visualization/renv.lock",
+          "lockfile_sha256": "ad17b0bec64cad3f97dfcc9e352f183fe99dcf77555b6bab6494ec277aa81b32",
+          "provenance": "digest resolved; package-set re-verification pending"
+        },
+        {
+          "version": "r4.4.3-v3",
+          "image": "ghcr.io/nidap-community/omix-r-visualization",
+          "digest": "sha256:d0c00bf328a6a4897c243472db742860d20f7f700d7aab3bbe44dd96a7d5a842",
+          "immutable_reference": "ghcr.io/nidap-community/omix-r-visualization@sha256:d0c00bf328a6a4897c243472db742860d20f7f700d7aab3bbe44dd96a7d5a842",
+          "r_version": "4.4.3",
+          "lockfile": "starter-environments/r-visualization/renv.lock",
+          "lockfile_sha256": "43bcc21cd8813c42c50d5cd42f528bcb8ad7ce9124522bff20bb01a17680d1c1",
+          "source_commit": "71e015d6459ab532672a520b45a2aa397d46a3b8",
+          "publication_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40207663064",
+          "resolved_on": "2026-10-25",
+          "provenance": "targeted Linux build, visualization package-load verification, ComplexHeatmap Expression Heatmap CLI fixture, and package inventory passed before publication; the published immutable digest was independently resolved, with package-set re-verification pending"
+        }
+      ]
     },
     "r-pathway": {
       "version": "r4.4.3-bioconductor3.20-v3",
