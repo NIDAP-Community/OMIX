@@ -106,6 +106,18 @@ read_deg_table <- function(path) {
   read.delim(path, stringsAsFactors = FALSE, check.names = FALSE)
 }
 
+# The public CLI accepts a path for custom pathways, whereas the preserved L2P
+# implementation accepts an already loaded data frame or pathway list. Read the
+# documented file input here without changing L2P selection or enrichment
+# behavior.
+read_custom_pathways <- function(path) {
+  if (is.null(path) || !nzchar(path)) return(NULL)
+  extension <- tolower(tools::file_ext(path))
+  if (extension == "rds") return(readRDS(path))
+  if (extension == "csv") return(read.csv(path, stringsAsFactors = FALSE, check.names = FALSE))
+  read.delim(path, stringsAsFactors = FALSE, check.names = FALSE)
+}
+
 as_logical <- function(value, option_name) {
   normalized <- tolower(value)
   if (!normalized %in% c("true", "false")) stop("ERROR: `--", option_name, "` must be true or false")
@@ -124,6 +136,7 @@ as_list <- function(value) {
 # existing exactly-one automatic comparison rule.
 deg_table <- read_deg_table(opt$deg_table)
 if (!is.data.frame(deg_table)) stop("ERROR: Loaded DEG table is not a data frame")
+custom_pathways <- read_custom_pathways(opt$custom_pathways)
 select_by_rank <- as_logical(opt$select_by_rank, "select_by_rank")
 
 single_requested <- as_list(opt[["comparison"]])
@@ -252,7 +265,7 @@ run_manifest <- lapply(seq_along(comparisons), function(index) {
     plot_title_prefix = if (is_batched_run) comparison else NULL,
     species = opt$species,
     collections_to_include = as_list(opt$collections_to_include),
-    custom_pathways = opt$custom_pathways,
+    custom_pathways = custom_pathways,
     custom_pathway_name_column = opt$custom_pathway_name_column,
     custom_pathway_gene_column = opt$custom_pathway_gene_column,
     select_by_rank = select_by_rank,
