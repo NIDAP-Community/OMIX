@@ -45,8 +45,10 @@
       "lockfile_sha256": "43bcc21cd8813c42c50d5cd42f528bcb8ad7ce9124522bff20bb01a17680d1c1",
       "source_commit": "71e015d6459ab532672a520b45a2aa397d46a3b8",
       "publication_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40207663064",
+      "verification_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40212591345",
       "resolved_on": "2026-10-25",
-      "provenance": "targeted Linux build, visualization package-load verification, ComplexHeatmap Expression Heatmap CLI fixture, and package inventory passed before publication; the published immutable digest was independently resolved, with package-set re-verification pending",
+      "verified_on": "2026-10-25",
+      "provenance": "targeted Linux build, visualization package-load verification, ComplexHeatmap Expression Heatmap CLI fixture, and package inventory passed before publication; the published immutable digest passed lockfile checksum and full package-set verification after publication",
       "releases": [
         {
           "version": "r4.4.3-v2",
@@ -68,8 +70,10 @@
           "lockfile_sha256": "43bcc21cd8813c42c50d5cd42f528bcb8ad7ce9124522bff20bb01a17680d1c1",
           "source_commit": "71e015d6459ab532672a520b45a2aa397d46a3b8",
           "publication_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40207663064",
+          "verification_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40212591345",
           "resolved_on": "2026-10-25",
-          "provenance": "targeted Linux build, visualization package-load verification, ComplexHeatmap Expression Heatmap CLI fixture, and package inventory passed before publication; the published immutable digest was independently resolved, with package-set re-verification pending"
+          "verified_on": "2026-10-25",
+          "provenance": "targeted Linux build, visualization package-load verification, ComplexHeatmap Expression Heatmap CLI fixture, and package inventory passed before publication; the published immutable digest passed lockfile checksum and full package-set verification after publication"
         }
       ]
     },
