@@ -21,9 +21,9 @@ for visualization.
 ## Quick start
 
 The module requires `ComplexHeatmap` 2.22.0 in the `r-visualization` runtime.
-The `r4.4.3-v3` runtime definition supplies that pin, but remains a candidate
-until targeted validation and a separate publication decision complete. From
-an OMIX checkout with a compatible local runtime, run:
+The published `r-visualization` v3 runtime supplies that pin. Record its
+immutable image digest with each reproducible analysis result. From an OMIX
+checkout with a compatible local runtime, run:
 
 ```bash
 Rscript modules/OMIX-Expression-Heatmap/scripts/run_expression_heatmap.R \
@@ -49,6 +49,16 @@ first column.
 Optional `--group_columns` create top annotations. Feature selection defaults
 to the 500 highest-variance features. Set `--include_all_genes true` and
 `--filter_top_genes_by_variance false` to display the complete matrix.
+
+Feature labels default to `auto`: the heatmap shows readable, wrapped labels
+when it contains up to 50 plotted rows and hides them for denser heatmaps.
+This keeps small GSVA/pathway and focused gene panels interpretable without
+overcrowding broad variable-gene heatmaps. In displayed labels only,
+underscores are replaced with spaces and long names wrap at 30 characters.
+Use `--display_gene_names=true` or `false` to override that choice. Font size
+also defaults to `auto` (8 points for up to 20 rows, 6 points for 21--50, and
+4 points otherwise); use `--gene_name_font_size=<positive number>` and
+`--row_label_max_length=<positive integer>` for an explicit layout.
 
 ## Outputs
 

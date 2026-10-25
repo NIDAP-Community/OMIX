@@ -45,13 +45,14 @@ option_list <- list(
   make_option("--cluster_genes", type = "character", default = "true"),
   make_option("--cluster_samples", type = "character", default = "true"),
   make_option("--center_and_rescale", type = "character", default = "true"),
-  make_option("--display_gene_names", type = "character", default = "false"),
+  make_option("--display_gene_names", type = "character", default = "auto"),
   make_option("--display_sample_names", type = "character", default = "true"),
   make_option("--heatmap_color_scheme", type = "character", default = "Bu Yl Rd"),
   make_option("--autoscale_heatmap_color", type = "character", default = "true"),
   make_option("--set_min_heatmap_color", type = "double", default = -2),
   make_option("--set_max_heatmap_color", type = "double", default = 2),
-  make_option("--gene_name_font_size", type = "double", default = 4),
+  make_option("--gene_name_font_size", type = "character", default = "auto"),
+  make_option("--row_label_max_length", type = "integer", default = 30L),
   make_option("--sample_name_font_size", type = "double", default = 8),
   make_option("--legend_font_size", type = "double", default = 10),
   make_option("--heatmap_title", type = "character", default = ""),
@@ -66,6 +67,9 @@ if (!nzchar(opt$expression_matrix) || !nzchar(opt$sample_metadata)) {
 }
 if (opt$top_genes_by_variance_to_include < 1L) {
   stop("--top_genes_by_variance_to_include must be at least 1.")
+}
+if (opt$row_label_max_length < 1L) {
+  stop("--row_label_max_length must be at least 1.")
 }
 if (!is.finite(opt$image_width) || !is.finite(opt$image_height) ||
     opt$image_width <= 0 || opt$image_height <= 0) {
@@ -123,13 +127,14 @@ result <- Expression_Heatmap_ComplexHeatmap(
   cluster_genes = as_logical(opt$cluster_genes, "cluster_genes"),
   cluster_samples = as_logical(opt$cluster_samples, "cluster_samples"),
   center_and_rescale = as_logical(opt$center_and_rescale, "center_and_rescale"),
-  display_gene_names = as_logical(opt$display_gene_names, "display_gene_names"),
+  display_gene_names = opt$display_gene_names,
   display_sample_names = as_logical(opt$display_sample_names, "display_sample_names"),
   heatmap_color_scheme = opt$heatmap_color_scheme,
   autoscale_heatmap_color = as_logical(opt$autoscale_heatmap_color, "autoscale_heatmap_color"),
   set_min_heatmap_color = opt$set_min_heatmap_color,
   set_max_heatmap_color = opt$set_max_heatmap_color,
   gene_name_font_size = opt$gene_name_font_size,
+  row_label_max_length = opt$row_label_max_length,
   sample_name_font_size = opt$sample_name_font_size,
   legend_font_size = opt$legend_font_size,
   heatmap_title = if (nzchar(opt$heatmap_title)) opt$heatmap_title else NULL,
@@ -145,6 +150,9 @@ writeLines(c(
   paste("sample_metadata=", normalizePath(opt$sample_metadata), sep = ""),
   paste("selected_samples=", paste(samples_to_include, collapse = ","), sep = ""),
   paste("group_columns=", paste(group_columns, collapse = ","), sep = ""),
+  paste("display_gene_names=", opt$display_gene_names, sep = ""),
+  paste("gene_name_font_size=", opt$gene_name_font_size, sep = ""),
+  paste("row_label_max_length=", opt$row_label_max_length, sep = ""),
   paste("plotted_features=", nrow(result), sep = "")
 ), file.path(output_dir, "expression_heatmap_run_summary.txt"))
 message("Expression heatmap outputs saved to: ", output_dir)
