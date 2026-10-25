@@ -56,9 +56,9 @@
       "lockfile_sha256": "520ffdb1c855bb5259731bc0069f78e1d2f7cb8846b86c629d7f5449c277e4a4",
       "required_packages": {
         "GSVA": "2.0.7",
-        "l2p": "0.0.14",
-        "l2psupp": "0.0.14",
-        "RCurl": "1.98.1.19",
+        "l2p": "0.0-14",
+        "l2psupp": "0.0-14",
+        "RCurl": "1.98-1.19",
         "OmixPathwayInputs": "0.1.0",
         "OmixPathwayPlots": "0.2.0"
       },
@@ -112,9 +112,9 @@
           "lockfile_sha256": "520ffdb1c855bb5259731bc0069f78e1d2f7cb8846b86c629d7f5449c277e4a4",
           "required_packages": {
             "GSVA": "2.0.7",
-            "l2p": "0.0.14",
-            "l2psupp": "0.0.14",
-            "RCurl": "1.98.1.19",
+            "l2p": "0.0-14",
+            "l2psupp": "0.0-14",
+            "RCurl": "1.98-1.19",
             "OmixPathwayInputs": "0.1.0",
             "OmixPathwayPlots": "0.2.0"
           },
