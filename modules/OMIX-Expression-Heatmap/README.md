@@ -20,9 +20,10 @@ for visualization.
 
 ## Quick start
 
-The module is intended for the `r-visualization` runtime after its
-`ComplexHeatmap` dependency is pinned and published. From an OMIX checkout,
-run:
+The module requires `ComplexHeatmap` 2.22.0 in the `r-visualization` runtime.
+The `r4.4.3-v3` runtime definition supplies that pin, but remains a candidate
+until targeted validation and a separate publication decision complete. From
+an OMIX checkout with a compatible local runtime, run:
 
 ```bash
 Rscript modules/OMIX-Expression-Heatmap/scripts/run_expression_heatmap.R \
@@ -64,10 +65,9 @@ to the 500 highest-variance features. Set `--include_all_genes true` and
 - Row standardization is enabled by default, making each displayed feature
   easier to compare across samples. Disable it to show the original continuous
   scale.
-- The current canonical module is in development because the shared runtime must still
-  record a pinned `ComplexHeatmap` dependency and receive validation. The
-  interface and a small reproducible fixture are included now so that runtime
-  validation is explicit rather than implicit.
+- The current canonical module is in development pending validation of its
+  pinned shared runtime. The interface and a small reproducible fixture are
+  included so that runtime validation is explicit rather than implicit.
 
 ## Interface and deployment
 
