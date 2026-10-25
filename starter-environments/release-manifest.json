@@ -46,18 +46,20 @@
       "provenance": "digest resolved; package-set re-verification pending"
     },
     "r-pathway": {
-      "version": "r4.4.3-bioconductor3.20-v2",
+      "version": "r4.4.3-bioconductor3.20-v3",
       "image": "ghcr.io/nidap-community/omix-r-pathway",
-      "digest": "sha256:25ad9f50df5a4d7f70a7e3debed13f8d5c9b07cbc46d57fdf5c3cf4f2e767ddc",
-      "immutable_reference": "ghcr.io/nidap-community/omix-r-pathway@sha256:25ad9f50df5a4d7f70a7e3debed13f8d5c9b07cbc46d57fdf5c3cf4f2e767ddc",
+      "digest": "sha256:20bfb0c77e8804b11730750f47ec8f355666a4be1ffa8d687052dc69a3b7e2e3",
+      "immutable_reference": "ghcr.io/nidap-community/omix-r-pathway@sha256:20bfb0c77e8804b11730750f47ec8f355666a4be1ffa8d687052dc69a3b7e2e3",
       "r_version": "4.4.3",
       "bioconductor_version": "3.20",
       "lockfile": "starter-environments/r-pathway/renv.lock",
-      "lockfile_sha256": "66b0b93e7b1f05dd9429e542c8fdca89b38770667827b53ffca80400b286795c",
+      "lockfile_sha256": "520ffdb1c855bb5259731bc0069f78e1d2f7cb8846b86c629d7f5449c277e4a4",
       "required_packages": {
         "GSVA": "2.0.7",
         "l2p": "0.0.14",
         "l2psupp": "0.0.14",
+        "RCurl": "1.98.1.19",
+        "OmixPathwayInputs": "0.1.0",
         "OmixPathwayPlots": "0.2.0"
       },
       "additional_sources": {
@@ -65,12 +67,70 @@
         "l2p_0.0-14_sha256": "0702383b23eccaa1cfa6bc2be5292bc0d64b24e9372206bf3b1825fda32c2e86",
         "l2psupp_0.0-14_sha256": "48a3c8ec20ea6aec3e4fae490a18b613ada74ae1f9d11b481902711eba50c82a"
       },
-      "source_commit": "29a390a1273e7f493d17cc59f0a1670bb1c914c8",
-      "publication_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/35242190309",
-      "verification_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/35997759223",
-      "resolved_on": "2026-09-17",
-      "verified_on": "2026-09-24",
-      "provenance": "targeted Linux build and package inventory passed before publication; the published immutable digest passed lockfile, R, Bioconductor, GSVA, L2P, OmixPathwayPlots, and representative OMIX-GSVA verification after publication"
+      "source_commit": "0ea6223129de6d98d69469027c19fa1887b59f6a",
+      "publication_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40143750294",
+      "verification_run": null,
+      "resolved_on": "2026-10-24",
+      "verified_on": null,
+      "provenance": "targeted Linux build, RCurl/L2P and OmixPathwayInputs/OmixPathwayPlots package inventory, and L2P Single, L2P Multi, and GSEA Preranked CLI smoke checks passed before publication; published immutable-digest verification pending",
+      "releases": [
+        {
+          "version": "r4.4.3-bioconductor3.20-v2",
+          "image": "ghcr.io/nidap-community/omix-r-pathway",
+          "digest": "sha256:25ad9f50df5a4d7f70a7e3debed13f8d5c9b07cbc46d57fdf5c3cf4f2e767ddc",
+          "immutable_reference": "ghcr.io/nidap-community/omix-r-pathway@sha256:25ad9f50df5a4d7f70a7e3debed13f8d5c9b07cbc46d57fdf5c3cf4f2e767ddc",
+          "r_version": "4.4.3",
+          "bioconductor_version": "3.20",
+          "lockfile": "starter-environments/r-pathway/renv.lock",
+          "lockfile_sha256": "66b0b93e7b1f05dd9429e542c8fdca89b38770667827b53ffca80400b286795c",
+          "required_packages": {
+            "GSVA": "2.0.7",
+            "l2p": "0.0.14",
+            "l2psupp": "0.0.14",
+            "OmixPathwayPlots": "0.2.0"
+          },
+          "additional_sources": {
+            "l2p_commit": "ab389bc978441f1893414da7a07e803bea971205",
+            "l2p_0.0-14_sha256": "0702383b23eccaa1cfa6bc2be5292bc0d64b24e9372206bf3b1825fda32c2e86",
+            "l2psupp_0.0-14_sha256": "48a3c8ec20ea6aec3e4fae490a18b613ada74ae1f9d11b481902711eba50c82a"
+          },
+          "source_commit": "29a390a1273e7f493d17cc59f0a1670bb1c914c8",
+          "publication_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/35242190309",
+          "verification_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/35997759223",
+          "resolved_on": "2026-09-17",
+          "verified_on": "2026-09-24",
+          "provenance": "targeted Linux build and package inventory passed before publication; the published immutable digest passed lockfile, R, Bioconductor, GSVA, L2P, OmixPathwayPlots, and representative OMIX-GSVA verification after publication"
+        },
+        {
+          "version": "r4.4.3-bioconductor3.20-v3",
+          "image": "ghcr.io/nidap-community/omix-r-pathway",
+          "digest": "sha256:20bfb0c77e8804b11730750f47ec8f355666a4be1ffa8d687052dc69a3b7e2e3",
+          "immutable_reference": "ghcr.io/nidap-community/omix-r-pathway@sha256:20bfb0c77e8804b11730750f47ec8f355666a4be1ffa8d687052dc69a3b7e2e3",
+          "r_version": "4.4.3",
+          "bioconductor_version": "3.20",
+          "lockfile": "starter-environments/r-pathway/renv.lock",
+          "lockfile_sha256": "520ffdb1c855bb5259731bc0069f78e1d2f7cb8846b86c629d7f5449c277e4a4",
+          "required_packages": {
+            "GSVA": "2.0.7",
+            "l2p": "0.0.14",
+            "l2psupp": "0.0.14",
+            "RCurl": "1.98.1.19",
+            "OmixPathwayInputs": "0.1.0",
+            "OmixPathwayPlots": "0.2.0"
+          },
+          "additional_sources": {
+            "l2p_commit": "ab389bc978441f1893414da7a07e803bea971205",
+            "l2p_0.0-14_sha256": "0702383b23eccaa1cfa6bc2be5292bc0d64b24e9372206bf3b1825fda32c2e86",
+            "l2psupp_0.0-14_sha256": "48a3c8ec20ea6aec3e4fae490a18b613ada74ae1f9d11b481902711eba50c82a"
+          },
+          "source_commit": "0ea6223129de6d98d69469027c19fa1887b59f6a",
+          "publication_run": "https://github.com/NIDAP-Community/OMIX/actions/runs/40143750294",
+          "verification_run": null,
+          "resolved_on": "2026-10-24",
+          "verified_on": null,
+          "provenance": "targeted Linux build, RCurl/L2P and OmixPathwayInputs/OmixPathwayPlots package inventory, and L2P Single, L2P Multi, and GSEA Preranked CLI smoke checks passed before publication; published immutable-digest verification pending"
+        }
+      ]
     },
     "r-seurat-conversion": {
       "version": "r4.4.3-v3",
