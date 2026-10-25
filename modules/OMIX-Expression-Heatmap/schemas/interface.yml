@@ -65,6 +65,37 @@ parameters:
     classification: public
     type: boolean
     default: true
+    description: Cluster sample columns by their displayed expression profiles. Set exactly one of this, arrange_sample_columns, or order_by_gene_expression to true.
+  arrange_sample_columns:
+    classification: public
+    type: boolean
+    default: false
+    description: Arrange sample columns by group_columns in their input-level order. Set exactly one sample-ordering mode to true.
+  order_by_gene_expression:
+    classification: public
+    type: boolean
+    default: false
+    description: Order sample columns by one selected feature's displayed expression. Set exactly one sample-ordering mode to true.
+  gene_to_order_columns:
+    classification: public
+    type: string
+    default: ""
+    description: Feature identifier used when order_by_gene_expression is true.
+  gene_expression_order:
+    classification: public
+    type: string
+    default: low_to_high
+    allowed: [low_to_high, high_to_low]
+  reorder_sample_dendrogram:
+    classification: advanced
+    type: boolean
+    default: false
+    description: Rotate a clustered sample dendrogram to the supplied sample-ID order. Requires cluster_samples true.
+  reorder_sample_dendrogram_order:
+    classification: advanced
+    type: string
+    default: ""
+    description: Comma-separated selected sample IDs, each exactly once, used only when reorder_sample_dendrogram is true.
   center_and_rescale:
     classification: public
     type: boolean
@@ -72,8 +103,10 @@ parameters:
     description: Row-standardize selected features before rendering.
   display_gene_names:
     classification: public
-    type: boolean
-    default: false
+    type: string
+    default: auto
+    allowed: ["auto", "true", "false"]
+    description: auto shows feature labels for up to 50 plotted rows and hides them for denser heatmaps. true and false force the earlier explicit behaviors.
   display_sample_names:
     classification: public
     type: boolean
@@ -97,12 +130,19 @@ parameters:
     default: 2
   gene_name_font_size:
     classification: public
-    type: number
-    default: 4
+    type: string
+    default: auto
+    description: auto uses 8 points for up to 20 displayed features, 6 points for 21 to 50, and 4 points for denser heatmaps. A positive numeric value overrides the automatic size.
+  row_label_max_length:
+    classification: public
+    type: integer
+    default: 30
+    description: Maximum row-label width before intuitive word wrapping. Underscores are rendered as spaces in the plot only; identifiers in the output matrix are unchanged.
   sample_name_font_size:
     classification: public
-    type: number
-    default: 8
+    type: string
+    default: auto
+    description: auto uses larger text for smaller cohorts (12 points through 12 samples, 11 through 40, 10 through 80, 8 through 160, then 6) and reduces one or two steps for unusually long labels. A positive numeric value overrides the automatic size.
   legend_font_size:
     classification: public
     type: number

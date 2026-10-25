@@ -22,7 +22,7 @@ Expression_Heatmap_ComplexHeatmap <- function(
   gene_clustering_method = "average",
   gene_distance_metric = "correlation",
   display_gene_dendrogram = TRUE,
-  display_gene_names = FALSE,
+  display_gene_names = "auto",
   center_and_rescale = TRUE,
   center_and_rescale_by_column = NULL,
   center_and_rescale_by_order = NULL,
@@ -62,9 +62,10 @@ Expression_Heatmap_ComplexHeatmap <- function(
   column_split_order = NULL,
   column_gap = 4,
   display_numbers = FALSE,
-  gene_name_font_size = 4,
+  gene_name_font_size = "auto",
+  row_label_max_length = 30,
   legend_font_size = 10,
-  sample_name_font_size = 8,
+  sample_name_font_size = "auto",
   heatmap_title = NULL,
   annotation_legend_title = NULL,
   annotation_legend_order = NULL,
@@ -98,6 +99,93 @@ Expression_Heatmap_ComplexHeatmap <- function(
       ))
     }
     tbl
+  }
+
+  normalize_display_gene_names <- function(value) {
+    if (length(value) != 1L || is.na(value)) {
+      stop("ERROR: `display_gene_names` must be `auto`, TRUE, or FALSE.")
+    }
+    if (is.logical(value)) {
+      return(isTRUE(value))
+    }
+    value <- tolower(trimws(as.character(value)))
+    if (identical(value, "auto")) {
+      return("auto")
+    }
+    if (value %in% c("true", "t", "1", "yes")) {
+      return(TRUE)
+    }
+    if (value %in% c("false", "f", "0", "no")) {
+      return(FALSE)
+    }
+    stop("ERROR: `display_gene_names` must be `auto`, TRUE, or FALSE.")
+  }
+
+  resolve_gene_name_font_size <- function(value, n_features) {
+    value_character <- tolower(trimws(as.character(value)[1L]))
+    if (identical(value_character, "auto")) {
+      if (n_features <= 20L) {
+        return(8)
+      }
+      if (n_features <= 50L) {
+        return(6)
+      }
+      return(4)
+    }
+    value_numeric <- suppressWarnings(as.numeric(value)[1L])
+    if (!is.finite(value_numeric) || value_numeric <= 0) {
+      stop("ERROR: `gene_name_font_size` must be `auto` or a positive number.")
+    }
+    value_numeric
+  }
+
+  resolve_sample_name_font_size <- function(value, n_samples, labels) {
+    value_character <- tolower(trimws(as.character(value)[1L]))
+    if (!identical(value_character, "auto")) {
+      value_numeric <- suppressWarnings(as.numeric(value)[1L])
+      if (!is.finite(value_numeric) || value_numeric <= 0) {
+        stop("ERROR: `sample_name_font_size` must be `auto` or a positive number.")
+      }
+      return(value_numeric)
+    }
+
+    base_size <- if (n_samples <= 12L) {
+      12
+    } else if (n_samples <= 40L) {
+      11
+    } else if (n_samples <= 80L) {
+      10
+    } else if (n_samples <= 160L) {
+      8
+    } else {
+      6
+    }
+    label_lengths <- nchar(gsub("[\\r\\n]+", " ", as.character(labels)))
+    max_label_length <- if (length(label_lengths)) max(label_lengths, na.rm = TRUE) else 0L
+    if (!is.finite(max_label_length)) {
+      max_label_length <- 0L
+    }
+    if (max_label_length > 30L) {
+      return(max(6, base_size - 2))
+    }
+    if (max_label_length > 18L) {
+      return(max(6, base_size - 1))
+    }
+    base_size
+  }
+
+  format_row_labels <- function(feature_ids, max_length, font_size) {
+    max_length <- suppressWarnings(as.integer(max_length)[1L])
+    if (is.na(max_length) || max_length < 1L) {
+      stop("ERROR: `row_label_max_length` must be a positive integer.")
+    }
+    effective_length <- min(
+      max_length,
+      max(15L, floor(max_length * 8 / font_size))
+    )
+    labels <- gsub("_", " ", as.character(feature_ids), fixed = TRUE)
+    labels <- gsub("[\r\n]+", " ", labels)
+    stringr::str_wrap(labels, width = effective_length)
   }
 
   row_zscore <- function(mat) {
@@ -212,6 +300,31 @@ Expression_Heatmap_ComplexHeatmap <- function(
       "`order_by_gene_expression` may be TRUE at one time."
     )
   }
+  if (order_by_gene_expression &&
+      (is.null(gene_to_order_columns) ||
+       length(gene_to_order_columns) != 1L ||
+       !nzchar(trimws(gene_to_order_columns)))) {
+    stop(
+      "ERROR: `gene_to_order_columns` must name one plotted feature when ",
+      "`order_by_gene_expression` is TRUE."
+    )
+  }
+  if (!gene_expression_order %in% c("low_to_high", "high_to_low")) {
+    stop(
+      "ERROR: `gene_expression_order` must be `low_to_high` or `high_to_low`."
+    )
+  }
+  if (reorder_sample_dendrogram && !cluster_samples) {
+    stop(
+      "ERROR: `reorder_sample_dendrogram` requires `cluster_samples = TRUE`."
+    )
+  }
+  if (reorder_sample_dendrogram && length(reorder_sample_dendrogram_order) == 0L) {
+    stop(
+      "ERROR: `reorder_sample_dendrogram_order` is required when ",
+      "`reorder_sample_dendrogram` is TRUE."
+    )
+  }
 
   required_metadata_cols <- unique(c(
     sample_name_column,
@@ -285,7 +398,9 @@ Expression_Heatmap_ComplexHeatmap <- function(
     )
 
   df_mat <- df[, colnames(df) != "Gene"] |> as.data.frame()
-  rownames(df_mat) <- stringr::str_wrap(df$Gene, 30)
+  # Preserve exact identifiers for feature selection and exported matrices.
+  # Display-only wrapping is applied later through `row_labels`.
+  rownames(df_mat) <- df$Gene
 
   if (!include_all_genes) {
     genes_parsed <- strsplit(specific_genes_to_include, " ")[[1]]
@@ -339,8 +454,33 @@ Expression_Heatmap_ComplexHeatmap <- function(
     mat_plot <- mat_selected
   }
 
+  display_gene_names <- normalize_display_gene_names(display_gene_names)
+  show_row_names <- if (identical(display_gene_names, "auto")) {
+    nrow(mat_plot) <= 50L
+  } else {
+    display_gene_names
+  }
+  effective_gene_name_font_size <- resolve_gene_name_font_size(
+    gene_name_font_size,
+    nrow(mat_plot)
+  )
+  row_labels <- stats::setNames(
+    format_row_labels(
+      rownames(mat_plot),
+      row_label_max_length,
+      effective_gene_name_font_size
+    ),
+    rownames(mat_plot)
+  )
+
   if (order_by_gene_expression) {
     gene_to_order_columns <- stringr::str_wrap(gsub(" ", "", gene_to_order_columns), 30)
+    if (!gene_to_order_columns %in% rownames(mat_plot)) {
+      stop(
+        "ERROR: `gene_to_order_columns` is not a plotted feature: ",
+        gene_to_order_columns
+      )
+    }
     order_idx <- if (gene_expression_order == "low_to_high") {
       order(mat_plot[gene_to_order_columns, ])
     } else {
@@ -482,6 +622,11 @@ Expression_Heatmap_ComplexHeatmap <- function(
     )
     labels_col <- unname(label_map[colnames(mat_plot)])
   }
+  effective_sample_name_font_size <- resolve_sample_name_font_size(
+    sample_name_font_size,
+    ncol(mat_plot),
+    labels_col
+  )
 
   column_split <- NULL
   if (!is.null(column_split_by_column)) {
@@ -533,6 +678,14 @@ Expression_Heatmap_ComplexHeatmap <- function(
   }
 
   if (reorder_sample_dendrogram && cluster_samples && !identical(column_cluster, FALSE)) {
+    if (length(reorder_sample_dendrogram_order) != ncol(mat_plot) ||
+        anyDuplicated(reorder_sample_dendrogram_order) ||
+        !setequal(reorder_sample_dendrogram_order, colnames(mat_plot))) {
+      stop(
+        "ERROR: `reorder_sample_dendrogram_order` must contain each selected ",
+        "sample ID exactly once."
+      )
+    }
     column_cluster <- stats::as.hclust(dendextend::rotate(
       stats::as.dendrogram(column_cluster),
       reorder_sample_dendrogram_order
@@ -566,6 +719,16 @@ Expression_Heatmap_ComplexHeatmap <- function(
   }
 
   message(sprintf("Total number of genes in heatmap: %d", nrow(mat_plot)))
+  message(sprintf(
+    "Feature labels: %s; font size: %g",
+    if (show_row_names) "shown" else "hidden",
+    effective_gene_name_font_size
+  ))
+  message(sprintf(
+    "Sample labels: %s; font size: %g",
+    if (display_sample_names) "shown" else "hidden",
+    effective_sample_name_font_size
+  ))
 
   render_heatmap <- function() {
     heatmap_obj <- ComplexHeatmap::Heatmap(
@@ -581,10 +744,11 @@ Expression_Heatmap_ComplexHeatmap <- function(
       cluster_columns = column_cluster,
       show_row_dend = display_gene_dendrogram,
       show_column_dend = display_sample_dendrograms,
-      show_row_names = display_gene_names,
+      show_row_names = show_row_names,
       show_column_names = display_sample_names,
-      row_names_gp = grid::gpar(fontsize = gene_name_font_size),
-      column_names_gp = grid::gpar(fontsize = sample_name_font_size),
+      row_labels = row_labels,
+      row_names_gp = grid::gpar(fontsize = effective_gene_name_font_size),
+      column_names_gp = grid::gpar(fontsize = effective_sample_name_font_size),
       column_labels = labels_col,
       top_annotation = top_annotation,
       column_split = column_split,
@@ -623,5 +787,6 @@ Expression_Heatmap_ComplexHeatmap <- function(
     utils::write.csv(df_out, export_results_file, row.names = FALSE)
   }
 
+  attr(df_out, "effective_sample_name_font_size") <- effective_sample_name_font_size
   df_out
 }
