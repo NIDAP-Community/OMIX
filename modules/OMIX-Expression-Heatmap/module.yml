@@ -9,6 +9,8 @@ description: Render annotated ComplexHeatmap expression heatmaps from normalized
 data_policy: No study data or generated results are committed. Callers supply explicit expression-matrix and sample-metadata paths.
 runtime_profile: r-visualization
 runtime_overlay:
-  ComplexHeatmap: required-unpinned
+  bioconductor:
+    - package: ComplexHeatmap
+      version: 2.22.0
 entrypoint: scripts/run_expression_heatmap.R
 deployment_adapters: []

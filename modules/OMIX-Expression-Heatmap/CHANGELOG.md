@@ -12,3 +12,6 @@
   intentionally outside this module.
 - Declared `ComplexHeatmap` as a required runtime overlay pending a pinned
   shared-runtime update and validation.
+- Pinned the required overlay to Bioconductor `ComplexHeatmap` 2.22.0; the
+  `r-visualization` v3 runtime candidate still requires validation and a
+  separate publication decision.

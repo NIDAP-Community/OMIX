@@ -387,7 +387,9 @@ jobs:
             packages <- c(
               "ggplot2", "dplyr", "tidyr", "ggbeeswarm", "broom",
               "multcomp", "multcompView", "RColorBrewer", "plotly",
-              "patchwork", "pheatmap", "optparse"
+              "patchwork", "pheatmap", "optparse", "ComplexHeatmap",
+              "circlize", "colorspace", "dendextend", "dendsort",
+              "matrixStats"
             )
             versions <- vapply(packages, function(package) {
               suppressPackageStartupMessages(library(package, character.only = TRUE))
@@ -395,6 +397,13 @@ jobs:
             }, character(1))
             writeLines(paste(sprintf("%s %s", packages, versions), collapse = "\\n"))
           '
+
+          docker run --rm \
+            --volume "${{ github.workspace }}:/omix:ro" \
+            --workdir /omix \
+            --entrypoint Rscript \
+            omix-r-visualization:ci \
+            modules/OMIX-Expression-Heatmap/tests/test-expression-heatmap-cli.R
 
       - name: Verify single-cell runtime
         if: steps.targets.outputs.singlecell == 'true'
