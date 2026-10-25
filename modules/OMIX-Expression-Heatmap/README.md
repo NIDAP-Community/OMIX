@@ -60,6 +60,16 @@ also defaults to `auto` (8 points for up to 20 rows, 6 points for 21--50, and
 4 points otherwise); use `--gene_name_font_size=<positive number>` and
 `--row_label_max_length=<positive integer>` for an explicit layout.
 
+Sample labels also default to `auto`, following the L2P-style principle of
+giving a small cohort more readable text while avoiding overcrowding in a
+large one: 12 points through 12 samples, 11 through 40, 10 through 80, 8
+through 160, then 6. Labels longer than 18 or 30 characters reduce that size
+by one or two steps, respectively. Use
+`--sample_name_font_size=<positive number>` for an explicit override. The
+metadata `--sample_label_column` is the portable counterpart of L2P Multi's
+replacement x-axis tick labels; provide concise display labels there without
+altering the matrix sample IDs.
+
 ## Column ordering
 
 Choose exactly one primary sample-column ordering mode:

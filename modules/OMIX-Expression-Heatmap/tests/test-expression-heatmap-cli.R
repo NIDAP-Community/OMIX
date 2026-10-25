@@ -25,7 +25,9 @@ run_summary <- readLines(file.path(result_dir, "expression_heatmap_run_summary.t
 stopifnot(all(c(
   "display_gene_names=auto",
   "gene_name_font_size=auto",
-  "row_label_max_length=30"
+  "row_label_max_length=30",
+  "sample_name_font_size=auto",
+  "resolved_sample_name_font_size=12"
 ) %in% run_summary))
 
 # Preserve the established explicit controls while the defaults are automatic.
@@ -36,6 +38,7 @@ explicit_command <- c(
   "--display_gene_names=true",
   "--gene_name_font_size=7",
   "--row_label_max_length=18",
+  "--sample_name_font_size=13",
   paste0("--output_dir=", explicit_result_dir)
 )
 status <- system2("Rscript", explicit_command)
@@ -47,7 +50,9 @@ explicit_summary <- readLines(file.path(
 stopifnot(all(c(
   "display_gene_names=true",
   "gene_name_font_size=7",
-  "row_label_max_length=18"
+  "row_label_max_length=18",
+  "sample_name_font_size=13",
+  "resolved_sample_name_font_size=13"
 ) %in% explicit_summary))
 
 # Use real pathway-database-style identifiers to exercise display-only label

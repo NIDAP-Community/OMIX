@@ -140,8 +140,9 @@ parameters:
     description: Maximum row-label width before intuitive word wrapping. Underscores are rendered as spaces in the plot only; identifiers in the output matrix are unchanged.
   sample_name_font_size:
     classification: public
-    type: number
-    default: 8
+    type: string
+    default: auto
+    description: auto uses larger text for smaller cohorts (12 points through 12 samples, 11 through 40, 10 through 80, 8 through 160, then 6) and reduces one or two steps for unusually long labels. A positive numeric value overrides the automatic size.
   legend_font_size:
     classification: public
     type: number

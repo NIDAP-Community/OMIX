@@ -65,7 +65,7 @@ Expression_Heatmap_ComplexHeatmap <- function(
   gene_name_font_size = "auto",
   row_label_max_length = 30,
   legend_font_size = 10,
-  sample_name_font_size = 8,
+  sample_name_font_size = "auto",
   heatmap_title = NULL,
   annotation_legend_title = NULL,
   annotation_legend_order = NULL,
@@ -137,6 +137,41 @@ Expression_Heatmap_ComplexHeatmap <- function(
       stop("ERROR: `gene_name_font_size` must be `auto` or a positive number.")
     }
     value_numeric
+  }
+
+  resolve_sample_name_font_size <- function(value, n_samples, labels) {
+    value_character <- tolower(trimws(as.character(value)[1L]))
+    if (!identical(value_character, "auto")) {
+      value_numeric <- suppressWarnings(as.numeric(value)[1L])
+      if (!is.finite(value_numeric) || value_numeric <= 0) {
+        stop("ERROR: `sample_name_font_size` must be `auto` or a positive number.")
+      }
+      return(value_numeric)
+    }
+
+    base_size <- if (n_samples <= 12L) {
+      12
+    } else if (n_samples <= 40L) {
+      11
+    } else if (n_samples <= 80L) {
+      10
+    } else if (n_samples <= 160L) {
+      8
+    } else {
+      6
+    }
+    label_lengths <- nchar(gsub("[\\r\\n]+", " ", as.character(labels)))
+    max_label_length <- if (length(label_lengths)) max(label_lengths, na.rm = TRUE) else 0L
+    if (!is.finite(max_label_length)) {
+      max_label_length <- 0L
+    }
+    if (max_label_length > 30L) {
+      return(max(6, base_size - 2))
+    }
+    if (max_label_length > 18L) {
+      return(max(6, base_size - 1))
+    }
+    base_size
   }
 
   format_row_labels <- function(feature_ids, max_length, font_size) {
@@ -587,6 +622,11 @@ Expression_Heatmap_ComplexHeatmap <- function(
     )
     labels_col <- unname(label_map[colnames(mat_plot)])
   }
+  effective_sample_name_font_size <- resolve_sample_name_font_size(
+    sample_name_font_size,
+    ncol(mat_plot),
+    labels_col
+  )
 
   column_split <- NULL
   if (!is.null(column_split_by_column)) {
@@ -684,6 +724,11 @@ Expression_Heatmap_ComplexHeatmap <- function(
     if (show_row_names) "shown" else "hidden",
     effective_gene_name_font_size
   ))
+  message(sprintf(
+    "Sample labels: %s; font size: %g",
+    if (display_sample_names) "shown" else "hidden",
+    effective_sample_name_font_size
+  ))
 
   render_heatmap <- function() {
     heatmap_obj <- ComplexHeatmap::Heatmap(
@@ -703,7 +748,7 @@ Expression_Heatmap_ComplexHeatmap <- function(
       show_column_names = display_sample_names,
       row_labels = row_labels,
       row_names_gp = grid::gpar(fontsize = effective_gene_name_font_size),
-      column_names_gp = grid::gpar(fontsize = sample_name_font_size),
+      column_names_gp = grid::gpar(fontsize = effective_sample_name_font_size),
       column_labels = labels_col,
       top_annotation = top_annotation,
       column_split = column_split,
@@ -742,5 +787,6 @@ Expression_Heatmap_ComplexHeatmap <- function(
     utils::write.csv(df_out, export_results_file, row.names = FALSE)
   }
 
+  attr(df_out, "effective_sample_name_font_size") <- effective_sample_name_font_size
   df_out
 }

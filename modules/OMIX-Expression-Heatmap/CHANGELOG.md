@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added L2P-informed automatic sample-axis font sizing, with a recorded
+  resolved size and a compatible positive numeric override. The policy reacts
+  to cohort size and label length while preserving metadata-driven labels.
 - Exposed the template's existing portable sample-column ordering modes in the
   CLI and schema: clustering, annotation-group arrangement, feature-expression
   ordering, and optional clustered-dendrogram rotation. Added explicit mode

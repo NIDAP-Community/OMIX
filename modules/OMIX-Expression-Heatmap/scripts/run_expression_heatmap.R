@@ -59,7 +59,7 @@ option_list <- list(
   make_option("--set_max_heatmap_color", type = "double", default = 2),
   make_option("--gene_name_font_size", type = "character", default = "auto"),
   make_option("--row_label_max_length", type = "integer", default = 30L),
-  make_option("--sample_name_font_size", type = "double", default = 8),
+  make_option("--sample_name_font_size", type = "character", default = "auto"),
   make_option("--legend_font_size", type = "double", default = 10),
   make_option("--heatmap_title", type = "character", default = ""),
   make_option("--image_width", type = "double", default = 12),
@@ -173,6 +173,8 @@ writeLines(c(
   paste("display_gene_names=", opt$display_gene_names, sep = ""),
   paste("gene_name_font_size=", opt$gene_name_font_size, sep = ""),
   paste("row_label_max_length=", opt$row_label_max_length, sep = ""),
+  paste("sample_name_font_size=", opt$sample_name_font_size, sep = ""),
+  paste("resolved_sample_name_font_size=", attr(result, "effective_sample_name_font_size"), sep = ""),
   paste("plotted_features=", nrow(result), sep = "")
 ), file.path(output_dir, "expression_heatmap_run_summary.txt"))
 message("Expression heatmap outputs saved to: ", output_dir)
