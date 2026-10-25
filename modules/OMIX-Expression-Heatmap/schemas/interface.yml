@@ -65,6 +65,37 @@ parameters:
     classification: public
     type: boolean
     default: true
+    description: Cluster sample columns by their displayed expression profiles. Set exactly one of this, arrange_sample_columns, or order_by_gene_expression to true.
+  arrange_sample_columns:
+    classification: public
+    type: boolean
+    default: false
+    description: Arrange sample columns by group_columns in their input-level order. Set exactly one sample-ordering mode to true.
+  order_by_gene_expression:
+    classification: public
+    type: boolean
+    default: false
+    description: Order sample columns by one selected feature's displayed expression. Set exactly one sample-ordering mode to true.
+  gene_to_order_columns:
+    classification: public
+    type: string
+    default: ""
+    description: Feature identifier used when order_by_gene_expression is true.
+  gene_expression_order:
+    classification: public
+    type: string
+    default: low_to_high
+    allowed: [low_to_high, high_to_low]
+  reorder_sample_dendrogram:
+    classification: advanced
+    type: boolean
+    default: false
+    description: Rotate a clustered sample dendrogram to the supplied sample-ID order. Requires cluster_samples true.
+  reorder_sample_dendrogram_order:
+    classification: advanced
+    type: string
+    default: ""
+    description: Comma-separated selected sample IDs, each exactly once, used only when reorder_sample_dendrogram is true.
   center_and_rescale:
     classification: public
     type: boolean

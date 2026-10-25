@@ -265,6 +265,31 @@ Expression_Heatmap_ComplexHeatmap <- function(
       "`order_by_gene_expression` may be TRUE at one time."
     )
   }
+  if (order_by_gene_expression &&
+      (is.null(gene_to_order_columns) ||
+       length(gene_to_order_columns) != 1L ||
+       !nzchar(trimws(gene_to_order_columns)))) {
+    stop(
+      "ERROR: `gene_to_order_columns` must name one plotted feature when ",
+      "`order_by_gene_expression` is TRUE."
+    )
+  }
+  if (!gene_expression_order %in% c("low_to_high", "high_to_low")) {
+    stop(
+      "ERROR: `gene_expression_order` must be `low_to_high` or `high_to_low`."
+    )
+  }
+  if (reorder_sample_dendrogram && !cluster_samples) {
+    stop(
+      "ERROR: `reorder_sample_dendrogram` requires `cluster_samples = TRUE`."
+    )
+  }
+  if (reorder_sample_dendrogram && length(reorder_sample_dendrogram_order) == 0L) {
+    stop(
+      "ERROR: `reorder_sample_dendrogram_order` is required when ",
+      "`reorder_sample_dendrogram` is TRUE."
+    )
+  }
 
   required_metadata_cols <- unique(c(
     sample_name_column,
@@ -338,7 +363,9 @@ Expression_Heatmap_ComplexHeatmap <- function(
     )
 
   df_mat <- df[, colnames(df) != "Gene"] |> as.data.frame()
-  rownames(df_mat) <- stringr::str_wrap(df$Gene, 30)
+  # Preserve exact identifiers for feature selection and exported matrices.
+  # Display-only wrapping is applied later through `row_labels`.
+  rownames(df_mat) <- df$Gene
 
   if (!include_all_genes) {
     genes_parsed <- strsplit(specific_genes_to_include, " ")[[1]]
@@ -413,6 +440,12 @@ Expression_Heatmap_ComplexHeatmap <- function(
 
   if (order_by_gene_expression) {
     gene_to_order_columns <- stringr::str_wrap(gsub(" ", "", gene_to_order_columns), 30)
+    if (!gene_to_order_columns %in% rownames(mat_plot)) {
+      stop(
+        "ERROR: `gene_to_order_columns` is not a plotted feature: ",
+        gene_to_order_columns
+      )
+    }
     order_idx <- if (gene_expression_order == "low_to_high") {
       order(mat_plot[gene_to_order_columns, ])
     } else {
@@ -605,6 +638,14 @@ Expression_Heatmap_ComplexHeatmap <- function(
   }
 
   if (reorder_sample_dendrogram && cluster_samples && !identical(column_cluster, FALSE)) {
+    if (length(reorder_sample_dendrogram_order) != ncol(mat_plot) ||
+        anyDuplicated(reorder_sample_dendrogram_order) ||
+        !setequal(reorder_sample_dendrogram_order, colnames(mat_plot))) {
+      stop(
+        "ERROR: `reorder_sample_dendrogram_order` must contain each selected ",
+        "sample ID exactly once."
+      )
+    }
     column_cluster <- stats::as.hclust(dendextend::rotate(
       stats::as.dendrogram(column_cluster),
       reorder_sample_dendrogram_order

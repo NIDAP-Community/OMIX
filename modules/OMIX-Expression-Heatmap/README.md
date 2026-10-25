@@ -60,12 +60,30 @@ also defaults to `auto` (8 points for up to 20 rows, 6 points for 21--50, and
 4 points otherwise); use `--gene_name_font_size=<positive number>` and
 `--row_label_max_length=<positive integer>` for an explicit layout.
 
+## Column ordering
+
+Choose exactly one primary sample-column ordering mode:
+
+- `--cluster_samples=true` (default) performs unsupervised hierarchical
+  clustering from the displayed matrix.
+- `--arrange_sample_columns=true --cluster_samples=false` groups columns by
+  `--group_columns`, retaining the input-level order within each group.
+- `--order_by_gene_expression=true --cluster_samples=false
+  --gene_to_order_columns=<feature>` orders samples by that plotted feature;
+  use `--gene_expression_order=low_to_high` or `high_to_low`.
+
+For a clustered heatmap, `--reorder_sample_dendrogram=true` with
+`--reorder_sample_dendrogram_order=<comma-separated sample IDs>` rotates the
+dendrogram to a specified leaf order. That list must contain every selected
+sample ID exactly once. With clustering disabled and no other ordering mode,
+`--samples_to_include` directly specifies the displayed column order.
+
 ## Outputs
 
 | File | Use |
 | --- | --- |
 | `expression_heatmap.png` | Annotated clustered heatmap. |
-| `expression_heatmap_matrix.csv` | Exact displayed matrix after duplicate-feature averaging, selection, and optional row standardization. |
+| `expression_heatmap_matrix.csv` | Exact displayed matrix after duplicate-feature averaging, selection, and optional row standardization; feature identifiers are preserved without plot-label wrapping. |
 | `expression_heatmap_run_summary.txt` | Inputs, selected samples, annotations, and plotted feature count. |
 
 ## Method notes
@@ -75,9 +93,9 @@ also defaults to `auto` (8 points for up to 20 rows, 6 points for 21--50, and
 - Row standardization is enabled by default, making each displayed feature
   easier to compare across samples. Disable it to show the original continuous
   scale.
-- The current canonical module is in development pending validation of its
-  pinned shared runtime. The interface and a small reproducible fixture are
-  included so that runtime validation is explicit rather than implicit.
+- The canonical module remains in development. Its interface, reproducible
+  fixtures, and exact published-runtime validation are recorded separately
+  from any future lifecycle-promotion decision.
 
 ## Interface and deployment
 

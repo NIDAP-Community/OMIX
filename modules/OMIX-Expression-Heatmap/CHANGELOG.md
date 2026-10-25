@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Exposed the template's existing portable sample-column ordering modes in the
+  CLI and schema: clustering, annotation-group arrangement, feature-expression
+  ordering, and optional clustered-dendrogram rotation. Added explicit mode
+  and ordering-vector validation.
+- Corrected long-feature handling so exported matrix identifiers remain exact;
+  word wrapping is now strictly a plot-label layout transformation.
 - Recorded that the published `r-visualization` v3 runtime supplies the
   required `ComplexHeatmap` 2.22.0 pin; the module remains in development
   pending its independent lifecycle evidence.
