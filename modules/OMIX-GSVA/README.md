@@ -27,9 +27,9 @@ Rscript modules/OMIX-GSVA/scripts/run_gsva.R \
   --normalized_data /path/to/normalized_expression.csv \
   --sample_metadata /path/to/sample_metadata.csv \
   --pathways_database /path/to/pathway_membership.tsv \
-  --gene_column Gene \
+  --gene_column auto \
   --sample_name_column Sample \
-  --collections_to_include 'H: hallmark gene sets' \
+  --collections_to_include auto \
   --species Human \
   --database_species Human \
   --output_dir /path/to/results/gsva
@@ -43,7 +43,9 @@ the metadata sample IDs with expression column names, in metadata row order.
 ### Normalized expression
 
 A delimited table with one unique gene-symbol column and numeric sample
-columns. The default gene column is `Gene`. Values must be normalized,
+columns. By default, `--gene_column auto` prefers `Gene` and then `GeneName`.
+Use an explicit existing column name to override that resolution exactly.
+Values must be normalized,
 continuous expression suitable for the chosen GSVA method—not raw counts.
 
 For an OMIX Limma Analysis downstream handoff, use the optional
@@ -76,6 +78,10 @@ The module does not bundle MSigDB or any other gene-set database. Supply a
 versioned data asset at runtime and retain its source, version, and license in
 the analysis provenance.
 
+By default, `--collections_to_include auto` selects `H: hallmark gene sets`
+for a Human pathway database and `MH: orthology-mapped hallmark gene sets` for
+a Mouse pathway database. Explicit collection names are never rewritten.
+
 Delimiters are detected independently for each input: `.csv` selects a comma,
 `.tsv`/`.tab` selects a tab, and other extensions are detected from an
 unambiguous header. Override detection with `--normalized_data_delim`,
@@ -94,8 +100,8 @@ unambiguous header. Override detection with `--normalized_data_delim`,
 ## Method notes
 
 - Defaults are method `gsva`, minimum gene-set size 15, maximum size 1200,
-  Human expression/database species, Hallmark collection, and gene-symbol
-  updating enabled.
+  Human expression/database species, an automatically selected
+  database-species Hallmark collection, and gene-symbol updating enabled.
 - `--update_genes true` uses `l2psupp` to update symbols before GSVA. Disable it
   only when the supplied identifiers and gene-set database have already been
   deliberately harmonized.

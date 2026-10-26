@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Added automatic OMIX handoff defaults: `gene_column = auto` prefers `Gene`
+  and then `GeneName`, while `collections_to_include = auto` selects the
+  Human or Mouse Hallmark collection for the selected pathway-database
+  species. Explicit existing feature columns and explicit collection names
+  remain unchanged. Validation errors now identify compatible feature-ID
+  columns and available collections for the selected species. This is a
+  scientific-default change; module version 1.0.0 preserves interface version
+  2 because existing explicit CLI and table contracts remain valid.
+
 - Documents and regression-tests the compatible OMIX Limma Analysis
   `Batch_Corrected_Expression.csv` plus `Sample_Metadata.csv` handoff. This
   preserves the existing GSVA input contract and does not change methods,
