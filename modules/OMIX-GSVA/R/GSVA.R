@@ -42,6 +42,68 @@ resolve_gsva_delim <- function(
   )
 }
 
+gsva_feature_id_columns <- c("Gene", "GeneName")
+
+resolve_gsva_gene_column <- function(normalized_data, gene_column = "auto") {
+  requested <- trimws(as.character(gene_column[[1L]]))
+  available_columns <- colnames(normalized_data)
+
+  if (!nzchar(requested) || identical(tolower(requested), "auto")) {
+    compatible_columns <- gsva_feature_id_columns[
+      gsva_feature_id_columns %in% available_columns
+    ]
+    if (length(compatible_columns) == 0L) {
+      stop(
+        "ERROR: Could not automatically select a feature-ID column. ",
+        "Compatible feature-ID columns: ",
+        paste(gsva_feature_id_columns, collapse = ", "), ". Available columns: ",
+        paste(available_columns, collapse = ", ")
+      )
+    }
+    return(compatible_columns[[1L]])
+  }
+
+  if (!requested %in% available_columns) {
+    stop(
+      "ERROR: Gene column '", requested, "' was not found in normalized_data. ",
+      "Compatible feature-ID columns: ",
+      paste(gsva_feature_id_columns, collapse = ", "), ". Available columns: ",
+      paste(available_columns, collapse = ", ")
+    )
+  }
+
+  requested
+}
+
+default_gsva_hallmark_collection <- function(collection_species) {
+  species_key <- tolower(trimws(as.character(collection_species[[1L]])))
+  if (identical(species_key, "mouse")) {
+    return("MH: orthology-mapped hallmark gene sets")
+  }
+  "H: hallmark gene sets"
+}
+
+resolve_gsva_collections <- function(
+  collections_to_include,
+  collection_species
+) {
+  requested <- trimws(as.character(collections_to_include))
+  requested <- requested[nzchar(requested)]
+  if (length(requested) == 0L) {
+    stop("ERROR: `collections_to_include` must name at least one collection or use 'auto'.")
+  }
+
+  is_auto <- tolower(requested) == "auto"
+  if (any(is_auto) && !all(is_auto)) {
+    stop("ERROR: 'auto' cannot be combined with explicit collection names.")
+  }
+  if (all(is_auto)) {
+    return(default_gsva_hallmark_collection(collection_species))
+  }
+
+  requested
+}
+
 #' Gene Set Variation Analysis (GSVA)
 #'
 #' @description
@@ -60,6 +122,7 @@ resolve_gsva_delim <- function(
 #' species. An optional pathways_database column may record the database name
 #' and release.
 #' @param gene_column Character. Gene name column in the normalized data.
+#' Use \code{"auto"} to prefer \code{Gene}, then \code{GeneName}.
 #' @param sample_name_column Character. Column containing sample name.
 #' @param samples_to_include Character vector.
 #' @param species
@@ -72,7 +135,8 @@ resolve_gsva_delim <- function(
 #' the Pathways Database dataset. Default: \code{Human}.
 #' @param collections_to_include
 #' Character. Collections from the pathways database to include in the
-#' analysis. Default: \code{c("H: hallmark gene sets")}.
+#' analysis. \code{"auto"} selects the Human or Mouse Hallmark collection
+#' for the selected database species. Explicit collection names are preserved.
 #' @param custom_pathways_database
 #' Logical. Set to TRUE for custom species in the Pathways Database. FALSE by
 #' default. Default: \code{FALSE}.
@@ -117,12 +181,12 @@ run_gsva <- function(
   normalized_data = NULL,
   sample_metadata_table = NULL,
   pathways_database = NULL,
-  gene_column,
+  gene_column = "auto",
   sample_name_column,
   samples_to_include,
   species = "Human",
   database_species = "Human",
-  collections_to_include = c("H: hallmark gene sets"),
+  collections_to_include = "auto",
   custom_pathways_database = FALSE,
   custom_species = "Mouse",
   method = "gsva",
@@ -210,6 +274,7 @@ run_gsva <- function(
     stop("ERROR: `pathways_database` is required.")
   }
 
+  gene_column <- resolve_gsva_gene_column(normalized_data, gene_column)
   required_norm_cols <- c(gene_column, samples_to_include)
   missing_norm_cols <- setdiff(required_norm_cols, colnames(normalized_data))
   if (length(missing_norm_cols) > 0) {
@@ -257,6 +322,10 @@ run_gsva <- function(
   } else {
     collection_species <- database_species
   }
+  collections_to_include <- resolve_gsva_collections(
+    collections_to_include,
+    collection_species
+  )
 
   available_species <- pathways_database %>%
     dplyr::distinct(species) %>%

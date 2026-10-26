@@ -16,7 +16,8 @@ inputs:
 parameters:
   gene_column:
     type: string
-    default: Gene
+    default: auto
+    description: Feature-ID column. Auto prefers Gene, then GeneName; an explicit existing column is preserved exactly.
   sample_name_column:
     type: string
     default: Sample
@@ -34,8 +35,8 @@ parameters:
     description: Species to select from the standard pathways database.
   collections_to_include:
     type: string
-    default: "H: hallmark gene sets"
-    description: Comma-separated collection names, matched exactly and kept together in one GSVA run.
+    default: auto
+    description: Comma-separated collection names, matched exactly and kept together in one GSVA run. Auto selects H: hallmark gene sets for a Human database and MH: orthology-mapped hallmark gene sets for a Mouse database.
   custom_pathways_database:
     type: boolean
     default: false

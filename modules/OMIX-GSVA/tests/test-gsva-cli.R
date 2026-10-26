@@ -60,19 +60,34 @@ run_cli <- function(
   sample_metadata_path,
   pathway_membership_path,
   results_dir,
-  capture_output = FALSE
+  capture_output = FALSE,
+  gene_column = NULL,
+  collections_to_include = NULL,
+  species = "Human",
+  database_species = "Human"
 ) {
   arguments <- c(
     "--vanilla", shQuote(cli_file),
     "--normalized_data", shQuote(normalized_path),
     "--sample_metadata", shQuote(sample_metadata_path),
     "--pathways_database", shQuote(pathway_membership_path),
-    "--gene_column", "Gene",
+    "--species", species,
+    "--database_species", database_species,
     "--minimum_geneset_size", "5",
     "--maximum_geneset_size", "100",
     "--update_genes", "false",
     "--output_dir", shQuote(results_dir)
   )
+  if (!is.null(gene_column)) {
+    arguments <- c(arguments, "--gene_column", shQuote(gene_column))
+  }
+  if (!is.null(collections_to_include)) {
+    arguments <- c(
+      arguments,
+      "--collections_to_include",
+      shQuote(collections_to_include)
+    )
+  }
   if (capture_output) {
     return(suppressWarnings(system2(
       file.path(R.home("bin"), "Rscript"),
@@ -109,8 +124,150 @@ stopifnot(any(grepl("OMIX module: OMIX-GSVA", summary_text, fixed = TRUE)))
 stopifnot(any(grepl("normalized data delimiter: ,", summary_text, fixed = TRUE)))
 stopifnot(any(grepl("sample metadata delimiter: ,", summary_text, fixed = TRUE)))
 stopifnot(any(grepl("pathways database delimiter: \\t (tab)", summary_text, fixed = TRUE)))
-stopifnot(any(grepl("OMIX module version: 0.3.0", summary_text, fixed = TRUE)))
+stopifnot(any(grepl("gene column: Gene", summary_text, fixed = TRUE)))
+stopifnot(any(grepl("collections: H: hallmark gene sets", summary_text, fixed = TRUE)))
+stopifnot(any(grepl("OMIX module version: 1.0.0", summary_text, fixed = TRUE)))
 stopifnot(!any(grepl("source template", summary_text, fixed = TRUE)))
+
+# Auto-detection accepts the two compatible feature-ID columns used by OMIX
+# handoffs. `Gene` remains preferred when present; a Limma-compatible
+# `GeneName` table succeeds without a manual --gene_column override.
+gene_name_expression <- expression
+names(gene_name_expression)[1L] <- "GeneName"
+gene_name_expression_path <- file.path(test_root, "normalized-genename.csv")
+utils::write.csv(
+  gene_name_expression,
+  gene_name_expression_path,
+  row.names = FALSE,
+  quote = FALSE
+)
+gene_name_output_dir <- file.path(test_root, "genename-auto-results")
+gene_name_status <- run_cli(
+  gene_name_expression_path,
+  metadata_path,
+  pathways_path,
+  gene_name_output_dir
+)
+stopifnot(identical(gene_name_status, 0L))
+gene_name_summary <- readLines(
+  file.path(gene_name_output_dir, "gsva_run_summary.txt"),
+  warn = FALSE
+)
+stopifnot(any(grepl("gene column: GeneName", gene_name_summary, fixed = TRUE)))
+
+# The automatic Hallmark collection follows the selected pathway-database
+# species. An explicit collection remains literal, even for a Mouse database.
+mouse_pathways <- rbind(
+  data.frame(
+    collection = "MH: orthology-mapped hallmark gene sets",
+    gene_set_name = "MOUSE_AUTO_SET_A",
+    gene_symbol = genes[1:20],
+    species = "Mouse"
+  ),
+  data.frame(
+    collection = "MH: orthology-mapped hallmark gene sets",
+    gene_set_name = "MOUSE_AUTO_SET_B",
+    gene_symbol = genes[21:40],
+    species = "Mouse"
+  ),
+  data.frame(
+    collection = "H: hallmark gene sets",
+    gene_set_name = "MOUSE_EXPLICIT_H_SET_A",
+    gene_symbol = genes[1:20],
+    species = "Mouse"
+  ),
+  data.frame(
+    collection = "H: hallmark gene sets",
+    gene_set_name = "MOUSE_EXPLICIT_H_SET_B",
+    gene_symbol = genes[21:40],
+    species = "Mouse"
+  )
+)
+mouse_pathways_path <- file.path(test_root, "mouse-pathways.tsv")
+utils::write.table(
+  mouse_pathways,
+  mouse_pathways_path,
+  sep = "\t",
+  row.names = FALSE,
+  quote = FALSE
+)
+mouse_output_dir <- file.path(test_root, "mouse-auto-results")
+mouse_status <- run_cli(
+  gene_name_expression_path,
+  metadata_path,
+  mouse_pathways_path,
+  mouse_output_dir,
+  species = "Mouse",
+  database_species = "Mouse"
+)
+stopifnot(identical(mouse_status, 0L))
+mouse_results <- utils::read.csv(
+  file.path(mouse_output_dir, "gsva_results.csv"),
+  check.names = FALSE
+)
+stopifnot(identical(mouse_results$Geneset, c("MOUSE_AUTO_SET_A", "MOUSE_AUTO_SET_B")))
+mouse_summary <- readLines(
+  file.path(mouse_output_dir, "gsva_run_summary.txt"),
+  warn = FALSE
+)
+stopifnot(any(grepl(
+  "collections: MH: orthology-mapped hallmark gene sets",
+  mouse_summary,
+  fixed = TRUE
+)))
+
+mouse_explicit_output_dir <- file.path(test_root, "mouse-explicit-results")
+mouse_explicit_status <- run_cli(
+  gene_name_expression_path,
+  metadata_path,
+  mouse_pathways_path,
+  mouse_explicit_output_dir,
+  collections_to_include = "H: hallmark gene sets",
+  species = "Mouse",
+  database_species = "Mouse"
+)
+stopifnot(identical(mouse_explicit_status, 0L))
+mouse_explicit_results <- utils::read.csv(
+  file.path(mouse_explicit_output_dir, "gsva_results.csv"),
+  check.names = FALSE
+)
+stopifnot(identical(
+  mouse_explicit_results$Geneset,
+  c("MOUSE_EXPLICIT_H_SET_A", "MOUSE_EXPLICIT_H_SET_B")
+))
+
+missing_gene_output <- run_cli(
+  expression_path,
+  metadata_path,
+  pathways_path,
+  file.path(test_root, "missing-gene-results"),
+  capture_output = TRUE,
+  gene_column = "MissingGene"
+)
+stopifnot(!is.null(attr(missing_gene_output, "status")))
+stopifnot(any(grepl(
+  "Compatible feature-ID columns: Gene, GeneName",
+  missing_gene_output,
+  fixed = TRUE
+)))
+
+missing_collection_output <- run_cli(
+  gene_name_expression_path,
+  metadata_path,
+  mouse_pathways_path,
+  file.path(test_root, "missing-collection-results"),
+  capture_output = TRUE,
+  collections_to_include = "Missing collection",
+  species = "Mouse",
+  database_species = "Mouse"
+)
+stopifnot(!is.null(attr(missing_collection_output, "status")))
+stopifnot(any(grepl("Available collections are:", missing_collection_output, fixed = TRUE)))
+stopifnot(any(grepl(
+  "MH: orthology-mapped hallmark gene sets",
+  missing_collection_output,
+  fixed = TRUE
+)))
 
 # OMIX Limma Analysis writes a batch-corrected downstream bundle with exactly
 # the same public table contract: Gene followed by sample columns, paired with

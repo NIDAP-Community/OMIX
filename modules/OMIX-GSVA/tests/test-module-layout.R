@@ -32,9 +32,10 @@ stopifnot(
 )
 
 gsva_defaults <- formals(run_gsva)
+stopifnot(identical(eval(gsva_defaults$gene_column), "auto"))
 stopifnot(identical(eval(gsva_defaults$species), "Human"))
 stopifnot(identical(eval(gsva_defaults$database_species), "Human"))
-stopifnot(identical(eval(gsva_defaults$collections_to_include), "H: hallmark gene sets"))
+stopifnot(identical(eval(gsva_defaults$collections_to_include), "auto"))
 stopifnot(identical(eval(gsva_defaults$custom_pathways_database), FALSE))
 stopifnot(identical(eval(gsva_defaults$custom_species), "Mouse"))
 stopifnot(identical(eval(gsva_defaults$method), "gsva"))
@@ -46,6 +47,32 @@ stopifnot(is.null(gsva_defaults$input_delim))
 stopifnot(is.null(gsva_defaults$normalized_data_delim))
 stopifnot(is.null(gsva_defaults$sample_metadata_delim))
 stopifnot(is.null(gsva_defaults$pathways_database_delim))
+
+feature_id_fixture <- data.frame(
+  Gene = "canonical_gene",
+  GeneName = "alternate_gene",
+  check.names = FALSE
+)
+stopifnot(identical(
+  resolve_gsva_gene_column(feature_id_fixture, "auto"),
+  "Gene"
+))
+stopifnot(identical(
+  resolve_gsva_gene_column(feature_id_fixture, "GeneName"),
+  "GeneName"
+))
+stopifnot(identical(
+  resolve_gsva_collections("auto", "Human"),
+  "H: hallmark gene sets"
+))
+stopifnot(identical(
+  resolve_gsva_collections("auto", "Mouse"),
+  "MH: orthology-mapped hallmark gene sets"
+))
+stopifnot(identical(
+  resolve_gsva_collections("H: hallmark gene sets", "Mouse"),
+  "H: hallmark gene sets"
+))
 
 function_text <- paste(readLines(function_file, warn = FALSE), collapse = "\n")
 stopifnot(!grepl("@import", function_text, fixed = TRUE))

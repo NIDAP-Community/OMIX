@@ -47,12 +47,12 @@ option_list <- list(
   make_option("--normalized_data", type = "character", default = "", help = "Normalized expression CSV, TSV, or TXT table"),
   make_option("--sample_metadata", type = "character", default = "", help = "Sample metadata CSV, TSV, or TXT table"),
   make_option("--pathways_database", type = "character", default = "", help = "Long gene-set membership CSV, TSV, or TXT table"),
-  make_option("--gene_column", type = "character", default = "Gene"),
+  make_option("--gene_column", type = "character", default = "auto", help = "Feature-ID column, or auto to prefer Gene then GeneName [default: %default]"),
   make_option("--sample_name_column", type = "character", default = "Sample"),
   make_option("--samples_to_include", type = "character", default = "", help = "Optional comma-separated sample IDs"),
   make_option("--species", type = "character", default = "Human"),
   make_option("--database_species", type = "character", default = "Human"),
-  make_option("--collections_to_include", type = "character", default = "H: hallmark gene sets", help = "Comma-separated exact collection names"),
+  make_option("--collections_to_include", type = "character", default = "auto", help = "Comma-separated exact collection names, or auto for the database-species Hallmark collection [default: %default]"),
   make_option("--custom_pathways_database", type = "character", default = "false", help = "true or false [default: %default]"),
   make_option("--custom_species", type = "character", default = "Mouse"),
   make_option("--method", type = "character", default = "gsva", help = "gsva, ssgsea, zscore, or plage [default: %default]"),
@@ -105,9 +105,7 @@ metadata_preview <- utils::read.delim(
   check.names = FALSE,
   stringsAsFactors = FALSE
 )
-if (!opt$gene_column %in% names(normalized_preview)) {
-  stop("Gene column '", opt$gene_column, "' was not found in --normalized_data.")
-}
+gene_column <- resolve_gsva_gene_column(normalized_preview, opt$gene_column)
 if (!opt$sample_name_column %in% names(metadata_preview)) {
   stop("Sample ID column '", opt$sample_name_column, "' was not found in --sample_metadata.")
 }
@@ -124,9 +122,14 @@ if (length(samples_to_include) == 0L) {
 }
 
 collections_to_include <- split_csv(opt$collections_to_include)
-if (length(collections_to_include) == 0L) {
-  stop("--collections_to_include must name at least one collection.")
-}
+collection_species <- if (as_logical(
+  opt$custom_pathways_database,
+  "custom_pathways_database"
+)) opt$custom_species else opt$database_species
+collections_to_include <- resolve_gsva_collections(
+  collections_to_include,
+  collection_species
+)
 if (opt$minimum_geneset_size < 1L) stop("--minimum_geneset_size must be at least 1.")
 if (opt$maximum_geneset_size < opt$minimum_geneset_size) {
   stop("--maximum_geneset_size must be greater than or equal to --minimum_geneset_size.")
@@ -143,7 +146,7 @@ results <- run_gsva(
   normalized_data_file = normalized_path,
   sample_metadata_file = metadata_path,
   pathways_database_file = pathways_path,
-  gene_column = opt$gene_column,
+  gene_column = gene_column,
   sample_name_column = opt$sample_name_column,
   samples_to_include = samples_to_include,
   species = opt$species,
@@ -175,6 +178,7 @@ summary_lines <- c(
   paste("sample metadata delimiter:", display_delim(sample_metadata_delim)),
   paste("pathways database delimiter:", display_delim(pathways_database_delim)),
   paste("samples:", paste(samples_to_include, collapse = ", ")),
+  paste("gene column:", gene_column),
   paste("collections:", paste(collections_to_include, collapse = ", ")),
   paste("expression species:", opt$species),
   paste("database species:", opt$database_species),
