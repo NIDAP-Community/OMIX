@@ -86,6 +86,7 @@ readiness.
 | [OMIX-L2P-Multi](modules/OMIX-L2P-Multi) | [OMIX-L2P-Multi](https://github.com/NIDAP-Community/OMIX-L2P-Multi) | Platform-neutral multi-comparison L2P over-representation pathway analysis. | Review |
 | [OMIX-Seurat-Pseudobulk](modules/OMIX-Seurat-Pseudobulk) | [OMIX-Seurat-Pseudobulk](https://github.com/NIDAP-Community/OMIX-Seurat-Pseudobulk) | Aggregate one selected, selected-set, or all post-filter Seurat cell types into separate raw donor-by-group pseudobulk counts, Harmony-corrected donor means, or SCTransform donor means, with metadata and compatible downstream-analysis manifests. | Review |
 | [OMIX-Expression-Heatmap](modules/OMIX-Expression-Heatmap) | — | Render annotated ComplexHeatmap expression heatmaps from normalized continuous feature-by-sample matrices. | Active |
+| [OMIX-PCA-3D](modules/OMIX-PCA-3D) | — | Render an interactive three-dimensional principal-component plot from an explicit feature-by-sample matrix and aligned sample metadata. | Review |
 
 ## Contribute or automate work
 
@@ -121,7 +122,7 @@ committed `renv.lock` below to create a user-local R project:
 | Runtime profile | Modules | Lockfile or status |
 | --- | --- | --- |
 | `r-statistics` | OMIX-DEG-Analysis, OMIX-Limma-Analysis | `starter-environments/r-statistics/renv.lock` |
-| `r-visualization` | OMIX-GSEA-Filters-Legacy, OMIX-Gene-Boxplots, OMIX-Volcano-Plot, OMIX-Expression-Heatmap | `starter-environments/r-visualization/renv.lock` |
+| `r-visualization` | OMIX-GSEA-Filters-Legacy, OMIX-Gene-Boxplots, OMIX-Volcano-Plot, OMIX-Expression-Heatmap, OMIX-PCA-3D | `starter-environments/r-visualization/renv.lock` |
 | `r-pathway` | OMIX-GSEA-Preranked-Legacy, OMIX-GSEA-Visualization-Legacy, OMIX-GSVA, OMIX-L2P-Single, OMIX-L2P-Multi | `starter-environments/r-pathway/renv.lock` |
 | `r-seurat-conversion` | OMIX-Seurat-Pseudobulk | `starter-environments/r-seurat-conversion/renv.lock` |
 

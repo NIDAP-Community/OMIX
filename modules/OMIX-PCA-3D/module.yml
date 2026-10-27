@@ -1,0 +1,16 @@
+name: omix-pca-3d
+display_name: OMIX PCA 3D
+version: 0.1.0
+interface_version: 1
+module_type: visualization
+status: review
+owner: OMIX Team
+description: Render an interactive three-dimensional principal-component plot from an explicit feature-by-sample matrix and aligned sample metadata.
+data_policy: No study data or generated results are committed. Callers supply explicit feature-matrix and sample-metadata paths.
+runtime_profile: r-visualization
+runtime_overlay:
+  bioconductor:
+    - package: edgeR
+      version: 4.4.2
+entrypoint: scripts/run_pca_3d.R
+deployment_adapters: []
