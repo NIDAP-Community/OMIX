@@ -1,0 +1,107 @@
+interface_version: 1
+entrypoint: scripts/run_pca_3d.R
+inputs:
+  feature_matrix:
+    classification: public
+    cli: --feature_matrix
+    type: path
+    required: true
+    formats: [csv, tsv, txt]
+    description: Feature-by-sample numeric matrix. Rows are features and columns are sample IDs; use raw non-negative counts only when use_cpm is true.
+  sample_metadata:
+    classification: public
+    cli: --sample_metadata
+    type: path
+    required: true
+    formats: [csv, tsv, txt]
+    description: One row per sample with sample-ID, display-label, and grouping columns aligned to feature-matrix columns.
+parameters:
+  feature_id_column:
+    classification: public
+    type: string
+    default: auto
+    description: Feature identifier column. auto accepts Gene, GeneName, or the first column.
+  sample_id_column:
+    classification: public
+    type: string
+    default: Sample
+    description: Sample-ID column in sample_metadata matching feature-matrix column names.
+  sample_label_column:
+    classification: public
+    type: string
+    default: Sample
+    description: Metadata column displayed in Plotly hover text.
+  group_column:
+    classification: public
+    type: string
+    default: Group
+    description: Metadata column that defines categorical point colors.
+  samples_to_include:
+    classification: public
+    type: string
+    default: ""
+    description: Optional comma-separated sample IDs. Blank selects matching metadata IDs in metadata-row order.
+  outlier_sample_ids:
+    classification: public
+    type: string
+    default: ""
+    description: Optional comma-separated selected sample IDs removed before PCA.
+  use_cpm:
+    classification: public
+    type: boolean
+    default: false
+    description: Apply edgeR CPM to non-negative raw counts before PCA. Leave false for normalized continuous matrices.
+  manual_label_renames:
+    classification: public
+    type: string
+    default: ""
+    description: Optional comma-separated old_label:new_label replacements applied to displayed hover labels only.
+  point_colors:
+    classification: public
+    type: string
+    default: indigo,carrot,lipstick,turquoise,lavender,jade,coral,azure,green,rum,orange,olive
+    description: Comma-separated named colors selected from indigo, carrot, lipstick, turquoise, lavender, jade, coral, azure, green, rum, orange, olive. Additional groups receive deterministic generated colors.
+  point_size:
+    classification: public
+    type: number
+    default: 8
+  plot_title:
+    classification: public
+    type: string
+    default: PCA 3D
+  self_contained_html:
+    classification: advanced
+    type: boolean
+    default: false
+    description: Write one self-contained HTML file when Pandoc is available. The default writes pca_3d.html with its required pca_3d_files asset directory.
+  output_dir:
+    classification: public
+    type: path
+    default: results
+internal_controls:
+  label_font_size:
+    classification: internal
+    fixed_value: 24
+    function_argument: label_font_size
+    description: Fixed template-compatible value; the released source revision did not expose it as a user parameter.
+outputs:
+  pca_3d_plot:
+    path: pca_3d.html
+    format: html
+    description: Interactive Plotly three-dimensional PCA scatter plot. Keep the companion pca_3d_files directory when self_contained_html is false.
+  pca_3d_assets:
+    path: pca_3d_files
+    format: directory
+    description: Companion JavaScript and style assets required by pca_3d.html when self_contained_html is false.
+  pca_components:
+    path: pca_3d_components.csv
+    format: csv
+    description: Principal-component eigenvalues and explained-variance statistics.
+  pca_coordinates:
+    path: pca_3d_coordinates.csv
+    format: csv
+    description: Sample PCA coordinates with the selected group and display label.
+  run_summary:
+    path: pca_3d_run_summary.txt
+    format: text
+    description: Explicit inputs, selected samples, controls, and OMIX module identity.
