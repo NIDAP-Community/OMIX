@@ -16,6 +16,7 @@ module locally, in a container, or on HPC.
 | Exporting a portable pathway catalog for L2P, GSEA, or GSVA | [Pathway data export contract](pathway-data-export-contract.md) |
 | Preparing a human-reviewed release | [Versioning and releases](versioning-and-releases.md) |
 | Defining or changing a canonical module readiness status | [Canonical module lifecycle](module-lifecycle.md) |
+| Adding or reviewing portable module PR test artifacts | [Canonical-module validation](canonical-module-validation.md) |
 | Building an automated release workflow | [Release automation contract](release-automation-contract.md) |
 | Coordinating several contributors or coding agents | [Agent team operating model](agent-team-operating-model.md) |
 

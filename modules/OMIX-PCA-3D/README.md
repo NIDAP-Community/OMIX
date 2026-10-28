@@ -37,6 +37,21 @@ The [runtime guide](../../docs/runtime-guide.md) explains how to create the
 module-specific effective `renv.lock` before a reproducible local, container,
 or HPC run.
 
+## Validation
+
+The committed small fixture has exact expected PCA coordinates and variance;
+it runs with the module preparation tests. The generic PR-validation contract
+and local container command are documented in
+[Canonical-module validation](../../docs/canonical-module-validation.md).
+
+For a stronger local known-result check, use
+`tests/test-pca-historical-parity.R` with explicit paths to a non-committed
+feature matrix, matching metadata, and historical Plotly RDS object. It checks
+sample/group identities, all three coordinates, and point sizes within an
+explicit tolerance. Do not commit private inputs or its derived outputs; record
+the input provenance, runtime digest, command, and numerical result in the
+session notes instead.
+
 ## Inputs
 
 | Input | Requirements |

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "module": "OMIX-Example",
+  "runtime_profile": "r-statistics",
+  "test_commands": [
+    "Rscript modules/OMIX-Example/tests/test-module-layout.R",
+    "Rscript modules/OMIX-Example/tests/test-example.R"
+  ],
+  "fixture_command": "Rscript modules/OMIX-Example/scripts/run_example.R --input=/workspace/modules/OMIX-Example/tests/fixtures/input.csv --output_dir=/artifacts",
+  "expected_artifacts": [
+    "result.csv",
+    "run_summary.txt"
+  ],
+  "known_result_evidence": [
+    "Record any local-only known-result command, input provenance, expected-result source, and comparison tolerance in the module changelog or linked issue. Never place study data in this manifest or GitHub Actions."
+  ]
+}

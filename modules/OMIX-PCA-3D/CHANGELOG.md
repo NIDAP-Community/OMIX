@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added a committed exact-result PCA regression for the public fixture and an
+  explicit-path local historical-Plotly parity check. These are validation
+  evidence only; PCA filtering, scaling, coordinates, and plot behavior are
+  unchanged.
 - Classified the canonical module as `review` after its direct CLI fixture,
   preprocessing checks, and repository checks passed in the published
   `r-visualization` v3 image. Independent review remains required before any
