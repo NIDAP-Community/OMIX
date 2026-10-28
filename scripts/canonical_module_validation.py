@@ -23,6 +23,7 @@ from typing import Any
 
 
 MANIFEST_NAME = "validation.json"
+MODULE_NAME_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]*")
 SHARED_VALIDATION_PATHS = {
     "scripts/canonical_module_validation.py",
     ".github/workflows/validate-canonical-module.yml",
@@ -43,7 +44,7 @@ def repo_root() -> Path:
 
 def module_directory(root: Path, module: str) -> Path:
     """Return a safe canonical-module directory for one public module name."""
-    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", module):
+    if not MODULE_NAME_PATTERN.fullmatch(module):
         abort(f"Invalid module name: {module}")
     directory = root / "modules" / module
     if not (directory / "module.yml").is_file():
@@ -238,12 +239,14 @@ def modules_for_changed_paths(root: Path, changed_paths: list[str]) -> list[str]
         for path in changed_paths
     )
     if shared_change:
-        return sorted(entry.name for entry in modules_root.iterdir() if entry.is_dir())
-    return sorted({
-        path.split("/")[1]
-        for path in changed_paths
-        if path.startswith("modules/") and len(path.split("/")) > 2
-    })
+        candidates = (entry.name for entry in modules_root.iterdir() if entry.is_dir())
+    else:
+        candidates = (
+            path.split("/")[1]
+            for path in changed_paths
+            if path.startswith("modules/") and len(path.split("/")) > 2
+        )
+    return sorted({module for module in candidates if MODULE_NAME_PATTERN.fullmatch(module)})
 
 
 def discover_command(arguments: argparse.Namespace) -> None:
@@ -262,8 +265,12 @@ def discover_command(arguments: argparse.Namespace) -> None:
         requested = modules_for_changed_paths(root, result.stdout.splitlines())
     included = []
     for module in sorted(requested):
+        if not MODULE_NAME_PATTERN.fullmatch(module):
+            if arguments.module and arguments.module != "all":
+                abort(f"Invalid module name: {module}")
+            continue
         directory = modules_root / module
-        if (directory / "tests" / MANIFEST_NAME).is_file():
+        if (directory / "module.yml").is_file() and (directory / "tests" / MANIFEST_NAME).is_file():
             included.append({"module": module})
         elif arguments.module and arguments.module != "all":
             abort(f"{module} has no opt-in validation manifest")

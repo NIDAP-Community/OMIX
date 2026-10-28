@@ -94,6 +94,16 @@ class CanonicalModuleValidationTests(unittest.TestCase):
         self.assertIn("OMIX-PCA-3D", selected)
         self.assertGreaterEqual(len(selected), 1)
 
+    def test_discovery_excludes_invalid_changed_module_names(self) -> None:
+        """Changed paths cannot emit shell syntax into the Actions matrix."""
+        selected = VALIDATION.modules_for_changed_paths(
+            ROOT,
+            ["modules/OMIX-PCA-3D$(touch-pwned)/README.md"],
+        )
+        self.assertEqual(selected, [])
+        with self.assertRaises(SystemExit):
+            VALIDATION.module_directory(ROOT, "OMIX-PCA-3D$(touch-pwned)")
+
 
 if __name__ == "__main__":
     unittest.main()

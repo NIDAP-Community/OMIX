@@ -31,12 +31,17 @@ jobs:
           fetch-depth: 0
       - id: modules
         shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REQUESTED_MODULE: ${{ inputs.module }}
+          PULL_REQUEST_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PULL_REQUEST_HEAD_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            matrix="$(python3 scripts/canonical_module_validation.py discover --module "${{ inputs.module }}")"
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            matrix="$(python3 scripts/canonical_module_validation.py discover --module "$REQUESTED_MODULE")"
           else
-            matrix="$(python3 scripts/canonical_module_validation.py discover --base "${{ github.event.pull_request.base.sha }}" --head "${{ github.sha }}")"
+            matrix="$(python3 scripts/canonical_module_validation.py discover --base "$PULL_REQUEST_BASE_SHA" --head "$PULL_REQUEST_HEAD_SHA")"
           fi
           echo "matrix=${matrix}" >> "$GITHUB_OUTPUT"
 
@@ -52,39 +57,48 @@ jobs:
       - name: Build validation plan
         id: plan
         shell: bash
+        env:
+          MODULE: ${{ matrix.module }}
         run: |
           set -euo pipefail
-          artifact_dir="$GITHUB_WORKSPACE/validation-artifacts/${{ matrix.module }}"
+          artifact_dir="$GITHUB_WORKSPACE/validation-artifacts/$MODULE"
           mkdir -p "$artifact_dir"
           python3 scripts/canonical_module_validation.py plan \
-            --module "${{ matrix.module }}" \
+            --module "$MODULE" \
             --output "$artifact_dir/validation-plan.json"
           python3 scripts/canonical_module_validation.py write-runner \
             --plan "$artifact_dir/validation-plan.json" \
             --output "$artifact_dir/run-validation.sh"
           echo "artifact_dir=$artifact_dir" >> "$GITHUB_OUTPUT"
-          echo "image=$(python3 scripts/canonical_module_validation.py plan --module "${{ matrix.module }}" --image-only)" >> "$GITHUB_OUTPUT"
+          echo "image=$(python3 scripts/canonical_module_validation.py plan --module "$MODULE" --image-only)" >> "$GITHUB_OUTPUT"
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Pull immutable runtime
-        run: docker pull "${{ steps.plan.outputs.image }}"
+        env:
+          IMAGE: ${{ steps.plan.outputs.image }}
+        run: docker pull "$IMAGE"
       - name: Run direct tests and fixture in the immutable runtime
+        env:
+          ARTIFACT_DIR: ${{ steps.plan.outputs.artifact_dir }}
+          IMAGE: ${{ steps.plan.outputs.image }}
         run: |
           docker run --rm \
             --volume "$GITHUB_WORKSPACE:/workspace:ro" \
-            --volume "${{ steps.plan.outputs.artifact_dir }}:/artifacts" \
+            --volume "$ARTIFACT_DIR:/artifacts" \
             --workdir /workspace \
-            "${{ steps.plan.outputs.image }}" \
+            "$IMAGE" \
             bash /artifacts/run-validation.sh
       - name: Record validation artifact checksums
+        env:
+          ARTIFACT_DIR: ${{ steps.plan.outputs.artifact_dir }}
         run: |
           python3 scripts/canonical_module_validation.py report \
-            --plan "${{ steps.plan.outputs.artifact_dir }}/validation-plan.json" \
-            --artifact-directory "${{ steps.plan.outputs.artifact_dir }}"
-          cat "${{ steps.plan.outputs.artifact_dir }}/validation-report.json" >> "$GITHUB_STEP_SUMMARY"
+            --plan "$ARTIFACT_DIR/validation-plan.json" \
+            --artifact-directory "$ARTIFACT_DIR"
+          cat "$ARTIFACT_DIR/validation-report.json" >> "$GITHUB_STEP_SUMMARY"
       - name: Upload review artifacts
         uses: actions/upload-artifact@v4
         with:
