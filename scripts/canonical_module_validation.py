@@ -14,6 +14,7 @@ import hashlib
 import json
 import os
 import re
+import shlex
 import stat
 import subprocess
 import sys
@@ -22,6 +23,12 @@ from typing import Any
 
 
 MANIFEST_NAME = "validation.json"
+SHARED_VALIDATION_PATHS = {
+    "scripts/canonical_module_validation.py",
+    ".github/workflows/validate-canonical-module.yml",
+    "tests/test_canonical_module_validation.py",
+}
+SHARED_VALIDATION_PREFIXES = ("templates/canonical-module-validation/",)
 
 
 def abort(message: str) -> None:
@@ -71,6 +78,27 @@ def relative_artifact(path: str) -> str:
     return candidate.as_posix()
 
 
+def fixture_identity(root: Path, path: str) -> dict[str, Any]:
+    """Identify one committed fixture file without allowing a path escape."""
+    relative = relative_artifact(path)
+    fixture = root / relative
+    if not fixture.is_file():
+        abort(f"Fixture inputs must name committed files: {fixture}")
+    return {"path": relative, "sha256": sha256(fixture), "bytes": fixture.stat().st_size}
+
+
+def checked_out_commit(root: Path) -> str:
+    """Record the repository commit that supplied the tested module and fixture."""
+    result = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=root,
+        text=True,
+        check=True,
+        capture_output=True,
+    )
+    return result.stdout.strip()
+
+
 def validation_plan(root: Path, module: str) -> dict[str, Any]:
     """Validate one module manifest and expand it into a runtime-bound plan."""
     directory = module_directory(root, module)
@@ -78,7 +106,10 @@ def validation_plan(root: Path, module: str) -> dict[str, Any]:
     if not manifest_path.is_file():
         abort(f"{module} has no opt-in validation manifest: {manifest_path}")
     manifest = read_json(manifest_path)
-    required = {"schema_version", "module", "runtime_profile", "test_commands", "fixture_command", "expected_artifacts"}
+    required = {
+        "schema_version", "module", "runtime_profile", "test_commands",
+        "fixture_command", "fixture_inputs", "expected_artifacts",
+    }
     missing = sorted(required - set(manifest))
     if missing:
         abort(f"{manifest_path} is missing required field(s): {', '.join(missing)}")
@@ -96,9 +127,14 @@ def validation_plan(root: Path, module: str) -> dict[str, Any]:
         abort(f"{manifest_path} test_commands must contain non-empty strings")
     if not isinstance(manifest["fixture_command"], str) or not manifest["fixture_command"].strip():
         abort(f"{manifest_path} fixture_command must be a non-empty string")
+    if not isinstance(manifest["fixture_inputs"], list) or not manifest["fixture_inputs"]:
+        abort(f"{manifest_path} fixture_inputs must be a non-empty list")
+    if not all(isinstance(path, str) and path.strip() for path in manifest["fixture_inputs"]):
+        abort(f"{manifest_path} fixture_inputs must contain non-empty relative file paths")
     if not isinstance(manifest["expected_artifacts"], list) or not manifest["expected_artifacts"]:
         abort(f"{manifest_path} expected_artifacts must be a non-empty list")
     artifacts = [relative_artifact(item) for item in manifest["expected_artifacts"]]
+    inputs = [fixture_identity(root, item) for item in manifest["fixture_inputs"]]
 
     release_manifest = read_json(root / "starter-environments" / "release-manifest.json")
     image = release_manifest.get("images", {}).get(profile, {})
@@ -110,10 +146,12 @@ def validation_plan(root: Path, module: str) -> dict[str, Any]:
         "schema_version": 1,
         "module": module,
         "module_directory": f"modules/{module}",
+        "omix_commit": checked_out_commit(root),
         "runtime_profile": profile,
         "runtime_immutable_reference": reference,
         "test_commands": manifest["test_commands"],
         "fixture_command": manifest["fixture_command"],
+        "fixture_inputs": inputs,
         "expected_artifacts": artifacts,
         "known_result_evidence": manifest.get("known_result_evidence", []),
     }
@@ -164,7 +202,7 @@ def runner_command(arguments: argparse.Namespace) -> None:
         "",
         "# Fail clearly if the module did not produce every declared review artifact.",
     ])
-    lines.extend(f"test -e /artifacts/{artifact}" for artifact in plan["expected_artifacts"])
+    lines.extend(f"test -e {shlex.quote('/artifacts/' + artifact)}" for artifact in plan["expected_artifacts"])
     runner.parent.mkdir(parents=True, exist_ok=True)
     runner.write_text("\n".join(lines) + "\n")
     runner.chmod(runner.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
@@ -192,6 +230,22 @@ def report_command(arguments: argparse.Namespace) -> None:
     write_json(artifact_dir / "validation-report.json", report)
 
 
+def modules_for_changed_paths(root: Path, changed_paths: list[str]) -> list[str]:
+    """Select all opt-ins for shared-runner changes, otherwise changed modules only."""
+    modules_root = root / "modules"
+    shared_change = any(
+        path in SHARED_VALIDATION_PATHS or path.startswith(SHARED_VALIDATION_PREFIXES)
+        for path in changed_paths
+    )
+    if shared_change:
+        return sorted(entry.name for entry in modules_root.iterdir() if entry.is_dir())
+    return sorted({
+        path.split("/")[1]
+        for path in changed_paths
+        if path.startswith("modules/") and len(path.split("/")) > 2
+    })
+
+
 def discover_command(arguments: argparse.Namespace) -> None:
     root = repo_root()
     modules_root = root / "modules"
@@ -205,7 +259,7 @@ def discover_command(arguments: argparse.Namespace) -> None:
             check=True,
             capture_output=True,
         )
-        requested = sorted({line.split("/")[1] for line in result.stdout.splitlines() if line.startswith("modules/") and len(line.split("/")) > 2})
+        requested = modules_for_changed_paths(root, result.stdout.splitlines())
     included = []
     for module in sorted(requested):
         directory = modules_root / module

@@ -29,12 +29,12 @@ script_file <- sub("^--file=", "", commandArgs(FALSE)[grepl("^--file=", commandA
 module_dir <- normalizePath(file.path(dirname(script_file), ".."))
 source(file.path(module_dir, "R", "OMIX_PCA_3D.R"))
 
-read_delimited <- function(path) {
+read_delimited <- function(path, col_classes = NA) {
   extension <- tolower(tools::file_ext(path))
   if (extension == "csv") {
-    utils::read.csv(path, check.names = FALSE, stringsAsFactors = FALSE)
+    utils::read.csv(path, check.names = FALSE, stringsAsFactors = FALSE, colClasses = col_classes)
   } else if (extension %in% c("tsv", "txt")) {
-    utils::read.delim(path, check.names = FALSE, stringsAsFactors = FALSE)
+    utils::read.delim(path, check.names = FALSE, stringsAsFactors = FALSE, colClasses = col_classes)
   } else {
     stop("Only CSV, TSV, or TXT input tables are supported: ", path, call. = FALSE)
   }
@@ -61,7 +61,9 @@ flatten_plotly <- function(figure) {
 }
 
 feature_matrix <- read_delimited(options$feature_matrix)
-sample_metadata <- read_delimited(options$sample_metadata)
+# Match the canonical CLI: IDs and display labels must retain leading zeroes
+# and other character formatting instead of being inferred as numbers.
+sample_metadata <- read_delimited(options$sample_metadata, col_classes = "character")
 historical_figure <- readRDS(options$historical_plot)
 samples_to_include <- split_csv(options$samples_to_include)
 if (!length(samples_to_include)) {

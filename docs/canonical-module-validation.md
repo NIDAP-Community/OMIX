@@ -27,6 +27,7 @@ as the starting point. The manifest must declare:
 | `module` / `runtime_profile` | Must exactly match the module directory and `module.yml`. |
 | `test_commands` | Direct contract and regression tests, run from the repository root. |
 | `fixture_command` | Portable CLI command using only committed public fixture data and writing to `/artifacts`. |
+| `fixture_inputs` | Committed public fixture files; their SHA-256 checksums and byte sizes are retained in the plan and report. |
 | `expected_artifacts` | Files and directories that the fixture must produce for review. |
 | `known_result_evidence` | Committed expected-result test(s), plus any explicit-path local historical comparison. |
 
@@ -78,7 +79,9 @@ validation manifest. For each one it:
 1. resolves the assigned immutable runtime digest;
 2. runs the declared direct tests and fixture command in that image;
 3. verifies every declared artifact exists;
-4. writes file digests and directory file counts to `validation-report.json`;
+4. records the checked-out OMIX commit, immutable runtime digest, fixture input
+   checksums, and output file digests/directory file counts in
+   `validation-report.json`;
 5. adds that report to the GitHub check summary and uploads the complete
    artifact bundle.
 

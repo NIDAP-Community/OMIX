@@ -7,6 +7,9 @@
     "Rscript modules/OMIX-Example/tests/test-example.R"
   ],
   "fixture_command": "Rscript modules/OMIX-Example/scripts/run_example.R --input=/workspace/modules/OMIX-Example/tests/fixtures/input.csv --output_dir=/artifacts",
+  "fixture_inputs": [
+    "modules/OMIX-Example/tests/fixtures/input.csv"
+  ],
   "expected_artifacts": [
     "result.csv",
     "run_summary.txt"

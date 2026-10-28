@@ -6,6 +6,7 @@ on:
       - modules/**
       - scripts/canonical_module_validation.py
       - templates/canonical-module-validation/**
+      - tests/test_canonical_module_validation.py
       - .github/workflows/validate-canonical-module.yml
   workflow_dispatch:
     inputs:
