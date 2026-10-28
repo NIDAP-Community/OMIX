@@ -27,7 +27,10 @@ read_table <- function(path, label) {
   if (!file.exists(path)) stop(label, " file does not exist: ", path, call. = FALSE)
   extension <- tolower(tools::file_ext(path))
   delimiter <- if (extension == "csv") "," else "\t"
-  utils::read.delim(path, sep = delimiter, check.names = FALSE, stringsAsFactors = FALSE)
+  utils::read.delim(
+    path, sep = delimiter, check.names = FALSE, stringsAsFactors = FALSE,
+    colClasses = if (identical(label, "sample_metadata")) "character" else NA
+  )
 }
 
 resolve_feature_id_column <- function(matrix_table, requested) {
