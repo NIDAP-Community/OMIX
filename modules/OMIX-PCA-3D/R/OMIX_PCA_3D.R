@@ -27,10 +27,10 @@ omix_pca_3d_random_colors <- function(k) {
   omix_pca_3d_require("colorspace")
   seed <- 10
   n <- 2e3
+  set.seed(seed)
   our_color_space <- colorspace::RGB(stats::runif(n), stats::runif(n), stats::runif(n))
   our_color_space <- methods::as(our_color_space, "LAB")
   current_color_space <- our_color_space@coords
-  set.seed(seed)
   centers <- stats::kmeans(current_color_space, k, iter.max = 20)$centers
   unname(colorspace::hex(colorspace::LAB(centers)))
 }
