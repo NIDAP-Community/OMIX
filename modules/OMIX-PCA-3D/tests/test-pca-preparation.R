@@ -37,6 +37,27 @@ stopifnot(nrow(prepared$components) == 3L)
 stopifnot(abs(sum(prepared$components$variance) - 100) < 1e-10)
 stopifnot(identical(prepared$axis_titles, sub(" variance", "", prepared$components$variance_label[1:3])))
 
+# These values are a committed oracle for the small public fixture.  They make
+# an accidental change to sample ordering, feature filtering, centering, or
+# scaling fail visibly instead of merely producing a syntactically valid plot.
+expected_coordinates <- matrix(
+  c(
+    -1.3952698054087807, 0.5646673878282418, 1.4173170960793374e-17,
+    -1.3561423899264731, -0.5700462513428353, 2.5115153420065801e-16,
+    2.7514121953352535, 0.0053788635145935, 3.9986626610466664e-17
+  ),
+  ncol = 3L,
+  byrow = TRUE,
+  dimnames = list(c("Sample_D", "Sample_C", "Sample_A"), c("PC1", "PC2", "PC3"))
+)
+stopifnot(isTRUE(all.equal(
+  as.matrix(prepared$coordinates[, c("PC1", "PC2", "PC3")]),
+  expected_coordinates,
+  tolerance = 1e-12
+)))
+expected_variance <- c(94.63474233567085, 5.365257664329145, 2.58504279609243e-31)
+stopifnot(isTRUE(all.equal(prepared$components$variance, expected_variance, tolerance = 1e-12)))
+
 if (requireNamespace("edgeR", quietly = TRUE)) {
   cpm_prepared <- omix_pca_3d_prepare(
     feature_matrix = feature_matrix,

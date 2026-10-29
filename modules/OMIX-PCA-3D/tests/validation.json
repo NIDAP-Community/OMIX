@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "module": "OMIX-PCA-3D",
+  "runtime_profile": "r-visualization",
+  "test_commands": [
+    "Rscript modules/OMIX-PCA-3D/tests/test-module-layout.R",
+    "Rscript modules/OMIX-PCA-3D/tests/test-pca-preparation.R",
+    "Rscript modules/OMIX-PCA-3D/tests/test-pca-cli.R",
+    "Rscript tests/test-monorepo-layout.R"
+  ],
+  "fixture_command": "Rscript modules/OMIX-PCA-3D/scripts/run_pca_3d.R --feature_matrix=/workspace/modules/OMIX-PCA-3D/tests/fixtures/feature_matrix.csv --sample_metadata=/workspace/modules/OMIX-PCA-3D/tests/fixtures/sample_metadata.csv --feature_id_column=Gene --sample_label_column=DisplayLabel --group_column=Group --samples_to_include=Sample_D,Sample_B,Sample_C,Sample_A --outlier_sample_ids=Sample_B --point_colors=indigo,orange --manual_label_renames='Treatment C:treated sample C' --plot_title='OMIX PCA 3D validation fixture' --output_dir=/artifacts",
+  "fixture_inputs": [
+    "modules/OMIX-PCA-3D/tests/fixtures/feature_matrix.csv",
+    "modules/OMIX-PCA-3D/tests/fixtures/sample_metadata.csv"
+  ],
+  "expected_artifacts": [
+    "pca_3d.html",
+    "pca_3d_files",
+    "pca_3d_coordinates.csv",
+    "pca_3d_components.csv",
+    "pca_3d_run_summary.txt"
+  ],
+  "known_result_evidence": [
+    "tests/test-pca-preparation.R compares the public synthetic fixture to exact expected PC coordinates and variance values.",
+    "tests/test-pca-historical-parity.R supports an explicit-path local comparison against a historical Plotly widget without committing its input data."
+  ]
+}
