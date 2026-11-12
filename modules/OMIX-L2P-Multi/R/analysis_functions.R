@@ -166,7 +166,7 @@ order_l2p_multi_results <- function(results, comparison_levels) {
 #' t-statistic rank" section. If FALSE, you need to set other parameters in
 #' "Genelist selected by fold-change and pval" section of the template to set
 #' thresholds on significance and fold change columns instead. The threshold
-#' method is the default: nominal p-value <= 0.05 and absolute fold change >=
+#' method is the default: nominal p-value < 0.05 and absolute fold change >=
 #' 1.2. Set this to TRUE to use the legacy t-statistic ranking method.
 #' Default: \code{FALSE}.
 #' @param top_pathways
@@ -1342,7 +1342,7 @@ l2p_multi <- function(
         genesmat %>%
           dplyr::arrange(.data[[significance_columns[i]]]) %>%
           dplyr::filter(
-            .data[[significance_columns[i]]] <= significance_threshold &
+            .data[[significance_columns[i]]] < significance_threshold &
               .data[[fold_change_columns[i]]] >= logFC_threshold
           ) %>%
           pull(.data[[gene_names_column]]) -> lists[[1]]
@@ -1351,7 +1351,7 @@ l2p_multi <- function(
         genesmat %>%
           dplyr::arrange(.data[[significance_columns[i]]]) %>%
           dplyr::filter(
-            .data[[significance_columns[i]]] <= significance_threshold &
+            .data[[significance_columns[i]]] < significance_threshold &
               .data[[fold_change_columns[i]]] <= logFC_threshold
           ) %>%
           pull(.data[[gene_names_column]]) -> lists[[2]]
@@ -1373,14 +1373,14 @@ l2p_multi <- function(
         genesmat %>%
           dplyr::arrange(.data[[significance_columns[i]]]) %>%
           dplyr::filter(
-            .data[[significance_columns[i]]] <= significance_threshold &
+            .data[[significance_columns[i]]] < significance_threshold &
               .data[[fold_change_columns[i]]] >= fold_change_threshold
           ) %>%
           pull(.data[[gene_names_column]]) -> lists[[1]]
         genesmat %>%
           dplyr::arrange(.data[[significance_columns[i]]]) %>%
           dplyr::filter(
-            .data[[significance_columns[i]]] <= significance_threshold &
+            .data[[significance_columns[i]]] < significance_threshold &
               .data[[fold_change_columns[i]]] <= -1 * fold_change_threshold
           ) %>%
           pull(.data[[gene_names_column]]) -> lists[[2]]

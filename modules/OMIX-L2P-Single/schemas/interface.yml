@@ -109,7 +109,7 @@ parameters:
     classification: public
     minimum: 0
     maximum: 1
-    description: Maximum nominal p-value, or the threshold applied to an explicitly selected adjusted-p-value column, for DEG-list selection.
+    description: Strict nominal p-value cutoff, or strict cutoff applied to an explicitly selected adjusted-p-value column, for DEG-list selection; values must be less than this threshold.
   fold_change_threshold:
     type: number
     default: 1.2
