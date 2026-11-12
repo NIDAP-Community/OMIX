@@ -254,7 +254,7 @@ resolve_l2p_comparison_columns <- function(
 #' t-statistic rank" section. If FALSE, you need to set other parameters in
 #' "Genelist selected by fold-change and pval" section of the template to set
 #' thresholds on significance and fold change columns instead. The threshold
-#' method is the default: nominal p-value <= 0.05 and absolute fold change >=
+#' method is the default: nominal p-value < 0.05 and absolute fold change >=
 #' 1.2. Set this to TRUE to use the legacy t-statistic ranking method.
 #' Default: \code{FALSE}.
 #' @param select_top_percentage_of_genes
@@ -1348,7 +1348,7 @@ l2p_single <- function(
       genes_to_include[[1]] <- deg_table %>%
         dplyr::arrange(.data[[significance_column]]) %>%
         dplyr::filter(
-          .data[[significance_column]] <= significance_threshold &
+          .data[[significance_column]] < significance_threshold &
             .data[[fold_change_column]] >= logFC_threshold
         ) %>%
         pull(gene_names_column)
@@ -1370,7 +1370,7 @@ l2p_single <- function(
       genes_to_include[[1]] <- deg_table %>%
         dplyr::arrange(.data[[significance_column]]) %>%
         dplyr::filter(
-          .data[[significance_column]] <= significance_threshold &
+          .data[[significance_column]] < significance_threshold &
             .data[[fold_change_column]] >= fold_change_threshold
         ) %>%
         pull(gene_names_column)
@@ -1401,7 +1401,7 @@ l2p_single <- function(
       genes_to_include[[2]] <- deg_table %>%
         dplyr::arrange(.data[[significance_column]]) %>%
         dplyr::filter(
-          .data[[significance_column]] <= significance_threshold &
+          .data[[significance_column]] < significance_threshold &
             .data[[fold_change_column]] <= logFC_threshold
         ) %>%
         pull(gene_names_column)
@@ -1423,7 +1423,7 @@ l2p_single <- function(
       genes_to_include[[2]] <- deg_table %>%
         dplyr::arrange(.data[[significance_column]]) %>%
         dplyr::filter(
-          .data[[significance_column]] <= significance_threshold &
+          .data[[significance_column]] < significance_threshold &
             .data[[fold_change_column]] <= -1 * fold_change_threshold
         ) %>%
         pull(gene_names_column)

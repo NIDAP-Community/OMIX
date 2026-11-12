@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **Breaking change:** threshold-mode gene selection now requires a nominal
+  p-value strictly below `--significance_threshold`; a value exactly equal to
+  the threshold is excluded. The public parameter contract is unchanged.
 - Reclassified canonical lifecycle status from active to review until a
   current local-versus-Code Ocean scientific-output comparison is recorded.
   This metadata correction does not change pathway-analysis behavior or
@@ -10,7 +13,7 @@
   `OmixPathwayInputs` 0.1.0. Wide families run in source order when comparison
   controls are blank; native unprefixed tables require one explicit label.
   Existing thresholds, explicit overrides, duplicate handling, and missing
-  value behavior are unchanged. Module version becomes 3.3.0; interface 1
+  value behavior are unchanged. Module version becomes 4.0.0; interface 1
   remains compatible.
 - Add advanced comparison-column suffix controls for ranking, significance,
   and fold change. They support deterministic automatic detection and ordered
@@ -36,7 +39,7 @@
 - **Breaking change:** the summary plot now displays up to 20 top pathways per
   regulated direction by default, rather than 12. Use
   `--number_of_pathways_to_plot` to reproduce another limit.
-- **Breaking change:** default gene-list selection now uses nominal p-value <=
+- **Breaking change:** default gene-list selection now uses nominal p-value <
   0.05 and absolute fold change >= 1.2 instead of the top/bottom t-statistic
   ranks. Pass `--select_by_rank true` to restore the prior rank-based default.
 - Prevent implicit graphics devices from writing `Rplots.pdf` during

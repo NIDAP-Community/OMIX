@@ -104,7 +104,7 @@ Rscript "$OMIX_ROOT/modules/OMIX-L2P-Multi/scripts/run_l2p_multi.R" \
   ordered comparison list. The module does not infer comparison order from
   column position.
 - By default, each comparison's up- and downregulated gene lists use nominal
-  p-value <= 0.05 and absolute fold change >= 1.2. This uses the inferred
+  p-value < 0.05 and absolute fold change >= 1.2. This uses the inferred
   `<comparison>_pval` and `<comparison>_FC` columns when they are available.
   To use the legacy top/bottom t-statistic ranking method instead, pass
   `--select_by_rank true`; its rank-specific options then apply.

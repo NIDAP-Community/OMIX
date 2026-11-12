@@ -136,7 +136,7 @@ same result, provenance, and plot files listed above.
   complete comparison prefix must be detectable from the canonical column
   suffixes.
 - By default, L2P selects up- and downregulated gene lists using nominal
-  p-value <= 0.05 and absolute fold change >= 1.2. This uses the inferred
+  p-value < 0.05 and absolute fold change >= 1.2. This uses the inferred
   `<comparison>_pval` and `<comparison>_FC` columns when they are available.
   To use the legacy top/bottom t-statistic ranking method instead, pass
   `--select_by_rank true`; its rank-specific options then apply.
