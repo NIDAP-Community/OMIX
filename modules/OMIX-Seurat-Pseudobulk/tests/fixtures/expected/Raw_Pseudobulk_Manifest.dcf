@@ -10,5 +10,5 @@ sample_id_column: Sample
 source_assay: RNA
 source_layer: counts
 upstream_batch_correction: none
-cell_type: Monocytes
+cell_category: Monocytes
 feature_count: 120
