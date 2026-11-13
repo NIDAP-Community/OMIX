@@ -342,8 +342,8 @@ for (index in seq_len(nrow(contract))) {
       "--seurat_rds", fixture_path,
       "--donor_column", "Donor",
       "--group_column", "Group",
-      "--cell_type_column", "CellType",
-      "--cell_type", "Monocytes",
+      "--cell_category_column", "CellCategory",
+      "--cell_category", "Monocytes",
       "--metadata_columns", "Batch",
       "--cell_filter_column", "Include",
       "--cell_filter_values", "yes",
@@ -375,7 +375,7 @@ for (index in seq_len(nrow(contract))) {
       identical(as.character(metadata$Donor), expected_donors),
       identical(as.character(metadata$Group), expected_groups),
       identical(as.character(metadata$Batch), expected_batches),
-      identical(as.character(metadata$CellType), rep("Monocytes", 8L)),
+      identical(as.character(metadata$CellCategory), rep("Monocytes", 8L)),
       identical(as.integer(metadata$Cells), rep(3L, 8L)),
       !anyNA(metadata)
     )

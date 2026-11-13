@@ -2,18 +2,28 @@
 
 ## Unreleased
 
-- Adds the optional collection-interface version 1 entry point for selected or
+- Breaking collection-interface-2 rename: the category collection command,
+  catalog fields, nested directory, and Pseudobulk collection-manifest
+  vocabulary now use `cell_category` and `CellCategory` consistently. The
+  interface requires Pseudobulk collection format version 2; the established
+  one-matrix Limma CLI remains unchanged.
+
+- Accepts Pseudobulk collections produced with `on_insufficient_cells = drop`.
+  The collection interface now ignores cell categories explicitly recorded as
+  omitted after sparse profile removal, while retaining strict validation for
+  every cell category passed to Limma and L2P Multi.
+
+- Adds the optional collection-interface entry point for selected or
   all OMIX Seurat Pseudobulk continuous-expression bundles. It fits an
-  independent donor-level M-F Limma model for every ordered cell type and
-  writes a deterministic L2P Multi input with stable cell-type-qualified
+  independent donor-level M-F Limma model for every ordered cell category and
+  writes a deterministic L2P Multi input with stable cell-category-qualified
   comparison names. Export rejects raw-count handoffs, insufficient M/F donor
   replication, missing or duplicate collection routing, different ordered
   tested-gene universes, and non-finite required statistics. It does not pool
-  cells, fit a cell-type interaction model, or union/intersect/fill features.
+  cells, fit a cell-category interaction model, or union/intersect/fill features.
 
-- Bumps the semantic module version to 1.2.0 for this backward-compatible
-  scientific feature. The established one-matrix CLI and interface version 3
-  remain valid, so `interface_version` is unchanged.
+- Bumps the semantic module version to 2.0.0 for the breaking collection
+  interface update. The established one-matrix CLI remains valid.
 
 - Adds optional declared technical-batch handling for continuous matrices.
   Batch columns are included in the Limma model, and the opt-in

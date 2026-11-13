@@ -1,7 +1,7 @@
 #' Write a DEG-ready donor-level table bundle from a Seurat RDS
 #'
 #' @description
-#' Uses the optional OmixSeurat bridge to select one cell type and create one
+#' Uses the optional OmixSeurat bridge to select one cell category and create one
 #' donor-by-group profile per biological replicate. `sum_counts` extracts raw
 #' counts and writes a count bundle for edgeR TMM plus limma-voom. The separate
 #' continuous-expression paths either extract a declared Harmony-corrected
@@ -15,8 +15,9 @@
 #' @param seurat_rds Path to a serialized Seurat object.
 #' @param donor_column Cell-metadata column identifying biological donors.
 #' @param group_column Cell-metadata column identifying the experimental group.
-#' @param cell_type_column Cell-metadata column identifying cell types.
-#' @param cell_type One exact cell-type value to aggregate.
+#' @param cell_category_column Cell-metadata column identifying the category to
+#'   aggregate, such as a cell category, cluster, region, or state label.
+#' @param cell_category One exact category value to aggregate.
 #' @param metadata_columns Optional cell-metadata columns to retain in output
 #'   sample metadata, such as Batch or Sex. Each value must be invariant and
 #'   non-missing within every donor-by-group profile.
@@ -38,7 +39,8 @@
 #'   compatible DEG and Limma handoffs.
 #' @param min_cells Minimum selected cells in each donor-by-group profile.
 #' @param on_insufficient_cells Whether profiles below min_cells cause an error
-#'   (default) or are intentionally dropped.
+#'   (default) or are intentionally dropped. In collection mode, `drop` also
+#'   omits a cell category that has fewer than two groups after profile filtering.
 #' @param output_dir Explicit directory for the pseudobulk table bundle.
 #'
 #' @return A list of output paths and the validated omix_standard_input.
@@ -46,8 +48,8 @@ omix_seurat_pseudobulk <- function(
   seurat_rds,
   donor_column,
   group_column,
-  cell_type_column,
-  cell_type,
+  cell_category_column,
+  cell_category,
   metadata_columns = NULL,
   cell_filter_column = NULL,
   cell_filter_values = NULL,
@@ -61,10 +63,10 @@ omix_seurat_pseudobulk <- function(
   feature_id_column = "GeneName",
   min_cells = 20L,
   on_insufficient_cells = c("error", "drop"),
-  output_dir = "results"
+  output_dir
 ) {
-  # Normalize the user-supplied paths first so every later error reports the
-  # same explicit file/directory the caller asked the module to use.
+  # Validate the explicit paths first so later errors identify the caller's
+  # declared input file and output directory.
   seurat_rds <- .omix_seurat_pseudobulk_path(seurat_rds, "seurat_rds", must_exist = TRUE)
   output_dir <- .omix_seurat_pseudobulk_path(output_dir, "output_dir", must_exist = FALSE)
   aggregation_method <- match.arg(aggregation_method)
@@ -96,12 +98,12 @@ omix_seurat_pseudobulk <- function(
     )
   }
   # Validate all identifiers before opening the RDS. This avoids ambiguous
-  # bridge errors when a required metadata column or cell-type label is blank.
+  # bridge errors when a required metadata column or category label is blank.
   required_values <- list(
     donor_column = donor_column,
     group_column = group_column,
-    cell_type_column = cell_type_column,
-    cell_type = cell_type,
+    cell_category_column = cell_category_column,
+    cell_category = cell_category,
     assay = assay,
     layer = layer,
     feature_id_column = feature_id_column
@@ -140,8 +142,8 @@ omix_seurat_pseudobulk <- function(
     path = seurat_rds,
     donor_column = donor_column,
     group_column = group_column,
-    cell_type_column = cell_type_column,
-    cell_type = cell_type,
+    cell_type_column = cell_category_column,
+    cell_type = cell_category,
     sample_metadata_columns = metadata_columns,
     cell_filter_column = cell_filter_column,
     cell_filter_values = cell_filter_values,
@@ -158,6 +160,7 @@ omix_seurat_pseudobulk <- function(
   } else {
     do.call(OmixSeurat::omix_read_seurat_expression_rds, input_arguments)
   }
+  input <- .omix_seurat_pseudobulk_category_input(input)
   # The bridge returns SCT/data means on the original log1p scale. Convert the
   # mean itself to log2 (rather than transforming cell values before averaging)
   # so direct limma reports interpretable log2 fold changes downstream.
@@ -237,7 +240,7 @@ omix_seurat_pseudobulk <- function(
   if (!all(c("GeneName", input$sample_columns) %in% names(matrix_data))) {
     stop("Donor-level matrix is missing GeneName or sample columns.", call. = FALSE)
   }
-  if (!all(c("Sample", "Group", "Donor", "CellType", "Cells") %in% names(metadata))) {
+  if (!all(c("Sample", "Group", "Donor", "CellCategory", "Cells") %in% names(metadata))) {
     stop("Pseudobulk metadata is missing required OMIX columns.", call. = FALSE)
   }
   if (!identical(as.character(metadata$Sample), as.character(input$sample_columns))) {
@@ -249,7 +252,12 @@ omix_seurat_pseudobulk <- function(
       call. = FALSE
     )
   }
-
+  if (file.exists(output_dir) && !dir.exists(output_dir)) {
+    stop("Pseudobulk output_dir must be a directory: ", output_dir, call. = FALSE)
+  }
+  if (dir.exists(output_dir) && length(list.files(output_dir, all.files = TRUE, no.. = TRUE)) > 0L) {
+    stop("Pseudobulk output_dir must be new or empty: ", output_dir, call. = FALSE)
+  }
   dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
   # These switches are the central handoff contract. The selected aggregation
@@ -329,7 +337,7 @@ omix_seurat_pseudobulk <- function(
     source_assay = provenance_value("assay"),
     source_layer = provenance_value("layer"),
     upstream_batch_correction = upstream_batch_correction,
-    cell_type = unique(as.character(metadata$CellType)),
+    cell_category = unique(as.character(metadata$CellCategory)),
     feature_count = as.character(nrow(matrix_data)),
     stringsAsFactors = FALSE
   )
@@ -352,7 +360,7 @@ omix_seurat_pseudobulk <- function(
     paste("Output manifest:", basename(manifest_path)),
     paste("Features:", nrow(matrix_data)),
     paste("Pseudobulk profiles:", length(input$sample_columns)),
-    paste("Cell type:", unique(as.character(metadata$CellType))),
+    paste("Cell category:", unique(as.character(metadata$CellCategory))),
     paste("Total selected cells:", sum(as.integer(metadata$Cells))),
     "Profiles per group:",
     paste(names(group_counts), as.integer(group_counts), sep = "=", collapse = "; "),
@@ -383,21 +391,21 @@ omix_seurat_pseudobulk <- function(
   )
 }
 
-#' Create a deterministic collection of cell-type-specific pseudobulk bundles
+#' Create a deterministic collection of cell-category-specific pseudobulk bundles
 #'
 #' @description
-#' Creates one ordinary OMIX pseudobulk bundle per selected cell type. Each
+#' Creates one ordinary OMIX pseudobulk bundle per selected cell category. Each
 #' bundle keeps donors (not cells) as the biological replicate and can be sent
 #' independently to the existing Limma command-line interface. The legacy
-#' one-cell-type function above remains unchanged; this collection function is
-#' the explicit opt-in path for selected or all post-filter cell-type labels.
+#' one-category function above remains unchanged; this collection function is
+#' the explicit opt-in path for selected or all post-filter category labels.
 #'
-#' @param cell_type_mode "one", "selected", or "all". Selected labels are
+#' @param cell_category_mode "one", "selected", or "all". Selected labels are
 #'   read in their table order; all labels are enumerated by the Seurat bridge
 #'   after the explicit cell filter.
-#' @param cell_type Exact label required for cell_type_mode = "one".
-#' @param cell_type_selection Optional one-column CSV, TSV, or TXT table named
-#'   CellType, required for cell_type_mode = "selected".
+#' @param cell_category Exact label required for cell_category_mode = "one".
+#' @param cell_category_selection Optional one-column CSV, TSV, or TXT table named
+#'   CellCategory, required for cell_category_mode = "selected".
 #' @inheritParams omix_seurat_pseudobulk
 #'
 #' @return Paths to a collection catalog, manifest, summary, and the nested
@@ -406,10 +414,10 @@ omix_seurat_pseudobulk_collection <- function(
   seurat_rds,
   donor_column,
   group_column,
-  cell_type_column,
-  cell_type_mode = c("one", "selected", "all"),
-  cell_type = NULL,
-  cell_type_selection = NULL,
+  cell_category_column,
+  cell_category_mode = c("one", "selected", "all"),
+  cell_category = NULL,
+  cell_category_selection = NULL,
   metadata_columns = NULL,
   cell_filter_column = NULL,
   cell_filter_values = NULL,
@@ -423,11 +431,11 @@ omix_seurat_pseudobulk_collection <- function(
   feature_id_column = "GeneName",
   min_cells = 20L,
   on_insufficient_cells = c("error", "drop"),
-  output_dir = "results"
+  output_dir
 ) {
   seurat_rds <- .omix_seurat_pseudobulk_path(seurat_rds, "seurat_rds", must_exist = TRUE)
   output_dir <- .omix_seurat_pseudobulk_path(output_dir, "output_dir", must_exist = FALSE)
-  cell_type_mode <- match.arg(cell_type_mode)
+  cell_category_mode <- match.arg(cell_category_mode)
   aggregation_method <- match.arg(aggregation_method)
   on_insufficient_cells <- match.arg(on_insufficient_cells)
   if (!requireNamespace("OmixSeurat", quietly = TRUE)) {
@@ -437,7 +445,10 @@ omix_seurat_pseudobulk_collection <- function(
       call. = FALSE
     )
   }
-  if (file.exists(output_dir) && length(list.files(output_dir, all.files = TRUE, no.. = TRUE)) > 0L) {
+  if (file.exists(output_dir) && !dir.exists(output_dir)) {
+    stop("Collection output_dir must be a directory: ", output_dir, call. = FALSE)
+  }
+  if (dir.exists(output_dir) && length(list.files(output_dir, all.files = TRUE, no.. = TRUE)) > 0L) {
     stop("Collection output_dir must be new or empty: ", output_dir, call. = FALSE)
   }
 
@@ -458,7 +469,7 @@ omix_seurat_pseudobulk_collection <- function(
   required_values <- list(
     donor_column = donor_column,
     group_column = group_column,
-    cell_type_column = cell_type_column,
+    cell_category_column = cell_category_column,
     assay = assay,
     layer = layer,
     feature_id_column = feature_id_column
@@ -483,49 +494,49 @@ omix_seurat_pseudobulk_collection <- function(
 
   available <- OmixSeurat::omix_list_seurat_cell_types_rds(
     path = seurat_rds,
-    cell_type_column = cell_type_column,
+    cell_type_column = cell_category_column,
     cell_filter_column = cell_filter_column,
     cell_filter_values = cell_filter_values
   )
-  selected_cell_types <- switch(
-    cell_type_mode,
+  selected_cell_categories <- switch(
+    cell_category_mode,
     one = {
-      if (!is.null(cell_type_selection)) stop("cell_type_selection is only valid for cell_type_mode = 'selected'.", call. = FALSE)
-      .omix_seurat_pseudobulk_scalar(cell_type, "cell_type")
-      cell_type
+      if (!is.null(cell_category_selection)) stop("cell_category_selection is only valid for cell_category_mode = 'selected'.", call. = FALSE)
+      .omix_seurat_pseudobulk_scalar(cell_category, "cell_category")
+      cell_category
     },
     selected = {
-      if (!is.null(cell_type)) stop("cell_type is only valid for cell_type_mode = 'one'.", call. = FALSE)
-      .omix_read_cell_type_selection(cell_type_selection)
+      if (!is.null(cell_category)) stop("cell_category is only valid for cell_category_mode = 'one'.", call. = FALSE)
+      .omix_read_cell_category_selection(cell_category_selection)
     },
     all = {
-      if (!is.null(cell_type) || !is.null(cell_type_selection)) {
-        stop("cell_type and cell_type_selection must be blank for cell_type_mode = 'all'.", call. = FALSE)
+      if (!is.null(cell_category) || !is.null(cell_category_selection)) {
+        stop("cell_category and cell_category_selection must be blank for cell_category_mode = 'all'.", call. = FALSE)
       }
       as.character(available$CellType)
     }
   )
-  unknown <- setdiff(selected_cell_types, as.character(available$CellType))
+  unknown <- setdiff(selected_cell_categories, as.character(available$CellType))
   if (length(unknown) > 0L) {
     stop(
-      "Requested cell type label(s) are absent after the cell filter: ",
+      "Requested cell category label(s) are absent after the cell filter: ",
       paste(unknown, collapse = ", "), ".",
       call. = FALSE
     )
   }
-  if (length(selected_cell_types) == 0L) {
-    stop("No cell types were selected for pseudobulk collection.", call. = FALSE)
+  if (length(selected_cell_categories) == 0L) {
+    stop("No cell categories were selected for pseudobulk collection.", call. = FALSE)
   }
-  cell_type_ids <- vapply(selected_cell_types, .omix_cell_type_stable_id, character(1))
-  if (anyDuplicated(cell_type_ids)) {
-    stop("Cell-type identifier collision detected; choose a smaller explicit selection and report the labels.", call. = FALSE)
+  cell_category_ids <- vapply(selected_cell_categories, .omix_cell_category_stable_id, character(1))
+  if (anyDuplicated(cell_category_ids)) {
+    stop("Cell-category identifier collision detected; choose a smaller explicit selection and report the labels.", call. = FALSE)
   }
 
   input_arguments <- list(
     path = seurat_rds,
     donor_column = donor_column,
     group_column = group_column,
-    cell_type_column = cell_type_column,
+    cell_type_column = cell_category_column,
     sample_metadata_columns = metadata_columns,
     cell_filter_column = cell_filter_column,
     cell_filter_values = cell_filter_values,
@@ -535,19 +546,20 @@ omix_seurat_pseudobulk_collection <- function(
     min_cells = 1L,
     on_insufficient_cells = "error"
   )
-  inputs <- vector("list", length(selected_cell_types))
-  profile_catalog <- vector("list", length(selected_cell_types))
-  group_failures <- character()
+  inputs <- vector("list", length(selected_cell_categories))
+  profile_catalog <- vector("list", length(selected_cell_categories))
+  retained_group_counts <- integer(length(selected_cell_categories))
   insufficient_details <- character()
   matrix_name <- if (identical(aggregation_method, "sum_counts")) "counts" else "expression"
-  for (index in seq_along(selected_cell_types)) {
-    label <- selected_cell_types[[index]]
+  for (index in seq_along(selected_cell_categories)) {
+    label <- selected_cell_categories[[index]]
     input_arguments$cell_type <- label
     input <- if (identical(aggregation_method, "sum_counts")) {
       do.call(OmixSeurat::omix_read_seurat_rds, input_arguments)
     } else {
       do.call(OmixSeurat::omix_read_seurat_expression_rds, input_arguments)
     }
+    input <- .omix_seurat_pseudobulk_category_input(input)
     if (identical(aggregation_method, "mean_sctransform_expression")) {
       input <- .omix_seurat_sctransform_log2_input(input)
     }
@@ -561,17 +573,11 @@ omix_seurat_pseudobulk_collection <- function(
         )
       )
     }
-    retained_groups <- unique(as.character(input$metadata$Group[eligible]))
-    if (length(retained_groups) < 2L) {
-      group_failures <- c(
-        group_failures,
-        paste0(label, " (eligible groups: ", paste(retained_groups, collapse = ", "), ")")
-      )
-    }
+    retained_group_counts[[index]] <- length(unique(as.character(input$metadata$Group[eligible])))
     profile_catalog[[index]] <- data.frame(
-      CellTypeID = cell_type_ids[[index]],
-      CellType = label,
-      SelectionMode = cell_type_mode,
+      CellCategoryID = cell_category_ids[[index]],
+      CellCategory = label,
+      SelectionMode = cell_category_mode,
       Donor = as.character(input$metadata$Donor),
       Group = as.character(input$metadata$Group),
       Cells = as.integer(input$metadata$Cells),
@@ -590,19 +596,40 @@ omix_seurat_pseudobulk_collection <- function(
       call. = FALSE
     )
   }
-  if (length(group_failures) > 0L) {
+  cell_category_eligible <- retained_group_counts >= 2L
+  group_failures <- vapply(
+    which(!cell_category_eligible),
+    function(index) {
+      eligible <- profile_catalog[[index]]$ProfileEligibility == "eligible"
+      retained_groups <- unique(as.character(profile_catalog[[index]]$Group[eligible]))
+      paste0(
+        selected_cell_categories[[index]],
+        " (eligible groups: ", paste(retained_groups, collapse = ", "), ")"
+      )
+    },
+    character(1)
+  )
+  if (identical(on_insufficient_cells, "error") && length(group_failures) > 0L) {
     stop(
       "Pseudobulk collection cannot write a downstream comparison because fewer than two groups remain for: ",
       paste(group_failures, collapse = "; "), ".",
       call. = FALSE
     )
   }
+  if (!any(cell_category_eligible)) {
+    stop(
+      "Pseudobulk collection cannot write a downstream comparison because fewer than two groups remain for every selected cell category: ",
+      paste(group_failures, collapse = "; "), ".",
+      call. = FALSE
+    )
+  }
 
   dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
-  bundle_root <- file.path(output_dir, "cell_types")
+  bundle_root <- file.path(output_dir, "cell_categories")
   dir.create(bundle_root, recursive = TRUE, showWarnings = FALSE)
-  bundles <- vector("list", length(selected_cell_types))
-  catalog_rows <- vector("list", length(selected_cell_types))
+  bundles <- vector("list", sum(cell_category_eligible))
+  names(bundles) <- cell_category_ids[cell_category_eligible]
+  catalog_rows <- vector("list", length(selected_cell_categories))
   matrix_filename <- switch(
     aggregation_method,
     sum_counts = "Pseudobulk_Counts.csv",
@@ -612,22 +639,32 @@ omix_seurat_pseudobulk_collection <- function(
   for (index in seq_along(inputs)) {
     input <- inputs[[index]]
     eligible <- profile_catalog[[index]]$ProfileEligibility == "eligible"
-    sample_columns <- as.character(input$sample_columns[eligible])
-    input[[matrix_name]] <- input[[matrix_name]][, c("GeneName", sample_columns), drop = FALSE]
-    input$metadata <- input$metadata[eligible, , drop = FALSE]
-    input$sample_columns <- sample_columns
-    bundle_dir <- file.path(bundle_root, cell_type_ids[[index]])
-    bundles[[index]] <- .omix_write_seurat_pseudobulk_bundle(
-      input = input,
-      output_dir = bundle_dir,
-      seurat_rds = seurat_rds,
-      aggregation_method = aggregation_method
-    )
+    bundle_path <- NA_character_
+    metadata_path <- NA_character_
+    manifest_path <- NA_character_
+    if (cell_category_eligible[[index]]) {
+      sample_columns <- as.character(input$sample_columns[eligible])
+      input[[matrix_name]] <- input[[matrix_name]][, c("GeneName", sample_columns), drop = FALSE]
+      input$metadata <- input$metadata[eligible, , drop = FALSE]
+      input$sample_columns <- sample_columns
+      bundle_dir <- file.path(bundle_root, cell_category_ids[[index]])
+      bundle <- .omix_write_seurat_pseudobulk_bundle(
+        input = input,
+        output_dir = bundle_dir,
+        seurat_rds = seurat_rds,
+        aggregation_method = aggregation_method
+      )
+      bundles[[cell_category_ids[[index]]]] <- bundle
+      bundle_path <- file.path("cell_categories", cell_category_ids[[index]], matrix_filename)
+      metadata_path <- file.path("cell_categories", cell_category_ids[[index]], "Pseudobulk_Sample_Metadata.csv")
+      manifest_path <- file.path("cell_categories", cell_category_ids[[index]], "Pseudobulk_Manifest.dcf")
+    }
     catalog_rows[[index]] <- transform(
       profile_catalog[[index]],
-      MatrixPath = file.path("cell_types", cell_type_ids[[index]], matrix_filename),
-      MetadataPath = file.path("cell_types", cell_type_ids[[index]], "Pseudobulk_Sample_Metadata.csv"),
-      BundleManifestPath = file.path("cell_types", cell_type_ids[[index]], "Pseudobulk_Manifest.dcf"),
+      CellCategoryEligibility = if (cell_category_eligible[[index]]) "included" else "dropped_fewer_than_two_groups",
+      MatrixPath = bundle_path,
+      MetadataPath = metadata_path,
+      BundleManifestPath = manifest_path,
       AggregationMethod = aggregation_method,
       SourceAssay = assay,
       SourceLayer = layer,
@@ -635,14 +672,16 @@ omix_seurat_pseudobulk_collection <- function(
     )
   }
   catalog <- do.call(rbind, catalog_rows)
-  catalog_path <- file.path(output_dir, "Cell_Type_Profile_Catalog.csv")
+  catalog_path <- file.path(output_dir, "Cell_Category_Profile_Catalog.csv")
   utils::write.csv(catalog, catalog_path, row.names = FALSE, quote = TRUE)
   collection_manifest_path <- file.path(output_dir, "Pseudobulk_Collection_Manifest.dcf")
   collection_manifest <- data.frame(
-    format_version = "1",
-    collection_kind = "cell_type_pseudobulk",
-    cell_type_selection_mode = cell_type_mode,
-    selected_cell_type_count = as.character(length(selected_cell_types)),
+    format_version = "2",
+    collection_kind = "cell_category_pseudobulk",
+    cell_category_selection_mode = cell_category_mode,
+    selected_cell_category_count = as.character(length(selected_cell_categories)),
+    written_cell_category_count = as.character(sum(cell_category_eligible)),
+    dropped_cell_category_count = as.character(sum(!cell_category_eligible)),
     aggregation_method = aggregation_method,
     source_assay = assay,
     source_layer = layer,
@@ -655,10 +694,14 @@ omix_seurat_pseudobulk_collection <- function(
   base::write.dcf(collection_manifest, file = collection_manifest_path)
   summary_path <- file.path(output_dir, "Pseudobulk_Collection_Run_Summary.txt")
   writeLines(c(
-    "OMIX Seurat cell-type pseudobulk collection run summary",
+    "OMIX Seurat cell-category pseudobulk collection run summary",
     paste("Seurat RDS:", seurat_rds),
-    paste("Selection mode:", cell_type_mode),
-    paste("Selected cell types:", paste(selected_cell_types, collapse = "; ")),
+    paste("Selection mode:", cell_category_mode),
+    paste("Requested cell categories:", paste(selected_cell_categories, collapse = "; ")),
+    paste("Written cell categories:", paste(selected_cell_categories[cell_category_eligible], collapse = "; ")),
+    if (any(!cell_category_eligible)) {
+      paste("Dropped cell categories (fewer than two eligible groups):", paste(group_failures, collapse = "; "))
+    },
     paste("Aggregation method:", aggregation_method),
     paste("Assay/layer:", paste0(assay, "/", layer)),
     paste("Minimum cells per donor-by-group profile:", min_cells),
@@ -671,44 +714,46 @@ omix_seurat_pseudobulk_collection <- function(
     collection_manifest_path = collection_manifest_path,
     run_summary_path = summary_path,
     bundles = bundles,
-    selected_cell_types = selected_cell_types,
-    cell_type_ids = cell_type_ids
+    selected_cell_categories = selected_cell_categories,
+    written_cell_categories = selected_cell_categories[cell_category_eligible],
+    dropped_cell_categories = selected_cell_categories[!cell_category_eligible],
+    cell_category_ids = cell_category_ids
   )
 }
 
-.omix_read_cell_type_selection <- function(path) {
-  path <- .omix_seurat_pseudobulk_path(path, "cell_type_selection", must_exist = TRUE)
+.omix_read_cell_category_selection <- function(path) {
+  path <- .omix_seurat_pseudobulk_path(path, "cell_category_selection", must_exist = TRUE)
   extension <- tolower(tools::file_ext(path))
   selection <- if (identical(extension, "csv")) {
     utils::read.csv(path, check.names = FALSE, stringsAsFactors = FALSE)
   } else if (extension %in% c("tsv", "txt")) {
     utils::read.delim(path, check.names = FALSE, stringsAsFactors = FALSE)
   } else {
-    stop("cell_type_selection must be a CSV, TSV, or TXT table: ", path, call. = FALSE)
+    stop("cell_category_selection must be a CSV, TSV, or TXT table: ", path, call. = FALSE)
   }
-  if (!identical(names(selection), "CellType")) {
-    stop("cell_type_selection must contain exactly one column named 'CellType'.", call. = FALSE)
+  if (!identical(names(selection), "CellCategory")) {
+    stop("cell_category_selection must contain exactly one column named 'CellCategory'.", call. = FALSE)
   }
-  labels <- as.character(selection$CellType)
+  labels <- as.character(selection$CellCategory)
   if (length(labels) == 0L || anyNA(labels) || any(!nzchar(labels))) {
-    stop("cell_type_selection must contain one or more non-empty CellType labels.", call. = FALSE)
+    stop("cell_category_selection must contain one or more non-empty CellCategory labels.", call. = FALSE)
   }
   if (anyDuplicated(labels)) {
-    stop("cell_type_selection contains duplicate CellType labels: ", paste(unique(labels[duplicated(labels)]), collapse = ", "), call. = FALSE)
+    stop("cell_category_selection contains duplicate CellCategory labels: ", paste(unique(labels[duplicated(labels)]), collapse = ", "), call. = FALSE)
   }
   labels
 }
 
-.omix_cell_type_stable_id <- function(label) {
-  .omix_seurat_pseudobulk_scalar(label, "cell_type")
+.omix_cell_category_stable_id <- function(label) {
+  .omix_seurat_pseudobulk_scalar(label, "cell_category")
   slug <- tolower(gsub("[^A-Za-z0-9]+", "-", enc2utf8(label)))
   slug <- gsub("(^-+|-+$)", "", slug)
   if (!nzchar(slug)) slug <- "label"
   slug <- substr(slug, 1L, 40L)
-  hash_path <- tempfile("omix-cell-type-id-")
+  hash_path <- tempfile("omix-cell-category-id-")
   on.exit(unlink(hash_path), add = TRUE)
   writeBin(charToRaw(enc2utf8(label)), hash_path)
-  paste0("ct-", slug, "-", unname(tools::md5sum(hash_path)))
+  paste0("cc-", slug, "-", unname(tools::md5sum(hash_path)))
 }
 
 .omix_seurat_pseudobulk_path <- function(value, name, must_exist) {
@@ -726,6 +771,19 @@ omix_seurat_pseudobulk_collection <- function(
   invisible(value)
 }
 
+.omix_seurat_pseudobulk_category_input <- function(input) {
+  if (!is.list(input) || is.null(input$metadata)) {
+    stop("The Seurat bridge did not return pseudobulk metadata.", call. = FALSE)
+  }
+  metadata <- as.data.frame(input$metadata, check.names = FALSE, stringsAsFactors = FALSE)
+  if (!"CellType" %in% names(metadata)) {
+    stop("The Seurat bridge metadata is missing CellType.", call. = FALSE)
+  }
+  names(metadata)[names(metadata) == "CellType"] <- "CellCategory"
+  input$metadata <- metadata
+  input
+}
+
 .omix_seurat_pseudobulk_values <- function(value, name) {
   values <- unique(as.character(value))
   if (length(values) == 0L || anyNA(values) || any(!nzchar(values))) {
@@ -739,7 +797,7 @@ omix_seurat_pseudobulk_collection <- function(
     return(NULL)
   }
   values <- .omix_seurat_pseudobulk_values(value, name)
-  reserved <- c("Sample", "Donor", "Group", "CellType", "Cells")
+  reserved <- c("Sample", "Donor", "Group", "CellCategory", "Cells")
   if (any(values %in% reserved)) {
     stop(
       name, " must not repeat standard pseudobulk column(s): ",

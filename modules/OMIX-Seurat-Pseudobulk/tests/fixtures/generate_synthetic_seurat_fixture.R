@@ -40,7 +40,7 @@ profile_grid <- expand.grid(
 )
 profile_grid <- profile_grid[order(match(profile_grid$Donor, donors), match(profile_grid$Group, groups)), ]
 metadata <- profile_grid[rep(seq_len(nrow(profile_grid)), each = 3L), , drop = FALSE]
-metadata$CellType <- "Monocytes"
+metadata$CellCategory <- "Monocytes"
 metadata$Batch <- ifelse(metadata$Donor %in% c("D1", "D2"), "Run1", "Run2")
 metadata$Include <- "yes"
 rownames(metadata) <- paste0("Cell", sprintf("%02d", seq_len(nrow(metadata))))

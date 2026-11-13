@@ -70,7 +70,7 @@ if (length(missing_packages) > 0L) {
   metadata <- data.frame(
     donor = rep(c("D1", "D2", "D3"), each = 4L),
     condition = rep(rep(c("A", "B"), each = 2L), 3L),
-    cell_type = "Mono",
+    cell_category = "Mono",
     Batch = rep(c("Run1", "Run2", "Run3"), each = 4L),
     row.names = paste0("Cell", seq_len(12L)),
     stringsAsFactors = FALSE
@@ -95,21 +95,21 @@ if (length(missing_packages) > 0L) {
     seurat_rds = rds_path,
     donor_column = "donor",
     group_column = "condition",
-    cell_type_column = "cell_type",
-    cell_type = "Mono",
+    cell_category_column = "cell_category",
+    cell_category = "Mono",
     metadata_columns = "Batch",
     min_cells = 2L,
     output_dir = output_dir
   )
   raw_sample_ids <- assert_bundle_alignment(pseudobulk)
   # A collection retains the same donor-level pseudobulk semantics for each
-  # exact cell type. It does not pool cells across labels.
-  object$cell_type[seq(1L, ncol(object), by = 2L)] <- "B cells"
-  object$cell_type[seq(2L, ncol(object), by = 2L)] <- "Mono"
+  # exact cell category. It does not pool cells across labels.
+  object$cell_category[seq(1L, ncol(object), by = 2L)] <- "B cells"
+  object$cell_category[seq(2L, ncol(object), by = 2L)] <- "Mono"
   saveRDS(object, rds_path)
   selection_path <- tempfile(fileext = ".csv")
   utils::write.csv(
-    data.frame(CellType = c("Mono", "B cells"), check.names = FALSE),
+    data.frame(CellCategory = c("Mono", "B cells"), check.names = FALSE),
     selection_path,
     row.names = FALSE
   )
@@ -117,40 +117,40 @@ if (length(missing_packages) > 0L) {
     seurat_rds = rds_path,
     donor_column = "donor",
     group_column = "condition",
-    cell_type_column = "cell_type",
-    cell_type_mode = "selected",
-    cell_type_selection = selection_path,
+    cell_category_column = "cell_category",
+    cell_category_mode = "selected",
+    cell_category_selection = selection_path,
     min_cells = 1L,
     output_dir = tempfile("omix-seurat-collection-")
   )
   collection_catalog <- utils::read.csv(collection$catalog_path, check.names = FALSE)
   stopifnot(
-    identical(collection$selected_cell_types, c("Mono", "B cells")),
-    all(c("CellTypeID", "ProfileEligibility", "MatrixPath", "SourceSeuratRds") %in% names(collection_catalog)),
+    identical(collection$selected_cell_categories, c("Mono", "B cells")),
+    all(c("CellCategoryID", "ProfileEligibility", "MatrixPath", "SourceSeuratRds") %in% names(collection_catalog)),
     all(collection_catalog$ProfileEligibility == "eligible"),
-    length(unique(collection_catalog$CellTypeID)) == 2L,
+    length(unique(collection_catalog$CellCategoryID)) == 2L,
     all(file.exists(file.path(dirname(collection$catalog_path), collection_catalog$MatrixPath)))
   )
   all_collection <- omix_seurat_pseudobulk_collection(
     seurat_rds = rds_path,
     donor_column = "donor",
     group_column = "condition",
-    cell_type_column = "cell_type",
-    cell_type_mode = "all",
+    cell_category_column = "cell_category",
+    cell_category_mode = "all",
     min_cells = 1L,
     output_dir = tempfile("omix-seurat-all-collection-")
   )
-  stopifnot(identical(all_collection$selected_cell_types, c("B cells", "Mono")))
+  stopifnot(identical(all_collection$selected_cell_categories, c("B cells", "Mono")))
   unknown_selection_path <- tempfile(fileext = ".csv")
-  utils::write.csv(data.frame(CellType = "Absent"), unknown_selection_path, row.names = FALSE)
+  utils::write.csv(data.frame(CellCategory = "Absent"), unknown_selection_path, row.names = FALSE)
   unknown_selection <- tryCatch(
     omix_seurat_pseudobulk_collection(
       seurat_rds = rds_path,
       donor_column = "donor",
       group_column = "condition",
-      cell_type_column = "cell_type",
-      cell_type_mode = "selected",
-      cell_type_selection = unknown_selection_path,
+      cell_category_column = "cell_category",
+      cell_category_mode = "selected",
+      cell_category_selection = unknown_selection_path,
       min_cells = 1L,
       output_dir = tempfile("omix-seurat-unknown-collection-")
     ),
@@ -163,8 +163,8 @@ if (length(missing_packages) > 0L) {
       seurat_rds = rds_path,
       donor_column = "donor",
       group_column = "condition",
-      cell_type_column = "cell_type",
-      cell_type_mode = "all",
+      cell_category_column = "cell_category",
+      cell_category_mode = "all",
       min_cells = 2L,
       on_insufficient_cells = "error",
       output_dir = tempfile("omix-seurat-insufficient-collection-")
@@ -173,24 +173,76 @@ if (length(missing_packages) > 0L) {
   )
   stopifnot(inherits(insufficient_collection, "error"))
   stopifnot(grepl("fewer than 2 cells", conditionMessage(insufficient_collection), fixed = TRUE))
-  dropped_collection <- tryCatch(
+  all_invalid_collection <- tryCatch(
     omix_seurat_pseudobulk_collection(
       seurat_rds = rds_path,
       donor_column = "donor",
       group_column = "condition",
-      cell_type_column = "cell_type",
-      cell_type_mode = "all",
+      cell_category_column = "cell_category",
+      cell_category_mode = "all",
       min_cells = 2L,
       on_insufficient_cells = "drop",
       output_dir = tempfile("omix-seurat-dropped-collection-")
     ),
     error = identity
   )
-  stopifnot(inherits(dropped_collection, "error"))
-  stopifnot(grepl("fewer than two groups remain", conditionMessage(dropped_collection), fixed = TRUE))
-  # Restore the original one-cell-type fixture before the established raw,
+  stopifnot(inherits(all_invalid_collection, "error"))
+  stopifnot(grepl("fewer than two groups remain", conditionMessage(all_invalid_collection), fixed = TRUE))
+  # With drop, a collection containing both testable and under-populated
+  # categories writes the testable bundle and records the omitted category rather
+  # than failing the entire collection.
+  mixed_metadata <- data.frame(
+    donor = rep(c("D1", "D2", "D3"), each = 7L),
+    condition = rep(c(rep("A", 4L), rep("B", 3L)), 3L),
+    cell_category = rep(c("B cells", "B cells", "Mono", "Mono", "B cells", "Mono", "Mono"), 3L),
+    Batch = rep(c("Run1", "Run2", "Run3"), each = 7L),
+    row.names = paste0("MixedCell", seq_len(21L)),
+    stringsAsFactors = FALSE
+  )
+  set.seed(20261112)
+  mixed_counts <- matrix(
+    stats::rpois(200L * nrow(mixed_metadata), lambda = 12),
+    nrow = 200L,
+    dimnames = list(paste0("MixedGene", seq_len(200L)), rownames(mixed_metadata))
+  )
+  mixed_object <- SeuratObject::CreateSeuratObject(
+    counts = Matrix::Matrix(mixed_counts, sparse = TRUE),
+    meta.data = mixed_metadata,
+    assay = "RNA"
+  )
+  mixed_rds_path <- tempfile(fileext = ".rds")
+  saveRDS(mixed_object, mixed_rds_path)
+  dropped_collection <- omix_seurat_pseudobulk_collection(
+    seurat_rds = mixed_rds_path,
+    donor_column = "donor",
+    group_column = "condition",
+    cell_category_column = "cell_category",
+    cell_category_mode = "all",
+    min_cells = 2L,
+    on_insufficient_cells = "drop",
+    output_dir = tempfile("omix-seurat-dropped-collection-")
+  )
+  dropped_catalog <- utils::read.csv(dropped_collection$catalog_path, check.names = FALSE)
+  dropped_manifest <- base::read.dcf(dropped_collection$collection_manifest_path)
+  stopifnot(
+    identical(dropped_collection$selected_cell_categories, c("B cells", "Mono")),
+    identical(dropped_collection$written_cell_categories, "Mono"),
+    identical(dropped_collection$dropped_cell_categories, "B cells"),
+    length(dropped_collection$bundles) == 1L,
+    all(dropped_catalog$CellCategoryEligibility[dropped_catalog$CellCategory == "Mono"] == "included"),
+    all(dropped_catalog$CellCategoryEligibility[dropped_catalog$CellCategory == "B cells"] == "dropped_fewer_than_two_groups"),
+    all(is.na(dropped_catalog$MatrixPath[dropped_catalog$CellCategory == "B cells"])),
+    all(file.exists(file.path(
+      dirname(dropped_collection$catalog_path),
+      dropped_catalog$MatrixPath[dropped_catalog$CellCategory == "Mono"]
+    ))),
+    identical(unname(dropped_manifest[1L, "selected_cell_category_count"]), "2"),
+    identical(unname(dropped_manifest[1L, "written_cell_category_count"]), "1"),
+    identical(unname(dropped_manifest[1L, "dropped_cell_category_count"]), "1")
+  )
+  # Restore the original one-cell-category fixture before the established raw,
   # Harmony, and SCT handoff checks below.
-  object$cell_type <- "Mono"
+  object$cell_category <- "Mono"
   saveRDS(object, rds_path)
   deg <- omix_deg_analysis(
     Dataset = pseudobulk$input$counts,
@@ -238,8 +290,8 @@ if (length(missing_packages) > 0L) {
     seurat_rds = rds_path,
     donor_column = "donor",
     group_column = "condition",
-    cell_type_column = "cell_type",
-    cell_type = "Mono",
+    cell_category_column = "cell_category",
+    cell_category = "Mono",
     metadata_columns = "Batch",
     aggregation_method = "mean_harmony_corrected_expression",
     min_cells = 2L,
@@ -312,8 +364,8 @@ if (length(missing_packages) > 0L) {
     seurat_rds = rds_path,
     donor_column = "donor",
     group_column = "condition",
-    cell_type_column = "cell_type",
-    cell_type = "Mono",
+    cell_category_column = "cell_category",
+    cell_category = "Mono",
     metadata_columns = "Batch",
     aggregation_method = "mean_sctransform_expression",
     min_cells = 2L,
@@ -378,15 +430,15 @@ if (length(missing_packages) > 0L) {
   stopifnot("variance model: ebayes_trend" %in% sct_summary)
   # Verify that the collection writer preserves both direct-Limma matrix
   # semantics, not just raw-count collection layout.
-  object$cell_type[seq(1L, ncol(object), by = 2L)] <- "B cells"
-  object$cell_type[seq(2L, ncol(object), by = 2L)] <- "Mono"
+  object$cell_category[seq(1L, ncol(object), by = 2L)] <- "B cells"
+  object$cell_category[seq(2L, ncol(object), by = 2L)] <- "Mono"
   saveRDS(object, rds_path)
   harmony_collection <- omix_seurat_pseudobulk_collection(
     seurat_rds = rds_path,
     donor_column = "donor",
     group_column = "condition",
-    cell_type_column = "cell_type",
-    cell_type_mode = "all",
+    cell_category_column = "cell_category",
+    cell_category_mode = "all",
     aggregation_method = "mean_harmony_corrected_expression",
     min_cells = 1L,
     output_dir = tempfile("omix-seurat-harmony-collection-")
@@ -402,8 +454,8 @@ if (length(missing_packages) > 0L) {
     seurat_rds = rds_path,
     donor_column = "donor",
     group_column = "condition",
-    cell_type_column = "cell_type",
-    cell_type_mode = "all",
+    cell_category_column = "cell_category",
+    cell_category_mode = "all",
     aggregation_method = "mean_sctransform_expression",
     min_cells = 1L,
     output_dir = tempfile("omix-seurat-sct-collection-")

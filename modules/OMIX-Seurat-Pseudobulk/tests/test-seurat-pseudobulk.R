@@ -23,7 +23,7 @@ input <- structure(
       Donor = c("Donor1", "Donor1", "Donor2", "Donor2"),
       Group = c("A", "B", "A", "B"),
       Batch = c("Run1", "Run1", "Run2", "Run2"),
-      CellType = rep("Monocytes", 4L),
+      CellCategory = rep("Monocytes", 4L),
       Cells = c(40L, 42L, 45L, 47L),
       stringsAsFactors = FALSE
     ),
@@ -61,6 +61,12 @@ invalid_error <- tryCatch(
   error = conditionMessage
 )
 stopifnot(grepl("GeneName", invalid_error, fixed = TRUE))
+
+nonempty_output_error <- tryCatch(
+  .omix_write_seurat_pseudobulk_bundle(input, output_dir, "fixture.rds"),
+  error = conditionMessage
+)
+stopifnot(grepl("Pseudobulk output_dir must be new or empty", nonempty_output_error, fixed = TRUE))
 
 continuous_input <- structure(
   list(

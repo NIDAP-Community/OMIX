@@ -32,13 +32,14 @@ stopifnot(length(list.files(file.path(module_root, "tests"), pattern = "\\.rds$"
 
 cli_text <- paste(readLines(cli_file, warn = FALSE), collapse = "\n")
 for (option in c(
-  "--seurat_rds", "--donor_column", "--group_column", "--cell_type_column",
-  "--cell_type", "--metadata_columns", "--aggregation_method", "--output_dir"
+  "--seurat_rds", "--donor_column", "--group_column", "--cell_category_column",
+  "--cell_category", "--metadata_columns", "--aggregation_method", "--output_dir"
 )) {
   stopifnot(grepl(option, cli_text, fixed = TRUE))
 }
 stopifnot(!grepl('"/data/', cli_text, fixed = TRUE))
 stopifnot(!grepl('"/results"', cli_text, fixed = TRUE))
+stopifnot(!grepl('make_option("--output_dir", type = "character", default', cli_text, fixed = TRUE))
 stopifnot(grepl('--feature_id_column", type = "character", default = "GeneName"', cli_text, fixed = TRUE))
 stopifnot(grepl("--feature_id_column is fixed to GeneName", cli_text, fixed = TRUE))
 
@@ -52,8 +53,9 @@ invalid_feature_output <- suppressWarnings(system2(
     "--seurat_rds", "not-used.rds",
     "--donor_column", "Donor",
     "--group_column", "Group",
-    "--cell_type_column", "CellType",
-    "--cell_type", "Monocytes",
+    "--cell_category_column", "CellCategory",
+    "--cell_category", "Monocytes",
+    "--output_dir", tempfile("omix-invalid-feature-"),
     "--feature_id_column", "Gene"
   ),
   stdout = TRUE,
@@ -62,6 +64,23 @@ invalid_feature_output <- suppressWarnings(system2(
 invalid_feature_status <- attr(invalid_feature_output, "status")
 stopifnot(!is.null(invalid_feature_status), invalid_feature_status != 0L)
 stopifnot(any(grepl("fixed to GeneName", invalid_feature_output, fixed = TRUE)))
+
+missing_output_output <- suppressWarnings(system2(
+  file.path(R.home("bin"), "Rscript"),
+  c(
+    shQuote(cli_file),
+    "--seurat_rds", "not-used.rds",
+    "--donor_column", "Donor",
+    "--group_column", "Group",
+    "--cell_category_column", "CellCategory",
+    "--cell_category", "Monocytes"
+  ),
+  stdout = TRUE,
+  stderr = TRUE
+))
+missing_output_status <- attr(missing_output_output, "status")
+stopifnot(!is.null(missing_output_status), missing_output_status != 0L)
+stopifnot(any(grepl("--output_dir is required", missing_output_output, fixed = TRUE)))
 
 adapter_url <- "https://github.com/NIDAP-Community/OMIX-Seurat-Pseudobulk"
 metadata_text <- paste(readLines(metadata_file, warn = FALSE), collapse = "\n")

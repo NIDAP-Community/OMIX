@@ -2,13 +2,26 @@
 
 ## Unreleased
 
-- Added an opt-in cell-type collection capability. Selected mode reads an
+- Made `output_dir` mandatory for both one-category and collection runs, and
+  reject non-empty output directories before writing artifacts. This prevents
+  an implicit working-directory-relative `results/` folder and mixed outputs
+  from separate runs.
+- Breaking interface-2 rename: `cell_category_column`, `cell_category`,
+  `cell_category_mode`, and `cell_category_selection` replace the former
+  cell-type inputs. The collection catalog, manifest fields, nested directory,
+  and metadata field now use `CellCategory` and `cell_categories` consistently.
+  Categories can be cell types, clusters, regions, or state labels.
+- Fixed collection-mode `on_insufficient_cells = drop` so that a cell category
+  with fewer than two groups after sparse profile removal is recorded and
+  omitted rather than aborting other valid cell-category bundles. The collection
+  manifest and run summary now distinguish requested, written, and omitted
+  cell categories; strict `error` behavior is unchanged.
+- Added an opt-in cell-category collection capability. Selected mode reads an
   ordered exact-label table and all mode enumerates non-missing labels after
   any explicit cell filter. Each label produces an ordinary nested pseudobulk
-  bundle plus a profile-level eligibility/provenance catalog; existing
-  one-cell-type calls and root-level output filenames are unchanged.
+  bundle plus a profile-level eligibility/provenance catalog.
 - Collection mode keeps donor-by-group profiles as biological replicates,
-  applies the existing minimum-cell policy independently per cell type, and
+  applies the existing minimum-cell policy independently per cell category, and
   rejects unknown labels, duplicate/empty selections, and labels with fewer
   than two retained groups. It does not pool cells or fit Limma models.
 - Registered the accepted Code Ocean deployment-adapter repository without
@@ -45,7 +58,7 @@
 ## 0.3.0 - 2026-09-18
 
 - Added mean_sctransform_expression, which averages the Seurat SCT/data layer
-  separately per cell type x donor and converts the log1p donor means to log2
+  separately per cell category x donor and converts the log1p donor means to log2
   scale for direct limma.
 - Expanded the manifest into an explicit downstream handoff contract:
   `sum_counts` routes only to OMIX DEG Analysis raw-count/voom, while Harmony
@@ -57,7 +70,7 @@
 ## 0.2.0 - 2026-09-17
 
 - Added `mean_harmony_corrected_expression`, which averages a declared
-  gene-level corrected expression layer per cell type × donor for direct limma.
+  gene-level corrected expression layer per cell category × donor for direct limma.
 - Preserved `sum_counts` as the default raw-count pseudobulk method for
   edgeR/limma-voom.
 - Added `Pseudobulk_Manifest.dcf` to declare matrix semantics, source layer,
@@ -66,6 +79,6 @@
 ## 0.1.0 - 2026-09-16
 
 - Added a portable explicit-path workflow that writes raw donor-by-group
-  pseudobulk count and metadata tables from one selected Seurat cell type.
+  pseudobulk count and metadata tables from one selected Seurat cell category.
 - Standardized the DEG handoff on GeneName, Sample, and Group, while retaining
-  Donor, CellType, cell counts, and optional invariant covariates.
+  Donor, CellCategory, cell counts, and optional invariant covariates.
