@@ -74,7 +74,8 @@ parameters:
     description: error stops when any donor-by-group profile is below min_cells. In selected/all collection mode, drop excludes those profiles and omits a cell category that then has fewer than two eligible groups; the catalog and run summary record the omission.
   output_dir:
     type: path
-    default: results
+    required: true
+    description: Explicit new or empty directory for this bundle or collection. Existing non-empty directories are rejected to prevent mixing artifacts from separate runs.
 outputs:
   donor_level_matrix:
     path: Pseudobulk_Counts.csv, Harmony_Mean_Expression.csv, or SCT_Mean_Log2_Expression.csv

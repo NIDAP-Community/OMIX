@@ -58,6 +58,10 @@ is not a freely configurable column name.
 Every selected donor-by-group profile must have at least 20 cells by default.
 The module stops on an under-populated profile unless `--on_insufficient_cells drop` is explicitly selected. In a selected/all collection, `drop` also omits a category that no longer retains two experimental groups after sparse profiles are removed, and records that omission in the collection artifacts.
 
+`--output_dir` is required. It must name a new or empty directory: the module
+rejects an existing non-empty directory so results from separate runs cannot be
+mixed.
+
 ## Quick start
 
 Restore the `r-seurat-conversion` profile as described in the root README, then

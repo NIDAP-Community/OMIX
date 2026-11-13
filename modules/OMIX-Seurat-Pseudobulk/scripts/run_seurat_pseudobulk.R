@@ -41,7 +41,7 @@ option_list <- list(
   make_option("--feature_id_column", type = "character", default = "GeneName", help = "Fixed downstream feature-ID column [default: %default]"),
   make_option("--min_cells", type = "integer", default = 20L),
   make_option("--on_insufficient_cells", type = "character", default = "error", help = "error or drop; collection drop omits categories without two eligible groups [default: %default]"),
-  make_option("--output_dir", type = "character", default = "results")
+  make_option("--output_dir", type = "character", help = "Required new or empty output directory")
 )
 parser <- OptionParser(
   usage = "Usage: %prog --seurat_rds OBJECT.rds --donor_column DONOR --group_column GROUP --cell_category_column CATEGORY --cell_category VALUE [options]",
@@ -50,7 +50,7 @@ parser <- OptionParser(
 )
 opt <- parse_args(parser)
 
-for (name in c("seurat_rds", "donor_column", "group_column")) {
+for (name in c("seurat_rds", "donor_column", "group_column", "output_dir")) {
   if (is.null(opt[[name]]) || !nzchar(opt[[name]])) {
     stop("ERROR: --", name, " is required")
   }

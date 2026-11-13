@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Made `output_dir` mandatory for both one-category and collection runs, and
+  reject non-empty output directories before writing artifacts. This prevents
+  an implicit working-directory-relative `results/` folder and mixed outputs
+  from separate runs.
 - Breaking interface-2 rename: `cell_category_column`, `cell_category`,
   `cell_category_mode`, and `cell_category_selection` replace the former
   cell-type inputs. The collection catalog, manifest fields, nested directory,

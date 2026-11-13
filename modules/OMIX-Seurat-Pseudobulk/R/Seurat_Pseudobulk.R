@@ -63,10 +63,10 @@ omix_seurat_pseudobulk <- function(
   feature_id_column = "GeneName",
   min_cells = 20L,
   on_insufficient_cells = c("error", "drop"),
-  output_dir = "results"
+  output_dir
 ) {
-  # Normalize the user-supplied paths first so every later error reports the
-  # same explicit file/directory the caller asked the module to use.
+  # Validate the explicit paths first so later errors identify the caller's
+  # declared input file and output directory.
   seurat_rds <- .omix_seurat_pseudobulk_path(seurat_rds, "seurat_rds", must_exist = TRUE)
   output_dir <- .omix_seurat_pseudobulk_path(output_dir, "output_dir", must_exist = FALSE)
   aggregation_method <- match.arg(aggregation_method)
@@ -252,6 +252,12 @@ omix_seurat_pseudobulk <- function(
       call. = FALSE
     )
   }
+  if (file.exists(output_dir) && !dir.exists(output_dir)) {
+    stop("Pseudobulk output_dir must be a directory: ", output_dir, call. = FALSE)
+  }
+  if (dir.exists(output_dir) && length(list.files(output_dir, all.files = TRUE, no.. = TRUE)) > 0L) {
+    stop("Pseudobulk output_dir must be new or empty: ", output_dir, call. = FALSE)
+  }
   dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
   # These switches are the central handoff contract. The selected aggregation
@@ -425,7 +431,7 @@ omix_seurat_pseudobulk_collection <- function(
   feature_id_column = "GeneName",
   min_cells = 20L,
   on_insufficient_cells = c("error", "drop"),
-  output_dir = "results"
+  output_dir
 ) {
   seurat_rds <- .omix_seurat_pseudobulk_path(seurat_rds, "seurat_rds", must_exist = TRUE)
   output_dir <- .omix_seurat_pseudobulk_path(output_dir, "output_dir", must_exist = FALSE)
@@ -439,7 +445,10 @@ omix_seurat_pseudobulk_collection <- function(
       call. = FALSE
     )
   }
-  if (file.exists(output_dir) && length(list.files(output_dir, all.files = TRUE, no.. = TRUE)) > 0L) {
+  if (file.exists(output_dir) && !dir.exists(output_dir)) {
+    stop("Collection output_dir must be a directory: ", output_dir, call. = FALSE)
+  }
+  if (dir.exists(output_dir) && length(list.files(output_dir, all.files = TRUE, no.. = TRUE)) > 0L) {
     stop("Collection output_dir must be new or empty: ", output_dir, call. = FALSE)
   }
 

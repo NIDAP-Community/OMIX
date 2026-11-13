@@ -62,6 +62,12 @@ invalid_error <- tryCatch(
 )
 stopifnot(grepl("GeneName", invalid_error, fixed = TRUE))
 
+nonempty_output_error <- tryCatch(
+  .omix_write_seurat_pseudobulk_bundle(input, output_dir, "fixture.rds"),
+  error = conditionMessage
+)
+stopifnot(grepl("Pseudobulk output_dir must be new or empty", nonempty_output_error, fixed = TRUE))
+
 continuous_input <- structure(
   list(
     expression = transform(input$counts, Donor1__A = Donor1__A / 10),
