@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-# Platform-neutral CLI for an ordered, donor-level M-F Limma cell-type
+# Platform-neutral CLI for an ordered, donor-level M-F Limma cell-category
 # collection. This deliberately consumes explicit portable paths; Code Ocean
 # or another deployment adapter owns any mounted-input discovery.
 
@@ -8,7 +8,7 @@ suppressPackageStartupMessages(library(optparse))
 
 script_argument <- grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE)
 if (length(script_argument) != 1L) {
-  stop("Could not determine the location of scripts/run_limma_cell_type_collection.R")
+  stop("Could not determine the location of scripts/run_limma_cell_category_collection.R")
 }
 module_root <- normalizePath(file.path(dirname(sub("^--file=", "", script_argument)), ".."))
 source(file.path(module_root, "R", "OMIX_Limma_Analysis.R"))
@@ -30,7 +30,7 @@ option_list <- list(
 )
 opt <- parse_args(OptionParser(option_list = option_list))
 
-result <- omix_limma_cell_type_collection(
+result <- omix_limma_cell_category_collection(
   pseudobulk_collection_manifest = opt$pseudobulk_collection_manifest,
   output_dir = opt$output_dir,
   contrast = opt$contrast,

@@ -1,7 +1,8 @@
 # OMIX Seurat Pseudobulk
 
-Create donor-level profiles from one selected cell type in an RDS-serialized
-Seurat object. The module can sum raw counts for a count-based DEG model,
+Create donor-level profiles from one selected cell category in an RDS-serialized
+Seurat object. A category can be a cell category, cluster, subcluster, tissue or
+spatial region, or a declared cell-state label. The module can sum raw counts for a count-based DEG model,
 average a declared Harmony-corrected expression layer, or average Seurat
 SCTransform expression for direct limma. Its portable result bundle routes
 raw counts only to [OMIX DEG Analysis](../OMIX-DEG-Analysis/README.md) and
@@ -11,7 +12,7 @@ continuous-expression means only to
 ## When to use it
 
 Use this module when the biological replicates are donors, patients, animals,
-or samples—not individual cells. It selects one exact cell type, optionally
+or samples—not individual cells. It selects one exact cell category, optionally
 applies an explicit cell-level filter, and makes one donor-by-group profile.
 
 | Aggregation method | Source matrix | Output | Compatible downstream analysis |
@@ -32,16 +33,30 @@ require Seurat.
 ## Inputs
 
 - A Seurat `.rds` object with the source assay and layer required by the chosen aggregation method.
-- Cell metadata containing a donor column, an experimental-group column, and a cell-type column.
-- One exact cell-type value to aggregate.
+- Cell metadata containing a donor column, an experimental-group column, and a category column.
+- One exact category value to aggregate in one mode, or an ordered set of category labels in collection mode.
 - Optional invariant sample-level metadata columns, such as `Batch`, to retain for DEG modelling.
+
+Use `--cell_category_column` and `--cell_category` for the category input.
+The category is any non-missing metadata label used to form separate
+pseudobulk outputs: for example, a cell type, `seurat_clusters`, a
+subcluster, a spatial region, or a cell-state label. It must be represented in
+at least two experimental groups after filtering to form a downstream
+comparison.
+
+`--cell_filter_column` and `--cell_filter_values` mean something different:
+they are an optional, shared pre-aggregation inclusion filter. They retain only
+cells whose filter column has one of the supplied exact values before category
+discovery and aggregation. For example, use a singlet/QC flag to exclude cells
+from every category, or a compartment value to analyze only tumor cells. The
+filter does not create separate outputs.
 
 The output feature identifier is fixed to `GeneName`. This is part of the
 portable handoff contract with OMIX DEG Analysis and OMIX Limma Analysis; it
 is not a freely configurable column name.
 
 Every selected donor-by-group profile must have at least 20 cells by default.
-The module stops on an under-populated profile unless `--on_insufficient_cells drop` is explicitly selected.
+The module stops on an under-populated profile unless `--on_insufficient_cells drop` is explicitly selected. In a selected/all collection, `drop` also omits a category that no longer retains two experimental groups after sparse profiles are removed, and records that omission in the collection artifacts.
 
 ## Quick start
 
@@ -53,8 +68,8 @@ Rscript modules/OMIX-Seurat-Pseudobulk/scripts/run_seurat_pseudobulk.R \
   --seurat_rds /path/to/object.rds \
   --donor_column donor \
   --group_column condition \
-  --cell_type_column cell_type \
-  --cell_type 'CD14+ Monocytes' \
+  --cell_category_column cell_category \
+  --cell_category 'CD14+ Monocytes' \
   --metadata_columns Batch \
   --aggregation_method sum_counts \
   --assay RNA \
@@ -89,8 +104,8 @@ Rscript modules/OMIX-Seurat-Pseudobulk/scripts/run_seurat_pseudobulk.R \
   --seurat_rds /path/to/object.rds \
   --donor_column donor \
   --group_column condition \
-  --cell_type_column cell_type \
-  --cell_type 'CD14+ Monocytes' \
+  --cell_category_column cell_category \
+  --cell_category 'CD14+ Monocytes' \
   --metadata_columns Batch \
   --aggregation_method mean_harmony_corrected_expression \
   --assay Harmony \
@@ -108,8 +123,8 @@ Rscript modules/OMIX-Seurat-Pseudobulk/scripts/run_seurat_pseudobulk.R \
   --seurat_rds /path/to/object.rds \
   --donor_column donor \
   --group_column condition \
-  --cell_type_column cell_type \
-  --cell_type 'CD14+ Monocytes' \
+  --cell_category_column cell_category \
+  --cell_category 'CD14+ Monocytes' \
   --metadata_columns Batch \
   --aggregation_method mean_sctransform_expression \
   --output_dir /path/to/results/sct-means
@@ -131,7 +146,7 @@ supported execution record.
 | `Pseudobulk_Counts.csv` | Written by `sum_counts`: raw integer-like counts with `GeneName` followed by one pseudobulk profile per column. |
 | `Harmony_Mean_Expression.csv` | Written by `mean_harmony_corrected_expression`: donor-level means from the declared corrected expression layer. |
 | `SCT_Mean_Log2_Expression.csv` | Written by `mean_sctransform_expression`: donor-level log2 means of SCTransform depth-corrected expression. |
-| `Pseudobulk_Sample_Metadata.csv` | Aligned `Sample`, `Donor`, `Group`, `CellType`, `Cells`, and requested covariates such as `Batch`. Use as the compatible downstream metadata input. |
+| `Pseudobulk_Sample_Metadata.csv` | Aligned `Sample`, `Donor`, `Group`, `CellCategory`, `Cells`, and requested covariates such as `Batch`. Use as the compatible downstream metadata input. |
 | `Pseudobulk_Manifest.dcf` | Matrix type, source layer, aggregation method, upstream correction, expected downstream module/mode, input kind, and recommended variance model. Pass it to OMIX Limma Analysis for a continuous-expression handoff. |
 | `Pseudobulk_Run_Summary.txt` | Aggregation parameters, profile counts, selected-cell total, and bridge provenance. |
 
@@ -139,17 +154,17 @@ The module does not normalize, batch-correct, or fit a statistical model. The
 manifest directs raw counts to DEG Analysis and continuous expression to Limma
 Analysis.
 
-## Multiple cell types
+## Multiple cell categories
 
 The default one mode preserves the established one-label command and root-level
-output bundle. It is the right choice for one cell type.
+output bundle. It is the right choice for one category.
 
 For a planned collection, use selected mode with an ordered CSV, TSV, or TXT
-table containing exactly one header column named CellType. Values are exact,
+table containing exactly one header column named CellCategory. Values are exact,
 case-sensitive labels. The module rejects duplicate, empty, and labels absent
 after the optional cell filter.
 
-    CellType
+    CellCategory
     CD14+ Monocytes
     CD4 T cells
 
@@ -157,32 +172,32 @@ after the optional cell filter.
       --seurat_rds /path/to/object.rds \
       --donor_column donor \
       --group_column sex \
-      --cell_type_column cell_type \
-      --cell_type_mode selected \
-      --cell_type_selection /path/to/cell_types.csv \
+      --cell_category_column seurat_clusters \
+      --cell_category_mode selected \
+      --cell_category_selection /path/to/cell_categories.csv \
       --aggregation_method mean_sctransform_expression \
       --min_cells 20 \
-      --output_dir /path/to/results/cell-type-pseudobulk
+      --output_dir /path/to/results/cell-category-pseudobulk
 
-Use all mode to enumerate every non-missing cell-type label remaining after the
+Use all mode to enumerate every non-missing category label remaining after the
 same explicit cell filter. Labels are sorted deterministically. Both collection
-modes create one ordinary pseudobulk bundle per cell type beneath
-cell_types/<stable-id>/, plus:
+modes create one ordinary pseudobulk bundle beneath `cell_categories/<stable-id>/`
+for every category that retains at least two groups, plus:
 
 | File | Contents |
 | --- | --- |
-| Cell_Type_Profile_Catalog.csv | Original exact label, stable directory ID, donor, group, observed cells, minimum-cell eligibility/exclusion, nested paths, aggregation settings, and source provenance. |
+| Cell_Category_Profile_Catalog.csv | Original exact category label, stable directory ID, donor, group, observed cells, minimum-cell eligibility/exclusion, nested paths, aggregation settings, and source provenance. |
 | Pseudobulk_Collection_Manifest.dcf | Collection-level mode and routing/provenance record. Do not pass this file to Limma; pass each nested ordinary Pseudobulk_Manifest.dcf. |
 | Pseudobulk_Collection_Run_Summary.txt | Human-readable selection and aggregation record. |
 
-The module applies min_cells independently to every cell type × donor × group
-profile. With on_insufficient_cells = error, it stops before writing the
-collection and identifies each affected profile. With drop, the catalog records
-the excluded profile; a cell type must still retain at least two groups to
-produce an ordinary downstream pseudobulk bundle.
+The module applies min_cells independently to every cell category × donor × group
+profile. With `on_insufficient_cells = error`, it stops before writing the
+collection and identifies each affected profile. With `drop`, the catalog
+records excluded profiles and omits a category that no longer retains two
+groups. The collection fails only when no selected category remains testable.
 
-Collection mode does not pool cells across cell types, fit a joint model, or
-test a cell-type-by-group interaction. Run the compatible Limma analysis on
+Collection mode does not pool cells across categories, fit a joint model, or
+test a category-by-group interaction. Run the compatible Limma analysis on
 each nested continuous-expression bundle. A separate canonical downstream
 collection step must validate a common tested-gene universe before a multi-
 comparison pathway module consumes the results.
@@ -202,7 +217,7 @@ comparison pathway module consumes the results.
   effects, but it does not itself establish that a technical batch has been
   handled. Record any upstream regression and model remaining batch as a DEG
   covariate when it is estimable.
-- One-mode invocation produces one cell-type-specific pseudobulk dataset.
+- One-mode invocation produces one category-specific pseudobulk dataset.
   Selected/all collection modes produce separate equivalent datasets rather
   than pooling cells or treating cells as biological replicates.
 - `--metadata_columns` values must be non-missing and identical across all

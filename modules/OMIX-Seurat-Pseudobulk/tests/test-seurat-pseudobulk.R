@@ -23,7 +23,7 @@ input <- structure(
       Donor = c("Donor1", "Donor1", "Donor2", "Donor2"),
       Group = c("A", "B", "A", "B"),
       Batch = c("Run1", "Run1", "Run2", "Run2"),
-      CellType = rep("Monocytes", 4L),
+      CellCategory = rep("Monocytes", 4L),
       Cells = c(40L, 42L, 45L, 47L),
       stringsAsFactors = FALSE
     ),

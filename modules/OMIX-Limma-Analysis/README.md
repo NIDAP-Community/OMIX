@@ -86,40 +86,42 @@ exactly two groups with at least two samples in each group. In that
 unambiguous case, OMIX records the inferred comparison. Supply an explicit
 contrast for every other design.
 
-## Cell-type collection to L2P Multi
+## Cell-category collection to L2P Multi
 
 Use the separate collection command after OMIX Seurat Pseudobulk has run in
 `selected` or `all` mode with a continuous-expression aggregation method. The
 collection command reads its explicit `Pseudobulk_Collection_Manifest.dcf`,
 then runs the established Limma implementation independently for every
-cell-type bundle. It currently implements the donor-level `M-F` comparison.
+cell-category bundle. It currently implements the donor-level `M-F` comparison.
 
 ```bash
-Rscript "$OMIX_ROOT/modules/OMIX-Limma-Analysis/scripts/run_limma_cell_type_collection.R" \
-  --pseudobulk_collection_manifest /path/to/cell-type-pseudobulk/Pseudobulk_Collection_Manifest.dcf \
+Rscript "$OMIX_ROOT/modules/OMIX-Limma-Analysis/scripts/run_limma_cell_category_collection.R" \
+  --pseudobulk_collection_manifest /path/to/cell-category-pseudobulk/Pseudobulk_Collection_Manifest.dcf \
   --contrast M-F \
-  --output_dir results/cell-type-limma
+  --output_dir results/cell-category-limma
 ```
 
-Every exported cell type must have at least two donor-level profiles in both
-the M and F groups. The command preserves Pseudobulk's selected order (or its
+Every exported cell category must have at least two donor-level profiles in both
+the M and F groups. When Pseudobulk collection uses its explicit `drop` policy,
+this command ignores cell categories recorded as omitted because they no longer
+retain two groups. It preserves the remaining Pseudobulk selected order (or
 deterministic all-mode order) and writes these L2P Multi comparison families:
 
 ```text
-<stable-cell-type-id>__M-F_tstat
-<stable-cell-type-id>__M-F_pval
-<stable-cell-type-id>__M-F_FC
+<stable-cell-category-id>__M-F_tstat
+<stable-cell-category-id>__M-F_pval
+<stable-cell-category-id>__M-F_FC
 ```
 
 Pass `L2P_Multi_Input.csv` to OMIX L2P Multi and copy the ordered comparison
 names from `L2P_Multi_Input_Provenance.csv` into `--comparisons`. The export
-requires every cell type to have the *exact same ordered tested-gene universe*
+requires every cell category to have the *exact same ordered tested-gene universe*
 and finite t-statistic, p-value, and fold-change values. It fails on a
 mismatch; it never silently pools cells, unions/intersects/reorders features,
 or fills missing statistics.
 
 This is a collection of independent M-F models. It does not test whether the
-M-F effect differs between cell types. Such a question requires a separately
+M-F effect differs between cell categories. Such a question requires a separately
 specified and validated interaction-model workflow.
 
 ## Inputs
@@ -155,7 +157,7 @@ With `--variance_model auto`, OMIX uses the following defaults:
 | `sctransform_mean_expression` | Sample-level mean SCT expression | `ebayes_trend` |
 | `harmony_corrected_mean_expression` | Sample-level mean Harmony-corrected expression | `ebayes` |
 | `gsva_enrichment_scores` | Pathway-by-sample GSVA or related scores | `ebayes` |
-| `cibersort_relative_fractions` | Cell-type fractions bounded by zero and one | `ebayes` after the selected fraction transformation |
+| `cibersort_relative_fractions` | Cell-category fractions bounded by zero and one | `ebayes` after the selected fraction transformation |
 | `cibersort_absolute_scores` | Non-compositional CIBERSORT absolute-mode scores | `ebayes` |
 | `methylation_m_values` | DNA-methylation M-values | `ebayes` |
 | `normalized_proteomics` | Normalized log-scale protein or phosphoprotein intensity | `ebayes` |
@@ -247,7 +249,7 @@ expression. Interpret the sign according to the supplied scale.
 | `variance_diagnostic.png` | Residual standard deviation versus average signal with a lowess trend when sufficient features are present. |
 | `Batch_Corrected_Expression.csv` | Written only when `--batch_effect_columns` and `--return_batch_corrected_values true` are supplied. This gene-by-sample matrix has the declared technical batch effect removed while protecting biological comparison groups. |
 | `L2P_Multi_Input.csv` | Collection-command output only: strict common-gene-universe wide table for OMIX L2P Multi. |
-| `L2P_Multi_Input_Provenance.csv` | Collection-command output only: ordered cell-type comparisons, source paths/hashes, and per-model decisions. |
+| `L2P_Multi_Input_Provenance.csv` | Collection-command output only: ordered cell-category comparisons, source paths/hashes, and per-model decisions. |
 
 ## Method notes
 
@@ -277,7 +279,7 @@ considerations.
 - [limma package and user guide](https://bioconductor.org/packages/release/bioc/html/limma.html)
 - [GSVA package vignette](https://bioconductor.org/packages/release/bioc/vignettes/GSVA/inst/doc/GSVA.html)
 - [speckle proportion-analysis manual](https://bioconductor.org/packages/release/bioc/manuals/speckle/man/speckle.pdf)
-- [Propeller method for differential cell-type proportions](https://doi.org/10.1093/bioinformatics/btac582)
+- [Propeller method for differential cell-category proportions](https://doi.org/10.1093/bioinformatics/btac582)
 
 ## Interface and deployment
 

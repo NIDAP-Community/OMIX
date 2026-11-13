@@ -16,21 +16,21 @@ write_manifest <- function(path) {
   ), path)
 }
 
-make_collection <- function(root, second_genes = c("Gene1", "Gene2", "Gene3"), f_profiles = 3L) {
+make_collection <- function(root, second_genes = c("Gene1", "Gene2", "Gene3"), f_profiles = 3L, omit_first = FALSE) {
   dir.create(root, recursive = TRUE, showWarnings = FALSE)
   ids <- c("ct-t-cells-11111111111111111111111111111111", "ct-monocytes-22222222222222222222222222222222")
   labels <- c("T cells", "Monocytes")
   catalog_rows <- list()
   for (index in seq_along(ids)) {
     id <- ids[[index]]
-    bundle_dir <- file.path(root, "cell_types", id)
+    bundle_dir <- file.path(root, "cell_categories", id)
     dir.create(bundle_dir, recursive = TRUE, showWarnings = FALSE)
     genes <- if (index == 1L) c("Gene1", "Gene2", "Gene3") else second_genes
     samples <- c(paste0("M", seq_len(3L)), paste0("F", seq_len(f_profiles)))
     matrix <- data.frame(
       GeneName = genes,
       setNames(lapply(seq_along(samples), function(sample_index) {
-        # Cell-type-specific values retain the same ordered gene universe while
+        # Cell-category-specific values retain the same ordered gene universe while
         # giving both comparisons a finite, non-zero M-F effect.
         c(5, 6, 7) + (sample_index <= 3L) * (index / 3)
       }), samples),
@@ -40,7 +40,7 @@ make_collection <- function(root, second_genes = c("Gene1", "Gene2", "Gene3"), f
       Sample = samples,
       Donor = samples,
       Group = c(rep("M", 3L), rep("F", f_profiles)),
-      CellType = labels[[index]],
+      CellCategory = labels[[index]],
       Cells = 40L,
       stringsAsFactors = FALSE,
       check.names = FALSE
@@ -48,18 +48,20 @@ make_collection <- function(root, second_genes = c("Gene1", "Gene2", "Gene3"), f
     utils::write.csv(matrix, file.path(bundle_dir, "SCT_Mean_Log2_Expression.csv"), row.names = FALSE)
     utils::write.csv(metadata, file.path(bundle_dir, "Pseudobulk_Sample_Metadata.csv"), row.names = FALSE)
     write_manifest(file.path(bundle_dir, "Pseudobulk_Manifest.dcf"))
+    omitted <- isTRUE(omit_first) && index == 1L
     catalog_rows[[index]] <- data.frame(
-      CellTypeID = id,
-      CellType = labels[[index]],
+      CellCategoryID = id,
+      CellCategory = labels[[index]],
       SelectionMode = "selected",
       Donor = metadata$Donor,
       Group = metadata$Group,
       Cells = metadata$Cells,
       MinCells = 20L,
       ProfileEligibility = "eligible",
-      MatrixPath = file.path("cell_types", id, "SCT_Mean_Log2_Expression.csv"),
-      MetadataPath = file.path("cell_types", id, "Pseudobulk_Sample_Metadata.csv"),
-      BundleManifestPath = file.path("cell_types", id, "Pseudobulk_Manifest.dcf"),
+      CellCategoryEligibility = if (omitted) "dropped_fewer_than_two_groups" else "included",
+      MatrixPath = if (omitted) NA_character_ else file.path("cell_categories", id, "SCT_Mean_Log2_Expression.csv"),
+      MetadataPath = if (omitted) NA_character_ else file.path("cell_categories", id, "Pseudobulk_Sample_Metadata.csv"),
+      BundleManifestPath = if (omitted) NA_character_ else file.path("cell_categories", id, "Pseudobulk_Manifest.dcf"),
       AggregationMethod = "mean_sctransform_expression",
       SourceAssay = "SCT",
       SourceLayer = "data",
@@ -69,25 +71,25 @@ make_collection <- function(root, second_genes = c("Gene1", "Gene2", "Gene3"), f
     )
   }
   catalog <- do.call(rbind, catalog_rows)
-  utils::write.csv(catalog, file.path(root, "Cell_Type_Profile_Catalog.csv"), row.names = FALSE)
+  utils::write.csv(catalog, file.path(root, "Cell_Category_Profile_Catalog.csv"), row.names = FALSE)
   base::write.dcf(data.frame(
-    format_version = "1",
-    collection_kind = "cell_type_pseudobulk",
-    cell_type_selection_mode = "selected",
-    selected_cell_type_count = "2",
+    format_version = "2",
+    collection_kind = "cell_category_pseudobulk",
+    cell_category_selection_mode = "selected",
+    selected_cell_category_count = "2",
     aggregation_method = "mean_sctransform_expression",
     source_assay = "SCT",
     source_layer = "data",
     source_seurat_rds = "/not-a-real-study-object.rds",
     min_cells = "20",
     on_insufficient_cells = "error",
-    profile_catalog = "Cell_Type_Profile_Catalog.csv",
+    profile_catalog = "Cell_Category_Profile_Catalog.csv",
     stringsAsFactors = FALSE
   ), file.path(root, "Pseudobulk_Collection_Manifest.dcf"))
   invisible(catalog)
 }
 
-work_dir <- tempfile("omix-limma-cell-type-collection-")
+work_dir <- tempfile("omix-limma-cell-category-collection-")
 dir.create(work_dir)
 collection_root <- file.path(work_dir, "collection")
 make_collection(collection_root)
@@ -95,8 +97,8 @@ manifest_path <- file.path(collection_root, "Pseudobulk_Collection_Manifest.dcf"
 output_dir <- file.path(work_dir, "result")
 
 # The direct function is the scientific contract; its output must preserve the
-# selected-cell-type order and the exact suffixes L2P Multi resolves by default.
-result <- omix_limma_cell_type_collection(manifest_path, output_dir)
+# selected-cell-category order and the exact suffixes L2P Multi resolves by default.
+result <- omix_limma_cell_category_collection(manifest_path, output_dir)
 expected_comparisons <- c(
   "ct-t-cells-11111111111111111111111111111111__M-F",
   "ct-monocytes-22222222222222222222222222222222__M-F"
@@ -109,26 +111,40 @@ expected_columns <- c("GeneName", unlist(lapply(expected_comparisons, function(c
 stopifnot(identical(names(wide), expected_columns))
 stopifnot(identical(wide$GeneName, c("Gene1", "Gene2", "Gene3")))
 
+# A Pseudobulk collection may preserve an omitted cell category as audit metadata
+# when its drop policy leaves fewer than two groups. Limma must analyze the
+# remaining bundle without attempting to resolve blank paths for the omission.
+dropped_collection_root <- file.path(work_dir, "collection-with-omission")
+make_collection(dropped_collection_root, omit_first = TRUE)
+dropped_result <- omix_limma_cell_category_collection(
+  file.path(dropped_collection_root, "Pseudobulk_Collection_Manifest.dcf"),
+  file.path(work_dir, "result-with-omission")
+)
+stopifnot(identical(
+  dropped_result$comparisons,
+  "ct-monocytes-22222222222222222222222222222222__M-F"
+))
+
 # This direct shape validation encodes the public L2P Multi conventional input
 # contract: a GeneName column and one tstat/pval/FC family per ordered label.
 .omix_limma_collection_validate_l2p_multi_shape(wide, expected_comparisons)
 provenance <- utils::read.csv(result$provenance, check.names = FALSE, stringsAsFactors = FALSE)
 stopifnot(identical(provenance$Comparison, expected_comparisons))
 stopifnot(all(c(
-  "CellTypeID", "CellType", "SelectionMode", "SourceMatrixPath", "SourceMatrixSHA256",
+  "CellCategoryID", "CellCategory", "SelectionMode", "SourceMatrixPath", "SourceMatrixSHA256",
   "SourceBundleManifestPath", "SourceLimmaAnalysisPath", "InputDataType", "VarianceModel",
   "ModelType", "MProfiles", "FProfiles", "TestedGeneCount", "SourceLimmaAnalysisSHA256"
 ) %in% names(provenance)))
 catalog_output <- utils::read.csv(result$catalog, check.names = FALSE, stringsAsFactors = FALSE)
 stopifnot(all(c("ProfileEligibility", "LimmaAnalysisPath", "L2PComparison") %in% names(catalog_output)))
-stopifnot(file.exists(file.path(output_dir, "cell_types", provenance$CellTypeID[[1L]], "Limma_Analysis.csv")))
+stopifnot(file.exists(file.path(output_dir, "cell_categories", provenance$CellCategoryID[[1L]], "Limma_Analysis.csv")))
 
 # Exercise the portable explicit-path CLI separately from the direct function.
 cli_output_dir <- file.path(work_dir, "cli-result")
 cli_output <- system2(
   file.path(R.home("bin"), "Rscript"),
   c(
-    file.path(module_dir, "scripts", "run_limma_cell_type_collection.R"),
+    file.path(module_dir, "scripts", "run_limma_cell_category_collection.R"),
     "--pseudobulk_collection_manifest", manifest_path,
     "--contrast", "M-F",
     "--output_dir", cli_output_dir
@@ -153,7 +169,7 @@ manifest <- base::read.dcf(missing_manifest)
 manifest[1L, "profile_catalog"] <- "not-present.csv"
 base::write.dcf(manifest, missing_manifest)
 expect_error(
-  omix_limma_cell_type_collection(missing_manifest, file.path(work_dir, "missing-catalog-output")),
+  omix_limma_cell_category_collection(missing_manifest, file.path(work_dir, "missing-catalog-output")),
   "profile_catalog was not found"
 )
 
@@ -163,50 +179,50 @@ malformed_mode_root <- file.path(work_dir, "malformed-mode")
 make_collection(malformed_mode_root)
 malformed_mode_manifest <- file.path(malformed_mode_root, "Pseudobulk_Collection_Manifest.dcf")
 manifest <- base::read.dcf(malformed_mode_manifest)
-manifest[1L, "cell_type_selection_mode"] <- "one"
+manifest[1L, "cell_category_selection_mode"] <- "one"
 base::write.dcf(manifest, malformed_mode_manifest)
 expect_error(
-  omix_limma_cell_type_collection(malformed_mode_manifest, file.path(work_dir, "malformed-mode-output")),
-  "cell_type_selection_mode as selected or all"
+  omix_limma_cell_category_collection(malformed_mode_manifest, file.path(work_dir, "malformed-mode-output")),
+  "cell_category_selection_mode as selected or all"
 )
 
 discordant_mode_root <- file.path(work_dir, "discordant-mode")
 catalog <- make_collection(discordant_mode_root)
 catalog$SelectionMode <- "all"
-utils::write.csv(catalog, file.path(discordant_mode_root, "Cell_Type_Profile_Catalog.csv"), row.names = FALSE)
+utils::write.csv(catalog, file.path(discordant_mode_root, "Cell_Category_Profile_Catalog.csv"), row.names = FALSE)
 expect_error(
-  omix_limma_cell_type_collection(file.path(discordant_mode_root, "Pseudobulk_Collection_Manifest.dcf"), file.path(work_dir, "discordant-mode-output")),
+  omix_limma_cell_category_collection(file.path(discordant_mode_root, "Pseudobulk_Collection_Manifest.dcf"), file.path(work_dir, "discordant-mode-output")),
   "SelectionMode must match the collection manifest"
 )
 
 duplicate_root <- file.path(work_dir, "duplicate-catalog")
 catalog <- make_collection(duplicate_root)
-utils::write.csv(rbind(catalog, catalog[1L, , drop = FALSE]), file.path(duplicate_root, "Cell_Type_Profile_Catalog.csv"), row.names = FALSE)
+utils::write.csv(rbind(catalog, catalog[1L, , drop = FALSE]), file.path(duplicate_root, "Cell_Category_Profile_Catalog.csv"), row.names = FALSE)
 expect_error(
-  omix_limma_cell_type_collection(file.path(duplicate_root, "Pseudobulk_Collection_Manifest.dcf"), file.path(work_dir, "duplicate-output")),
-  "duplicate CellTypeID/Donor/Group"
+  omix_limma_cell_category_collection(file.path(duplicate_root, "Pseudobulk_Collection_Manifest.dcf"), file.path(work_dir, "duplicate-output")),
+  "duplicate CellCategoryID/Donor/Group"
 )
 
 missing_source_root <- file.path(work_dir, "missing-source")
 catalog <- make_collection(missing_source_root)
-catalog$MatrixPath[catalog$CellTypeID == catalog$CellTypeID[[1L]]] <- "cell_types/missing/SCT_Mean_Log2_Expression.csv"
-utils::write.csv(catalog, file.path(missing_source_root, "Cell_Type_Profile_Catalog.csv"), row.names = FALSE)
+catalog$MatrixPath[catalog$CellCategoryID == catalog$CellCategoryID[[1L]]] <- "cell_categories/missing/SCT_Mean_Log2_Expression.csv"
+utils::write.csv(catalog, file.path(missing_source_root, "Cell_Category_Profile_Catalog.csv"), row.names = FALSE)
 expect_error(
-  omix_limma_cell_type_collection(file.path(missing_source_root, "Pseudobulk_Collection_Manifest.dcf"), file.path(work_dir, "missing-source-output")),
+  omix_limma_cell_category_collection(file.path(missing_source_root, "Pseudobulk_Collection_Manifest.dcf"), file.path(work_dir, "missing-source-output")),
   "MatrixPath was not found"
 )
 
 insufficient_root <- file.path(work_dir, "insufficient")
 make_collection(insufficient_root, f_profiles = 1L)
 expect_error(
-  omix_limma_cell_type_collection(file.path(insufficient_root, "Pseudobulk_Collection_Manifest.dcf"), file.path(work_dir, "insufficient-output")),
+  omix_limma_cell_category_collection(file.path(insufficient_root, "Pseudobulk_Collection_Manifest.dcf"), file.path(work_dir, "insufficient-output")),
   "requires at least two donor-level profiles"
 )
 
 mismatch_root <- file.path(work_dir, "feature-mismatch")
 make_collection(mismatch_root, second_genes = c("Gene1", "GeneX", "Gene3"))
 expect_error(
-  omix_limma_cell_type_collection(file.path(mismatch_root, "Pseudobulk_Collection_Manifest.dcf"), file.path(work_dir, "mismatch-output")),
+  omix_limma_cell_category_collection(file.path(mismatch_root, "Pseudobulk_Collection_Manifest.dcf"), file.path(work_dir, "mismatch-output")),
   "exact same ordered tested-gene universe"
 )
 
@@ -217,4 +233,4 @@ expect_error(
   "non-finite numeric values"
 )
 
-message("OMIX-Limma-Analysis cell-type collection checks passed")
+message("OMIX-Limma-Analysis cell-category collection checks passed")

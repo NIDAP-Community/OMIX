@@ -32,8 +32,8 @@ stopifnot(length(list.files(file.path(module_root, "tests"), pattern = "\\.rds$"
 
 cli_text <- paste(readLines(cli_file, warn = FALSE), collapse = "\n")
 for (option in c(
-  "--seurat_rds", "--donor_column", "--group_column", "--cell_type_column",
-  "--cell_type", "--metadata_columns", "--aggregation_method", "--output_dir"
+  "--seurat_rds", "--donor_column", "--group_column", "--cell_category_column",
+  "--cell_category", "--metadata_columns", "--aggregation_method", "--output_dir"
 )) {
   stopifnot(grepl(option, cli_text, fixed = TRUE))
 }
@@ -52,8 +52,8 @@ invalid_feature_output <- suppressWarnings(system2(
     "--seurat_rds", "not-used.rds",
     "--donor_column", "Donor",
     "--group_column", "Group",
-    "--cell_type_column", "CellType",
-    "--cell_type", "Monocytes",
+    "--cell_category_column", "CellCategory",
+    "--cell_category", "Monocytes",
     "--feature_id_column", "Gene"
   ),
   stdout = TRUE,
