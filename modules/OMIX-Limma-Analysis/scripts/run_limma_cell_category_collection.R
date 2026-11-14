@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-# Platform-neutral CLI for an ordered, donor-level M-F Limma cell-category
+# Platform-neutral CLI for an ordered, donor-level two-group Limma cell-category
 # collection. This deliberately consumes explicit portable paths; Code Ocean
 # or another deployment adapter owns any mounted-input discovery.
 
@@ -20,15 +20,22 @@ split_csv <- function(value) {
 
 option_list <- list(
   make_option("--pseudobulk_collection_manifest", type = "character", default = "", help = "Pseudobulk_Collection_Manifest.dcf from selected/all OMIX Seurat Pseudobulk"),
-  make_option("--contrast", type = "character", default = "M-F", help = "Fixed donor-level comparison for the current collection contract [default: %default]"),
+  make_option("--contrast", type = "character", default = "", help = "Optional explicit two-group comparison; blank infers one only when unambiguous [default: blank]"),
   make_option("--sample_names_column", type = "character", default = "Sample"),
   make_option("--gene_names_column", type = "character", default = "GeneName"),
   make_option("--covariate_columns", type = "character", default = "", help = "Optional comma-separated covariate columns"),
   make_option("--batch_effect_columns", type = "character", default = "", help = "Optional comma-separated technical batch columns"),
   make_option("--donor_variable_column", type = "character", default = "", help = "Optional repeated-measure donor blocking column"),
-  make_option("--output_dir", type = "character", default = "results")
+  make_option("--output_dir", type = "character", help = "Required new or empty output directory")
 )
 opt <- parse_args(OptionParser(option_list = option_list))
+
+if (is.null(opt$pseudobulk_collection_manifest) || !nzchar(trimws(opt$pseudobulk_collection_manifest))) {
+  stop("--pseudobulk_collection_manifest is required.", call. = FALSE)
+}
+if (is.null(opt$output_dir) || !nzchar(trimws(opt$output_dir))) {
+  stop("--output_dir is required.", call. = FALSE)
+}
 
 result <- omix_limma_cell_category_collection(
   pseudobulk_collection_manifest = opt$pseudobulk_collection_manifest,

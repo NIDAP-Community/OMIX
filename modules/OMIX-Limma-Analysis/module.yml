@@ -1,7 +1,7 @@
 name: omix-limma-analysis
 display_name: OMIX Limma Analysis
-version: 2.0.0
-interface_version: 4
+version: 3.0.0
+interface_version: 5
 module_type: statistical-analysis
 status: active
 owner: OMIX Team

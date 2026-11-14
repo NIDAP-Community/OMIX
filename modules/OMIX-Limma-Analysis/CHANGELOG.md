@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- Breaking collection-interface-3 update: cell-category collection accepts an
+  explicit two-group donor-level contrast such as `1-0` or
+  `Treated-Control`, or infers one only when exactly two groups have at least
+  two eligible profiles in every emitted category. It no longer defaults to
+  M-F. Explicit collection contrasts model only the named pair; excluded
+  groups, requested and resolved contrasts, and group-independent profile
+  counts are recorded in the catalog and provenance. The collection output
+  directory is now required. The established one-matrix Limma CLI is
+  unchanged.
+
+- Bumps the semantic module version to 3.0.0 and the module interface to 5
+  for the collection-contract break.
+
 - Breaking collection-interface-2 rename: the category collection command,
   catalog fields, nested directory, and Pseudobulk collection-manifest
   vocabulary now use `cell_category` and `CellCategory` consistently. The

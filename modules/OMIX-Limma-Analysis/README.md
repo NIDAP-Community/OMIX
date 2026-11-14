@@ -92,25 +92,33 @@ Use the separate collection command after OMIX Seurat Pseudobulk has run in
 `selected` or `all` mode with a continuous-expression aggregation method. The
 collection command reads its explicit `Pseudobulk_Collection_Manifest.dcf`,
 then runs the established Limma implementation independently for every
-cell-category bundle. It currently implements the donor-level `M-F` comparison.
+cell-category bundle. It analyzes one donor-level two-group comparison per
+collection. Supply an explicit direction such as `1-0` or
+`Treated-Control`; leave `--contrast` blank only when every emitted category
+has the same two groups with at least two eligible donor profiles each.
+`--output_dir` is required and must name a new or empty directory.
 
 ```bash
 Rscript "$OMIX_ROOT/modules/OMIX-Limma-Analysis/scripts/run_limma_cell_category_collection.R" \
   --pseudobulk_collection_manifest /path/to/cell-category-pseudobulk/Pseudobulk_Collection_Manifest.dcf \
-  --contrast M-F \
+  --contrast Treated-Control \
   --output_dir results/cell-category-limma
 ```
 
-Every exported cell category must have at least two donor-level profiles in both
-the M and F groups. When Pseudobulk collection uses its explicit `drop` policy,
-this command ignores cell categories recorded as omitted because they no longer
-retain two groups. It preserves the remaining Pseudobulk selected order (or
-deterministic all-mode order) and writes these L2P Multi comparison families:
+Every compared group must have at least two donor-level profiles in every
+exported cell category. With a third or later replicated group, an explicit
+contrast models only its named pair and records the excluded groups in the
+catalog and provenance. A blank contrast is rejected if more than two groups
+qualify, rather than selecting a pair silently. When Pseudobulk collection uses
+its explicit `drop` policy, this command ignores categories recorded as omitted
+because they no longer retain two groups. It preserves the remaining Pseudobulk
+selected order (or deterministic all-mode order) and writes these L2P Multi
+comparison families:
 
 ```text
-<stable-cell-category-id>__M-F_tstat
-<stable-cell-category-id>__M-F_pval
-<stable-cell-category-id>__M-F_FC
+<stable-cell-category-id>__<resolved-contrast>_tstat
+<stable-cell-category-id>__<resolved-contrast>_pval
+<stable-cell-category-id>__<resolved-contrast>_FC
 ```
 
 Pass `L2P_Multi_Input.csv` to OMIX L2P Multi and copy the ordered comparison
@@ -120,9 +128,10 @@ and finite t-statistic, p-value, and fold-change values. It fails on a
 mismatch; it never silently pools cells, unions/intersects/reorders features,
 or fills missing statistics.
 
-This is a collection of independent M-F models. It does not test whether the
-M-F effect differs between cell categories. Such a question requires a separately
-specified and validated interaction-model workflow.
+This is a collection of independent donor-level models. It does not test
+whether the selected group effect differs between cell categories. Such a
+question requires a separately specified and validated interaction-model
+workflow.
 
 ## Inputs
 

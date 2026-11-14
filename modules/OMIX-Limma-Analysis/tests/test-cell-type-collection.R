@@ -16,7 +16,14 @@ write_manifest <- function(path) {
   ), path)
 }
 
-make_collection <- function(root, second_genes = c("Gene1", "Gene2", "Gene3"), f_profiles = 3L, omit_first = FALSE) {
+make_collection <- function(
+  root,
+  second_genes = c("Gene1", "Gene2", "Gene3"),
+  group_labels = c("M", "F"),
+  profiles_per_group = rep(3L, length(group_labels)),
+  omit_first = FALSE
+) {
+  stopifnot(length(group_labels) == length(profiles_per_group), all(profiles_per_group >= 1L))
   dir.create(root, recursive = TRUE, showWarnings = FALSE)
   ids <- c("ct-t-cells-11111111111111111111111111111111", "ct-monocytes-22222222222222222222222222222222")
   labels <- c("T cells", "Monocytes")
@@ -26,20 +33,25 @@ make_collection <- function(root, second_genes = c("Gene1", "Gene2", "Gene3"), f
     bundle_dir <- file.path(root, "cell_categories", id)
     dir.create(bundle_dir, recursive = TRUE, showWarnings = FALSE)
     genes <- if (index == 1L) c("Gene1", "Gene2", "Gene3") else second_genes
-    samples <- c(paste0("M", seq_len(3L)), paste0("F", seq_len(f_profiles)))
+    sample_groups <- rep(group_labels, profiles_per_group)
+    samples <- unlist(Map(
+      function(group, count) paste0("sample_", gsub("[^A-Za-z0-9]", "", group), "_", seq_len(count)),
+      group_labels,
+      profiles_per_group
+    ), use.names = FALSE)
     matrix <- data.frame(
       GeneName = genes,
       setNames(lapply(seq_along(samples), function(sample_index) {
         # Cell-category-specific values retain the same ordered gene universe while
         # giving both comparisons a finite, non-zero M-F effect.
-        c(5, 6, 7) + (sample_index <= 3L) * (index / 3)
+        c(5, 6, 7) + (sample_groups[[sample_index]] == group_labels[[1L]]) * (index / 3)
       }), samples),
       check.names = FALSE
     )
     metadata <- data.frame(
       Sample = samples,
       Donor = samples,
-      Group = c(rep("M", 3L), rep("F", f_profiles)),
+      Group = sample_groups,
       CellCategory = labels[[index]],
       Cells = 40L,
       stringsAsFactors = FALSE,
@@ -96,8 +108,8 @@ make_collection(collection_root)
 manifest_path <- file.path(collection_root, "Pseudobulk_Collection_Manifest.dcf")
 output_dir <- file.path(work_dir, "result")
 
-# The direct function is the scientific contract; its output must preserve the
-# selected-cell-category order and the exact suffixes L2P Multi resolves by default.
+# The direct function is the scientific contract; a blank contrast infers the
+# only replicated pair and preserves the exact suffixes L2P Multi resolves.
 result <- omix_limma_cell_category_collection(manifest_path, output_dir)
 expected_comparisons <- c(
   "ct-t-cells-11111111111111111111111111111111__M-F",
@@ -133,10 +145,12 @@ stopifnot(identical(provenance$Comparison, expected_comparisons))
 stopifnot(all(c(
   "CellCategoryID", "CellCategory", "SelectionMode", "SourceMatrixPath", "SourceMatrixSHA256",
   "SourceBundleManifestPath", "SourceLimmaAnalysisPath", "InputDataType", "VarianceModel",
-  "ModelType", "MProfiles", "FProfiles", "TestedGeneCount", "SourceLimmaAnalysisSHA256"
+  "ModelType", "RequestedContrast", "ResolvedContrast", "ContrastSource", "ModeledGroups",
+  "ExcludedGroups", "EligibleGroupProfileCounts", "ModeledGroupProfileCounts", "TestedGeneCount",
+  "SourceLimmaAnalysisSHA256"
 ) %in% names(provenance)))
 catalog_output <- utils::read.csv(result$catalog, check.names = FALSE, stringsAsFactors = FALSE)
-stopifnot(all(c("ProfileEligibility", "LimmaAnalysisPath", "L2PComparison") %in% names(catalog_output)))
+stopifnot(all(c("ProfileEligibility", "LimmaAnalysisPath", "L2PComparison", "CollectionContrastMembership") %in% names(catalog_output)))
 stopifnot(file.exists(file.path(output_dir, "cell_categories", provenance$CellCategoryID[[1L]], "Limma_Analysis.csv")))
 
 # Exercise the portable explicit-path CLI separately from the direct function.
@@ -146,7 +160,6 @@ cli_output <- system2(
   c(
     file.path(module_dir, "scripts", "run_limma_cell_category_collection.R"),
     "--pseudobulk_collection_manifest", manifest_path,
-    "--contrast", "M-F",
     "--output_dir", cli_output_dir
   ),
   stdout = TRUE,
@@ -155,11 +168,81 @@ cli_output <- system2(
 stopifnot(is.null(attr(cli_output, "status")))
 stopifnot(file.exists(file.path(cli_output_dir, "L2P_Multi_Input.csv")))
 
+cli_missing_output <- suppressWarnings(system2(
+  file.path(R.home("bin"), "Rscript"),
+  c(
+    file.path(module_dir, "scripts", "run_limma_cell_category_collection.R"),
+    "--pseudobulk_collection_manifest", manifest_path
+  ),
+  stdout = TRUE,
+  stderr = TRUE
+))
+stopifnot(!is.null(attr(cli_missing_output, "status")))
+stopifnot(any(grepl("--output_dir is required", cli_missing_output, fixed = TRUE)))
+
+# Numeric group labels use the natural explicit/inferred comparison labels from
+# the ordinary Limma contract.  The collection export qualifies those labels
+# with the stable cell-category ID for L2P Multi.
+numeric_root <- file.path(work_dir, "numeric-groups")
+make_collection(numeric_root, group_labels = c("0", "1"), profiles_per_group = c(3L, 3L))
+numeric_result <- omix_limma_cell_category_collection(
+  file.path(numeric_root, "Pseudobulk_Collection_Manifest.dcf"),
+  file.path(work_dir, "numeric-result")
+)
+numeric_comparisons <- paste0(c(
+  "ct-t-cells-11111111111111111111111111111111",
+  "ct-monocytes-22222222222222222222222222222222"
+), "__1-0")
+stopifnot(identical(numeric_result$comparisons, numeric_comparisons))
+stopifnot(identical(numeric_result$requested_contrast, ""))
+stopifnot(identical(numeric_result$resolved_contrast, "1-0"))
+stopifnot(identical(numeric_result$contrast_source, "inferred"))
+numeric_provenance <- utils::read.csv(numeric_result$provenance, check.names = FALSE, stringsAsFactors = FALSE)
+stopifnot(all(is.na(numeric_provenance$RequestedContrast) | numeric_provenance$RequestedContrast == ""))
+stopifnot(identical(numeric_provenance$ResolvedContrast, c("1-0", "1-0")))
+stopifnot(identical(numeric_provenance$ModeledGroups, c("0,1", "0,1")))
+
+# An explicit pair selects only the named groups when a category has a third
+# replicated group.  The excluded profiles remain visible in the collection
+# catalog instead of becoming silent nuisance-model rows.
+three_group_root <- file.path(work_dir, "three-groups")
+make_collection(
+  three_group_root,
+  group_labels = c("Control", "Treated", "Reference"),
+  profiles_per_group = c(3L, 3L, 3L)
+)
+three_group_result <- omix_limma_cell_category_collection(
+  file.path(three_group_root, "Pseudobulk_Collection_Manifest.dcf"),
+  file.path(work_dir, "three-group-result"),
+  contrast = "Treated-Control"
+)
+stopifnot(identical(three_group_result$resolved_contrast, "Treated-Control"))
+three_group_provenance <- utils::read.csv(three_group_result$provenance, check.names = FALSE, stringsAsFactors = FALSE)
+stopifnot(identical(three_group_provenance$ExcludedGroups, c("Reference", "Reference")))
+three_group_catalog <- utils::read.csv(three_group_result$catalog, check.names = FALSE, stringsAsFactors = FALSE)
+stopifnot(all(three_group_catalog$CollectionContrastMembership[three_group_catalog$Group == "Reference"] == "excluded_not_in_contrast"))
+stopifnot(all(three_group_catalog$CollectionContrastMembership[three_group_catalog$Group %in% c("Control", "Treated")] == "included"))
+three_group_metadata <- utils::read.csv(
+  file.path(dirname(three_group_result$l2p_multi_input), "cell_categories", "ct-t-cells-11111111111111111111111111111111", "Sample_Metadata.csv"),
+  stringsAsFactors = FALSE
+)
+stopifnot(identical(sort(unique(three_group_metadata$Group)), c("Control", "Treated")))
+
 expect_error <- function(expression, pattern) {
   error <- tryCatch(force(expression), error = identity)
   stopifnot(inherits(error, "error"))
   stopifnot(grepl(pattern, conditionMessage(error), fixed = TRUE))
 }
+
+# A collection never reuses a populated directory, avoiding stale category
+# bundles being mixed with a later run.
+populated_output_dir <- file.path(work_dir, "populated-output")
+dir.create(populated_output_dir)
+writeLines("old result", file.path(populated_output_dir, "old.txt"))
+expect_error(
+  omix_limma_cell_category_collection(manifest_path, populated_output_dir),
+  "output_dir must be new or empty"
+)
 
 # Invalid collection routing is rejected before any analysis is written.
 missing_catalog_root <- file.path(work_dir, "missing-catalog")
@@ -213,10 +296,33 @@ expect_error(
 )
 
 insufficient_root <- file.path(work_dir, "insufficient")
-make_collection(insufficient_root, f_profiles = 1L)
+make_collection(insufficient_root, profiles_per_group = c(3L, 1L))
 expect_error(
-  omix_limma_cell_category_collection(file.path(insufficient_root, "Pseudobulk_Collection_Manifest.dcf"), file.path(work_dir, "insufficient-output")),
+  omix_limma_cell_category_collection(
+    file.path(insufficient_root, "Pseudobulk_Collection_Manifest.dcf"),
+    file.path(work_dir, "insufficient-output"),
+    contrast = "M-F"
+  ),
   "requires at least two donor-level profiles"
+)
+
+ambiguous_root <- file.path(work_dir, "ambiguous")
+make_collection(ambiguous_root, group_labels = c("Control", "Treated", "Reference"), profiles_per_group = c(3L, 3L, 3L))
+expect_error(
+  omix_limma_cell_category_collection(
+    file.path(ambiguous_root, "Pseudobulk_Collection_Manifest.dcf"),
+    file.path(work_dir, "ambiguous-output")
+  ),
+  "a single comparison cannot be inferred"
+)
+
+expect_error(
+  omix_limma_cell_category_collection(
+    file.path(ambiguous_root, "Pseudobulk_Collection_Manifest.dcf"),
+    file.path(work_dir, "absent-group-output"),
+    contrast = "Unknown-Control"
+  ),
+  "Collection contrast is not estimable"
 )
 
 mismatch_root <- file.path(work_dir, "feature-mismatch")

@@ -874,24 +874,81 @@ omix_limma_analysis <- Limma_Analysis
     stop("Pseudobulk manifest input kind does not match its declared matrix type for ", cell_category_id, ".", call. = FALSE)
   }
   if (!identical(input_contract$input_kind, "log2_expression")) {
-    stop("L2P Multi export requires log2-expression pseudobulk for ", cell_category_id, " so an M-F_FC column is defined.", call. = FALSE)
+    stop("L2P Multi export requires log2-expression pseudobulk for ", cell_category_id, " so a contrast FC column is defined.", call. = FALSE)
   }
   list(manifest = manifest, input_contract = input_contract)
 }
 
-.omix_limma_collection_validate_m_f_profiles <- function(record, metadata, sample_names_column, contrast_variable_columns) {
-  .omix_limma_collection_require_columns(metadata, c(sample_names_column, "Donor", contrast_variable_columns), paste0("Metadata for ", record$id))
+.omix_limma_collection_optional_scalar <- function(value, name) {
+  if (is.null(value) || length(value) == 0L) return("")
+  if (!is.character(value) || length(value) != 1L || is.na(value)) {
+    stop(name, " must be one character value or blank.", call. = FALSE)
+  }
+  trimws(value)
+}
+
+.omix_limma_collection_explicit_contrast_groups <- function(contrast, group_counts) {
+  group_labels <- names(group_counts)
+  group_label_map <- stats::setNames(make.names(group_labels, unique = TRUE), group_labels)
+  rewritten <- .omix_limma_rewrite_contrast(contrast, group_label_map)
+  contrast_matrix <- tryCatch(
+    limma::makeContrasts(contrasts = rewritten, levels = unname(group_label_map)),
+    error = function(error) NULL
+  )
+  if (is.null(contrast_matrix)) {
+    stop(
+      "Collection contrast is not estimable from eligible groups. Requested contrast: ", contrast,
+      ". Eligible group replicate counts: ", .omix_limma_format_group_counts(group_counts), ".",
+      call. = FALSE
+    )
+  }
+  coefficients <- as.numeric(contrast_matrix[, 1L])
+  selected_safe_labels <- rownames(contrast_matrix)[abs(coefficients) > 1e-12]
+  selected_groups <- names(group_label_map)[match(selected_safe_labels, unname(group_label_map))]
+  selected_coefficients <- coefficients[abs(coefficients) > 1e-12]
+  if (length(selected_groups) != 2L ||
+      !identical(sort(selected_coefficients), c(-1, 1))) {
+    stop(
+      "Collection contrast must compare exactly two eligible donor groups with coefficients +1 and -1. Requested contrast: ", contrast,
+      ". Eligible groups: ", paste(group_labels, collapse = ", "), ".",
+      call. = FALSE
+    )
+  }
+  selected_groups
+}
+
+.omix_limma_collection_select_profiles <- function(record, metadata, sample_names_column, contrast) {
+  .omix_limma_collection_require_columns(metadata, c(sample_names_column, "Donor", "Group"), paste0("Metadata for ", record$id))
   metadata[[sample_names_column]] <- as.character(metadata[[sample_names_column]])
   if (anyNA(metadata[[sample_names_column]]) || any(!nzchar(metadata[[sample_names_column]])) || anyDuplicated(metadata[[sample_names_column]])) {
     stop("Metadata for ", record$id, " must contain unique non-empty sample IDs.", call. = FALSE)
   }
   eligible <- record$rows[record$rows$ProfileEligibility == "eligible", , drop = FALSE]
-  eligible_m_f <- eligible[eligible$Group %in% c("M", "F"), , drop = FALSE]
-  expected_keys <- paste(eligible_m_f$Donor, eligible_m_f$Group, sep = "\r")
-  selected <- metadata[as.character(metadata[[contrast_variable_columns]]) %in% c("M", "F"), , drop = FALSE]
-  observed_keys <- paste(as.character(selected$Donor), as.character(selected[[contrast_variable_columns]]), sep = "\r")
+  group_counts <- .omix_limma_group_counts(eligible, "Group")
+  if (!nzchar(contrast)) {
+    contrast_details <- .omix_limma_resolve_contrasts(NULL, group_counts)
+    selected_groups <- names(group_counts)[group_counts > 1L]
+  } else {
+    if (grepl(",", contrast, fixed = TRUE)) {
+      stop("Collection contrast accepts exactly one two-group comparison; supply one expression such as 1-0 or Treated-Control.", call. = FALSE)
+    }
+    selected_groups <- .omix_limma_collection_explicit_contrast_groups(contrast, group_counts)
+    contrast_details <- list(requested = contrast, resolved = contrast, source = "explicit")
+  }
+  selected_group_counts <- group_counts[selected_groups]
+  if (any(selected_group_counts < 2L)) {
+    stop(
+      "Cell category ", record$id, " requires at least two donor-level profiles in each compared group; observed ",
+      .omix_limma_format_group_counts(selected_group_counts), ".",
+      call. = FALSE
+    )
+  }
+  expected <- eligible[eligible$Group %in% selected_groups, , drop = FALSE]
+  expected_keys <- paste(expected$Donor, expected$Group, sep = "\r")
+  selected <- metadata[as.character(metadata$Group) %in% selected_groups, , drop = FALSE]
+  observed_keys <- paste(as.character(selected$Donor), as.character(selected$Group), sep = "\r")
   if (anyDuplicated(observed_keys)) {
-    stop("Metadata for ", record$id, " has duplicate donor/group profiles for the M-F model.", call. = FALSE)
+    stop("Metadata for ", record$id, " has duplicate donor/group profiles for the collection contrast.", call. = FALSE)
   }
   if (!setequal(expected_keys, observed_keys)) {
     missing <- setdiff(expected_keys, observed_keys)
@@ -900,13 +957,17 @@ omix_limma_analysis <- Limma_Analysis
       if (length(missing)) paste0("missing eligible catalog profile(s): ", paste(missing, collapse = ", ")),
       if (length(unexpected)) paste0("unexpected metadata profile(s): ", paste(unexpected, collapse = ", "))
     )
-    stop("Metadata for ", record$id, " does not exactly match eligible catalog M/F profiles (", paste(detail, collapse = "; "), ").", call. = FALSE)
+    stop("Metadata for ", record$id, " does not exactly match eligible catalog profiles for the collection contrast (", paste(detail, collapse = "; "), ").", call. = FALSE)
   }
-  group_counts <- table(factor(as.character(selected[[contrast_variable_columns]]), levels = c("M", "F")))
-  if (any(group_counts < 2L)) {
-    stop("Cell category ", record$id, " requires at least two donor-level profiles in each M and F group; observed M=", group_counts[["M"]], ", F=", group_counts[["F"]], ".", call. = FALSE)
-  }
-  selected
+  list(
+    metadata = selected,
+    requested_contrast = if (identical(contrast_details$source, "explicit")) contrast_details$requested else "",
+    resolved_contrast = contrast_details$resolved,
+    contrast_source = contrast_details$source,
+    selected_groups = selected_groups,
+    excluded_groups = setdiff(names(group_counts), selected_groups),
+    eligible_group_counts = group_counts
+  )
 }
 
 .omix_limma_collection_validate_l2p_multi_shape <- function(table, comparisons) {
@@ -950,18 +1011,20 @@ omix_limma_analysis <- Limma_Analysis
   ), file.path(output_dir, "run_summary.txt"))
 }
 
-#' Run M-F Limma models for an ordered pseudobulk cell-category collection.
+#' Run generalized two-group Limma models for an ordered pseudobulk cell-category collection.
 #'
 #' @description
 #' Consumes the collection manifest written by OMIX Seurat Pseudobulk, fits the
 #' ordinary continuous-matrix Limma model independently for each cell category, and
 #' writes a strict common-gene-universe wide table for OMIX L2P Multi.  This is
-#' a collection of independent donor-level M-F comparisons, not a pooled-cell
+#' a collection of independent donor-level two-group comparisons, not a pooled-cell
 #' analysis or a cell-category-by-group interaction model.
 #'
 #' @param pseudobulk_collection_manifest Pseudobulk collection manifest path.
 #' @param output_dir New or empty destination directory.
-#' @param contrast Fixed M-F contrast for the collection contract.
+#' @param contrast Optional explicit two-group contrast. When blank, the
+#'   contrast is inferred only if exactly two groups have at least two eligible
+#'   donor-level profiles in every cell category.
 #' @param sample_names_column Metadata sample-ID column.
 #' @param gene_names_column Matrix feature-ID column.
 #' @param covariate_columns Optional Limma covariate columns.
@@ -970,33 +1033,33 @@ omix_limma_analysis <- Limma_Analysis
 #' @return Paths and comparison IDs for the L2P Multi handoff.
 omix_limma_cell_category_collection <- function(
     pseudobulk_collection_manifest,
-    output_dir = "results",
-    contrast = "M-F",
+    output_dir,
+    contrast = "",
     sample_names_column = "Sample",
     gene_names_column = "GeneName",
     covariate_columns = NULL,
     batch_effect_columns = NULL,
     donor_variable_column = NULL) {
-  contrast <- .omix_limma_collection_scalar(contrast, "contrast")
-  if (!identical(contrast, "M-F")) {
-    stop("The cell-category collection contract currently supports only the explicit donor-level contrast M-F.", call. = FALSE)
-  }
+  contrast <- .omix_limma_collection_optional_scalar(contrast, "contrast")
   output_dir <- .omix_limma_collection_scalar(output_dir, "output_dir")
-  if (file.exists(output_dir) && length(list.files(output_dir, all.files = TRUE, no.. = TRUE)) > 0L) {
+  if (file.exists(output_dir) && !dir.exists(output_dir)) {
+    stop("output_dir must be a directory path: ", output_dir, call. = FALSE)
+  }
+  if (dir.exists(output_dir) && length(list.files(output_dir, all.files = TRUE, no.. = TRUE)) > 0L) {
     stop("output_dir must be new or empty for a cell-category collection: ", output_dir, call. = FALSE)
   }
   collection <- .omix_limma_collection_read_catalog(pseudobulk_collection_manifest)
   cell_category_runs <- vector("list", length(collection$records))
   reference_genes <- NULL
+  collection_contrast <- NULL
 
   for (index in seq_along(collection$records)) {
     record <- collection$records[[index]]
     bundle <- .omix_limma_collection_resolve_bundle_contract(record$bundle_manifest_path, record$id)
     matrix <- .omix_limma_collection_read_table(record$matrix_path)
     metadata <- .omix_limma_collection_read_table(record$metadata_path)
-    selected_metadata <- .omix_limma_collection_validate_m_f_profiles(
-      record, metadata, sample_names_column, "Group"
-    )
+    profile_selection <- .omix_limma_collection_select_profiles(record, metadata, sample_names_column, contrast)
+    selected_metadata <- profile_selection$metadata
     selected_samples <- as.character(selected_metadata[[sample_names_column]])
     result <- omix_limma_analysis(
       Dataset = matrix,
@@ -1005,7 +1068,7 @@ omix_limma_cell_category_collection <- function(
       samples_to_include = selected_samples,
       gene_names_column = gene_names_column,
       contrast_variable_columns = "Group",
-      contrasts = contrast,
+      contrasts = if (identical(profile_selection$contrast_source, "explicit")) profile_selection$resolved_contrast else NULL,
       covariate_columns = covariate_columns,
       batch_effect_columns = batch_effect_columns,
       donor_variable_column = donor_variable_column,
@@ -1014,7 +1077,21 @@ omix_limma_cell_category_collection <- function(
       input_data_type = bundle$input_contract$input_data_type,
       fraction_transform = bundle$input_contract$fraction_transform
     )
-    required_statistics <- paste0(contrast, c("_tstat", "_pval", "_FC"))
+    limma_run <- attr(result, "omix_limma_run")
+    resolved_contrast <- limma_run$contrasts
+    if (length(resolved_contrast) != 1L || !identical(resolved_contrast, profile_selection$resolved_contrast)) {
+      stop("Collection contrast resolution did not match the Limma result for ", record$id, ".", call. = FALSE)
+    }
+    if (is.null(collection_contrast)) {
+      collection_contrast <- resolved_contrast
+    } else if (!identical(collection_contrast, resolved_contrast)) {
+      stop(
+        "Every emitted cell category must resolve the same collection contrast. ",
+        record$id, " resolved ", resolved_contrast, " while earlier categories resolved ", collection_contrast, ".",
+        call. = FALSE
+      )
+    }
+    required_statistics <- paste0(resolved_contrast, c("_tstat", "_pval", "_FC"))
     .omix_limma_collection_require_columns(result, c("Gene", required_statistics), paste0("Limma results for ", record$id))
     genes <- as.character(result$Gene)
     if (anyNA(genes) || any(!nzchar(genes)) || anyDuplicated(genes)) {
@@ -1037,26 +1114,33 @@ omix_limma_cell_category_collection <- function(
       matrix = matrix,
       metadata = selected_metadata,
       result = result,
-      limma_run = attr(result, "omix_limma_run")
+      limma_run = limma_run,
+      profile_selection = profile_selection,
+      resolved_contrast = resolved_contrast
     )
   }
 
-  comparisons <- vapply(cell_category_runs, function(run) paste0(run$record$id, "__", contrast), character(1))
+  comparisons <- vapply(cell_category_runs, function(run) paste0(run$record$id, "__", run$resolved_contrast), character(1))
   l2p_input <- data.frame(GeneName = reference_genes, check.names = FALSE, stringsAsFactors = FALSE)
   provenance_rows <- vector("list", length(cell_category_runs))
   for (index in seq_along(cell_category_runs)) {
     run <- cell_category_runs[[index]]
     comparison <- comparisons[[index]]
-    l2p_input[[paste0(comparison, "_tstat")]] <- as.numeric(run$result[[paste0(contrast, "_tstat")]])
-    l2p_input[[paste0(comparison, "_pval")]] <- as.numeric(run$result[[paste0(contrast, "_pval")]])
-    l2p_input[[paste0(comparison, "_FC")]] <- as.numeric(run$result[[paste0(contrast, "_FC")]])
+    l2p_input[[paste0(comparison, "_tstat")]] <- as.numeric(run$result[[paste0(run$resolved_contrast, "_tstat")]])
+    l2p_input[[paste0(comparison, "_pval")]] <- as.numeric(run$result[[paste0(run$resolved_contrast, "_pval")]])
+    l2p_input[[paste0(comparison, "_FC")]] <- as.numeric(run$result[[paste0(run$resolved_contrast, "_FC")]])
     provenance_rows[[index]] <- data.frame(
       CollectionOrder = run$record$order,
       Comparison = comparison,
       CellCategoryID = run$record$id,
       CellCategory = run$record$label,
       SelectionMode = run$record$selection_mode,
-      Contrast = contrast,
+      RequestedContrast = run$profile_selection$requested_contrast,
+      ResolvedContrast = run$resolved_contrast,
+      ContrastSource = run$profile_selection$contrast_source,
+      ModeledGroups = paste(run$profile_selection$selected_groups, collapse = ","),
+      ExcludedGroups = paste(run$profile_selection$excluded_groups, collapse = ","),
+      EligibleGroupProfileCounts = .omix_limma_format_group_counts(run$profile_selection$eligible_group_counts),
       SourceMatrixPath = run$record$matrix_path,
       SourceMatrixSHA256 = .omix_limma_collection_hash(run$record$matrix_path),
       SourceMetadataPath = run$record$metadata_path,
@@ -1071,8 +1155,7 @@ omix_limma_cell_category_collection <- function(
       DonorVariableColumn = if (length(run$limma_run$donor_variable_column)) run$limma_run$donor_variable_column else "",
       CovariateColumns = paste(run$limma_run$covariate_columns, collapse = ","),
       BatchEffectColumns = paste(run$limma_run$batch_effect_columns, collapse = ","),
-      MProfiles = sum(as.character(run$metadata$Group) == "M"),
-      FProfiles = sum(as.character(run$metadata$Group) == "F"),
+      ModeledGroupProfileCounts = .omix_limma_format_group_counts(run$limma_run$group_replicate_counts),
       TestedGeneCount = nrow(run$result),
       stringsAsFactors = FALSE,
       check.names = FALSE
@@ -1093,7 +1176,7 @@ omix_limma_cell_category_collection <- function(
         source_matrix_path = run$record$matrix_path,
         source_metadata_path = run$record$metadata_path,
         source_bundle_manifest_path = run$record$bundle_manifest_path,
-        contrast = contrast,
+        contrast = run$resolved_contrast,
         limma_run = run$limma_run
       )
     )
@@ -1108,6 +1191,16 @@ omix_limma_cell_category_collection <- function(
   output_paths <- stats::setNames(provenance$SourceLimmaAnalysisPath, provenance$CellCategoryID)
   catalog$LimmaAnalysisPath <- unname(output_paths[catalog$CellCategoryID])
   catalog$L2PComparison <- unname(provenance$Comparison[match(catalog$CellCategoryID, provenance$CellCategoryID)])
+  modeled_groups <- stats::setNames(provenance$ModeledGroups, provenance$CellCategoryID)
+  # This marks group membership in the selected contrast. ProfileEligibility
+  # remains the authoritative per-profile record of whether it entered Limma.
+  catalog$CollectionContrastMembership <- ifelse(
+    vapply(seq_len(nrow(catalog)), function(index) {
+      catalog$Group[[index]] %in% strsplit(modeled_groups[[catalog$CellCategoryID[[index]]]], ",", fixed = TRUE)[[1L]]
+    }, logical(1)),
+    "included",
+    "excluded_not_in_contrast"
+  )
   utils::write.csv(l2p_input, file.path(output_dir, "L2P_Multi_Input.csv"), row.names = FALSE, na = "")
   utils::write.csv(provenance, file.path(output_dir, "L2P_Multi_Input_Provenance.csv"), row.names = FALSE, na = "")
   utils::write.csv(catalog, file.path(output_dir, "Limma_Cell_Category_Collection_Catalog.csv"), row.names = FALSE, na = "")
@@ -1117,7 +1210,9 @@ omix_limma_cell_category_collection <- function(
     paste("pseudobulk collection manifest SHA-256:", .omix_limma_collection_hash(collection$collection_manifest_path)),
     paste("profile catalog:", collection$catalog_path),
     paste("profile catalog SHA-256:", .omix_limma_collection_hash(collection$catalog_path)),
-    paste("contrast:", contrast),
+    paste("requested contrast:", if (nzchar(contrast)) contrast else "<blank>"),
+    paste("resolved contrast:", collection_contrast),
+    paste("contrast source:", cell_category_runs[[1L]]$profile_selection$contrast_source),
     paste("cell categories:", paste(comparisons, collapse = ",")),
     paste("tested genes:", length(reference_genes)),
     "L2P Multi input uses the exact ordered common tested-gene universe; no pooling, interaction model, union, intersection, reordering, or missing-value fill was performed."
@@ -1126,6 +1221,9 @@ omix_limma_cell_category_collection <- function(
     l2p_multi_input = file.path(output_dir, "L2P_Multi_Input.csv"),
     provenance = file.path(output_dir, "L2P_Multi_Input_Provenance.csv"),
     catalog = file.path(output_dir, "Limma_Cell_Category_Collection_Catalog.csv"),
-    comparisons = comparisons
+    comparisons = comparisons,
+    requested_contrast = contrast,
+    resolved_contrast = collection_contrast,
+    contrast_source = cell_category_runs[[1L]]$profile_selection$contrast_source
   )
 }
