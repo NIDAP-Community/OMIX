@@ -51,6 +51,15 @@ the biological group column, contrast, optional fixed covariates, optional
 technical batch column, and—only for genuine repeated measures—optional donor
 column.
 
+`--contrasts` is optional. When it is blank, DEG infers one comparison only
+when the selected model data contain exactly two groups with at least two
+biological samples each; the deterministic direction is the second group minus
+the first group in sorted group-label order. It stops rather than guessing when
+the design is ambiguous or under-replicated. Supply explicit contrasts whenever
+you need a particular direction, order, or a selected pair from more groups.
+The run summary records requested and resolved contrasts, their source,
+group-label mapping, and replicate counts.
+
 ## Run locally or on HPC
 
 Set `OMIX_ROOT` to the OMIX checkout, then prepare a writable runtime project
@@ -139,6 +148,9 @@ downstream DEG table.
 ### Experimental design
 
 - Every comparison group needs at least two biological samples.
+- Blank `--contrasts` is safe only for a replicated binary selected-sample
+  design. It is not a substitute for choosing a comparison in a multi-group
+  study; use an explicit numerator-minus-denominator contrast such as `B-A`.
 - The donor column is only for repeated measurements from the same biological
   participant. Technical replicates within a donor-by-group combination are
   rejected rather than selected silently.

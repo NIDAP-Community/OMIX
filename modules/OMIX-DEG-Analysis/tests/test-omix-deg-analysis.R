@@ -95,6 +95,62 @@ stopifnot(isTRUE(all.equal(
   tolerance = 1e-10
 )))
 
+# A blank contrast is safe only for the replicated binary design actually
+# selected for the model. Its direction follows the deterministic group order.
+inferred_unpaired <- omix_deg_analysis(
+  Dataset = fixture$dataset,
+  Metadata_Table = fixture$metadata,
+  sample_names_column = "Sample",
+  samples_to_include = fixture$metadata$Sample,
+  gene_names_column = "Gene",
+  contrast_variable_columns = "Condition",
+  batch_effect_columns = "Batch"
+)
+inferred_run <- attr(inferred_unpaired, "omix_deg_run")
+stopifnot(
+  "B-A_logFC" %in% names(inferred_unpaired),
+  identical(inferred_run$requested_contrasts, character()),
+  identical(inferred_run$resolved_contrasts, "B-A"),
+  identical(inferred_run$contrast_source, "inferred"),
+  identical(names(inferred_run$group_replicate_counts), c("A", "B")),
+  identical(as.integer(inferred_run$group_replicate_counts), c(3L, 3L))
+)
+
+# Numeric group labels are mapped only inside the design. Public columns and
+# provenance retain the natural 1-0 direction callers supplied or inferred.
+numeric_metadata <- fixture$metadata
+numeric_metadata$Condition <- rep(c("0", "1"), each = 3L)
+numeric_groups <- omix_deg_analysis(
+  Dataset = fixture$dataset,
+  Metadata_Table = numeric_metadata,
+  sample_names_column = "Sample",
+  samples_to_include = numeric_metadata$Sample,
+  gene_names_column = "Gene",
+  contrast_variable_columns = "Condition",
+  contrasts = character(),
+  batch_effect_columns = "Batch"
+)
+numeric_run <- attr(numeric_groups, "omix_deg_run")
+stopifnot(
+  "1-0_logFC" %in% names(numeric_groups),
+  identical(numeric_run$resolved_contrasts, "1-0"),
+  identical(numeric_run$group_label_mapping, structure(c("X1", "X0"), names = c("1", "0")))
+)
+
+# Explicit contrasts retain both their requested direction and order.
+ordered_explicit <- omix_deg_analysis(
+  Dataset = fixture$dataset,
+  Metadata_Table = fixture$metadata,
+  sample_names_column = "Sample",
+  samples_to_include = fixture$metadata$Sample,
+  gene_names_column = "Gene",
+  contrast_variable_columns = "Condition",
+  contrasts = c("A-B", "B-A"),
+  batch_effect_columns = "Batch"
+)
+stopifnot(identical(attr(ordered_explicit, "omix_deg_run")$resolved_contrasts, c("A-B", "B-A")))
+stopifnot(identical(grep("^[AB]-[AB]_FC$", names(ordered_explicit), value = TRUE), c("A-B_FC", "B-A_FC")))
+
 # RSEM expected_count values are count-scale estimates and can be fractional.
 # They must follow the raw-count edgeR/voom path without rounding or rejection.
 rsem_expected_counts <- fixture$dataset
@@ -189,10 +245,11 @@ paired <- omix_deg_analysis(
   samples_to_include = paired_metadata$Sample,
   gene_names_column = "Gene",
   contrast_variable_columns = "Condition",
-  contrasts = "B-A",
+  contrasts = character(),
   donor_variable_column = "Donor"
 )
 stopifnot(identical(attr(paired, "omix_deg_run")$model_type, "repeated_measures"))
+stopifnot(identical(attr(paired, "omix_deg_run")$contrast_source, "inferred"))
 stopifnot(identical(attr(paired, "omix_deg_run")$expression_output, "batch_adjusted_voom"))
 stopifnot(identical(attr(paired, "omix_deg_run")$voom_trend_span, 0.5))
 stopifnot(identical(attr(paired, "omix_deg_run")$voom_adaptive_span, FALSE))
@@ -244,6 +301,64 @@ stopifnot(
   grepl("Each comparison group must contain at least two biological samples", under_replicated_error, fixed = TRUE)
 )
 
+under_replicated_inference_error <- tryCatch(
+  omix_deg_analysis(
+    Dataset = fixture$dataset[, c("Gene", under_replicated_metadata$Sample), drop = FALSE],
+    Metadata_Table = under_replicated_metadata,
+    sample_names_column = "Sample",
+    samples_to_include = under_replicated_metadata$Sample,
+    gene_names_column = "Gene",
+    contrast_variable_columns = "Condition",
+    contrasts = character()
+  ),
+  error = conditionMessage
+)
+stopifnot(
+  is.character(under_replicated_inference_error),
+  grepl("No contrast was supplied", under_replicated_inference_error, fixed = TRUE),
+  grepl("A=1, B=2", under_replicated_inference_error, fixed = TRUE)
+)
+
+ambiguous_metadata <- fixture$metadata
+ambiguous_metadata$Condition <- rep(c("A", "B", "C"), each = 2L)
+ambiguous_inference_error <- tryCatch(
+  omix_deg_analysis(
+    Dataset = fixture$dataset,
+    Metadata_Table = ambiguous_metadata,
+    sample_names_column = "Sample",
+    samples_to_include = ambiguous_metadata$Sample,
+    gene_names_column = "Gene",
+    contrast_variable_columns = "Condition",
+    contrasts = character(),
+    batch_effect_columns = "Batch"
+  ),
+  error = conditionMessage
+)
+stopifnot(
+  is.character(ambiguous_inference_error),
+  grepl("No contrast was supplied", ambiguous_inference_error, fixed = TRUE),
+  grepl("A=2, B=2, C=2", ambiguous_inference_error, fixed = TRUE)
+)
+
+absent_group_error <- tryCatch(
+  omix_deg_analysis(
+    Dataset = fixture$dataset,
+    Metadata_Table = fixture$metadata,
+    sample_names_column = "Sample",
+    samples_to_include = fixture$metadata$Sample,
+    gene_names_column = "Gene",
+    contrast_variable_columns = "Condition",
+    contrasts = "Missing-A",
+    batch_effect_columns = "Batch"
+  ),
+  error = conditionMessage
+)
+stopifnot(
+  is.character(absent_group_error),
+  grepl("Missing", absent_group_error, fixed = TRUE),
+  grepl("Available groups: A, B", absent_group_error, fixed = TRUE)
+)
+
 continuous_dataset <- fixture$dataset
 continuous_dataset[, fixture$metadata$Sample] <- log2(as.matrix(continuous_dataset[, fixture$metadata$Sample]) + 1)
 continuous <- omix_deg_analysis(
@@ -253,13 +368,14 @@ continuous <- omix_deg_analysis(
   samples_to_include = fixture$metadata$Sample,
   gene_names_column = "Gene",
   contrast_variable_columns = "Condition",
-  contrasts = "B-A",
+  contrasts = character(),
   analysis_mode = "harmony_mean_expression"
 )
 stopifnot(all(c("GeneName", "B-A_logFC", "B-A_pval", "B-A_adjpval") %in% colnames(continuous)))
 stopifnot(identical(attr(continuous, "omix_deg_run")$analysis_mode, "harmony_mean_expression"))
 stopifnot(identical(attr(continuous, "omix_deg_run")$normalization_method, "None"))
 stopifnot(identical(attr(continuous, "omix_deg_run")$variance_model, "ebayes"))
+stopifnot(identical(attr(continuous, "omix_deg_run")$contrast_source, "inferred"))
 stopifnot(identical(attr(continuous, "omix_deg_run")$expression_output, "input_harmony_corrected_expression"))
 stopifnot(identical(attr(continuous, "omix_deg_run")$adjusted_columns, character()))
 continuous_batch_error <- tryCatch(
@@ -285,13 +401,14 @@ sct_continuous <- omix_deg_analysis(
   samples_to_include = fixture$metadata$Sample,
   gene_names_column = "Gene",
   contrast_variable_columns = "Condition",
-  contrasts = "B-A",
+  contrasts = character(),
   analysis_mode = "sct_mean_expression"
 )
 stopifnot(identical(attr(sct_continuous, "omix_deg_run")$analysis_mode, "sct_mean_expression"))
 stopifnot(identical(attr(sct_continuous, "omix_deg_run")$variance_model, "ebayes_trend"))
 stopifnot(identical(attr(sct_continuous, "omix_deg_run")$input_matrix_type, "sctransform_mean_log2_expression"))
 stopifnot(identical(attr(sct_continuous, "omix_deg_run")$expression_output, "input_sctransform_log2_expression"))
+stopifnot(identical(attr(sct_continuous, "omix_deg_run")$contrast_source, "inferred"))
 sct_with_batch_covariate <- omix_deg_analysis(
   Dataset = continuous_dataset,
   Metadata_Table = fixture$metadata,
@@ -299,7 +416,7 @@ sct_with_batch_covariate <- omix_deg_analysis(
   samples_to_include = fixture$metadata$Sample,
   gene_names_column = "Gene",
   contrast_variable_columns = "Condition",
-  contrasts = "B-A",
+  contrasts = character(),
   covariate_columns = "Batch",
   analysis_mode = "sct_mean_expression"
 )

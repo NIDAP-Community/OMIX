@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Breaking default update: `--contrasts` is now blank by default rather than
+  `B-A`. DEG infers a deterministic comparison only when the selected model
+  data contain exactly two groups with at least two biological samples each;
+  otherwise it reports group replicate counts and requires an explicit
+  direction. Explicit contrast direction and order are unchanged. Run
+  provenance now records requested and resolved contrasts, their source,
+  original-to-model group-label mapping, and group replicate counts. Numeric
+  labels retain their original values in output columns. This advances the
+  module to 1.0.0 and interface version 3.
+
 - Corrected the continuous-expression variance model: Harmony-corrected donor
   means retain ordinary empirical Bayes, while SCTransform donor means now use
   trend-aware empirical Bayes to match canonical OMIX Limma Analysis. The run

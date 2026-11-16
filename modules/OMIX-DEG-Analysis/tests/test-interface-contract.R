@@ -34,7 +34,7 @@ cli_defaults <- sub('.*default = \"([^\"]*)\".*', "\\1", option_lines)
 names(cli_defaults) <- cli_names
 
 stopifnot(
-  identical(schema$interface_version, 2L),
+  identical(schema$interface_version, 3L),
   identical(schema$entrypoint, "scripts/run_deg_analysis.R"),
   !anyDuplicated(names(schema_controls)),
   identical(sort(names(schema_controls)), sort(cli_names))
