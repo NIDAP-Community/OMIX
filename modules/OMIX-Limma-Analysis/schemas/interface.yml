@@ -129,9 +129,9 @@ outputs:
     format: png
     description: Residual standard deviation versus average signal with a lowess trend when enough features are available.
 collection_interface:
-  interface_version: 2
+  interface_version: 3
   entrypoint: scripts/run_limma_cell_category_collection.R
-  description: Explicit selected/all cell-category pseudobulk collection interface. It runs independent donor-level M-F Limma models and writes a deterministic wide table for OMIX L2P Multi; it does not pool cells or fit a cell-category interaction model.
+  description: Explicit selected/all cell-category pseudobulk collection interface. It runs independent donor-level two-group Limma models and writes a deterministic wide table for OMIX L2P Multi; it does not pool cells or fit a cell-category interaction model.
   inputs:
     pseudobulk_collection_manifest:
       required: true
@@ -141,9 +141,8 @@ collection_interface:
   parameters:
     contrast:
       type: string
-      default: M-F
-      allowed: [M-F]
-      description: Fixed donor-level comparison. Both M and F require at least two donor-level profiles in every emitted cell category.
+      default: ""
+      description: Optional explicit two-group contrast, such as 1-0 or Treated-Control. When blank, one contrast is inferred only when exactly two groups have at least two eligible donor-level profiles in every emitted cell category. Explicit contrasts model only their named pair and record excluded groups.
     sample_names_column:
       type: string
       default: Sample
@@ -164,24 +163,24 @@ collection_interface:
       description: Optional repeated-measure donor blocking column. Supply only when a donor contributes repeated modeled profiles within each cell category.
     output_dir:
       type: path
-      default: results
+      required: true
   outputs:
     l2p_multi_input:
       path: L2P_Multi_Input.csv
       format: csv
-      description: GeneName plus ordered <stable-cell-category-id>__M-F_tstat, _pval, and _FC column families. Every emitted cell category has the exact same ordered tested-gene universe and finite required statistics.
+      description: GeneName plus ordered <stable-cell-category-id>__<resolved-contrast>_tstat, _pval, and _FC column families. Every emitted cell category has the exact same ordered tested-gene universe and finite required statistics.
     l2p_multi_input_provenance:
       path: L2P_Multi_Input_Provenance.csv
       format: csv
-      description: Ordered comparison, stable/display cell-category identity, source paths and hashes, Limma model/contrast/variance decisions, profile counts, and output path for every exported cell category.
+      description: Ordered comparison, stable/display cell-category identity, requested and resolved contrast, modeled and excluded groups, source paths and hashes, Limma model/variance decisions, profile counts, and output path for every exported cell category.
     collection_catalog:
       path: Limma_Cell_Category_Collection_Catalog.csv
       format: csv
-      description: Input pseudobulk profile eligibility and routing with the associated Limma and L2P Multi comparison paths.
+      description: Input pseudobulk profile eligibility and routing, including every group's included or excluded-not-in-contrast membership, with associated Limma and L2P Multi comparison paths.
     collection_run_summary:
       path: Limma_Cell_Category_Collection_Run_Summary.txt
       format: text
-      description: Collection source hashes, contrast, comparison order, tested-gene count, and strict common-universe statement.
+      description: Collection source hashes, requested and resolved contrast, comparison order, tested-gene count, and strict common-universe statement.
     per_cell_category_limma_bundles:
       path: cell_categories/<stable-cell-category-id>/
       format: directory

@@ -5,7 +5,14 @@ test_file <- sub("^--file=", "", test_args[grepl("^--file=", test_args)])
 module_dir <- normalizePath(file.path(dirname(test_file), ".."))
 source(file.path(module_dir, "R", "analysis_functions.R"))
 
-requested_comparisons <- c("B-A", "C-A", "B-C")
+# Cell-category collection output qualifies each original contrast with a
+# stable category ID.  These labels exercise numeric groups, ordinary words,
+# periods, and underscores through the same suffix resolver L2P Multi uses.
+requested_comparisons <- c(
+  "CT_T.CELLS__1-0",
+  "CT_MONOCYTES__TREATED-CONTROL",
+  "CT_STATE_A.B__POST_TREATMENT-PRE.TREATMENT"
+)
 
 # Use a deterministic L2P stand-in so this regression exercises both full
 # gene-list selection paths without making pathway-database contents part of
@@ -15,11 +22,10 @@ requested_comparisons <- c("B-A", "C-A", "B-C")
 l2p <- function(a, ...) {
   selected_genes <- as.character(a)
   selected_id <- selected_genes[[1L]]
-  comparison <- sub("_(UP|DOWN)_.*$", "", selected_id)
-  direction <- sub("^[^_]+_", "", selected_id)
-  direction <- sub("_.*$", "", direction)
+  comparison <- sub("_(UP|DOWN)_[0-9]+$", "", selected_id)
+  direction <- sub("^.*_(UP|DOWN)_[0-9]+$", "\\1", selected_id)
 
-  comparison_p <- c("B-A" = 0.030, "C-A" = 0.001, "B-C" = 0.010)
+  comparison_p <- stats::setNames(c(0.030, 0.001, 0.010), requested_comparisons)
   direction_offset <- if (identical(direction, "DOWN")) 0.001 else 0
   pathway_prefix <- paste0("PATH_", gsub("-", "_", comparison))
   pathway_name <- paste0(pathway_prefix, c("_ZETA", "_ALPHA"))
