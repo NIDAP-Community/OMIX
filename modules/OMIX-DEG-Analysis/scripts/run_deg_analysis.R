@@ -86,7 +86,7 @@ option_list <- list(
   make_option("--sample_names_column", type = "character", default = "Sample"),
   make_option("--samples_to_include", type = "character", default = ""),
   make_option("--contrast_variable_columns", type = "character", default = "Group"),
-  make_option("--contrasts", type = "character", default = "B-A"),
+  make_option("--contrasts", type = "character", default = "", help = "Optional comma-separated numerator-minus-denominator contrasts. When blank, infer one only when exactly two groups have at least two selected samples each [default: blank]"),
   make_option("--covariate_columns", type = "character", default = ""),
   make_option("--batch_effect_columns", type = "character", default = "auto", help = "Comma-separated technical batch columns; auto uses Batch for raw_counts only when that metadata column exists, and otherwise uses no batch term"),
   make_option("--donor_variable_column", type = "character", default = ""),
@@ -204,6 +204,11 @@ writeLines(c(
   paste("analysis mode:", run_summary$analysis_mode),
   paste("input matrix type:", run_summary$input_matrix_type),
   paste("model type:", run_summary$model_type),
+  paste("requested contrasts:", if (length(run_summary$requested_contrasts)) paste(run_summary$requested_contrasts, collapse = ",") else "<blank>"),
+  paste("resolved contrasts:", paste(run_summary$resolved_contrasts, collapse = ",")),
+  paste("contrast source:", run_summary$contrast_source),
+  paste("group label mapping:", paste0(names(run_summary$group_label_mapping), "=", unname(run_summary$group_label_mapping), collapse = ",")),
+  paste("group replicate counts:", paste0(names(run_summary$group_replicate_counts), "=", as.integer(run_summary$group_replicate_counts), collapse = ",")),
   paste(
     "variance model:",
     if (identical(run_summary$analysis_mode, "raw_counts")) "voom precision weights plus ebayes" else run_summary$variance_model

@@ -23,8 +23,10 @@
 #' @param gene_names_column Dataset column containing gene identifiers.
 #' @param contrast_variable_columns One or two metadata columns defining the
 #'   comparison groups.
-#' @param contrasts Character vector of requested contrasts, for example
-#'   `"Treatment-Control"` or `"Treatment.Responder-Control.Responder"`.
+#' @param contrasts Optional character vector of requested contrasts, for
+#'   example `"Treatment-Control"` or
+#'   `"Treatment.Responder-Control.Responder"`. When blank, infer one only
+#'   when exactly two groups have at least two selected samples each.
 #' @param covariate_columns Optional metadata columns included in the
 #'   differential-expression model as fixed effects.
 #' @param donor_variable_column Optional donor/patient metadata column. When
@@ -60,6 +62,47 @@
 #' @return A data frame with gene-level statistics followed by one downstream
 #'   expression column per selected sample. A run summary is attached in the
 #'   `omix_deg_run` attribute.
+.omix_deg_as_character <- function(values, argument, allow_empty = FALSE) {
+  values <- trimws(as.character(values))
+  values <- values[nzchar(values)]
+  if (!allow_empty && length(values) == 0L) {
+    stop(argument, " must contain at least one value.", call. = FALSE)
+  }
+  values
+}
+
+.omix_deg_group_counts <- function(groups) {
+  table(factor(as.character(groups)))
+}
+
+.omix_deg_format_group_counts <- function(group_counts) {
+  paste0(names(group_counts), "=", as.integer(group_counts), collapse = ", ")
+}
+
+.omix_deg_resolve_contrasts <- function(contrasts, group_counts) {
+  requested <- .omix_deg_as_character(contrasts, "contrasts", allow_empty = TRUE)
+  if (length(requested) > 0L) {
+    return(list(requested = requested, resolved = requested, source = "explicit"))
+  }
+
+  estimable_groups <- names(group_counts)[group_counts > 1L]
+  if (length(estimable_groups) == 2L) {
+    return(list(
+      requested = character(),
+      resolved = paste0(estimable_groups[[2L]], "-", estimable_groups[[1L]]),
+      source = "inferred"
+    ))
+  }
+
+  stop(
+    "No contrast was supplied and a single comparison cannot be inferred. ",
+    "Selected-sample group replicate counts: ", .omix_deg_format_group_counts(group_counts), ". ",
+    "Blank contrast inference requires exactly two groups with at least two samples each; ",
+    "otherwise provide an explicit contrast such as B-A.",
+    call. = FALSE
+  )
+}
+
 .omix_deg_analysis_raw_counts <- function(
   Dataset,
   Metadata_Table,
@@ -67,7 +110,7 @@
   samples_to_include,
   gene_names_column,
   contrast_variable_columns,
-  contrasts,
+  contrasts = NULL,
   covariate_columns = NULL,
   donor_variable_column = NULL,
   batch_effect_columns = NULL,
@@ -175,10 +218,17 @@
     stop("Comparison-group metadata contains missing or empty values.")
   }
 
-  contrast_terms <- unique(unlist(strsplit(as.character(contrasts), "-", fixed = TRUE)))
+  all_group_counts <- .omix_deg_group_counts(raw_groups)
+  contrast_details <- .omix_deg_resolve_contrasts(contrasts, all_group_counts)
+  contrasts <- contrast_details$resolved
+  contrast_terms <- unique(unlist(strsplit(contrasts, "-", fixed = TRUE)))
   absent_groups <- setdiff(contrast_terms, unique(raw_groups))
   if (length(absent_groups) > 0L) {
-    stop("Requested contrast group(s) absent from metadata: ", paste(absent_groups, collapse = ", "))
+    stop(
+      "Requested contrast group(s) absent from selected model samples: ", paste(absent_groups, collapse = ", "), ". ",
+      "Available groups: ", paste(names(all_group_counts), collapse = ", "), ". ",
+      "Provide an explicit numerator-minus-denominator contrast such as B-A."
+    )
   }
   include <- raw_groups %in% contrast_terms
   sample_metadata <- sample_metadata[include, , drop = FALSE]
@@ -212,7 +262,7 @@
   group_labels <- unname(group_levels[raw_groups])
   sample_metadata$.omix_group <- factor(group_labels, levels = unname(group_levels))
 
-  contrast_labels <- vapply(as.character(contrasts), function(contrast) {
+  model_contrast_labels <- vapply(contrasts, function(contrast) {
     terms <- strsplit(contrast, "-", fixed = TRUE)[[1L]]
     paste(unname(group_levels[terms]), collapse = "-")
   }, character(1))
@@ -377,7 +427,7 @@
     )
   }
 
-  contrast_matrix <- limma::makeContrasts(contrasts = contrast_labels, levels = design)
+  contrast_matrix <- limma::makeContrasts(contrasts = model_contrast_labels, levels = design)
   fit <- limma::contrasts.fit(fit, contrast_matrix)
   fit <- limma::eBayes(fit)
 
@@ -433,12 +483,12 @@
   p_values <- fit$p.value
   adjusted_p_values <- apply(p_values, 2L, stats::p.adjust, method = "BH")
 
-  colnames(fold_change) <- paste0(colnames(fold_change), "_FC")
-  colnames(log_fc) <- paste0(colnames(log_fc), "_logFC")
-  colnames(standard_error) <- paste0(colnames(standard_error), "_SE")
-  colnames(fit$t) <- paste0(colnames(fit$t), "_tstat")
-  colnames(p_values) <- paste0(colnames(p_values), "_pval")
-  colnames(adjusted_p_values) <- paste0(colnames(adjusted_p_values), "_adjpval")
+  colnames(fold_change) <- paste0(contrasts, "_FC")
+  colnames(log_fc) <- paste0(contrasts, "_logFC")
+  colnames(standard_error) <- paste0(contrasts, "_SE")
+  colnames(fit$t) <- paste0(contrasts, "_tstat")
+  colnames(p_values) <- paste0(contrasts, "_pval")
+  colnames(adjusted_p_values) <- paste0(contrasts, "_adjpval")
 
   results <- data.frame(
     GeneName = rownames(voom_expression$E),
@@ -477,6 +527,11 @@
       adjustment_columns
     )),
     modeled_covariates = model_covariates,
+    group_label_mapping = group_levels,
+    group_replicate_counts = all_group_counts,
+    requested_contrasts = contrast_details$requested,
+    resolved_contrasts = contrasts,
+    contrast_source = contrast_details$source,
     consensus_correlation = if (is.null(correlation_fit)) NULL else correlation_fit$consensus.correlation,
     normalization_diagnostic_files = unname(diagnostic_files)
   )
@@ -518,7 +573,7 @@ omix_deg_analysis <- function(
   samples_to_include,
   gene_names_column,
   contrast_variable_columns,
-  contrasts,
+  contrasts = NULL,
   covariate_columns = NULL,
   donor_variable_column = NULL,
   batch_effect_columns = NULL,
@@ -760,13 +815,18 @@ omix_deg_analysis <- function(
   if (anyNA(raw_groups) || any(raw_groups == "")) {
     stop("Comparison-group metadata contains missing or empty values.", call. = FALSE)
   }
-  if (length(contrasts) == 0L || anyNA(contrasts) || any(!nzchar(contrasts))) {
-    stop("contrasts must contain one or more non-empty comparisons.", call. = FALSE)
-  }
-  contrast_terms <- unique(unlist(strsplit(as.character(contrasts), "-", fixed = TRUE)))
+  all_group_counts <- .omix_deg_group_counts(raw_groups)
+  contrast_details <- .omix_deg_resolve_contrasts(contrasts, all_group_counts)
+  contrasts <- contrast_details$resolved
+  contrast_terms <- unique(unlist(strsplit(contrasts, "-", fixed = TRUE)))
   absent_groups <- setdiff(contrast_terms, unique(raw_groups))
   if (length(absent_groups) > 0L) {
-    stop("Requested contrast group(s) absent from metadata: ", paste(absent_groups, collapse = ", "), call. = FALSE)
+    stop(
+      "Requested contrast group(s) absent from selected model samples: ", paste(absent_groups, collapse = ", "), ". ",
+      "Available groups: ", paste(names(all_group_counts), collapse = ", "), ". ",
+      "Provide an explicit numerator-minus-denominator contrast such as B-A.",
+      call. = FALSE
+    )
   }
   include <- raw_groups %in% contrast_terms
   sample_metadata <- sample_metadata[include, , drop = FALSE]
@@ -792,7 +852,7 @@ omix_deg_analysis <- function(
   names(group_levels) <- group_levels_raw
   group_labels <- unname(group_levels[raw_groups])
   sample_metadata$.omix_group <- factor(group_labels, levels = unname(group_levels))
-  contrast_labels <- vapply(as.character(contrasts), function(contrast) {
+  model_contrast_labels <- vapply(contrasts, function(contrast) {
     terms <- strsplit(contrast, "-", fixed = TRUE)[[1L]]
     paste(unname(group_levels[terms]), collapse = "-")
   }, character(1))
@@ -862,7 +922,7 @@ omix_deg_analysis <- function(
     fit <- limma::lmFit(expression, design)
     model_type <- "continuous_linear"
   }
-  contrast_matrix <- limma::makeContrasts(contrasts = contrast_labels, levels = design)
+  contrast_matrix <- limma::makeContrasts(contrasts = model_contrast_labels, levels = design)
   fit <- limma::contrasts.fit(fit, contrast_matrix)
   fit <- limma::eBayes(fit, trend = identical(variance_model, "ebayes_trend"))
 
@@ -886,12 +946,12 @@ omix_deg_analysis <- function(
   standard_error <- sqrt(fit$s2.post) * fit$stdev.unscaled
   p_values <- fit$p.value
   adjusted_p_values <- apply(p_values, 2L, stats::p.adjust, method = "BH")
-  colnames(fold_change) <- paste0(colnames(fold_change), "_FC")
-  colnames(log_fc) <- paste0(colnames(log_fc), "_logFC")
-  colnames(standard_error) <- paste0(colnames(standard_error), "_SE")
-  colnames(fit$t) <- paste0(colnames(fit$t), "_tstat")
-  colnames(p_values) <- paste0(colnames(p_values), "_pval")
-  colnames(adjusted_p_values) <- paste0(colnames(adjusted_p_values), "_adjpval")
+  colnames(fold_change) <- paste0(contrasts, "_FC")
+  colnames(log_fc) <- paste0(contrasts, "_logFC")
+  colnames(standard_error) <- paste0(contrasts, "_SE")
+  colnames(fit$t) <- paste0(contrasts, "_tstat")
+  colnames(p_values) <- paste0(contrasts, "_pval")
+  colnames(adjusted_p_values) <- paste0(contrasts, "_adjpval")
 
   results <- data.frame(
     GeneName = rownames(expression),
@@ -921,6 +981,11 @@ omix_deg_analysis <- function(
     expression_output = expression_output,
     adjusted_columns = character(),
     modeled_covariates = covariate_columns,
+    group_label_mapping = group_levels,
+    group_replicate_counts = all_group_counts,
+    requested_contrasts = contrast_details$requested,
+    resolved_contrasts = contrasts,
+    contrast_source = contrast_details$source,
     consensus_correlation = if (is.null(correlation_fit)) NULL else correlation_fit$consensus.correlation,
     normalization_diagnostic_files = character()
   )

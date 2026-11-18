@@ -1,7 +1,7 @@
 name: omix-deg-analysis
 display_name: OMIX-DEG-Analysis
-version: 0.4.4
-interface_version: 2
+version: 1.0.0
+interface_version: 3
 module_type: differential-expression
 status: review
 owner: OMIX Team

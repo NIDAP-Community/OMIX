@@ -39,7 +39,7 @@ utils::write.csv(rsem_expected_count_table, rsem_expected_counts_path, row.names
 utils::write.csv(metadata_with_batch, metadata_with_batch_path, row.names = FALSE)
 utils::write.csv(metadata_without_batch, metadata_without_batch_path, row.names = FALSE)
 
-run_cli <- function(metadata_path, output_dir, batch_effect_columns = NULL, counts_input = counts_path) {
+run_cli <- function(metadata_path, output_dir, batch_effect_columns = NULL, counts_input = counts_path, contrasts = NULL) {
   arguments <- c(
     entrypoint,
     "--counts", counts_input,
@@ -49,6 +49,9 @@ run_cli <- function(metadata_path, output_dir, batch_effect_columns = NULL, coun
   )
   if (!is.null(batch_effect_columns)) {
     arguments <- c(arguments, "--batch_effect_columns", batch_effect_columns)
+  }
+  if (!is.null(contrasts)) {
+    arguments <- c(arguments, "--contrasts", contrasts)
   }
   output <- suppressWarnings(system2(
     file.path(R.home("bin"), "Rscript"),
@@ -67,8 +70,25 @@ stopifnot(
   identical(with_batch$status, 0L),
   file.exists(file.path(with_batch_output, "DEG_Analysis.csv")),
   file.exists(file.path(with_batch_output, "Sample_Metadata.csv")),
+  "requested contrasts: <blank>" %in% readLines(file.path(with_batch_output, "run_summary.txt")),
+  "resolved contrasts: B-A" %in% readLines(file.path(with_batch_output, "run_summary.txt")),
+  "contrast source: inferred" %in% readLines(file.path(with_batch_output, "run_summary.txt")),
   "voom trend span: 0.5" %in% readLines(file.path(with_batch_output, "run_summary.txt")),
   "voom adaptive span: false" %in% readLines(file.path(with_batch_output, "run_summary.txt"))
+)
+
+explicit_direction_output <- file.path(working_dir, "explicit-direction")
+explicit_direction <- run_cli(
+  metadata_with_batch_path,
+  explicit_direction_output,
+  contrasts = "A-B"
+)
+stopifnot(
+  identical(explicit_direction$status, 0L),
+  "requested contrasts: A-B" %in% readLines(file.path(explicit_direction_output, "run_summary.txt")),
+  "resolved contrasts: A-B" %in% readLines(file.path(explicit_direction_output, "run_summary.txt")),
+  "contrast source: explicit" %in% readLines(file.path(explicit_direction_output, "run_summary.txt")),
+  "A-B_logFC" %in% names(utils::read.csv(file.path(explicit_direction_output, "DEG_Analysis.csv"), check.names = FALSE))
 )
 
 # RSEM expected_count output is a fractional count-scale input. The public CLI

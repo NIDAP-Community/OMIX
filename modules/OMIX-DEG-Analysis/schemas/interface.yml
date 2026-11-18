@@ -1,4 +1,4 @@
-interface_version: 2
+interface_version: 3
 entrypoint: scripts/run_deg_analysis.R
 inputs:
   table:
@@ -76,8 +76,8 @@ parameters:
     cli: --contrasts
     classification: public
     type: string
-    default: B-A
-    description: Comma-separated numerator-minus-denominator contrasts in the requested output order.
+    default: ""
+    description: Optional comma-separated numerator-minus-denominator contrasts in the requested output order. When blank, one contrast is inferred only when exactly two selected-sample groups have at least two samples each. The run summary records requested and resolved contrasts, their source, original-to-model label mapping, and replicate counts.
   covariate_columns:
     cli: --covariate_columns
     classification: advanced
